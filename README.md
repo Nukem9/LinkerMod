@@ -1,2 +1,2 @@
 # LinkerMod
-Enhancements for Black Ops
+Enhancements for Black Ops' modtools
