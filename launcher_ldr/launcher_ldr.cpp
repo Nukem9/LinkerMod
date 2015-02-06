@@ -47,7 +47,9 @@ void FixCommandLine(int argc, char *argv[])
 	// If this is Black Ops, fix the fs_game variable
 	if (strstr(g_CommandLine, "BlackOps"))
 	{
-		if (StrDel(g_CommandLine, "+set fs_game mods/raw", '\0'))
+		StrDel(g_CommandLine, "+set fs_game raw", '\0');
+
+		if (StrDel(g_CommandLine, "+set fs_game dev", '\0'))
 			strcat_s(g_CommandLine, "+set fs_game raw");
 	}
 }
