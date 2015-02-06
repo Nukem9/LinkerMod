@@ -29,28 +29,39 @@ void Com_LoadBsp(const char *filename)
 	Com_Printf(0, "\n");
 	Com_Printf(0, "Com_LoadBsp(%s)\n", filename);
 
+	//
+	// Get a handle to the file
+	//
 	int bspFileHandle;
 	comBspGlob->fileSize = FS_FOpenFile(filename, &bspFileHandle);
 
 	if(!bspFileHandle)
 		Com_Error(0, "EXE_ERR_COULDNT_LOAD\x15%s", filename);
 
-	// Allocate space for the BSP
+	//
+	// Allocate space for the BSP header and read it
+	//
 	comBspGlob->header = (BspHeader *)Z_Malloc(comBspGlob->fileSize);
 
-	// Read the BSP data
 	if(FS_Read(comBspGlob->header, comBspGlob->fileSize, bspFileHandle) != comBspGlob->fileSize)
 		Com_Error(0, "EXE_ERR_COULDNT_LOAD\x15%s", filename);
 
+	//
 	// Close the BSP file handle
+	//
 	FS_FCloseFile(bspFileHandle);
 
+	//
 	// Calculate the CRC32 of the BSP data
+	//
 	comBspGlob->checksum = crc32_calculate((const char *)comBspGlob->header, comBspGlob->fileSize, 0);
 
 	Com_Printf(0, "\tSize:  %d\n", comBspGlob->fileSize);
 	Com_Printf(0, "\tCRC32: %X\n", comBspGlob->checksum);
 
+	//
+	// Did the BSP load correctly, and is it a valid version?
+	//
 	if (Com_BspError())
 	{
 		Z_Free(comBspGlob->header);
@@ -59,6 +70,9 @@ void Com_LoadBsp(const char *filename)
 		Com_Printf(0, "EXE_ERR_WRONG_MAP_VERSION_NUM\x15%s", filename);
 	}
 
+	//
+	// Mod tools assertion checks
+	//
 	ASSERT(strlen(filename) < ARRAYSIZE(comBspGlob->name));
 
 	strcpy_s(comBspGlob->name, filename);
@@ -81,6 +95,10 @@ const void *Com_LoadBspLump(const char *mapname, LumpType type, unsigned int ele
 	}
 	else
 	{
+		//
+		// Fall back to a manual disk read if the BSP isn't loaded right now
+		// TODO: UNIMPLEMENTED
+		//
 		char filename[256];
 		Com_GetBspFilename(filename, ARRAYSIZE(filename), mapname);
 

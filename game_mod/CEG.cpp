@@ -23,7 +23,7 @@ ULONG_PTR g_ImageCodeSize;
 void Patch_CEG()
 {
 	g_ImageBase		= (ULONG_PTR)GetModuleHandleA(nullptr);
-	g_ImageCodeSize = 0x9A2C00 - 0x401000;
+	g_ImageCodeSize = 0x5A1C00;
 	g_ImageEnd		= g_ImageBase + g_ImageCodeSize;
 
 	g_MemoryBuffer = VirtualAlloc(nullptr, g_ImageCodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
@@ -36,77 +36,6 @@ void Patch_CEG()
 	Detours::X86::DetourFunction((PBYTE)0x967760, (PBYTE)&hk_memcpy);
 	Detours::X86::DetourFunction((PBYTE)0x8EF04F, (PBYTE)&hk_inline_memcpy);
 	Detours::X86::DetourFunction((PBYTE)0x8EF168, (PBYTE)&hk_inline_memcpy2);
-}
-
-BOOL DataCompare(const BYTE *pData, const BYTE *bMask, const char *szMask)
-{
-	while (*szMask)
-	{
-		if (*szMask == 'x' && *pData != *bMask)
-			return FALSE;
-
-		++szMask;
-		++bMask;
-		++pData;
-	}
-
-	return *szMask == 0;
-}
-
-DWORD FindPattern(DWORD dwAddress, DWORD dwEnd, PBYTE pbMask, char *szMask)
-{
-	if (pbMask && szMask)
-	{
-		for (DWORD i = dwAddress; i < dwEnd; i++)
-		{
-			if (DataCompare((PBYTE)i, pbMask, szMask))
-				return i;
-		}
-	}
-
-	return 0;
-}
-
-void Enumerate(bool(__cdecl * pfnCallback)(DWORD address), PBYTE pbMask, char *szMask)
-{
-	DWORD dwCurAddress = g_ImageBase;
-
-	while (1)
-	{
-		dwCurAddress = FindPattern(dwCurAddress, g_ImageEnd, pbMask, szMask);
-
-		if (!dwCurAddress || !pfnCallback(dwCurAddress))
-			break;
-
-		dwCurAddress++;
-	}
-}
-
-void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size);
-void RunCegTests()
-{
-	auto ceglog = [](DWORD addr)
-	{
-		//if (addr == 0x402420)
-		//	return true;
-
-		if (addr % 0x10 != 0)
-			return false;
-
-		//PatchMemory(addr, (PBYTE)"\xCC", 1);
-		//char buf[128];
-		//sprintf_s(buf, "0x%x", addr);
-		//MessageBoxA(nullptr, "", "", 0);
-
-		//DWORD val = ((DWORD(__cdecl *)())addr)();
-
-		//sprintf_s(buf, "0x%x - 0x%x", addr, val);
-		//MessageBoxA(nullptr, buf, "", 0);
-		return true;
-	};
-
-	Enumerate(ceglog, (PBYTE)"\xE8\x00\x00\x00\x00\xFF\xE0", "x????xx");
-	MessageBoxA(nullptr, "", "", 0);
 }
 
 DWORD __declspec(noinline) GetNewAddress(DWORD dwOld)

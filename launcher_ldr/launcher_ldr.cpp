@@ -65,12 +65,18 @@ void FixDirectory(int argc, char *argv[])
 	char *filePart = nullptr;
 	GetFullPathNameA(temp, ARRAYSIZE(temp), g_ExeDirectory, &filePart);
 
+	//
+	// Trim off the file name
+	//
 	if (filePart)
 		*filePart = '\0';
 }
 
 int main(int argc, char *argv[])
 {
+	//
+	// Disable STDOUT buffering
+	//
 	setbuf(stdout, NULL);
 
 	if (argc < 3)
@@ -111,7 +117,10 @@ int main(int argc, char *argv[])
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli;
 		memset(&jeli, 0, sizeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
 
+		//
 		// Configure all child processes associated with the job to terminate when the
+		// parent process does
+		//
 		jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 		if (0 == SetInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
 		{

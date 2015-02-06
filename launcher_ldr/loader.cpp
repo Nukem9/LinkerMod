@@ -2,6 +2,9 @@
 
 LPVOID GetLoadLibraryAddr()
 {
+	//
+	// TODO: Remote kernel32.dll address can change
+	//
 	HMODULE hMod = GetModuleHandleA("kernel32.dll");
 
 	return (LPVOID)GetProcAddress(hMod, "LoadLibraryA");
