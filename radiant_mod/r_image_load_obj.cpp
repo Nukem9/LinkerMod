@@ -1,5 +1,16 @@
 #include "stdafx.h"
 
+void Image_UploadData(GfxImage *image, _D3DFORMAT format, _D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
+{
+  if ( image->mapType != 5 || !mipLevel || *(char*)0xA857857 )
+  {
+    if ( image->mapType == 4 )
+      Image_Upload3D_CopyData_PC(image, format, mipLevel, src);
+    else
+      Image_Upload2D_CopyData_PC(image, format, face, mipLevel, src);
+  }
+}
+
 bool Image_ValidateHeader(GfxImageFileHeader *imageFile, const char *filepath)
 {
 	//
