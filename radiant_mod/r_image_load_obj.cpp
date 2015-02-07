@@ -108,26 +108,27 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 		//
 		// Use streamed mipmaps if possible
 		//
-		streamedMipLevels = Image_GetPcStreamedMips(&fileHeader);
-		image->streaming = streamedMipLevels > 0;
+		streamedMipLevels	= Image_GetPcStreamedMips(&fileHeader);
+		char streaming		= streamedMipLevels > 0;
+		//image->streaming	= streamedMipLevels > 0;
 
-		if (!image->streaming /*|| loadHighmip*/)
+		if (streaming /*|| loadHighmip*/)
 		{
-			image->skippedMipLevels = 0;
-			streamedMipLevels = 0;
+			//image->skippedMipLevels = 0;
+			streamedMipLevels		= 0;
 		}
 		else
 		{
-			fileHeader.dimensions[0] >>= streamedMipLevels;
-			fileHeader.dimensions[1] >>= streamedMipLevels;
-			image->skippedMipLevels = streamedMipLevels;
+			fileHeader.dimensions[0]	>>= streamedMipLevels;
+			fileHeader.dimensions[1]	>>= streamedMipLevels;
+			//image->skippedMipLevels		= streamedMipLevels;
 		}
 
 		//
 		// Upload the raw data into a DirectX buffer
 		//
-		image->loadedSize	= fileHeader.fileSizeForPicmip[streamedMipLevels] - 48;
-		image->baseSize		= fileHeader.fileSizeForPicmip[0] - 48;
+		//image->loadedSize	= fileHeader.fileSizeForPicmip[streamedMipLevels] - 48;
+		//image->baseSize		= fileHeader.fileSizeForPicmip[0] - 48;
 
 		Image_LoadFromData(image, &fileHeader, imageData, 2);
 		Z_Free(imageData);
@@ -151,8 +152,8 @@ void Image_PrintTruncatedFileError(const char *filepath)
 
 void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *srcData, unsigned int allocFlags)
 {
-	image->loadedSize	= fileHeader->fileSizeForPicmip[image->skippedMipLevels] - 48;
-	image->baseSize		= fileHeader->fileSizeForPicmip[0] - 48;
+	//image->loadedSize	= fileHeader->fileSizeForPicmip[image->skippedMipLevels] - 48;
+	//image->baseSize	= fileHeader->fileSizeForPicmip[0] - 48;
 	image->texture.ptr	= 0;
 
 	switch (fileHeader->format)
@@ -395,8 +396,8 @@ unsigned int Image_CountMipmaps(unsigned int imageFlags, unsigned int width, uns
 	if (imageFlags & 2)
 		return 1;
 
-	unsigned int mipCount = 1;
-	unsigned int mipRes = 1;
+	unsigned int mipCount	= 1;
+	unsigned int mipRes		= 1;
 
 	while (mipRes < width || mipRes < height || mipRes < depth)
 	{
@@ -414,7 +415,7 @@ char Image_GetPcStreamedMips(GfxImageFileHeader *fileHeader)
 		if (fileHeader->flags & 0xC)
 			return false;
 
-		char streamedMipLevels = 0;
+		char streamedMipLevels	= 0;
 		signed int minDimension = 0;
 
 		if (fileHeader->dimensions[1] < fileHeader->dimensions[0])

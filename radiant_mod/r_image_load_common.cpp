@@ -83,3 +83,34 @@ void Image_Setup(GfxImage *image, int width, int height, int depth, unsigned int
 	((void(__cdecl *)(GfxImage *, int, int, int, unsigned int, D3DFORMAT))0x56AC60)
 		(image, width, height, depth, imageFlags, imageFormat);
 }
+
+void Image_Upload2D_CopyData_PC(GfxImage *image, D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
+{
+	static DWORD dwCall = 0x56A6A0;
+
+	__asm
+	{
+		push src
+		push face
+		push format
+		mov edi, mipLevel
+		mov eax, image
+		call [dwCall]
+		add esp, 0xC
+	}
+}
+
+void Image_Upload3D_CopyData_PC(GfxImage *image, D3DFORMAT format, unsigned int mipLevel, const char *src)
+{
+	static DWORD dwCall = 0x56A8F0;
+
+	__asm
+	{
+		push mipLevel
+		push format
+		push image
+		mov eax, src
+		call [dwCall]
+		add esp, 0xC
+	}
+}
