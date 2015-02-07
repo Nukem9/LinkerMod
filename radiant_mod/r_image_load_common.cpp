@@ -6,9 +6,14 @@ void Image_GetPicmip(GfxImage *image, Picmip *picmip)
 	ASSERT(picmip);
 
 	if (image->noPicmip)
-		*&picmip->platform[0] = 0;
+	{
+		picmip->platform[0] = 0;
+		picmip->platform[1] = 0;
+	}
 	else
+	{
 		Image_PicmipForSemantic(image->semantic, picmip);
+	}
 }
 
 void Image_PicmipForSemantic(char semantic, Picmip *picmip)
@@ -22,7 +27,8 @@ void Image_PicmipForSemantic(char semantic, Picmip *picmip)
 
 	case 0:
 	case 1:
-		*&picmip->platform[0] = 0;
+		picmip->platform[0] = 0;
+		picmip->platform[1] = 0;
 		return;
 
 	case 2:
