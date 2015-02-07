@@ -11,15 +11,30 @@ enum MapType
 	MAPTYPE_COUNT = 0x6,
 };
 
+enum ImageCategory
+{
+	IMG_CATEGORY_UNKNOWN = 0x0,
+	IMG_CATEGORY_AUTO_GENERATED = 0x1,
+	IMG_CATEGORY_LIGHTMAP = 0x2,
+	IMG_CATEGORY_LOAD_FROM_FILE = 0x3,
+	IMG_CATEGORY_RAW = 0x4,
+	IMG_CATEGORY_FIRST_UNMANAGED = 0x5,
+	IMG_CATEGORY_WATER = 0x5,
+	IMG_CATEGORY_RENDERTARGET = 0x6,
+	IMG_CATEGORY_TEMP = 0x7,
+};
+
 struct Picmip
 {
 	char platform[2];
 };
+static_assert(sizeof(Picmip) == 2, "Invalid Picmip size!");
 
 struct CardMemory
 {
 	int platform[2];
 };
+static_assert(sizeof(CardMemory) == 8, "Invalid CardMemory size!");
 
 struct GfxImageFileHeader
 {
@@ -37,6 +52,7 @@ union GfxTexture
 {
 	int *ptr;
 };
+static_assert(sizeof(GfxTexture) == 4, "Invalid GfxTexture size!");
 
 struct GfxImage
 {
@@ -46,19 +62,19 @@ struct GfxImage
 	bool noPicmip;			// OK 10
 	char semantic;			// OK 11
 	char track;				// OK 12
-
-	char unk2[3];	// -- 12
-
+	char unk1[3];	// -- 12
 	CardMemory cardMemory;	// OK 16
 	unsigned short width;	// OK 24
 	unsigned short height;	// OK 26
 	unsigned short depth;	// OK 28
 	char category;			// OK 30
-	char _pad[1];	// -- 31
+	char unk2[1];	// -- 31
 	const char *name;		// OK 32
 };
+static_assert(sizeof(GfxImage) == 36, "Invalid GfxImage size!");
+
 /*
-struct GfxImage
+struct GfxImage_BO
 {
 	GfxTexture texture;
 	char mapType;
@@ -82,7 +98,6 @@ struct GfxImage
 	unsigned int hash;
 };
 */
-static_assert(sizeof(GfxImage) == 0x24, "Invalid size for GfxImage");
 
 void Image_GetPicmip(GfxImage *image, Picmip *picmip);
 void Image_PicmipForSemantic(char semantic, Picmip *picmip);

@@ -23,7 +23,7 @@ bool Image_ValidateHeader(GfxImageFileHeader *imageFile, const char *filepath)
 
 bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(const char *, int *))
 {
-	ASSERT(image->category == 3 /*IMG_CATEGORY_LOAD_FROM_FILE*/);
+	ASSERT(image->category == IMG_CATEGORY_LOAD_FROM_FILE);
 	ASSERT(!image->texture.ptr);
 
 	//
@@ -98,8 +98,8 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 	int picmip				= image->picmip.platform[/*useFastFile->current.enabled == 0*/0];
 	char streamedMipLevels	= picmip > 0;
 
-	int readSize	= fileHeader.fileSizeForPicmip[picmip > 0] - 48;
-	char *imageData = (char *)Z_Malloc(readSize);
+	int readSize			= fileHeader.fileSizeForPicmip[picmip > 0] - 48;
+	char *imageData			= (char *)Z_Malloc(readSize);
 
 	if (FS_Read(imageData, readSize, fileHandle) == readSize)
 	{
@@ -208,9 +208,9 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 
 void Image_UploadData(GfxImage *image, _D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
 {
-	if (image->mapType != 5 || !mipLevel || *(char *)0x13ACAD6)
+	if (image->mapType != MAPTYPE_CUBE || !mipLevel || *(char *)0x13ACAD6)
 	{
-		if (image->mapType == 4)
+		if (image->mapType == MAPTYPE_3D)
 			Image_Upload3D_CopyData_PC(image, format, mipLevel, src);
 		else
 			Image_Upload2D_CopyData_PC(image, format, face, mipLevel, src);
@@ -219,15 +219,15 @@ void Image_UploadData(GfxImage *image, _D3DFORMAT format, D3DCUBEMAP_FACES face,
 
 void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *data, D3DFORMAT format, int bytesPerPixel, int allocFlags)
 {
-	signed int faceCount; // [sp+30h] [bp-18h]@11
-
 	ASSERT(image);
 	ASSERT(fileHeader);
 	ASSERT(data);
 
 	Image_SetupFromFile(image, fileHeader, format, allocFlags);
 
-	if (image->mapType == 5)
+	signed int faceCount;
+
+	if (image->mapType == MAPTYPE_CUBE)
 		faceCount = 6;
 	else
 		faceCount = 1;
@@ -289,7 +289,6 @@ void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *dat
 
 void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char *data, D3DFORMAT format, int bytesPerBlock, unsigned int allocFlags)
 {
-	signed int faceCount; // [sp+2Ch] [bp-8h]@17
 
 	ASSERT(image);
 	ASSERT(fileHeader);
@@ -301,7 +300,9 @@ void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char 
 
 	Image_SetupFromFile(image, fileHeader, format, allocFlags);
 
-	if (image->mapType == 5)
+	signed int faceCount;
+
+	if (image->mapType == MAPTYPE_CUBE)
 		faceCount = 6;
 	else
 		faceCount = 1;
