@@ -71,9 +71,15 @@ void Image_PicmipForSemantic(char semantic, Picmip *picmip)
 	picmip->platform[0] = picmipUsed;
 }
 
-unsigned int Image_CubemapFace(unsigned int faceIndex)
+D3DCUBEMAP_FACES Image_CubemapFace(unsigned int faceIndex)
 {
 	ASSERT(faceIndex < 6);
 
-	return faceIndex;
+	return (D3DCUBEMAP_FACES)faceIndex;
+}
+
+void Image_Setup(GfxImage *image, int width, int height, int depth, unsigned int imageFlags, D3DFORMAT imageFormat)
+{
+	((void(__cdecl *)(GfxImage *, int, int, int, unsigned int, D3DFORMAT))0x56AC60)
+		(image, width, height, depth, imageFlags, imageFormat);
 }

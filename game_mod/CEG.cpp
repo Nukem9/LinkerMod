@@ -22,7 +22,7 @@ ULONG_PTR g_ImageCodeSize;
 
 void Patch_CEG()
 {
-	g_ImageBase		= (ULONG_PTR)GetModuleHandleA(nullptr);
+	g_ImageBase		= (ULONG_PTR)GetModuleHandle(nullptr);
 	g_ImageCodeSize = 0x5A1C00;
 	g_ImageEnd		= g_ImageBase + g_ImageCodeSize;
 
