@@ -9,7 +9,7 @@
 #include "detours/Typedef.h"
 #include "detours/Detours.h"
 
-#define ASSERT(x)
+#include "assertdef.h"
 
 #include "d3dtypes.h"
 #include "T5.h"

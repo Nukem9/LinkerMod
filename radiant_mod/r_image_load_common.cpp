@@ -2,8 +2,8 @@
 
 void Image_GetPicmip(GfxImage *image, Picmip *picmip)
 {
-	ASSERT(image);
-	ASSERT(picmip);
+	ASSERT(image != nullptr);
+	ASSERT(picmip != nullptr);
 
 	if (image->noPicmip)
 	{

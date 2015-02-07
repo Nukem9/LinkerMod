@@ -33,6 +33,9 @@
     <ClInclude Include="r_image_load_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="assertdef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -42,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="r_image_load_common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="assertdef.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

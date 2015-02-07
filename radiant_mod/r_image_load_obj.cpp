@@ -40,6 +40,7 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 	// Get a handle to the file
 	//
 	int fileHandle;
+	strcpy_s(filepath, "images/default.iwi");
 	int fileSize = OpenFileRead(filepath, &fileHandle);
 
 	if (fileSize == -1)
@@ -201,6 +202,7 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 		Image_LoadDxtc(image, fileHeader, srcData, D3DFMT_A16B16G16R16F, 128, allocFlags);
 		break;
 	default:
+		printf("Case - %d\n", fileHeader->format);
 		ASSERT(false && "Unhandled case");
 		break;
 	}
@@ -208,6 +210,8 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 
 void Image_UploadData(GfxImage *image, _D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
 {
+	printf("%s START\n", image->name);
+
 	if (image->mapType != MAPTYPE_CUBE || !mipLevel || *(char *)0x13ACAD6)
 	{
 		if (image->mapType == MAPTYPE_3D)
@@ -215,13 +219,15 @@ void Image_UploadData(GfxImage *image, _D3DFORMAT format, D3DCUBEMAP_FACES face,
 		else
 			Image_Upload2D_CopyData_PC(image, format, face, mipLevel, src);
 	}
+
+	printf("END\n");
 }
 
 void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *data, D3DFORMAT format, int bytesPerPixel, int allocFlags)
 {
-	ASSERT(image);
-	ASSERT(fileHeader);
-	ASSERT(data);
+	ASSERT(image != nullptr);
+	ASSERT(fileHeader != nullptr);
+	ASSERT(data != nullptr);
 
 	Image_SetupFromFile(image, fileHeader, format, allocFlags);
 
@@ -289,10 +295,9 @@ void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *dat
 
 void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char *data, D3DFORMAT format, int bytesPerBlock, unsigned int allocFlags)
 {
-
-	ASSERT(image);
-	ASSERT(fileHeader);
-	ASSERT(data);
+	ASSERT(image != nullptr);
+	ASSERT(fileHeader != nullptr);
+	ASSERT(data != nullptr);
 	ASSERT(format == 113
 		|| format == '1TXD'
 		|| format == '3TXD'
@@ -335,8 +340,8 @@ void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char 
 
 void Image_ExpandBgr(const char *src, unsigned int count, char *dst)
 {
-	ASSERT(src);
-	ASSERT(dst);
+	ASSERT(src != nullptr);
+	ASSERT(dst != nullptr);
 	ASSERT(count > 0);
 
 	do
@@ -355,8 +360,8 @@ void Image_ExpandBgr(const char *src, unsigned int count, char *dst)
 
 void Image_SetupFromFile(GfxImage *image, GfxImageFileHeader *fileHeader, D3DFORMAT imageFormat, unsigned int allocFlags)
 {
-	ASSERT(image);
-	ASSERT(fileHeader);
+	ASSERT(image != nullptr);
+	ASSERT(fileHeader != nullptr);
 
 	int depth;
 	int height;

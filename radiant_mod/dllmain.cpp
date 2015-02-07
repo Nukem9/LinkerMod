@@ -18,6 +18,21 @@ BOOL RadiantMod_Init()
 	printf("----> Loading radiant mod\n");
 	fflush(stdout);
 
+	//
+	// Create an external console for Radiant
+	//
+	if (AllocConsole())
+	{
+		freopen("CONOUT$", "w", stdout);
+		freopen("CONOUT$", "w", stderr);
+		freopen("CONIN$", "r", stdin);
+	}
+
+	//
+	// Hook any needed functions
+	//
+	Detours::X86::DetourFunction((PBYTE)0x5675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
+
 	return TRUE;
 }
 
