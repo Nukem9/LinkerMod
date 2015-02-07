@@ -53,4 +53,5 @@ struct GfxImage
 
 void Image_GetPicmip(GfxImage *image, Picmip *picmip);
 void Image_PicmipForSemantic(char semantic, Picmip *picmip);
-unsigned int Image_CubemapFace(unsigned int faceIndex);
+D3DCUBEMAP_FACES Image_CubemapFace(unsigned int faceIndex);
+void Image_Setup(GfxImage *image, int width, int height, int depth, unsigned int imageFlags, D3DFORMAT imageFormat);
