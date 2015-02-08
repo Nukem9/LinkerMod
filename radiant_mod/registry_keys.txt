@@ -1,0 +1,6 @@
+These Registry Paths Appear to Be Used by CoDWaWRadiant
+All keys appear to exist within: "Software\iw\CoDWaWRadiantModTool\"
+
+Software\iw\CoDWaWRadiantModTool\CoDWaWRadiantModTool
+Software\iw\CoDWaWRadiantModTool\IniPrefs
+Software\iw\CoDWaWRadiantModTool\MRU
