@@ -21,6 +21,19 @@ void FixupFunction(ULONG_PTR Address, ULONG_PTR CEGEaxAddress)
 	PatchMemory(Address + 1, (PBYTE)&data, 4);
 }
 
+void strcpy_safe(char *Dest, const char *Src)
+{
+	size_t srcLen = strlen(Src);
+	size_t dstLen = strlen(Dest);
+
+	ASSERT(srcLen <= dstLen);
+
+	DWORD d;
+	VirtualProtect(Dest, srcLen, PAGE_EXECUTE_READWRITE, &d);
+	strcpy_s(Dest, dstLen, Src);
+	VirtualProtect(Dest, srcLen, d, &d);
+}
+
 void __declspec(naked) hk_Com_Printf()
 {
 	__asm
@@ -61,15 +74,15 @@ BOOL RadiantMod_Init()
 	//
 	// Hook any needed functions
 	//
-	DetourFunction((PBYTE)0x5675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
-	Detours::X86::FixupFunction(0x4683F0, (ULONG_PTR)&hk_Com_Printf);
+	Detours::X86::DetourFunction((PBYTE)0x5675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
+	FixupFunction(0x4683F0, (ULONG_PTR)&hk_Com_Printf);
 
 	//
 	// FixRegistryEntries to prevent collision with CoDWAWRadiant - DEV
 	//
-	strcpy((char*)0x006F8688,"Software\iw\CoDBORadiantModTool\CoDBORadiantModTool");
-	strcpy((char*)0x006F0CD0,"Software\iw\CoDBORadiantModTool\IniPrefs");
-	strcpy((char*)0x006EC300,"Software\iw\CoDBORadiantModTool\MRU");
+	strcpy_safe((char *)0x006F8688, "Software\\iw\\CoDBORadiantModTool\\CoDBORadiantModTool");
+	strcpy_safe((char *)0x006F0CD0, "Software\\iw\\CoDBORadiantModTool\\IniPrefs");
+	strcpy_safe((char *)0x006EC300, "Software\\iw\\CoDBORadiantModTool\\MRU");
 
 	return TRUE;
 }
