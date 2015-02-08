@@ -298,10 +298,7 @@ void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char 
 	ASSERT(image != nullptr);
 	ASSERT(fileHeader != nullptr);
 	ASSERT(data != nullptr);
-	ASSERT(format == 113
-		|| format == '1TXD'
-		|| format == '3TXD'
-		|| format == '5TXD');
+	ASSERT(format == D3DFMT_A16B16G16R16F || format == D3DFMT_DXT1 || format == D3DFMT_DXT3 || format == D3DFMT_DXT5);
 
 	Image_SetupFromFile(image, fileHeader, format, allocFlags);
 
@@ -312,8 +309,8 @@ void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char 
 	else
 		faceCount = 1;
 	
-	int mipcount = Image_CountMipmapsForFile(fileHeader);
-	int picmip = image->picmip.platform[/*useFastFile->current.enabled == 0*/0];
+	int mipcount	= Image_CountMipmapsForFile(fileHeader);
+	int picmip		= image->picmip.platform[/*useFastFile->current.enabled == 0*/0];
 
 	for (int mipLevel = mipcount - 1; mipLevel >= picmip; --mipLevel)
 	{
