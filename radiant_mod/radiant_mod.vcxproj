@@ -80,6 +80,8 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="r_image_load_common.cpp" />
     <ClCompile Include="r_image_load_obj.cpp" />
+    <ClCompile Include="r_material_load_obj.cpp" />
+    <ClCompile Include="r_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assertdef.h" />
@@ -88,6 +90,8 @@
     <ClInclude Include="detours\Typedef.h" />
     <ClInclude Include="r_image_load_common.h" />
     <ClInclude Include="r_image_load_obj.h" />
+    <ClInclude Include="r_material_load_obj.h" />
+    <ClInclude Include="r_utils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />
   </ItemGroup>
