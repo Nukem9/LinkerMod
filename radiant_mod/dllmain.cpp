@@ -83,6 +83,15 @@ BOOL RadiantMod_Init()
 	strcpy_safe((char *)0x006F8688, "Software\\iw\\CoDBORadiantModTool\\CoDBORadiantModTool");
 	strcpy_safe((char *)0x006F0CD0, "Software\\iw\\CoDBORadiantModTool\\IniPrefs");
 	strcpy_safe((char *)0x006EC300, "Software\\iw\\CoDBORadiantModTool\\MRU");
+	strcpy_safe((char *)0x006F0D08, "iw\\CoDBORadiantModTool");
+
+	//
+	// More BO Radiant re-branding of names
+	//
+	strcpy_safe((char *)0x006F7984, "CoDBORadiantModTool");
+	strcpy_safe((char *)0x006ECA30, "You will need to restart CoDBORadiantModTool for the view changes to take place.");
+	strcpy_safe((char *)0x006EC5CC, "CoDBORadiantModTool Project files( *.prj )|*.prj||");
+	strcpy_safe((char *)0x00749640, "CoDBORadiantModTool Project (*.prj)");
 
 	return TRUE;
 }
