@@ -22,7 +22,6 @@ FILE *Material_OpenShader_BlackOps(const char *shaderName, const char *shaderVer
 		shaderVersion,
 		shaderName);
 
-	printf("BO SHADER: %s\n", shaderPath);
 	return fopen(shaderPath, "rb");
 }
 
@@ -43,7 +42,6 @@ FILE *Material_OpenShader_WAW(const char *shaderName, const char *shaderVersion)
 		shaderVersion,
 		R_HashAssetName(shaderString));
 
-	printf("WAW SHADER: %s %s\n", shaderString, shaderPath);
 	return fopen(shaderPath, "rb");
 }
 
@@ -58,7 +56,7 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 	if (shaderFile)
 	{
 		//
-		// Skip the first 4 bytes
+		// Skip the first 4 bytes (zeros)
 		//
 		fpos_t pos = 4;
 		fsetpos(shaderFile, &pos);
@@ -77,8 +75,7 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 		//
 		// Load the WAW version if it wasn't found
 		//
-		if (!shaderFile)
-			shaderFile = Material_OpenShader_WAW(shaderName, shaderVersion);
+		shaderFile = Material_OpenShader_WAW(shaderName, shaderVersion);
 
 		if (!shaderFile)
 			return 0;
