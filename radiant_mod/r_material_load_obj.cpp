@@ -235,6 +235,9 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 {
 	char techType[130];
 
+	//
+	// Create a file path using normal techsets and read data
+	//
 	char filename[MAX_PATH];
 	Com_sprintf(filename, MAX_PATH, "techsets/%s.techset", name);
 
@@ -243,8 +246,17 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 
 	if (fileSize < 0)
 	{
-		Com_PrintError(8, "^1ERROR: Couldn't open techniqueSet '%s'\n", filename);
-		return nullptr;
+		//
+		// Try loading with PIMP enabled
+		//
+		Com_sprintf(filename, MAX_PATH, "pimp/techsets/%s.techset", name);
+		fileSize = FS_ReadFile(filename, (void **)&fileData);
+
+		if (fileSize < 0)
+		{
+			Com_PrintError(8, "^1ERROR: Couldn't open techniqueSet '%s'\n", filename);
+			return nullptr;
+		}
 	}
 
 	const char *textData = (const char *)fileData;
