@@ -86,6 +86,16 @@ D3DCUBEMAP_FACES Image_CubemapFace(unsigned int faceIndex)
 
 void Image_Setup(GfxImage *image, int width, int height, int depth, unsigned int imageFlags, D3DFORMAT imageFormat)
 {
+	switch (imageFlags)
+	{
+	case -64:
+	case -61:
+	case -112:
+	case -48:
+		imageFlags = 0;
+		break;
+	}
+
 	((void(__cdecl *)(GfxImage *, int, int, int, unsigned int, D3DFORMAT))0x56AC60)
 		(image, width, height, depth, imageFlags, imageFormat);
 }
