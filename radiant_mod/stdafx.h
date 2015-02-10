@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <intrin.h>
 
+#define SRCLINE(x)
+
 #pragma comment(lib, "detours/Detours.lib")
 #include "detours/Typedef.h"
 #include "detours/Detours.h"
@@ -13,6 +15,7 @@
 
 #include "d3dtypes.h"
 #include "T5.h"
+#include "q_parse.h"
 #include "com_files.h"
 #include "r_utils.h"
 #include "r_material_load_obj.h"

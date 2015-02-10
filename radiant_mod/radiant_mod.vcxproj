@@ -78,6 +78,7 @@
   <ItemGroup>
     <ClCompile Include="assertdef.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="q_parse.cpp" />
     <ClCompile Include="r_image_load_common.cpp" />
     <ClCompile Include="r_image_load_obj.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
@@ -88,6 +89,7 @@
     <ClInclude Include="com_files.h" />
     <ClInclude Include="detours\Detours.h" />
     <ClInclude Include="detours\Typedef.h" />
+    <ClInclude Include="q_parse.h" />
     <ClInclude Include="r_image_load_common.h" />
     <ClInclude Include="r_image_load_obj.h" />
     <ClInclude Include="r_material_load_obj.h" />
