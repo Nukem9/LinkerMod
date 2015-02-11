@@ -1,5 +1,4 @@
 //TODO: Rewrite / Clean Code
-//Use any arg to overwrite currently existant exported files
 
 #include <Windows.h>
 #include <TlHelp32.h>
@@ -107,6 +106,13 @@ struct TechsetTechniqueInfo
 	std::vector<int> TechTypes;
 };
 
+struct TechniqueInfo
+{
+	std::string name;
+	std::string vsName;
+	std::string psName;
+};
+
 #include <fstream>
 void ListAssetPtrs()
 {
@@ -121,6 +127,7 @@ void ListAssetPtrs()
 
 	CreateDirectory(L"shader_out",NULL);
 	CreateDirectory(L"techset_out",NULL);
+	CreateDirectory(L"techniques_out",NULL);
 
 	do
 	{
@@ -168,13 +175,44 @@ void ListAssetPtrs()
 							if(techset.techniques[i])
 							{
 								MaterialTechnique tech;
+								
 								ReadProcessMemory(hProcess,techset.techniques[i],&tech,sizeof(tech),&numofbytesread);
 								char tech_name[256];
 								ReadProcessMemory(hProcess,tech.name,&tech_name,256,&numofbytesread);
 
+								//if(/*strcmp(tech_name,"pimp_technique_trivial_7ecdac33")*/0 == 0)
+								//{
+								//	//printf("pimp_technique_trivial_7ecdac33 %d,%d,%d\a\n",tech.passArray[0].perObjArgCount,tech.passArray[0].perPrimArgCount,tech.passArray[0].stableArgCount);
+								//	for(int passIndex = 0; passIndex < tech.passCount; passIndex++)
+								//	{
+								//		int argCount = tech.passArray[passIndex].stableArgCount +  tech.passArray[passIndex].perObjArgCount + tech.passArray[passIndex].perPrimArgCount;
+
+								//		MaterialShaderArgument* args = new MaterialShaderArgument[argCount];
+								//		ReadProcessMemory(hProcess,tech.passArray[passIndex].___u7.localArgs,args,sizeof(MaterialShaderArgument)*argCount,&numofbytesread);
+								//		for(int a = 0; a < argCount; a++)
+								//		{
+								//			if(Material_HasConstant(&mat,args[a].u.codeSampler,hProcess))
+								//			{
+								//				//printf("Arg [%d]:	type: %d\n",a,args[a]);//tech.passArray[passIndex].___u7.localArgs[a].type);
+								//			
+								//			
+								//				printf("%s\n",Material_StringFromHash(args[a].u.codeSampler,hProcess).c_str());
+								//			}
+								//		}
+								//	}
+								//	//Sleep(4500);
+								//}
+
+
+								if(tech.passCount != 1)
+									printf("PassCount: %d\a\n",tech.passCount);
+
+								//tech.passArray[0].perObjArgCount //possibly the ones that are per shader
+								//tech.passArray[0].primArgCount //possibly the ones that are per technique
+
 								std::string technique_key = tech_name;
 
-								int c = 0;
+								DWORD c = 0;
 								for(c = 0; c < TechsetData.size(); c++)
 								{
 									if(technique_key == TechsetData[c].techniqueName)
@@ -197,6 +235,8 @@ void ListAssetPtrs()
 								{
 									techniqueConflictCheck[technique_key] = true;
 
+									TechniqueInfo techniqueData;
+									techniqueData.name = technique_key;
 									//printf("Technique:	%s\n",tech_name);
 
 									//Do Vertex Shader
@@ -204,6 +244,7 @@ void ListAssetPtrs()
 									ReadProcessMemory(hProcess,tech.passArray[0].vertexShader,&vs,sizeof(vs),&numofbytesread);
 									char vs_name[256];
 									ReadProcessMemory(hProcess,vs.name,&vs_name,256,&numofbytesread);
+									techniqueData.vsName = vs_name;
 
 									std::string vs_key = vs_name;
 									if(!vsConflictCheck.count(vs_key))
@@ -239,6 +280,7 @@ void ListAssetPtrs()
 									ReadProcessMemory(hProcess,tech.passArray[0].___u2.pixelShader,&ps,sizeof(ps),&numofbytesread);
 									char ps_name[256];
 									ReadProcessMemory(hProcess,ps.name,&ps_name,256,&numofbytesread);
+									techniqueData.psName = ps_name;
 
 									std::string ps_key = ps_name;
 									if(!psConflictCheck.count(ps_key))
@@ -261,12 +303,36 @@ void ListAssetPtrs()
 											DWORD NULL_DATA = 0;
 											ofile.write((char*)&NULL_DATA,sizeof(DWORD));
 											ofile.write((char*)&shaderSize,sizeof(unsigned __int16));
-											ofile.write((char*)&NULL_DATA,sizeof(unsigned __int16));
-								
 											ofile.write((char*)shader_data,shaderSize);
 											ofile.close();
+											
+								
 											delete[] shader_data;
 										}
+									}
+
+									//Write Technique
+									std::string filepath = "techniques_out/";
+									filepath += techniqueData.name;
+									filepath += ".tech";
+									if(!FileExists(filepath.c_str()) || overwriteFiles) //prevents collisions even more TEMPORARY
+									{
+										printf("technique:	%s\n",techniqueData.name.c_str());
+										std::ofstream ofile(filepath.c_str(), std::ios::out | std::ios::binary);
+			
+										std::string outData = "{\r\n";
+										outData += "	stateMap \"default\";\r\n\r\n";//fix statemap type later
+										outData += "	vertexShader 3.0 \"";
+										outData += techniqueData.vsName;
+										outData += "\"\r\n	{\r\n	}\r\n\r\n";
+										outData += "	pixelShader 3.0 \"";
+										outData += techniqueData.psName;
+										outData += "\"\r\n	{\r\n	}\r\n\r\n";
+										//add vars here
+										outData += "}\r\n\r\n";
+									
+										ofile.write((char*)outData.c_str(),outData.size());
+										ofile.close();
 									}
 								}
 							}
@@ -280,10 +346,10 @@ void ListAssetPtrs()
 						{
 							printf("Techset:	%s\n",name);
 							std::ofstream ofile(filepath, std::ios::out | std::ios::binary);
-							for(int i = 0; i < TechsetData.size(); i++)
+							for(DWORD i = 0; i < TechsetData.size(); i++)
 							{
 								std::string outBuf;
-								for(int t = 0; t < TechsetData[i].TechTypes.size(); t++)
+								for(DWORD t = 0; t < TechsetData[i].TechTypes.size(); t++)
 								{
 									outBuf += Material_TechniqueTypeForName(TechsetData[i].TechTypes[t]);
 									outBuf += ":\r\n";
@@ -311,6 +377,7 @@ void ListAssetPtrs()
 
 int main(int argc, char** argv)
 {
+	//argc = 2;
 	if(argc > 1)
 	{
 		overwriteFiles = true;
