@@ -83,6 +83,7 @@
     <ClCompile Include="r_image_load_obj.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_utils.cpp" />
+    <ClCompile Include="xmodel_load_obj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assertdef.h" />
@@ -96,6 +97,7 @@
     <ClInclude Include="r_utils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />
+    <ClInclude Include="xmodel_load_obj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

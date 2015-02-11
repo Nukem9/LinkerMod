@@ -45,6 +45,9 @@
     <ClInclude Include="q_parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="xmodel_load_obj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -66,6 +69,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="q_parse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xmodel_load_obj.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

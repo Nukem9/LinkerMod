@@ -18,7 +18,7 @@ bool Material_MatchToken(const char **text, const char *match)
 SRCLINE(4720)
 bool Material_CopyTextToDXBuffer(void *cachedShader, unsigned int shaderLen, void **shader)
 {
-	static DWORD dwCall = 0x52F6B0;
+	static DWORD dwCall = 0x0052F6B0;
 
 	__asm
 	{
@@ -259,14 +259,13 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 		}
 	}
 
-	const char *textData = (const char *)fileData;
+	const char *textData	= (const char *)fileData;
+	size_t nameSize			= strlen(name) + 1;
+	char *techniqueSet		= (char *)Z_Malloc(nameSize + 248);
 
-	size_t nameSize = strlen(name) + 1;
-	char *techniqueSet = (char *)Z_Malloc(nameSize + 248);
-
-	*(char **)(techniqueSet + 0) = techniqueSet + 248;
-	*(BYTE *)(techniqueSet + 4) = 0;
-	*(char **)(techniqueSet + 8) = techniqueSet;
+	*(char **)(techniqueSet + 0)	= techniqueSet + 248;
+	*(BYTE *)(techniqueSet + 4)		= 0;
+	*(char **)(techniqueSet + 8)	= techniqueSet;
 
 	memcpy(techniqueSet + 248, name, nameSize);
 
@@ -277,7 +276,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	Com_SetSpaceDelimited(0);
 	Com_SetKeepStringQuotes(1);
 
-	int techTypeCount = 0;
+	int techTypeCount	= 0;
 	bool usingTechnique = false;
 	while (1)
 	{
@@ -341,8 +340,8 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 					*(DWORD *)&techniqueSet[4 * techType[techTypeIndex] + 12] = (DWORD)technique;
 			}
 
-			techTypeCount = 0;
-			usingTechnique = false;
+			techTypeCount	= 0;
+			usingTechnique	= false;
 			if (!Material_MatchToken(&textData, ";"))
 			{
 				techniqueSet = 0;

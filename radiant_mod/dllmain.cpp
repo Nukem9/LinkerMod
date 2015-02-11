@@ -56,152 +56,6 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
-bool XModelLoadConfigFile_WAW(const char **pos, int name, int config)
-{
-	static DWORD dwCall = 0x4DFAA0;
-
-	__asm
-	{
-		push config
-		push name
-		mov edi, pos
-		call [dwCall]
-		add esp, 0x8
-	}
-}
-
-bool XModelLoadConfigFile_BlackOps(const char **pos, int name, int config)
-{
-	//
-	// Check for World at War's version first
-	//
-	WORD xmodelVersion = *(WORD *)*pos;
-
-	if (xmodelVersion == 62)
-	{
-		*pos += 2; // WORD version
-		*pos += 3; // Black Ops adjustment
-
-		//
-		// Shift the header in order to match WAW's header
-		//
-		__int16 v3; // cx@1
-		bool result; // al@2
-		const char *v7; // eax@3
-		const char *v8; // edx@3
-		int v9; // esi@3
-		char v10; // cl@4
-		const char *v11; // eax@5
-		const char *v12; // edx@5
-		int v13; // esi@5
-		char v14; // cl@6
-		const char *v15; // ecx@7
-		int v16; // ebp@7
-		float v17; // ST24_4@8
-		const char *v18; // ecx@8
-		const char *v19; // edx@8
-		int v20; // esi@8
-		char v21; // al@9
-		bool v22; // zf@10
-		signed int v23; // [sp+Ch] [bp-8h]@7
-
-			*(BYTE *)(config + 4140) = *(BYTE *)(*pos);
-			*pos += 1;
-
-			*(float *)(config + 4112) = *(float *)(*pos);
-			*pos += 4;
-
-			*(float *)(config + 4116) = *(float *)(*pos);
-			*pos += 4;
-
-			*(float *)(config + 4120) = *(float *)(*pos);
-			*pos += 4;
-
-			*(float *)(config + 4124) = *(float *)(*pos);
-			*pos += 4;
-
-			*(float *)(config + 4128) = *(float *)(*pos);
-			*pos += 4;
-
-			*(float *)(config + 4132) = *(float *)(*pos);
-			*pos += 4;
-
-			v7 = *pos;
-			v8 = v7;
-			v9 = config + 0x102D;
-			do
-			{
-				v10 = *v8;
-				*(BYTE *)v9++ = *v8++;
-			} while (v10);
-
-			printf("LEN: %d\n", strlen(v7) + 1);
-			*pos += strlen(v7) + 1;
-			v11 = *pos;
-			v12 = *pos;
-			v13 = config + 5165;
-			do
-			{
-				v14 = *v12;
-				*(BYTE *)v13++ = *v12++;
-			} while (v14);
-
-			printf("LEN: %d\n", strlen(v11) + 1);
-			*pos += strlen(v11) + 1;
-
-			// BURN ANOTHER STRING
-			printf("LEN: %d\n", strlen(*pos) + 1);
-			*pos += strlen(*pos) + 1;
-			// BURN A FLOAT
-			*pos += 4;
-
-			v15 = *pos;
-			v16 = config;
-			v23 = 4;
-
-			do
-			{
-				v17 = *(float *)v15;
-				v18 = v15 + 4;
-				*(float *)(v16 + 1024) = v17;
-				v19 = v18;
-				v20 = v16;
-				do
-				{
-					v21 = *v19;
-					*(BYTE *)v20++ = *v19++;
-				} while (v21);
-				v16 += 1028;
-				v22 = v23-- == 1;
-				v15 = &v18[strlen(v18) + 1];
-			} while (!v22);
-			*(DWORD *)(config + 4136) = *(DWORD *)v15;
-			*pos = v15 + 4;
-		
-			return true;
-	}
-
-	return XModelLoadConfigFile_WAW(pos, name, config);
-}
-
-bool __declspec(naked) hk_XModelLoadConfigFile()
-{
-	__asm
-	{
-		push ebp
-		mov ebp, esp
-
-		push [ebp + 0xC]
-		push [ebp + 0x8]
-		push edi
-		call XModelLoadConfigFile_BlackOps
-		add esp, 0xC
-
-		pop ebp
-		retn
-	}
-}
-
 BOOL RadiantMod_Init()
 {
 	printf("----> Loading radiant mod\n");
@@ -230,14 +84,12 @@ BOOL RadiantMod_Init()
 	//
 	// Hook technique/techset loading functions for PIMP (ShaderWorks)
 	//
-	FixupFunction(0x005190FF, (ULONG_PTR)&Material_LoadTechniqueSet);
-	PatchMemory(0x005190FF, (PBYTE)"\xE8", 1);
+	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
 
 	//
 	// Hook xmodel loading to support Black Ops
 	//
-	FixupFunction(0x004E036E, (ULONG_PTR)&hk_XModelLoadConfigFile);
-	PatchMemory(0x004E036E, (PBYTE)"\xE8", 1);
+	Detours::X86::DetourFunction((PBYTE)0x004DFAA0, (PBYTE)&hk_XModelLoadConfigFile);
 
 	//
 	// FixRegistryEntries to prevent collision with CoDWAWRadiant - DEV
