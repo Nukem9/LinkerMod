@@ -113,6 +113,38 @@ struct TechniqueInfo
 	std::string psName;
 };
 
+void GetConstantStrings(std::string& shader_string, std::vector<std::string>& partialConstantStrings, std::vector<std::string>& completeConstantStrings)
+{
+	for(DWORD i = 0; i < partialConstantStrings.size(); i++)//do constant lookup
+	{
+		int searchLoc = 0;
+		for(int constLoc = shader_string.find(partialConstantStrings[i]); constLoc != -1; constLoc = shader_string.find(partialConstantStrings[i], searchLoc))
+		{
+			std::string foundString = shader_string.c_str() + constLoc;
+
+			//check for conflicts
+			bool hasConflict = false;
+			for(DWORD c = 0; c < completeConstantStrings.size(); c++)
+			{
+				if(completeConstantStrings[c] == foundString)
+				{
+					hasConflict = true;
+					searchLoc = constLoc+1;
+					break;
+				}
+			}
+
+			if(hasConflict == false)
+			{
+				completeConstantStrings.push_back(foundString);
+				partialConstantStrings.erase(partialConstantStrings.begin() + i);
+				i--;
+				break;
+			}
+		}
+	}
+}
+
 #include <fstream>
 void ListAssetPtrs()
 {
@@ -150,10 +182,51 @@ void ListAssetPtrs()
 
 					char assetName[80];
 					Material mat;
+
+					
+		
 					ReadProcessMemory(hProcess,(BYTE*)PoolPtr1.ptr,&mat,sizeof(mat),&numofbytesread);//PoolPtr1 is the asset
 
 					ReadProcessMemory(hProcess,(BYTE*)mat.info.name,&assetName,80,&numofbytesread);
 
+					std::vector<std::string> partialConstantStrings;
+					std::vector<std::string> completeConstantStringsPS;
+					std::vector<std::string> completeConstantStringsVS;
+					MaterialConstantDef* constants = new MaterialConstantDef[mat.constantCount];
+					ReadProcessMemory(hProcess,(BYTE*)mat.___u10.constantTable,constants,sizeof(MaterialConstantDef)*mat.constantCount,&numofbytesread);//PoolPtr1 is the asset
+					//if(strcmp("mc/mtl_c_usa_blackops_mason_head_tns",assetName) == 0)
+					//{//printf("Material: %s\n",assetName);*/
+					for(int i = 0; i < mat.constantCount; i++)
+					{
+						if(std::string(constants[i].name).size() < 12)
+						{
+							//completeConstantStrings.push_back(constants[i].name);
+						}
+						else
+						{
+							partialConstantStrings.push_back(std::string(constants[i].name));
+							if(partialConstantStrings[partialConstantStrings.size()-1].size() > 12)
+							{
+								partialConstantStrings[partialConstantStrings.size()-1].resize(12); //truncates the strings that arent null terminated
+							}
+						}
+
+						//std::string tmp = constants[i].name;
+						//if(tmp.size() > 12)
+						//	tmp[12] = 0;
+						//printf("	%s\n",tmp.c_str()); //issue these are limitted to 12 chars
+						//possible method to get the full strings for the constant names
+						//open all shaders used by the material and search for the strings
+						//if one string has multiple occurences (skip the first one)
+						//if a  new shader compare with previous strings
+
+						//valid format     x = material.x;
+
+						//unknown (vertex routing options) & statemap
+					}
+					//printf("BREAK MAYBE?");
+					//}
+					//delete[] constants;
 					MaterialTechniqueSet techset;
 
 					ReadProcessMemory(hProcess,mat.___u8.localTechniqueSet,&techset,sizeof(techset),&numofbytesread);
@@ -175,33 +248,35 @@ void ListAssetPtrs()
 							if(techset.techniques[i])
 							{
 								MaterialTechnique tech;
+								//tech.passArray->vertexDecl->routing.data
 								
+
 								ReadProcessMemory(hProcess,techset.techniques[i],&tech,sizeof(tech),&numofbytesread);
 								char tech_name[256];
 								ReadProcessMemory(hProcess,tech.name,&tech_name,256,&numofbytesread);
 
-								//if(/*strcmp(tech_name,"pimp_technique_trivial_7ecdac33")*/0 == 0)
-								//{
-								//	//printf("pimp_technique_trivial_7ecdac33 %d,%d,%d\a\n",tech.passArray[0].perObjArgCount,tech.passArray[0].perPrimArgCount,tech.passArray[0].stableArgCount);
-								//	for(int passIndex = 0; passIndex < tech.passCount; passIndex++)
-								//	{
-								//		int argCount = tech.passArray[passIndex].stableArgCount +  tech.passArray[passIndex].perObjArgCount + tech.passArray[passIndex].perPrimArgCount;
+								if(strcmp(tech_name,"pimp_technique_trivial_7ecdac33") == 0)
+								{
+									//printf("pimp_technique_trivial_7ecdac33 %d,%d,%d\a\n",tech.passArray[0].perObjArgCount,tech.passArray[0].perPrimArgCount,tech.passArray[0].stableArgCount);
+									for(int passIndex = 0; passIndex < tech.passCount; passIndex++)
+									{
+										int argCount = tech.passArray[passIndex].stableArgCount +  tech.passArray[passIndex].perObjArgCount + tech.passArray[passIndex].perPrimArgCount;
 
-								//		MaterialShaderArgument* args = new MaterialShaderArgument[argCount];
-								//		ReadProcessMemory(hProcess,tech.passArray[passIndex].___u7.localArgs,args,sizeof(MaterialShaderArgument)*argCount,&numofbytesread);
-								//		for(int a = 0; a < argCount; a++)
-								//		{
-								//			if(Material_HasConstant(&mat,args[a].u.codeSampler,hProcess))
-								//			{
-								//				//printf("Arg [%d]:	type: %d\n",a,args[a]);//tech.passArray[passIndex].___u7.localArgs[a].type);
-								//			
-								//			
-								//				printf("%s\n",Material_StringFromHash(args[a].u.codeSampler,hProcess).c_str());
-								//			}
-								//		}
-								//	}
-								//	//Sleep(4500);
-								//}
+										MaterialShaderArgument* args = new MaterialShaderArgument[argCount];
+										ReadProcessMemory(hProcess,tech.passArray[passIndex].___u7.localArgs,args,sizeof(MaterialShaderArgument)*argCount,&numofbytesread);
+										for(int a = 0; a < argCount; a++)
+										{
+											//if(Material_HasConstant(&mat,args[a].u.codeSampler,hProcess))
+											{
+												printf("Arg [%d]:	type: %d\n",a,args[a]);//tech.passArray[passIndex].___u7.localArgs[a].type);
+											
+											
+												//printf("%s\n",Material_StringFromHash(args[a].u.codeSampler,hProcess).c_str());
+											}
+										}
+									}
+									//system("PAUSE");
+								}
 
 
 								if(tech.passCount != 1)
@@ -271,8 +346,20 @@ void ListAssetPtrs()
 								
 											ofile.write((char*)shader_data,shaderSize);
 											ofile.close();
-											delete[] shader_data;
+
 										}
+										std::string shader_string((char*)shader_data,shaderSize); //used for constant lookup
+										delete[] shader_data;
+
+										GetConstantStrings(shader_string, partialConstantStrings, completeConstantStringsVS);
+										//for(DWORD i = 0; i < partialConstantStrings.size(); i++)//do constant lookup
+										//{
+										//	int constantLoc = shader_string.find(partialConstantStrings[i]);
+										//	if(constantLoc != -1)
+										//	{
+										//		printf("cost");
+										//	}
+										//}
 									}
 
 									//Do Pixel Shader
@@ -306,10 +393,20 @@ void ListAssetPtrs()
 											ofile.write((char*)shader_data,shaderSize);
 											ofile.close();
 											
-								
-											delete[] shader_data;
 										}
+										
+										std::string shader_string((char*)shader_data,shaderSize); //used for constant lookup
+										delete[] shader_data;
+										
+										GetConstantStrings(shader_string, partialConstantStrings, completeConstantStringsPS);
 									}
+
+									/*for(DWORD i = 0; i < partialConstantStrings.size(); i++)
+									{
+										completeConstantStringsVS;
+										completeConstantStringsPS;
+										printf("Unknown Constant: \'%s\'\n",partialConstantStrings[i].c_str());
+									}*/
 
 									//Write Technique
 									std::string filepath = "techniques_out/";
@@ -324,16 +421,39 @@ void ListAssetPtrs()
 										outData += "	stateMap \"default\";\r\n\r\n";//fix statemap type later
 										outData += "	vertexShader 3.0 \"";
 										outData += techniqueData.vsName;
-										outData += "\"\r\n	{\r\n	}\r\n\r\n";
+										outData += "\"\r\n	{\r\n";
+										//vs stuff
+										for(int i = 0; i < completeConstantStringsVS.size(); i++)
+										{
+											outData += "		";
+											outData += completeConstantStringsVS[i];
+											outData += " material.";
+											outData += completeConstantStringsVS[i];
+											outData += ";\r\n";
+										}
+										outData += "	}\r\n\r\n";
 										outData += "	pixelShader 3.0 \"";
 										outData += techniqueData.psName;
-										outData += "\"\r\n	{\r\n	}\r\n\r\n";
+										outData += "\"\r\n	{\r\n";
+										//ps stuff
+										for(int i = 0; i < completeConstantStringsPS.size(); i++)
+										{
+											outData += "		";
+											outData += completeConstantStringsPS[i];
+											outData += " material.";
+											outData += completeConstantStringsPS[i];
+											outData += ";\r\n";
+										}
+										outData += "	}\r\n\r\n";
 										//add vars here
 										outData += "}\r\n\r\n";
 									
 										ofile.write((char*)outData.c_str(),outData.size());
 										ofile.close();
 									}
+
+									completeConstantStringsPS.resize(0);
+									completeConstantStringsVS.resize(0);
 								}
 							}
 						}
@@ -359,7 +479,6 @@ void ListAssetPtrs()
 								outBuf += ";\r\n\r\n";
 								ofile.write(outBuf.c_str(),outBuf.size());
 							}
-					
 							ofile.close();
 						}
 					}
