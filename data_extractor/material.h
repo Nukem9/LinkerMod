@@ -247,3 +247,35 @@ struct Material
   $C3F7A89422F64E7CE7B1D04043902CE5 ___u10;
   GfxStateBits *stateBitsTable;
 };
+
+
+struct MaterialInfoRaw
+{
+  unsigned int nameOffset;
+  unsigned int refImageNameOffset;
+  char gameFlags;
+  char sortKey;
+  char textureAtlasRowCount;
+  char textureAtlasColumnCount;
+  float maxDeformMove;
+  char deformFlags;
+  char usage;
+  unsigned __int16 toolFlags;
+  unsigned int locale;
+  unsigned __int16 autoTexScaleWidth;
+  unsigned __int16 autoTexScaleHeight;
+  float tessSize;
+  int surfaceFlags;
+  int contents;
+};
+
+struct MaterialRaw
+{
+  MaterialInfoRaw info;
+  unsigned int refStateBits[2];
+  unsigned __int16 textureCount;
+  unsigned __int16 constantCount;
+  unsigned int techSetNameOffset;
+  unsigned int textureTableOffset;
+  unsigned int constantTableOffset;
+};

@@ -196,6 +196,7 @@ void ListAssetPtrs()
 					ReadProcessMemory(hProcess,(BYTE*)mat.___u10.constantTable,constants,sizeof(MaterialConstantDef)*mat.constantCount,&numofbytesread);//PoolPtr1 is the asset
 					//if(strcmp("mc/mtl_c_usa_blackops_mason_head_tns",assetName) == 0)
 					//{//printf("Material: %s\n",assetName);*/
+
 					for(int i = 0; i < mat.constantCount; i++)
 					{
 						if(std::string(constants[i].name).size() < 12)
@@ -278,6 +279,9 @@ void ListAssetPtrs()
 									//system("PAUSE");
 								}
 
+								MaterialVertexDeclaration vertDecl; //stream count = number of args in technique
+								ReadProcessMemory(hProcess,tech.passArray[0].vertexDecl,&vertDecl,sizeof(vertDecl),&numofbytesread);
+								
 
 								if(tech.passCount != 1)
 									printf("PassCount: %d\a\n",tech.passCount);
@@ -414,7 +418,7 @@ void ListAssetPtrs()
 									filepath += ".tech";
 									if(!FileExists(filepath.c_str()) || overwriteFiles) //prevents collisions even more TEMPORARY
 									{
-										printf("technique:	%s\n",techniqueData.name.c_str());
+										printf("Technique:	%s\n",techniqueData.name.c_str());
 										std::ofstream ofile(filepath.c_str(), std::ios::out | std::ios::binary);
 			
 										std::string outData = "{\r\n";
@@ -423,7 +427,7 @@ void ListAssetPtrs()
 										outData += techniqueData.vsName;
 										outData += "\"\r\n	{\r\n";
 										//vs stuff
-										for(int i = 0; i < completeConstantStringsVS.size(); i++)
+										for(DWORD i = 0; i < completeConstantStringsVS.size(); i++)
 										{
 											outData += "		";
 											outData += completeConstantStringsVS[i];
@@ -436,7 +440,7 @@ void ListAssetPtrs()
 										outData += techniqueData.psName;
 										outData += "\"\r\n	{\r\n";
 										//ps stuff
-										for(int i = 0; i < completeConstantStringsPS.size(); i++)
+										for(DWORD i = 0; i < completeConstantStringsPS.size(); i++)
 										{
 											outData += "		";
 											outData += completeConstantStringsPS[i];
@@ -445,7 +449,25 @@ void ListAssetPtrs()
 											outData += ";\r\n";
 										}
 										outData += "	}\r\n\r\n";
-										//add vars here
+										mat;
+										//vertex routing
+										if(techset.worldVertFormat > 1)
+										{
+											printf("world vert format %d\n",techset.worldVertFormat);
+										}
+
+										for(int i = 0; i < vertDecl.streamCount; i++)
+										{
+											outData += "	vertex.";
+											outData += Technique_DestToString(vertDecl.routing.data[i].dest);
+											outData += " = code.";
+											outData += Technique_SourceToString(vertDecl.routing.data[i].source);
+											outData += ";\r\n";
+										}
+
+										//declTypes appears to have an override and is not used
+										
+										outData += "\r\n";
 										outData += "}\r\n\r\n";
 									
 										ofile.write((char*)outData.c_str(),outData.size());
@@ -496,7 +518,7 @@ void ListAssetPtrs()
 
 int main(int argc, char** argv)
 {
-	//argc = 2;
+	argc = 2;
 	if(argc > 1)
 	{
 		overwriteFiles = true;

@@ -137,3 +137,204 @@ char* Material_TechniqueTypeForName(int techniqueType)
   
   return techniqueNames[techniqueType];
 }
+
+
+char* Technique_SourceToString(char source)
+{
+	char* sourceStrings[10];
+	sourceStrings[0] = "position";
+	sourceStrings[1] = "color";
+	sourceStrings[2] = "texcoord[0]";
+	sourceStrings[3] = "normal";
+	sourceStrings[4] = "tangent";
+	sourceStrings[5] = "texcoord[1]";
+	sourceStrings[6] = "texcoord[2]";
+	sourceStrings[7] = "normalTransform[0]";
+	sourceStrings[8] = "normalTransform[1]";
+	sourceStrings[9] = "blendweight";
+	//0 = position
+	//3 = normal
+	//4 = tangent
+	//1 = color
+	//2 = texcoord[0]
+	//5 6 = texcoord[1 2]
+	//7 8 = normalTransform[0 1]
+	//9 blendweight
+
+	//check Material_StreamSourceForName for more info
+	return sourceStrings[source];
+}
+
+char* Technique_DestToString(char dest)
+{
+	char* destStrings[20];
+	//if dest > 20 return should probably an error
+
+	destStrings[0] = "position";
+	destStrings[1] = "normal";
+	destStrings[2] = "color[0]";
+	destStrings[3] = "color[1]";
+	destStrings[4] = "depth";
+	destStrings[5] = "texcoord[0]";
+	destStrings[6] = "texcoord[1]";
+	destStrings[7] = "texcoord[2]";
+	destStrings[8] = "texcoord[3]";
+	destStrings[9] = "texcoord[4]";
+	destStrings[10] = "texcoord[5]";
+	destStrings[11] = "texcoord[6]";
+	destStrings[12] = "texcoord[7]";
+	destStrings[13] = "texcoord[8]";
+	destStrings[14] = "texcoord[9]";
+	destStrings[15] = "texcoord[10]";
+	destStrings[16] = "texcoord[11]";
+	destStrings[17] = "texcoord[12]";
+	destStrings[18] = "texcoord[13]";
+	destStrings[19] = "blendweight";
+
+	return destStrings[dest];
+	// 0 = position
+	// 1 = normal
+	// 2 3 = color[0 1] 
+	// 4 = depth
+	// 5 - (5+13)[aka 18] = texcoord[0 - 13]
+	// 19 = blendweight
+	//else unknown
+
+	//check Material_StreamDestForName for more information
+}
+
+//enum MaterialWorldVertexFormat
+//{
+//  MTL_WORLDVERT_TEX_1_NRM_1 = 0x0,
+//  MTL_WORLDVERT_TEX_2_NRM_1 = 0x1,
+//  MTL_WORLDVERT_TEX_2_NRM_2 = 0x2,
+//  MTL_WORLDVERT_TEX_3_NRM_1 = 0x3,
+//  MTL_WORLDVERT_TEX_3_NRM_2 = 0x4,
+//  MTL_WORLDVERT_TEX_3_NRM_3 = 0x5,
+//  MTL_WORLDVERT_TEX_4_NRM_1 = 0x6,
+//  MTL_WORLDVERT_TEX_4_NRM_2 = 0x7,
+//  MTL_WORLDVERT_TEX_4_NRM_3 = 0x8,
+//};
+
+
+enum GfxBlend
+{
+  GFXS_BLEND_DISABLED = 0x0,
+  GFXS_BLEND_ZERO = 0x1,
+  GFXS_BLEND_ONE = 0x2,
+  GFXS_BLEND_SRCCOLOR = 0x3,
+  GFXS_BLEND_INVSRCCOLOR = 0x4,
+  GFXS_BLEND_SRCALPHA = 0x5,
+  GFXS_BLEND_INVSRCALPHA = 0x6,
+  GFXS_BLEND_DESTALPHA = 0x7,
+  GFXS_BLEND_INVDESTALPHA = 0x8,
+  GFXS_BLEND_DESTCOLOR = 0x9,
+  GFXS_BLEND_INVDESTCOLOR = 0xA,
+  GFXS_BLEND_MASK = 0xF,
+};
+
+
+enum GfxBlendOp
+{
+  GFXS_BLENDOP_DISABLED = 0x0,
+  GFXS_BLENDOP_ADD = 0x1,
+  GFXS_BLENDOP_SUBTRACT = 0x2,
+  GFXS_BLENDOP_REVSUBTRACT = 0x3,
+  GFXS_BLENDOP_MIN = 0x4,
+  GFXS_BLENDOP_MAX = 0x5,
+  GFXS_BLENDOP_MASK = 0x7,
+};
+
+/*  306 */
+enum $B8A254328D12B632EF29D90876D26447
+{
+  GFXS0_SRCBLEND_RGB_SHIFT = 0x0,
+  GFXS0_SRCBLEND_RGB_MASK = 0xF,
+  GFXS0_DSTBLEND_RGB_SHIFT = 0x4,
+  GFXS0_DSTBLEND_RGB_MASK = 0xF0,
+  GFXS0_BLENDOP_RGB_SHIFT = 0x8,
+  GFXS0_BLENDOP_RGB_MASK = 0x700,
+  GFXS0_BLEND_RGB_MASK = 0x7FF,
+  GFXS0_ATEST_DISABLE = 0x800,
+  GFXS0_ATEST_GT_0 = 0x1000,
+  GFXS0_ATEST_GE_255 = 0x2000,
+  GFXS0_ATEST_GE_128 = 0x3000,
+  GFXS0_ATEST_MASK = 0x3000,
+  GFXS0_CULL_SHIFT = 0xE,
+  GFXS0_CULL_NONE = 0x4000,
+  GFXS0_CULL_BACK = 0x8000,
+  GFXS0_CULL_FRONT = 0xC000,
+  GFXS0_CULL_MASK = 0xC000,
+  GFXS0_SRCBLEND_ALPHA_SHIFT = 0x10,
+  GFXS0_SRCBLEND_ALPHA_MASK = 0xF0000,
+  GFXS0_DSTBLEND_ALPHA_SHIFT = 0x14,
+  GFXS0_DSTBLEND_ALPHA_MASK = 0xF00000,
+  GFXS0_BLENDOP_ALPHA_SHIFT = 0x18,
+  GFXS0_BLENDOP_ALPHA_MASK = 0x7000000,
+  GFXS0_BLEND_ALPHA_MASK = 0x7FF0000,
+  GFXS0_COLORWRITE_RGB = 0x8000000,
+  GFXS0_COLORWRITE_ALPHA = 0x10000000,
+  GFXS0_COLORWRITE_MASK = 0x18000000,
+  GFXS0_POLYMODE_LINE = 0x80000000,
+  GFXS1_DEPTHWRITE = 0x1,
+  GFXS1_DEPTHTEST_DISABLE = 0x2,
+  GFXS1_DEPTHTEST_SHIFT = 0x2,
+  GFXS1_DEPTHTEST_ALWAYS = 0x0,
+  GFXS1_DEPTHTEST_LESS = 0x4,
+  GFXS1_DEPTHTEST_EQUAL = 0x8,
+  GFXS1_DEPTHTEST_LESSEQUAL = 0xC,
+  GFXS1_DEPTHTEST_MASK = 0xC,
+  GFXS1_DEPTHFUNC_MASK = 0xF,
+  GFXS1_POLYGON_OFFSET_SHIFT = 0x4,
+  GFXS1_POLYGON_OFFSET_0 = 0x0,
+  GFXS1_POLYGON_OFFSET_1 = 0x10,
+  GFXS1_POLYGON_OFFSET_2 = 0x20,
+  GFXS1_POLYGON_OFFSET_SHADOWMAP = 0x30,
+  GFXS1_POLYGON_OFFSET_MASK = 0x30,
+  GFXS1_STENCIL_FRONT_ENABLE = 0x40,
+  GFXS1_STENCIL_BACK_ENABLE = 0x80,
+  GFXS1_STENCIL_MASK = 0xC0,
+  GFXS1_STENCIL_FRONT_PASS_SHIFT = 0x8,
+  GFXS1_STENCIL_FRONT_FAIL_SHIFT = 0xB,
+  GFXS1_STENCIL_FRONT_ZFAIL_SHIFT = 0xE,
+  GFXS1_STENCIL_FRONT_FUNC_SHIFT = 0x11,
+  GFXS1_STENCIL_FRONT_MASK = 0xFFF00,
+  GFXS1_STENCIL_BACK_PASS_SHIFT = 0x14,
+  GFXS1_STENCIL_BACK_FAIL_SHIFT = 0x17,
+  GFXS1_STENCIL_BACK_ZFAIL_SHIFT = 0x1A,
+  GFXS1_STENCIL_BACK_FUNC_SHIFT = 0x1D,
+  GFXS1_STENCIL_BACK_MASK = 0xFFF00000,
+  GFXS1_STENCILFUNC_FRONTBACK_MASK = 0xE00E0000,
+  GFXS1_STENCILOP_FRONTBACK_MASK = 0x1FF1FF00,
+};
+
+/*  307 */
+enum GfxTextureOp
+{
+  GFXS_TEXOP_DISABLE = 0x0,
+  GFXS_TEXOP_SELECTARG1 = 0x1,
+  GFXS_TEXOP_SELECTARG2 = 0x2,
+  GFXS_TEXOP_MODULATE = 0x3,
+  GFXS_TEXOP_MODULATE2X = 0x4,
+  GFXS_TEXOP_MODULATE4X = 0x5,
+  GFXS_TEXOP_ADD = 0x6,
+  GFXS_TEXOP_ADDSIGNED = 0x7,
+  GFXS_TEXOP_ADDSIGNED2X = 0x8,
+  GFXS_TEXOP_SUBTRACT = 0x9,
+  GFXS_TEXOP_ADDSMOOTH = 0xA,
+  GFXS_TEXOP_BLENDDIFFUSEALPHA = 0xB,
+  GFXS_TEXOP_BLENDTEXTUREALPHA = 0xC,
+  GFXS_TEXOP_BLENDFACTORALPHA = 0xD,
+  GFXS_TEXOP_BLENDTEXTUREALPHAPM = 0xE,
+  GFXS_TEXOP_BLENDCURRENTALPHA = 0xF,
+  GFXS_TEXOP_MODULATEALPHA_ADDCOLOR = 0x10,
+  GFXS_TEXOP_MODULATECOLOR_ADDALPHA = 0x11,
+  GFXS_TEXOP_MODULATEINVALPHA_ADDCOLOR = 0x12,
+  GFXS_TEXOP_MODULATEINVCOLOR_ADDALPHA = 0x13,
+  GFXS_TEXOP_DOTPRODUCT3 = 0x14,
+  GFXS_TEXOP_MULTIPLYADD = 0x15,
+  GFXS_TEXOP_LERP = 0x16,
+  GFXS_TEXOP_COUNT = 0x17,
+  GFXS_TEXOP_BITS = 0x5,
+  GFXS_TEXOP_MASK = 0x1F,
+};
