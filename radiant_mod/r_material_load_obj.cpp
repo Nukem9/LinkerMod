@@ -259,6 +259,9 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 		}
 	}
 
+	//
+	// Allocate the techset structure
+	//
 	const char *textData	= (const char *)fileData;
 	size_t nameSize			= strlen(name) + 1;
 	char *techniqueSet		= (char *)Z_Malloc(nameSize + 248);
@@ -269,8 +272,14 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 
 	memcpy(techniqueSet + 248, name, nameSize);
 
+	//
+	// TODO: What does this function actually do?
+	//
 	((void(__cdecl *)())0x005525D0)();
 
+	//
+	// Begin the text parsing session
+	//
 	Com_BeginParseSession(filename);
 	Com_SetScriptWarningPrefix("^1ERROR: ");
 	Com_SetSpaceDelimited(0);

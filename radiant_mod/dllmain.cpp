@@ -76,20 +76,21 @@ BOOL RadiantMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x5675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
 	FixupFunction(0x004683F0, (ULONG_PTR)&hk_Com_Printf);
-	FixupFunction(0x0052F700, (ULONG_PTR)&hk_Material_LoadShader);
-
-	PatchMemory(0x4DF7F6, (PBYTE)"\xEB", 1);
-	PatchMemory(0x4E09DB, (PBYTE)"\xEB", 1);
 
 	//
-	// Hook technique/techset loading functions for PIMP (ShaderWorks)
+	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
+	Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
 
 	//
-	// Hook xmodel loading to support Black Ops
+	// Hook Xmodel loading functions to support Black Ops
 	//
 	Detours::X86::DetourFunction((PBYTE)0x004DFAA0, (PBYTE)&hk_XModelLoadConfigFile);
+
+	PatchMemory(0x004E09DB, (PBYTE)"\xEB", 1);// Xmodelsurfs version check
+	PatchMemory(0x004DF7F6, (PBYTE)"\xEB", 1);// Xmpdelparts version check
+	PatchMemory(0x005351A2, (PBYTE)"\x08", 1);// 4 byte xmodelsurfs file adjustment (MagicNumber)
 
 	//
 	// FixRegistryEntries to prevent collision with CoDWAWRadiant - DEV
