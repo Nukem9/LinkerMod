@@ -89,6 +89,7 @@ void Image_Setup(GfxImage *image, int width, int height, int depth, unsigned int
 	switch (imageFlags)
 	{
 	case -64:
+	case -63:
 	case -61:
 	case -112:
 	case -48:
