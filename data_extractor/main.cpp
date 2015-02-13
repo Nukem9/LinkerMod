@@ -18,11 +18,79 @@ struct sPoolPtr //sAssetPtr
 	int zeros;
 };
 
+enum MaterialTextureSource
+{
+  TEXTURE_SRC_CODE_BLACK = 0x0,
+  TEXTURE_SRC_CODE_WHITE = 0x1,
+  TEXTURE_SRC_CODE_IDENTITY_NORMAL_MAP = 0x2,
+  TEXTURE_SRC_CODE_MODEL_LIGHTING = 0x3,
+  TEXTURE_SRC_CODE_LIGHTMAP_PRIMARY = 0x4,
+  TEXTURE_SRC_CODE_LIGHTMAP_SECONDARY = 0x5,
+  TEXTURE_SRC_CODE_SHADOWMAP_SUN = 0x6,
+  TEXTURE_SRC_CODE_SHADOWMAP_SPOT = 0x7,
+  TEXTURE_SRC_CODE_FEEDBACK = 0x8,
+  TEXTURE_SRC_CODE_RESOLVED_POST_SUN = 0x9,
+  TEXTURE_SRC_CODE_RESOLVED_SCENE = 0xA,
+  TEXTURE_SRC_CODE_POST_EFFECT_SRC = 0xB,
+  TEXTURE_SRC_CODE_POST_EFFECT_GODRAYS = 0xC,
+  TEXTURE_SRC_CODE_POST_EFFECT_0 = 0xD,
+  TEXTURE_SRC_CODE_POST_EFFECT_1 = 0xE,
+  TEXTURE_SRC_CODE_SKY = 0xF,
+  TEXTURE_SRC_CODE_LIGHT_ATTENUATION = 0x10,
+  TEXTURE_SRC_CODE_DLIGHT_ATTENUATION = 0x11,
+  TEXTURE_SRC_CODE_OUTDOOR = 0x12,
+  TEXTURE_SRC_CODE_FLOATZ = 0x13,
+  TEXTURE_SRC_CODE_PROCESSED_FLOATZ = 0x14,
+  TEXTURE_SRC_CODE_RAW_FLOATZ = 0x15,
+  TEXTURE_SRC_CODE_CASE_TEXTURE = 0x16,
+  TEXTURE_SRC_CODE_CINEMATIC_Y = 0x17,
+  TEXTURE_SRC_CODE_CINEMATIC_CR = 0x18,
+  TEXTURE_SRC_CODE_CINEMATIC_CB = 0x19,
+  TEXTURE_SRC_CODE_CINEMATIC_A = 0x1A,
+  TEXTURE_SRC_CODE_REFLECTION_PROBE = 0x1B,
+  TEXTURE_SRC_CODE_FEATHER_FLOAT_Z = 0x1C,
+  TEXTURE_SRC_CODE_TERRAIN_SCORCH_TEXTURE_0 = 0x1D,
+  TEXTURE_SRC_CODE_TERRAIN_SCORCH_TEXTURE_1 = 0x1E,
+  TEXTURE_SRC_CODE_TERRAIN_SCORCH_TEXTURE_2 = 0x1F,
+  TEXTURE_SRC_CODE_TERRAIN_SCORCH_TEXTURE_3 = 0x20,
+  TEXTURE_SRC_CODE_TERRAIN_SCORCH_TEXTURE_LAST = 0x20,
+  TEXTURE_SRC_CODE_LIGHTMAP_SECONDARYB = 0x21,
+  TEXTURE_SRC_CODE_TEXTURE_0 = 0x22,
+  TEXTURE_SRC_CODE_TEXTURE_1 = 0x23,
+  TEXTURE_SRC_CODE_TEXTURE_2 = 0x24,
+  TEXTURE_SRC_CODE_TEXTURE_3 = 0x25,
+  TEXTURE_SRC_CODE_IMPACT_MASK = 0x26,
+  TEXTURE_SRC_CODE_UI3D = 0x27,
+  TEXTURE_SRC_CODE_MISSILE_CAM = 0x28,
+  TEXTURE_SRC_CODE_COMPOSITE_RESULT = 0x29,
+  TEXTURE_SRC_CODE_HEATMAP = 0x2A,
+  TEXTURE_SRC_CODE_COUNT = 0x2B,
+};
+
+struct CodeSamplerSource
+{
+  const char *name;
+  MaterialTextureSource source;
+  CodeSamplerSource *subtable;
+  int arrayCount;
+  int arrayStride;
+};
+
+struct CodeConstantSource
+{
+  const char *name;
+  char source;
+  CodeConstantSource *subtable;
+  int arrayCount;
+  int arrayStride;
+};
 
 
 BYTE* db_hashTable = (BYTE*)0x00CD81F8;
 sPoolPtr* AssetList = (sPoolPtr*)0x00DE85D8;
 char* zoneNameArray = (char*)0x010C6608;
+CodeConstantSource* s_codeConsts = (CodeConstantSource*)0x00B49158;
+CodeSamplerSource* s_codeSamplers = (CodeSamplerSource*)0x00B48AD8;
 
 #include "material.h"
 
@@ -157,9 +225,9 @@ void ListAssetPtrs()
 	unsigned int v4 = 0;
 	unsigned int assetCount = 0;
 
-	CreateDirectory(L"shader_out",NULL);
-	CreateDirectory(L"techset_out",NULL);
-	CreateDirectory(L"techniques_out",NULL);
+	CreateDirectory(L"shader_bin",NULL);
+	CreateDirectory(L"techsets",NULL);
+	CreateDirectory(L"techniques",NULL);
 
 	do
 	{
@@ -211,6 +279,8 @@ void ListAssetPtrs()
 								partialConstantStrings[partialConstantStrings.size()-1].resize(12); //truncates the strings that arent null terminated
 							}
 						}
+					
+
 
 						//std::string tmp = constants[i].name;
 						//if(tmp.size() > 12)
@@ -225,19 +295,32 @@ void ListAssetPtrs()
 
 						//unknown (vertex routing options) & statemap
 					}
+
+
+					partialConstantStrings.push_back("colorMapSampler");//always add this for now
+					partialConstantStrings.push_back("fogConsts2");
+					partialConstantStrings.push_back("sunFog");
+					partialConstantStrings.push_back("sunFogColor");
+					partialConstantStrings.push_back("sunFogDir");
+
+
 					//printf("BREAK MAYBE?");
 					//}
 					//delete[] constants;
 					MaterialTechniqueSet techset;
 
 					ReadProcessMemory(hProcess,mat.___u8.localTechniqueSet,&techset,sizeof(techset),&numofbytesread);
-
 					//printf("%s\n",assetName,zoneName,PoolPtr1.ptr);
 
 					char name[256];
 					ReadProcessMemory(hProcess,techset.name,name,256,&numofbytesread);
 					std::string techset_key = name;
 			
+				/*	if(techset_key == "2d")
+					{
+						int breake = 2;
+					}*/
+
 					if(!techsetConflictCheck.count(techset_key))
 					{
 						techsetConflictCheck[name] = true;
@@ -250,7 +333,7 @@ void ListAssetPtrs()
 							{
 								MaterialTechnique tech;
 								//tech.passArray->vertexDecl->routing.data
-								
+								tech.passArray[0].vertexShader;
 
 								ReadProcessMemory(hProcess,techset.techniques[i],&tech,sizeof(tech),&numofbytesread);
 								char tech_name[256];
@@ -310,6 +393,7 @@ void ListAssetPtrs()
 								}
 
 								
+								
 								if(!techniqueConflictCheck.count(technique_key))
 								{
 									techniqueConflictCheck[technique_key] = true;
@@ -334,7 +418,7 @@ void ListAssetPtrs()
 										BYTE* shader_data = new BYTE[shaderSize];
 										ReadProcessMemory(hProcess,vs.prog.loadDef.program,shader_data,shaderSize,&numofbytesread);
 	
-										std::string filepath = "shader_out/";
+										std::string filepath = "shader_bin/";
 										filepath += "vs_main_vs_3_0_"; //vertex shaders use this
 										filepath += vs_name;
 
@@ -355,7 +439,9 @@ void ListAssetPtrs()
 										std::string shader_string((char*)shader_data,shaderSize); //used for constant lookup
 										delete[] shader_data;
 
+									
 										GetConstantStrings(shader_string, partialConstantStrings, completeConstantStringsVS);
+									
 										//for(DWORD i = 0; i < partialConstantStrings.size(); i++)//do constant lookup
 										//{
 										//	int constantLoc = shader_string.find(partialConstantStrings[i]);
@@ -382,7 +468,7 @@ void ListAssetPtrs()
 										BYTE* shader_data = new BYTE[shaderSize];
 										ReadProcessMemory(hProcess,ps.prog.loadDef.program,shader_data,shaderSize,&numofbytesread);
 
-										std::string filepath = "shader_out/";
+										std::string filepath = "shader_bin/";
 										filepath += "ps_main_ps_3_0_"; //Pixel shaders use this
 										filepath += ps_name;
 
@@ -401,11 +487,20 @@ void ListAssetPtrs()
 										
 										std::string shader_string((char*)shader_data,shaderSize); //used for constant lookup
 										delete[] shader_data;
-										
+										/*		if(techset_key == "2d")
+									{
+										int a = 35;
+									}*/
 										GetConstantStrings(shader_string, partialConstantStrings, completeConstantStringsPS);
+										/*		if(techset_key == "2d")
+									{
+										int a = 35;
+									}*/
 									}
 
-									/*for(DWORD i = 0; i < partialConstantStrings.size(); i++)
+								
+
+								/*	for(DWORD i = 0; i < partialConstantStrings.size(); i++)
 									{
 										completeConstantStringsVS;
 										completeConstantStringsPS;
@@ -413,7 +508,7 @@ void ListAssetPtrs()
 									}*/
 
 									//Write Technique
-									std::string filepath = "techniques_out/";
+									std::string filepath = "techniques/";
 									filepath += techniqueData.name;
 									filepath += ".tech";
 									if(!FileExists(filepath.c_str()) || overwriteFiles) //prevents collisions even more TEMPORARY
@@ -431,7 +526,7 @@ void ListAssetPtrs()
 										{
 											outData += "		";
 											outData += completeConstantStringsVS[i];
-											outData += " material.";
+											outData += " = material.";
 											outData += completeConstantStringsVS[i];
 											outData += ";\r\n";
 										}
@@ -444,8 +539,15 @@ void ListAssetPtrs()
 										{
 											outData += "		";
 											outData += completeConstantStringsPS[i];
-											outData += " material.";
-											outData += completeConstantStringsPS[i];
+											outData += " = material.";
+											if(completeConstantStringsPS[i] != "colorMapSampler")
+											{
+												outData += completeConstantStringsPS[i];
+											}
+											else
+											{
+												outData += "colorMap";
+											}
 											outData += ";\r\n";
 										}
 										outData += "	}\r\n\r\n";
@@ -480,7 +582,7 @@ void ListAssetPtrs()
 							}
 						}
 
-						std::string filepath = "techset_out/";
+						std::string filepath = "techsets/";
 						filepath += techset_key;
 						filepath += ".techset";
 
