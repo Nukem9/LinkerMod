@@ -13,9 +13,9 @@ void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 	FlushInstructionCache(GetCurrentProcess(), (LPVOID)Address, Size);
 }
 
-void FixupFunction(ULONG_PTR Address, ULONG_PTR CEGEaxAddress)
+void FixupFunction(ULONG_PTR Address, ULONG_PTR DestAddress)
 {
-	DWORD data = (CEGEaxAddress - Address - 5);
+	DWORD data = (DestAddress - Address - 5);
 
 	PatchMemory(Address + 0, (PBYTE)"\xE9", 1);
 	PatchMemory(Address + 1, (PBYTE)&data, 4);
@@ -56,10 +56,50 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
+FILE *dumpFile;
+
+void DumpTable_Recurse(CodeConstantSource *Table, int Indent)
+{
+	//
+	// Cached buffer for indents
+	//
+	char indentBuf[16];
+	memset(indentBuf, 0, sizeof(indentBuf));
+
+	for (int i = 0; i < Indent; i++)
+		strcat_s(indentBuf, "\t");
+
+	//
+	// Enumerate all entries until nullptr is hit
+	//
+	for (;;)
+	{
+		CodeConstantSource *entry = Table++;
+
+		if (entry->name == nullptr)
+			break;
+
+		//
+		// Build the buffer
+		//
+		char buf[256];
+
+		sprintf_s(buf, "%s{ \"%s\", %d, %x, %d, %d },\n", indentBuf, entry->name, (int)entry->source, entry->subtable, entry->arrayCount, entry->arrayStride);
+		fprintf(dumpFile, buf);
+
+		if (entry->subtable)
+			DumpTable_Recurse(entry->subtable, Indent + 1);
+	}
+
+	fprintf(dumpFile, "\n");
+}
+
 BOOL RadiantMod_Init()
 {
 	printf("----> Loading radiant mod\n");
 	fflush(stdout);
+
+	fopen_s(&dumpFile, "outfile.txt", "w");
 
 	//
 	// Create an external console for Radiant
@@ -80,6 +120,7 @@ BOOL RadiantMod_Init()
 	//
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
+	Detours::X86::DetourFunction((PBYTE)0x0052EA70, (PBYTE)&hk_Material_DefaultArgumentSource);
 	Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
 

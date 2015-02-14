@@ -59,7 +59,7 @@ bool XModelLoadConfigFile(const char **pos, int name, int config)
 	XModelLoadConfigString(pos, (char *)(config + 0x102D));
 
 	// physicsPresetFilename?
-	XModelLoadConfigString(pos, (char *)(config + 5165));
+	XModelLoadConfigString(pos, (char *)(config + 0x142D));
 
 	if (xmodelVersion == 62)
 	{

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+SRCLINE(51)
 unsigned int R_HashAssetName(const char *name)
 {
 	int hash = 0;
