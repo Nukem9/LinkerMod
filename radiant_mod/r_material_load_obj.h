@@ -123,6 +123,9 @@ bool Material_IgnoreTechnique(const char *name);
 int Material_TechniqueTypeForName(const char *name);
 void *Material_LoadTechniqueSet(const char *name, int renderer);
 
+bool hk_Material_ParseSamplerSource();
+bool hk_Material_ParseConstantSource();
+
 bool hk_Material_DefaultArgumentSource();
 void hk_Material_LoadShader();
 

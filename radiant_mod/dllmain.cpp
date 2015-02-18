@@ -111,6 +111,10 @@ BOOL RadiantMod_Init()
 		freopen("CONIN$", "r", stdin);
 	}
 
+	Detours::X86::DetourFunction((PBYTE)0x0052E2C0, (PBYTE)&hk_Material_ParseSamplerSource);
+	Detours::X86::DetourFunction((PBYTE)0x0052E6E0, (PBYTE)&hk_Material_ParseConstantSource);
+
+
 	//
 	// Hook any needed functions
 	//

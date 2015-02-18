@@ -1,5 +1,23 @@
 #include "stdafx.h"
 
+SRCLINE(2158)
+const float *__cdecl Material_RegisterLiteral(const float *literal)
+{
+	static DWORD dwCall = 0x0052CC60;
+
+	__asm
+	{
+		mov edi, literal
+		call [dwCall]
+	}
+}
+
+SRCLINE(2197)
+const char *Material_RegisterString(const char *string)
+{
+	return ((const char *(__cdecl *)(const char *))0x0052CD70)(string);
+}
+
 SRCLINE(2819)
 bool Material_UsingTechnique(int techType)
 {
@@ -31,6 +49,154 @@ bool Material_DefaultIndexRange(ShaderIndexRange *indexRangeRef, unsigned int ar
 	return true;
 }
 
+SRCLINE(3437)
+bool Material_ParseIndexRange(const char **text, unsigned int arrayCount, ShaderIndexRange *indexRange)
+{
+	if (*Com_Parse(text) != '[')
+	{
+		Com_UngetToken();
+		indexRange->first = 0;
+		indexRange->count = arrayCount;
+		indexRange->isImplicit = 1;
+		return true;
+	}
+
+	indexRange->isImplicit = 0;
+	indexRange->first = Com_ParseInt(text);
+
+	if (indexRange->first < arrayCount)
+	{
+		if (*Com_Parse(text) == ',')
+		{
+			int last = Com_ParseInt(text);
+
+			if (last >= indexRange->first && last < arrayCount)
+				return Material_MatchToken(text, "]");
+
+			Com_ScriptError("ending index %i is not in the range [%i, %i]\n", last, indexRange->first, arrayCount - 1);
+			return false;
+		}
+		else
+		{
+			Com_UngetToken();
+			indexRange->count = 1;
+			return true;
+		}
+	}
+
+	Com_ScriptError("index %i is not in the range [0, %i]\n", indexRange->first, arrayCount - 1);
+	return false;
+}
+
+SRCLINE(3487)
+bool Material_ParseArrayOffset(const char **text, int arrayCount, int arrayStride, int *offset)
+{
+	if (!Material_MatchToken(text, "["))
+		return false;
+
+	int arrayIndex = Com_ParseInt(text);
+
+	if (arrayIndex >= 0 && arrayIndex < arrayCount)
+	{
+		if (!Material_MatchToken(text, "]"))
+			return false;
+
+		*offset = arrayStride * arrayIndex;
+		return true;
+	}
+
+	Com_ScriptError("array index must be in range [0, %i]\n", arrayCount - 1);
+	return false;
+}
+
+SRCLINE(3506)
+bool Material_CodeSamplerSource_r(const char **text, int offset, CodeSamplerSource *sourceTable, ShaderArgumentSource *argSource)
+{
+	ASSERT(text != nullptr);
+	ASSERT(sourceTable != nullptr);
+
+	if (!Material_MatchToken(text, "."))
+		return false;
+
+	const char *token = Com_Parse(text);
+
+	int sourceIndex;
+	for (sourceIndex = 0;; sourceIndex++)
+	{
+		if (!sourceTable[sourceIndex].name)
+		{
+			Com_ScriptError("unknown sampler source '%s'\n", token);
+			return false;
+		}
+
+		if (!strcmp(token, sourceTable[sourceIndex].name))
+			break;
+	}
+
+	if (sourceTable[sourceIndex].subtable)
+	{
+		if (sourceTable[sourceIndex].arrayCount)
+		{
+			int additionalOffset;
+
+			if (!Material_ParseArrayOffset(
+				text,
+				sourceTable[sourceIndex].arrayCount,
+				sourceTable[sourceIndex].arrayStride,
+				&additionalOffset))
+				return false;
+
+			offset += additionalOffset;
+		}
+
+		return Material_CodeSamplerSource_r(text, offset, sourceTable[sourceIndex].subtable, argSource);
+	}
+	else
+	{
+		argSource->type = 4;
+		argSource->u.codeIndex = offset + sourceTable[sourceIndex].source;
+
+		if (sourceTable[sourceIndex].arrayCount)
+		{
+			ASSERT(sourceTable[sourceIndex].arrayStride == 1);
+			return Material_ParseIndexRange(text, sourceTable[sourceIndex].arrayCount, &argSource->indexRange);
+		}
+
+		argSource->indexRange.first = 0;
+		argSource->indexRange.count = 1;
+		argSource->indexRange.isImplicit = true;
+		return true;
+	}
+
+	return false;
+}
+
+SRCLINE(3555)
+bool Material_ParseSamplerSource(const char **text, ShaderArgumentSource *argSource)
+{
+	const char *token = Com_Parse(text);
+
+	if (!strcmp(token, "sampler"))
+		return Material_CodeSamplerSource_r(text, 0, s_codeSamplers, argSource);
+
+	if (!strcmp(token, "material"))
+	{
+		if (!Material_MatchToken(text, "."))
+			return false;
+		
+		argSource->type = 2;
+		argSource->u.literalConst = (const float *)Material_RegisterString(Com_Parse(text));
+		argSource->indexRange.first = 0;
+		argSource->indexRange.count = 1;
+		argSource->indexRange.isImplicit = 1;
+
+		return argSource->u.literalConst != nullptr;
+	}
+
+	Com_ScriptError("expected 'sampler' or 'material', found '%s' instead\n", token);
+	return false;
+}
+
 SRCLINE(3580)
 bool Material_DefaultSamplerSourceFromTable(const char *constantName, ShaderIndexRange *indexRange, CodeSamplerSource *sourceTable, ShaderArgumentSource *argSource)
 {
@@ -57,7 +223,176 @@ bool Material_DefaultSamplerSourceFromTable(const char *constantName, ShaderInde
 SRCLINE(3606)
 bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
-	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource) != 0;
+	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource) != false;
+}
+
+SRCLINE(3613)
+bool Material_ParseVector(const char **text, int elemCount, float *vector)
+{
+	if (Material_MatchToken(text, "("))
+	{
+		int elemIndex = 0;
+
+		while (1)
+		{
+			vector[elemIndex++] = Com_ParseFloat(text);
+
+			if (elemIndex == elemCount)
+				break;
+
+			if (!Material_MatchToken(text, ","))
+				return false;
+		}
+
+		return Material_MatchToken(text, ")");
+	}
+
+	return false;
+}
+
+SRCLINE(3632)
+bool Material_ParseLiteral(const char **text, const char *token, float *literal)
+{
+	ASSERT(text != nullptr);
+	ASSERT(token != nullptr);
+	ASSERT(literal != nullptr);
+
+	literal[0] = 0.0f;
+	literal[1] = 0.0f;
+	literal[2] = 0.0f;
+	literal[3] = 1.0f;
+
+	if (!strcmp(token, "float1"))
+		Material_ParseVector(text, 1, literal);
+	else if (!strcmp(token, "float2"))
+		Material_ParseVector(text, 2, literal);
+	else if (!strcmp(token, "float3"))
+		Material_ParseVector(text, 3, literal);
+	else if (!strcmp(token, "float4"))
+		Material_ParseVector(text, 4, literal);
+	else
+		return false;
+
+	return true;
+}
+
+SRCLINE(3657)
+bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const char **text, int offset, CodeConstantSource *sourceTable, ShaderArgumentSource *argSource)
+{
+	ASSERT(text != nullptr);
+	ASSERT(sourceTable != nullptr);
+	ASSERT(argSource != nullptr);
+
+	if (Material_MatchToken(text, "."))
+	{
+		const char *token = Com_Parse(text);
+
+		int sourceIndex;
+		for (sourceIndex = 0;; sourceIndex++)
+		{
+			if (!sourceTable[sourceIndex].name)
+			{
+				Com_ScriptError("unknown constant source '%s'\n", token);
+				return false;
+			}
+
+			if (!strcmp(token, sourceTable[sourceIndex].name))
+				break;
+		}
+		if (sourceTable[sourceIndex].arrayCount)
+		{
+			//ASSERT(sourceTable[sourceIndex].subtable || (sourceTable[sourceIndex].source < CONST_SRC_FIRST_CODE_MATRIX && sourceTable[sourceIndex].arrayStride == 1));
+
+			if (sourceTable[sourceIndex].subtable)
+			{
+				int additionalOffset;
+
+				if (!Material_ParseArrayOffset(
+					text,
+					sourceTable[sourceIndex].arrayCount,
+					sourceTable[sourceIndex].arrayStride,
+					&additionalOffset))
+					return false;
+
+				offset += additionalOffset;
+			}
+			else
+			{
+				ASSERT(sourceTable[sourceIndex].arrayStride == 1);
+
+				if (!Material_ParseIndexRange(text, sourceTable[sourceIndex].arrayCount, &argSource->indexRange))
+					return false;
+			}
+		}
+
+		if (sourceTable[sourceIndex].subtable)
+			return Material_ParseCodeConstantSource_r(shaderType, text, offset, sourceTable[sourceIndex].subtable, argSource);
+
+		argSource->type = 2 * (shaderType != 0) + 3;
+		argSource->u.codeIndex = offset + sourceTable[sourceIndex].source;
+
+		//ASSERT((argSource->type == MTL_ARG_CODE_VERTEX_CONST) || s_codeConstUpdateFreq[argSource->u.codeIndex] != MTL_UPDATE_PER_PRIM);
+
+		if (!sourceTable[sourceIndex].arrayCount)
+		{
+			if (argSource->u.codeIndex >= 197)
+			{
+				if (!Material_ParseIndexRange(text, 4, &argSource->indexRange))
+					return false;
+			}
+			else
+			{
+				argSource->indexRange.first = 0;
+				argSource->indexRange.count = 1;
+				argSource->indexRange.isImplicit = 0;
+			}
+		}
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+	return false;
+}
+
+SRCLINE(3722)
+bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **text, ShaderArgumentSource *argSource)
+{
+	float literal[4]; // [sp+28h] [bp-14h]@1
+
+	const char *token = Com_Parse(text);
+	if (Material_ParseLiteral(text, token, literal))
+	{
+		argSource->type = shaderType != 0 ? 7 : 1;
+		argSource->u.literalConst = Material_RegisterLiteral(literal);
+		argSource->indexRange.first = 0;
+		argSource->indexRange.count = 1;
+		argSource->indexRange.isImplicit = 1;
+		return argSource->u.literalConst != 0;
+	}
+
+	if (!strcmp(token, "constant"))
+		return Material_ParseCodeConstantSource_r(shaderType, text, 0, s_codeConsts, argSource);
+
+	if (!strcmp(token, "material"))
+	{
+		if (!Material_MatchToken(text, "."))
+			return false;
+
+		token = Com_Parse(text);
+		argSource->type = shaderType != 0 ? 6 : 0;
+		argSource->u.literalConst = (const float *)Material_RegisterString(token);
+		argSource->indexRange.first = 0;
+		argSource->indexRange.count = 1;
+		argSource->indexRange.isImplicit = 1;
+		return argSource->u.literalConst != 0;
+	}
+
+	Com_ScriptError("expected 'sampler' or 'material', found '%s' instead\n", token);
+	return false;
 }
 
 SRCLINE(3758)
@@ -490,6 +825,41 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	return techniqueSet;
 }
 
+bool __declspec(naked) hk_Material_ParseSamplerSource()
+{
+	__asm
+	{
+		push ebp
+		mov ebp, esp
+
+		push [ebp + 0x8]
+		push ebx
+		call Material_ParseSamplerSource
+		add esp, 0x8
+
+		pop ebp
+		retn
+	}
+}
+
+bool __declspec(naked) hk_Material_ParseConstantSource()
+{
+	__asm
+	{
+		push ebp
+		mov ebp, esp
+
+		push ebx
+		push [ebp + 0xC]
+		push [ebp + 0x8]
+		call Material_ParseConstantSource
+		add esp, 0xC
+
+		pop ebp
+		retn
+	}
+}
+
 bool __declspec(naked) hk_Material_DefaultArgumentSource()
 {
 	__asm
@@ -572,11 +942,15 @@ CodeSamplerSource s_lightmapSamplers[] =
 	{ "primary", 4, 0, 0, 0 },
 	{ "secondary", 5, 0, 0, 0 },
 	{ "secondaryb", 33, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
 };
 
 CodeSamplerSource s_lightSamplers[] =
 {
 	{ "attenuation", 16, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
 };
 
 CodeSamplerSource s_codeSamplers[] =
@@ -609,6 +983,8 @@ CodeSamplerSource s_codeSamplers[] =
 	{ "ui3d", 39, 0, 0, 0 },
 	{ "missileCam", 40, 0, 0, 0 },
 	{ "compositeResult", 41, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
 };
 
 CodeSamplerSource s_defaultCodeSamplers[] =
@@ -639,6 +1015,8 @@ CodeSamplerSource s_defaultCodeSamplers[] =
 	{ "ui3dSampler", 39, 0, 0, 0 },
 	{ "missileCamSampler", 40, 0, 0, 0 },
 	{ "heatmapSampler", 42, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
 };
 
 CodeConstantSource s_nearPlaneConsts[] =
@@ -646,6 +1024,8 @@ CodeConstantSource s_nearPlaneConsts[] =
 	{ "org", 16, 0, 0, 0 },
 	{ "dx", 17, 0, 0, 0 },
 	{ "dy", 18, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
 };
 
 CodeConstantSource s_sunConsts[] =
@@ -653,6 +1033,8 @@ CodeConstantSource s_sunConsts[] =
 	{ "position", 50, 0, 0, 0 },
 	{ "diffuse", 51, 0, 0, 0 },
 	{ "specular", 52, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
 };
 
 CodeConstantSource s_lightConsts[] =
@@ -674,6 +1056,8 @@ CodeConstantSource s_lightConsts[] =
 	{ "coneControl1", 13, 0, 0, 0 },
 	{ "coneControl2", 14, 0, 0, 0 },
 	{ "spotCookieSlideControl", 15, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
 };
 
 CodeConstantSource s_codeConsts[] =
@@ -863,6 +1247,8 @@ CodeConstantSource s_codeConsts[] =
 	{ "skyColorMultiplier", 194, 0, 0, 0 },
 	{ "extraCamParam", 195, 0, 0, 0 },
 	{ "emblemLUTSelector", 196, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
 };
 
 CodeConstantSource s_defaultCodeConsts[] =
@@ -892,4 +1278,6 @@ CodeConstantSource s_defaultCodeConsts[] =
 	{ "lightSpotCookieSlideControl", 15, 0, 0, 0 },
 	{ "spotShadowmapPixelAdjust", 70, 0, 0, 0 },
 	{ "dlightSpotShadowmapPixelAdjust", 71, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
 };

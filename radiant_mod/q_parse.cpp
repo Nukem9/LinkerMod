@@ -42,6 +42,21 @@ void Com_ScriptError(const char *msg, ...)
 	return ((void(__cdecl *)(const char *, ...))0x004D1800)(buf);
 }
 
+SRCLINE(408)
+void Com_UngetToken()
+{
+	char *pi = (char *)0x744770 + 1056 * *(DWORD *)0x748970;
+
+	if (pi[1028])
+	{
+		Com_ScriptError("UngetToken called twice");
+		ASSERT(false);
+	}
+
+	pi[1028] = 1;
+	*(DWORD *)0x748974 = *(DWORD *)0x748978;
+}
+
 SRCLINE(997)
 const char *Com_Parse(const char **data_p)
 {
@@ -52,4 +67,16 @@ SRCLINE(1056)
 int Com_MatchToken(const char **buf_p, const char *match, int warning)
 {
 	return ((int(__cdecl *)(const char **, const char *, int))0x004D2040)(buf_p, match, warning);
+}
+
+SRCLINE(1196)
+float Com_ParseFloat(const char **buf_p)
+{
+	return (float)atof(Com_Parse(buf_p));
+}
+
+SRCLINE(1214)
+int Com_ParseInt(const char **buf_p)
+{
+	return atoi(Com_Parse(buf_p));
 }
