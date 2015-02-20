@@ -249,14 +249,24 @@ struct Material
 };
 
 
+struct MaterialConstantDefRaw
+{
+	char content[32];
+};
+
+struct MaterialTextureDefRaw
+{
+	char content[12];
+};
+
 struct MaterialInfoRaw
 {
-  unsigned int nameOffset;
+  unsigned int nameOffset;	
   unsigned int refImageNameOffset;
-  char gameFlags;
-  char sortKey;
-  char textureAtlasRowCount;
-  char textureAtlasColumnCount;
+  char gameFlags;			
+  char sortKey;					
+  char textureAtlasRowCount;    
+  char textureAtlasColumnCount; 
   float maxDeformMove;
   char deformFlags;
   char usage;
@@ -272,10 +282,10 @@ struct MaterialInfoRaw
 struct MaterialRaw
 {
   MaterialInfoRaw info;
-  unsigned int refStateBits[2];
-  unsigned __int16 textureCount;
-  unsigned __int16 constantCount;
-  unsigned int techSetNameOffset;
-  unsigned int textureTableOffset;
-  unsigned int constantTableOffset;
+  unsigned int refStateBits[2];  
+  unsigned __int16 textureCount; 
+  unsigned __int16 constantCount; 
+  unsigned int techSetNameOffset; 
+  unsigned int textureTableOffset; 
+  unsigned int constantTableOffset; 
 };
