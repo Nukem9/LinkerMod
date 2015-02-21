@@ -249,14 +249,32 @@ struct Material
 };
 
 
-struct MaterialInfoRaw
+struct MaterialConstantDefRaw //likely to have a length of 32
 {
   unsigned int nameOffset;
+  float literal[4];
+};
+
+struct MaterialTextureDefRaw
+{
+  unsigned int nameOffset;
+  char samplerState;
+  char semantic;
+  union
+  {
+  	unsigned int imageNameOffset;
+	unsigned int waterDefOffset;
+  };
+};
+
+struct MaterialInfoRaw
+{
+  unsigned int nameOffset;	
   unsigned int refImageNameOffset;
-  char gameFlags;
-  char sortKey;
-  char textureAtlasRowCount;
-  char textureAtlasColumnCount;
+  char gameFlags;			
+  char sortKey;					
+  char textureAtlasRowCount;    
+  char textureAtlasColumnCount; 
   float maxDeformMove;
   char deformFlags;
   char usage;
@@ -272,10 +290,10 @@ struct MaterialInfoRaw
 struct MaterialRaw
 {
   MaterialInfoRaw info;
-  unsigned int refStateBits[2];
-  unsigned __int16 textureCount;
-  unsigned __int16 constantCount;
-  unsigned int techSetNameOffset;
-  unsigned int textureTableOffset;
-  unsigned int constantTableOffset;
+  unsigned int refStateBits[2];  
+  unsigned __int16 textureCount; 
+  unsigned __int16 constantCount; 
+  unsigned int techSetNameOffset; 
+  unsigned int textureTableOffset; 
+  unsigned int constantTableOffset; 
 };
