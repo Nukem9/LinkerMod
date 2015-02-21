@@ -249,14 +249,22 @@ struct Material
 };
 
 
-struct MaterialConstantDefRaw
+struct MaterialConstantDefRaw //likely to have a length of 32
 {
-	char content[32];
+  unsigned int nameOffset;
+  float literal[4];
 };
 
 struct MaterialTextureDefRaw
 {
-	char content[12];
+  unsigned int nameOffset;
+  char samplerState;
+  char semantic;
+  union
+  {
+  	unsigned int imageNameOffset;
+	unsigned int waterDefOffset;
+  };
 };
 
 struct MaterialInfoRaw
