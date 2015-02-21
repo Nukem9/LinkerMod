@@ -6,6 +6,12 @@
                 ((DWORD)(BYTE)(ch2) << 16) | ((DWORD)(BYTE)(ch3) << 24 ))
 #endif /* defined(MAKEFOURCC) */
 
+struct _D3DXSEMANTIC
+{
+  unsigned int Usage;
+  unsigned int UsageIndex;
+};
+
 typedef enum _D3DFORMAT
 {
     D3DFMT_UNKNOWN              =  0,

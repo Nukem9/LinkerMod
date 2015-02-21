@@ -11,6 +11,8 @@
 #include "detours/Detours.h"
 
 #define SRCLINE(x)
+#define CHECK_SIZE(Type, Size) static_assert(sizeof(Type) == Size, "Invalid type size!");
+
 #include "assertdef.h"
 
 #include "d3dtypes.h"

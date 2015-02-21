@@ -39,7 +39,7 @@ void Com_ScriptError(const char *msg, ...)
 	va_start(va, msg);
 	_vsnprintf_s(buf, _TRUNCATE, msg, va);
 
-	return ((void(__cdecl *)(const char *, ...))0x004D1800)(buf);
+	((void(__cdecl *)(const char *, ...))0x004D1800)(buf);
 }
 
 SRCLINE(408)
@@ -67,6 +67,12 @@ SRCLINE(1056)
 int Com_MatchToken(const char **buf_p, const char *match, int warning)
 {
 	return ((int(__cdecl *)(const char **, const char *, int))0x004D2040)(buf_p, match, warning);
+}
+
+SRCLINE(1116)
+void Com_SkipRestOfLine(const char **data)
+{
+	((void(__cdecl *)(const char **))0x004D2160)(data);
 }
 
 SRCLINE(1196)

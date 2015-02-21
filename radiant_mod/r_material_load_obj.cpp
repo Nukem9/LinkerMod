@@ -276,6 +276,58 @@ bool Material_ParseLiteral(const char **text, const char *token, float *literal)
 	return true;
 }
 
+char Material_GetStreamDestForSemantic(_D3DXSEMANTIC *semantic)
+{
+	bool v2; // zf@8
+
+	switch (semantic->Usage)
+	{
+	case 0:
+		if (semantic->UsageIndex)
+			goto LABEL_19;
+		return 0;
+
+	case 3:
+		if (semantic->UsageIndex)
+			goto LABEL_19;
+		return 1;
+
+	case 10:
+		v2 = semantic->UsageIndex == 0;
+
+		if (semantic->UsageIndex >= 2)
+			goto LABEL_19;
+
+		return semantic->UsageIndex + 2;
+
+	case 12:
+		if (semantic->UsageIndex)
+			goto LABEL_19;
+		return 4;
+
+	case 5:
+		v2 = semantic->UsageIndex == 0;
+
+		if (semantic->UsageIndex >= 14)
+			goto LABEL_19;
+
+		return semantic->UsageIndex + 5;
+
+	case 1:
+		if (semantic->UsageIndex)
+			goto LABEL_19;
+		return 19;
+
+	default:
+	LABEL_19:
+		ASSERT(false);
+		//Com_Error(ERR_DROP, "Unknown shader input/output usage %i:%i\n", semantic->Usage, semantic->UsageIndex);
+		return 0;
+	}
+
+	return 0;
+}
+
 SRCLINE(3657)
 bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const char **text, int offset, CodeConstantSource *sourceTable, ShaderArgumentSource *argSource)
 {
@@ -342,9 +394,9 @@ bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const cha
 			}
 			else
 			{
-				argSource->indexRange.first = 0;
-				argSource->indexRange.count = 1;
-				argSource->indexRange.isImplicit = 0;
+				argSource->indexRange.first			= 0;
+				argSource->indexRange.count			= 1;
+				argSource->indexRange.isImplicit	= false;
 			}
 		}
 
@@ -361,17 +413,18 @@ bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const cha
 SRCLINE(3722)
 bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **text, ShaderArgumentSource *argSource)
 {
-	float literal[4]; // [sp+28h] [bp-14h]@1
-
 	const char *token = Com_Parse(text);
+
+	float literal[4];
 	if (Material_ParseLiteral(text, token, literal))
 	{
-		argSource->type = shaderType != 0 ? 7 : 1;
-		argSource->u.literalConst = Material_RegisterLiteral(literal);
-		argSource->indexRange.first = 0;
-		argSource->indexRange.count = 1;
-		argSource->indexRange.isImplicit = 1;
-		return argSource->u.literalConst != 0;
+		argSource->type						= shaderType != MTL_VERTEX_SHADER ? 7 : 1;
+		argSource->u.literalConst			= Material_RegisterLiteral(literal);
+		argSource->indexRange.first			= 0;
+		argSource->indexRange.count			= 1;
+		argSource->indexRange.isImplicit	= true;
+
+		return argSource->u.literalConst != nullptr;
 	}
 
 	if (!strcmp(token, "constant"))
@@ -383,12 +436,13 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 			return false;
 
 		token = Com_Parse(text);
-		argSource->type = shaderType != 0 ? 6 : 0;
-		argSource->u.literalConst = (const float *)Material_RegisterString(token);
-		argSource->indexRange.first = 0;
-		argSource->indexRange.count = 1;
-		argSource->indexRange.isImplicit = 1;
-		return argSource->u.literalConst != 0;
+		argSource->type						= shaderType != MTL_VERTEX_SHADER ? 6 : 0;
+		argSource->u.literalConst			= (const float *)Material_RegisterString(token);
+		argSource->indexRange.first			= 0;
+		argSource->indexRange.count			= 1;
+		argSource->indexRange.isImplicit	= true;
+
+		return argSource->u.literalConst != nullptr;
 	}
 
 	Com_ScriptError("expected 'sampler' or 'material', found '%s' instead\n", token);
@@ -456,11 +510,62 @@ bool Material_UnknownShaderworksConstantSource(MaterialShaderType shaderType, co
 	}
 }
 
+SRCLINE(3815)
+unsigned int Material_ElemCountForParamName(const char *shaderName, ShaderUniformDef *paramTable, unsigned int paramCount, const char *name, ShaderParamType *paramType)
+{
+	unsigned int count = 0;
+
+	for (unsigned int paramIndex = 0; paramIndex < paramCount; paramIndex++)
+	{
+		if (!strcmp(name, paramTable[paramIndex].name))
+		{
+			if (count && paramTable[paramIndex].type != *paramType)
+				Com_Error(ERR_DROP, "param type changed from %i to %i", paramTable[paramIndex].type, *paramType);
+
+			*paramType = paramTable[paramIndex].type;
+
+			if (count <= paramTable[paramIndex].index)
+				count = paramTable[paramIndex].index + 1;
+			
+			ASSERT(count > 0);
+		}
+	}
+
+	return count;
+}
+
+SRCLINE(3840)
+bool Material_ParseArgumentSource(MaterialShaderType shaderType, const char **text, const char *shaderName, ShaderParamType paramType, ShaderArgumentSource *argSource)
+{
+	ASSERT(text != nullptr);
+	ASSERT(*text != '\0');
+	ASSERT(shaderName != nullptr);
+	ASSERT(argSource != nullptr);
+
+	if (Material_MatchToken(text, "="))
+	{
+		if (paramType)
+		{
+			if (paramType > SHADER_PARAM_FLOAT4 && paramType <= SHADER_PARAM_SAMPLER_1D)
+				return Material_ParseSamplerSource(text, argSource);
+		
+			ASSERT(false && "Unknown constant type");
+			return false;
+		}
+
+		return Material_ParseConstantSource(shaderType, text, argSource);
+	}
+
+	return false;
+}
+
 SRCLINE(3868)
 bool Material_DefaultArgumentSource(MaterialShaderType shaderType, const char *constantName, ShaderParamType paramType, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
 	ASSERT(constantName != nullptr);
 	ASSERT(argSource != nullptr);
+
+	printf("type: %d name: %s param: %d\n", shaderType, constantName, paramType);
 
 	if (paramType)
 	{
@@ -474,6 +579,580 @@ bool Material_DefaultArgumentSource(MaterialShaderType shaderType, const char *c
 		return true;
 
 	return Material_UnknownShaderworksConstantSource(shaderType, constantName, indexRange, argSource);
+}
+
+SRCLINE(3980)
+int Material_CompareShaderArgumentsForCombining(const void *e0, const void *e1)
+{
+	MaterialShaderArgument *c1 = (MaterialShaderArgument *)e0;
+	MaterialShaderArgument *c2 = (MaterialShaderArgument *)e1;
+
+	int v4 = c1->type == 4 || c1->type == 2;
+	int v3 = c2->type == 4 || c2->type == 2;
+
+	if (v4 == v3)
+		return c1->dest - c2->dest;
+  
+	return v4 - v3;
+}
+
+SRCLINE(3994)
+bool Material_AttemptCombineShaderArguments(MaterialShaderArgument *arg0, MaterialShaderArgument *arg1)
+{
+	if (arg0->type != arg1->type)
+		return false;
+
+	if (arg0->type != 3 && arg0->type != 5)
+		return false;
+
+	if (arg0->u.codeConst.rowCount + arg0->dest != arg1->dest)
+		return false;
+
+	if ((signed int)LOWORD(arg0->u.literalConst) < 197)
+		return false;
+
+	if (arg0->u.codeConst.index != arg1->u.codeConst.index)
+		return false;
+						
+	if (arg0->u.codeConst.rowCount + arg0->u.codeConst.firstRow != arg1->u.codeConst.firstRow)
+		return false;
+
+	ASSERT((arg1->u.codeConst.rowCount + arg0->u.codeConst.rowCount + arg0->u.codeConst.firstRow < 2
+		|| arg1->u.codeConst.rowCount + arg0->u.codeConst.rowCount + arg0->u.codeConst.firstRow > 4));
+
+	arg0->u.codeConst.rowCount += arg1->u.codeConst.rowCount;
+	return true;
+}
+
+SRCLINE(4020)
+unsigned int Material_CombineShaderArguments(unsigned int usedCount, MaterialShaderArgument *localArgs)
+{
+	int dstIndex = 0;
+
+	for (unsigned int srcIndex = 1; srcIndex < usedCount; srcIndex++)
+	{
+		if (!Material_AttemptCombineShaderArguments(&localArgs[dstIndex], &localArgs[srcIndex]))
+		{
+			dstIndex++;
+			
+			localArgs[dstIndex].type			= localArgs[srcIndex].type;
+			localArgs[dstIndex].dest			= localArgs[srcIndex].dest;
+			localArgs[dstIndex].u.codeSampler	= localArgs[srcIndex].u.codeSampler;
+		}
+	}
+
+	return dstIndex + 1;
+}
+
+SRCLINE(4037)
+bool Material_SetShaderArguments(unsigned int usedCount, MaterialShaderArgument *localArgs, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args)
+{
+	ASSERT(args != nullptr);
+	ASSERT(argCount != nullptr);
+
+	if (usedCount)
+	{
+		if (*argCount + usedCount > argLimit)
+		{
+			Com_ScriptError("more than %i total shader arguments\n", argLimit);
+			return false;
+		}
+		
+		// Sort arguments so they can be easily combined
+		qsort(localArgs, usedCount, sizeof(MaterialShaderArgument), Material_CompareShaderArgumentsForCombining);
+
+		// Combine the arguments if possible (and get the new count)
+		usedCount = Material_CombineShaderArguments(usedCount, localArgs);
+
+		// Copy all of the fixed arguments to the real table
+		memcpy((char *)&args[*argCount], (char *)localArgs, sizeof(MaterialShaderArgument) * usedCount);
+
+		// Adjust the output count
+		*argCount += usedCount;
+	}
+
+	return true;
+}
+
+SRCLINE(4058)
+ShaderUniformDef *Material_GetShaderArgumentDest(const char *paramName, unsigned int paramIndex, ShaderUniformDef *paramTable, unsigned int paramCount)
+{
+	for (unsigned int tableIndex = 0; tableIndex < paramCount; tableIndex++)
+	{
+		if (paramTable[tableIndex].index == paramIndex && !strcmp(paramTable[tableIndex].name, paramName))
+		{
+			if (paramTable[tableIndex].isAssigned)
+			{
+				Com_ScriptError("parameter %s index %i already assigned\n", paramName, paramIndex);
+				return nullptr;
+			}
+
+			paramTable[tableIndex].isAssigned = true;
+			return &paramTable[tableIndex];
+		}
+	}
+
+	ASSERT(false && "unfound name should be caught earlier");
+	return nullptr;
+}
+
+SRCLINE(4083)
+bool MaterialAddShaderArgument(const char *shaderName, const char *paramName, MaterialShaderArgument *arg, char (*registerUsage)[64])
+{
+	if (arg->type > 1 && arg->type != 3)
+		return true;
+
+	if (arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
+	{
+		Com_ScriptError("Invalid vertex register index %d in '%s' for '%s'\n", arg->dest, shaderName, paramName);
+		return false;
+	}
+
+	if ((*registerUsage)[64 * arg->dest])
+	{
+		Com_ScriptError(
+			"Vertex register collision at index %d in '%s' between '%s' and '%s'\n",
+			arg->dest,
+			shaderName,
+			&(*registerUsage)[64 * arg->dest],
+			paramName);
+
+		return false;
+	}
+
+	I_strncpyz(&(*registerUsage)[64 * arg->dest], paramName, 64);
+	return true;
+}
+
+SRCLINE(4112)
+bool Material_AddShaderArgumentFromLiteral(const char *shaderName, const char *paramName, unsigned __int16 type, const float *literal, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64])
+{
+	ASSERT(type != 7 && arg->dest < R_MAX_PIXEL_SHADER_CONSTS);
+
+	arg->type			= type;
+	arg->dest			= dest->resourceDest;
+	arg->u.codeSampler	= (unsigned int)literal;
+
+	return MaterialAddShaderArgument(shaderName, paramName, arg, registerUsage);
+}
+
+SRCLINE(4129)
+bool Material_AddShaderArgumentFromCodeConst(const char *shaderName, const char *paramName, unsigned __int16 type, unsigned int codeIndex, unsigned int offset, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64])
+{
+	ASSERT(type != 5 && arg->dest < R_MAX_PIXEL_SHADER_CONSTS);
+
+	arg->type					= type;
+	arg->dest					= dest->resourceDest;
+	arg->u.codeConst.rowCount	= 1;
+
+	if (codeIndex < 197)
+	{
+		arg->u.codeConst.index		= offset + codeIndex;
+		arg->u.codeConst.firstRow	= 0;
+	}
+	else
+	{
+		if (dest->isTransposed)
+			arg->u.codeConst.index = ((codeIndex - 197) ^ 2) + 197;
+		else
+			arg->u.codeConst.index = codeIndex;
+
+		arg->u.codeConst.firstRow = offset;
+	}
+
+	return MaterialAddShaderArgument(shaderName, paramName, arg, registerUsage);
+}
+
+SRCLINE(4159)
+void Material_AddShaderArgumentFromCodeSampler(unsigned __int16 type, unsigned int codeSampler, ShaderUniformDef *dest, MaterialShaderArgument *arg)
+{
+	arg->type			= type;
+	arg->dest			= dest->resourceDest;
+	arg->u.codeSampler	= codeSampler;
+}
+
+SRCLINE(4166)
+bool Material_AddShaderArgumentFromMaterial(const char *shaderName, const char *paramName, unsigned __int16 type, const char *name, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64])
+{
+	ASSERT(type != 6 && arg->dest < R_MAX_PIXEL_SHADER_CONSTS);
+
+	Material_RegisterString(name);
+
+	arg->type			= type;
+	arg->dest			= dest->resourceDest;
+	arg->u.codeSampler	= R_HashString(name);
+
+	return MaterialAddShaderArgument(shaderName, paramName, arg, registerUsage);
+}
+
+SRCLINE(4185)
+bool Material_AddShaderArgument(const char *shaderName, ShaderArgumentSource *argSource, ShaderArgumentDest *argDest, ShaderUniformDef *paramTable, unsigned int paramCount, unsigned int *usedCount, MaterialShaderArgument *argTable, char(*registerUsage)[64])
+{
+	if (argSource->indexRange.isImplicit)
+	{
+		ASSERT(argSource->indexRange.first == 0);
+
+		if (argDest->indexRange.count > argSource->indexRange.count)
+		{
+			Com_ScriptError("The destination needs %i entries, but the source can only provide %i",
+				argDest->indexRange.count,
+				argSource->indexRange.count);
+
+			return false;
+		}
+
+		argSource->indexRange.count = argDest->indexRange.count;
+	}
+	else if (argDest->indexRange.count != argSource->indexRange.count)
+	{
+		Com_ScriptError("The destination needs %i entries, but the source provides %i",
+			argDest->indexRange.count,
+			argSource->indexRange.count);
+
+		return false;
+	}
+
+	switch (argSource->type)
+	{
+	case 1:
+	case 7:
+	{
+		if (argDest->indexRange.count != 1)
+		{
+			Com_ScriptError("Must assign literals to a constant one row at a time");
+			return false;
+		}
+
+		ShaderUniformDef *dest = Material_GetShaderArgumentDest(
+			argDest->paramName,
+			argDest->indexRange.first,
+			paramTable,
+			paramCount);
+
+		if (!dest)
+			return false;
+
+		if (!Material_AddShaderArgumentFromLiteral(
+			shaderName,
+			argDest->paramName,
+			argSource->type,
+			argSource->u.literalConst,
+			dest,
+			&argTable[*usedCount],
+			registerUsage))
+			return false;
+
+		*usedCount += 1;
+		return true;
+	}
+
+	case 3:
+	case 5:
+	{
+		for (unsigned int indexOffset = 0; indexOffset < argDest->indexRange.count; ++indexOffset)
+		{
+			ShaderUniformDef *dest = Material_GetShaderArgumentDest(
+				argDest->paramName,
+				indexOffset + argDest->indexRange.first,
+				paramTable,
+				paramCount);
+
+			if (!dest)
+				return false;
+
+			if (!Material_AddShaderArgumentFromCodeConst(
+				shaderName,
+				argDest->paramName,
+				argSource->type,
+				LOWORD(argSource->u.literalConst),
+				indexOffset + argSource->indexRange.first,
+				dest,
+				&argTable[*usedCount],
+				registerUsage))
+				return false;
+
+			*usedCount += 1;
+		}
+
+		return true;
+	}
+
+	case 4:
+	{
+		for (unsigned int indexOffset = 0; indexOffset < argDest->indexRange.count; indexOffset++)
+		{
+			ShaderUniformDef *dest = Material_GetShaderArgumentDest(
+				argDest->paramName,
+				indexOffset + argDest->indexRange.first,
+				paramTable,
+				paramCount);
+
+			if (!dest)
+				return false;
+
+			Material_AddShaderArgumentFromCodeSampler(
+				argSource->type,
+				indexOffset + argSource->indexRange.first + argSource->u.codeIndex,
+				dest,
+				&argTable[*usedCount]);
+
+			*usedCount += 1;
+		}
+
+		return true;
+	}
+
+	case 0:
+	case 2:
+	case 6:
+	{
+		if (argDest->indexRange.count != 1)
+		{
+			Com_ScriptError("Must assign material values one at a time");
+			return false;
+		}
+
+		ASSERT(argSource->indexRange.first == 0);
+		ASSERT(argSource->indexRange.count == 1);
+
+		ShaderUniformDef *dest = Material_GetShaderArgumentDest(
+			argDest->paramName,
+			argDest->indexRange.first,
+			paramTable,
+			paramCount);
+
+		if (!dest)
+			return false;
+
+		if (!Material_AddShaderArgumentFromMaterial(
+			shaderName,
+			argDest->paramName,
+			argSource->type,
+			argSource->u.name,
+			dest,
+			&argTable[*usedCount],
+			registerUsage))
+			return false;
+
+		*usedCount += 1;
+		return true;
+	}
+
+	default:
+		ASSERT(false && "Unhandled case");
+		break;
+	}
+
+	return false;
+}
+
+SRCLINE(4275)
+bool CodeConstIsOneOf(unsigned __int16 constCodeIndex, const unsigned __int16 *consts, int numConsts)
+{
+	for (int constIdx = 0; constIdx < numConsts; constIdx++)
+	{
+		if (consts[constIdx] == constCodeIndex)
+			return true;
+	}
+
+	return false;
+}
+
+SRCLINE(4285)
+bool Material_ParseShaderArguments(const char **text, const char *shaderName, MaterialShaderType shaderType, ShaderUniformDef *paramTable, unsigned int paramCount, unsigned __int16 *techFlags, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args)
+{
+	unsigned __int16 v10; // cx@54
+	__int16 v14; // [sp+18h] [bp-5134h]@24
+	unsigned __int16 v15; // [sp+1Ch] [bp-5130h]@25
+
+	ASSERT(techFlags != nullptr);
+	ASSERT(paramTable  != nullptr);
+
+	if (!Material_MatchToken(text, "{"))
+		return false;
+
+	//
+	// Values for shader registers stored as 64-byte strings
+	//
+	char registerUsage[16384];
+	memset(registerUsage, 0, sizeof(registerUsage));
+
+	//
+	// Array of parsed shader arguments
+	//
+	MaterialShaderArgument localArgs[512];
+
+	//
+	// Current shader argument dest/source
+	//
+	ShaderArgumentDest argDest;
+	ShaderArgumentSource argSource;
+
+	unsigned int usedCount = 0;
+	while (1)
+	{
+		const char *token = Com_Parse(text);
+
+		if (!*token)
+		{
+			Com_ScriptError("unexpected end-of-file\n");
+			return false;
+		}
+
+		if (*token == '}')
+			break;
+
+		char paramName[256];
+		I_strncpyz(paramName, token, sizeof(paramName));
+
+		ShaderParamType paramType;
+		unsigned int registerCount = Material_ElemCountForParamName(shaderName, paramTable, paramCount, paramName, &paramType);
+
+		if (registerCount)
+		{
+			if (!Material_ParseIndexRange(text, registerCount, &argDest.indexRange))
+				return false;
+
+			argDest.paramName = paramName;
+			
+			if (!Material_ParseArgumentSource(shaderType, text, shaderName, paramType, &argSource))
+				return false;
+			
+			if (!Material_MatchToken(text, ";"))
+				return false;
+			
+			if (!Material_AddShaderArgument(
+				shaderName,
+				&argSource,
+				&argDest,
+				paramTable,
+				paramCount,
+				&usedCount,
+				localArgs,
+				(char(*)[64])registerUsage))
+				return false;
+
+			if (v14 == 4)
+			{
+				switch (v15)
+				{
+				case 9:
+					*techFlags |= 1;
+					break;
+				case 10:
+					*techFlags |= 2;
+					break;
+				case 19:
+				case 20:
+				case 21:
+					*techFlags |= 64;
+					break;
+				}
+			}
+		}
+		else
+		{
+			if (!Material_MatchToken(text, "="))
+				return false;
+
+			Com_SkipRestOfLine(text);
+		}
+	}
+
+	if (usedCount == paramCount)
+		return Material_SetShaderArguments(usedCount, localArgs, argLimit, argCount, args);
+
+	//
+	// Try and use default arguments for undefined parameters
+	//
+	for (unsigned int paramIndex = 0; paramIndex < paramCount; paramIndex++)
+	{
+		if (paramTable[paramIndex].isAssigned)
+			continue;
+
+		argDest.paramName				= paramTable[paramIndex].name;
+		argDest.indexRange.first		= paramTable[paramIndex].index;
+		argDest.indexRange.count		= 1;
+		argDest.indexRange.isImplicit	= false;
+
+		if (Material_DefaultArgumentSource(
+			shaderType,
+			paramTable[paramIndex].name,
+			paramTable[paramIndex].type,
+			&argDest.indexRange,
+			&argSource))
+		{
+			if (v14 == 5)
+			{
+				if (v15 == 4)
+					*techFlags |= 0x10u;
+			}
+			else if (v14 == 4 && (v15 == 19 || v15 == 20 || v15 == 21))
+			{
+				*techFlags |= 0x40u;
+			}
+
+			if (v14 == 3 && v15 == 120)
+				*techFlags |= 0x100u;
+			
+			if (v14 == 3)
+			{
+				v10 = *techFlags;
+				if (!(v10 & 0x20))
+				{
+					unsigned short foliageConsts[4];
+					foliageConsts[0] = 81;
+					foliageConsts[1] = 82;
+					foliageConsts[2] = 83;
+					foliageConsts[3] = 84;
+
+					if (CodeConstIsOneOf(v15, (const unsigned __int16 *)foliageConsts, 4))
+						*techFlags |= 0x20u;
+				}
+			}
+
+			if (v14 == 3 && !(*techFlags & 0x200))
+			{
+				unsigned short scorchConsts[2];
+				scorchConsts[0] = 114;
+				scorchConsts[1] = 118;
+
+				if (CodeConstIsOneOf(v15, scorchConsts, 2))
+					*techFlags |= 0x200u;
+			}
+
+			if (!Material_AddShaderArgument(
+				shaderName,
+				&argSource,
+				&argDest,
+				paramTable,
+				paramCount,
+				&usedCount,
+				localArgs,
+				(char(*)[64])registerUsage))
+				return false;
+		}
+	}
+
+	//
+	// Apply arguments if all parameters matched
+	//
+	if (usedCount == paramCount)
+		return Material_SetShaderArguments(usedCount, localArgs, argLimit, argCount, args);
+
+	//
+	// Notify the user of any undefined arguments in the shader
+	//
+	Com_PrintWarning(8, "Undefined shader parameter(s) in %s\n", shaderName);
+
+	for (unsigned int paramIndex = 0; paramIndex < paramCount; paramIndex++)
+	{
+		if (!paramTable[paramIndex].isAssigned)
+			Com_PrintWarning(8, "  %s\n", paramTable[paramIndex].name);
+	}
+
+	Com_PrintWarning(8, "%i parameter(s) were undefined\n", paramCount - usedCount);
+	return false;
 }
 
 SRCLINE(4720)
@@ -578,12 +1257,13 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 		}
 	}
 
-	void *shaderMemory = Z_Malloc(shaderDataSize);
+	void *shaderMemory	= Z_Malloc(shaderDataSize);
+	void *shader		= nullptr;
+
 	fread(shaderMemory, 1, shaderDataSize, shaderFile);
 
-	void *shader = nullptr;
 	if (!Material_CopyTextToDXBuffer(shaderMemory, shaderDataSize, &shader))
-		printf("SHADER CREATION FAILED\n");
+		ASSERT(false && "SHADER CREATION FAILED\n");
 
 	fclose(shaderFile);
 	Z_Free(shaderMemory);
@@ -700,7 +1380,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	// Create a file path using normal techsets and read data
 	//
 	char filename[MAX_PATH];
-	Com_sprintf(filename, MAX_PATH, "techsets/%s.techset", name);
+	Com_sprintf(filename, MAX_PATH, "pimp/techsets/%s.techset", name);
 
 	void *fileData;
 	int fileSize = FS_ReadFile(filename, (void **)&fileData);
@@ -710,8 +1390,8 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 		//
 		// Try loading with PIMP enabled
 		//
-		Com_sprintf(filename, MAX_PATH, "pimp/techsets/%s.techset", name);
-		fileSize = FS_ReadFile(filename, (void **)&fileData);
+		//Com_sprintf(filename, MAX_PATH, "techsets/%s.techset", name);
+		//fileSize = FS_ReadFile(filename, (void **)&fileData);
 
 		if (fileSize < 0)
 		{
@@ -793,7 +1473,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 			{
 				if (!techTypeCount)
 				{
-					Com_ScriptError("Unknown technique type '%s'\n");
+					Com_ScriptError("Unknown technique type '%s'\n", token);
 					techniqueSet = 0;
 					break;
 				}
@@ -801,7 +1481,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 				void *technique = Material_RegisterTechnique(token, renderer);
 				if (!technique)
 				{
-					Com_ScriptError("Couldn't register technique '%s'\n");
+					Com_ScriptError("Couldn't register technique '%s'\n", token);
 					techniqueSet = 0;
 					break;
 				}
@@ -823,6 +1503,45 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	Com_EndParseSession();
 	FS_FreeFile(fileData);
 	return techniqueSet;
+}
+
+bool __declspec(naked) hk_Material_AddShaderArgument()
+{
+	__asm
+	{
+		push ebp
+		mov ebp, esp
+
+		push [ebp + 0x20]					// a8: registerUsage
+		push [ebp + 0x1C]					// a7: argTable
+		push [ebp + 0x18]					// a6: usedCount
+		push [ebp + 0x14]					// a5: paramCount
+		push [ebp + 0x10]					// a4: paramTable
+		push eax							// a3: argDest
+		push [ebp + 0x0C]					// a2: argSource
+		push [ebp + 0x08]					// a1: shaderName
+		call Material_AddShaderArgument
+		add esp, 0x20
+
+		pop ebp
+		retn
+	}
+}
+
+char __declspec(naked) hk_Material_GetStreamDestForSemantic()
+{
+	__asm
+	{
+		push ebp
+		mov ebp, esp
+
+		push eax
+		call Material_GetStreamDestForSemantic
+		add esp, 0x4
+
+		pop ebp
+		retn
+	}
 }
 
 bool __declspec(naked) hk_Material_ParseSamplerSource()

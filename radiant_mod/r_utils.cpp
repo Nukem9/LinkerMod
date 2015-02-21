@@ -15,3 +15,14 @@ unsigned int R_HashAssetName(const char *name)
 
 	return hash;
 }
+
+SRCLINE(70)
+unsigned int R_HashString(const char *string)
+{
+	int hash = 0;
+
+	for (const char *pos = string; *pos; pos++)
+		hash = (char)(*pos | 0x20) ^ 33 * hash;
+
+	return hash;
+}

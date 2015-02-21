@@ -113,7 +113,9 @@ BOOL RadiantMod_Init()
 
 	Detours::X86::DetourFunction((PBYTE)0x0052E2C0, (PBYTE)&hk_Material_ParseSamplerSource);
 	Detours::X86::DetourFunction((PBYTE)0x0052E6E0, (PBYTE)&hk_Material_ParseConstantSource);
+	Detours::X86::DetourFunction((PBYTE)0x0052FDB0, (PBYTE)&hk_Material_GetStreamDestForSemantic);
 
+	Detours::X86::DetourFunction((PBYTE)0x0052EFB0, (PBYTE)&hk_Material_AddShaderArgument);
 
 	//
 	// Hook any needed functions
@@ -152,6 +154,11 @@ BOOL RadiantMod_Init()
 	strcpy_safe((char *)0x006ECA30, "You will need to restart CoDBORadiantModTool for the view changes to take place.");
 	strcpy_safe((char *)0x006EC5CC, "CoDBORadiantModTool Project files( *.prj )|*.prj||");
 	strcpy_safe((char *)0x00749640, "CoDBORadiantModTool Project (*.prj)");
+
+	//
+	// Debug INT3 to make sure specific functions are not called
+	//
+
 
 	return TRUE;
 }
