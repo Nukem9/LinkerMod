@@ -99,8 +99,6 @@ BOOL RadiantMod_Init()
 	printf("----> Loading radiant mod\n");
 	fflush(stdout);
 
-	fopen_s(&dumpFile, "outfile.txt", "w");
-
 	//
 	// Create an external console for Radiant
 	//
@@ -111,12 +109,6 @@ BOOL RadiantMod_Init()
 		freopen("CONIN$", "r", stdin);
 	}
 
-	Detours::X86::DetourFunction((PBYTE)0x0052E2C0, (PBYTE)&hk_Material_ParseSamplerSource);
-	Detours::X86::DetourFunction((PBYTE)0x0052E6E0, (PBYTE)&hk_Material_ParseConstantSource);
-	Detours::X86::DetourFunction((PBYTE)0x0052FDB0, (PBYTE)&hk_Material_GetStreamDestForSemantic);
-
-	Detours::X86::DetourFunction((PBYTE)0x0052EFB0, (PBYTE)&hk_Material_AddShaderArgument);
-
 	//
 	// Hook any needed functions
 	//
@@ -126,7 +118,6 @@ BOOL RadiantMod_Init()
 	//
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
-	Detours::X86::DetourFunction((PBYTE)0x0052EA70, (PBYTE)&hk_Material_DefaultArgumentSource);
 	Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
 
@@ -158,7 +149,24 @@ BOOL RadiantMod_Init()
 	//
 	// Debug INT3 to make sure specific functions are not called
 	//
+#define DO_NOT_USE(x) PatchMemory((x), (PBYTE)"\xCC", 1)
 
+	DO_NOT_USE(0x0052EA20);// Material_ParseArgumentSource
+	DO_NOT_USE(0x0052E2C0);// Material_ParseSamplerSource
+	DO_NOT_USE(0x0052E6E0);// Material_ParseConstantSource
+	DO_NOT_USE(0x0052F210);// Material_ParseShaderArguments
+	DO_NOT_USE(0x0052E050);// Material_ParseIndexRange
+	DO_NOT_USE(0x0052EFB0);// Material_AddShaderArgument
+	DO_NOT_USE(0x0052ED40);// Material_SetShaderArguments
+
+	DO_NOT_USE(0x0052EA70);// Material_DefaultArgumentSource
+	DO_NOT_USE(0x0052E370);// Material_DefaultSamplerSourceFromTable
+	DO_NOT_USE(0x0052E800);// Material_DefaultConstantSourceFromTable
+	DO_NOT_USE(0x0052E910);// Material_UnknownShaderworksConstantSource
+
+	DO_NOT_USE(0x0052FDB0);// Material_GetStreamDestForSemantic
+	DO_NOT_USE(0x0052DA70);// Material_NameForStreamDest
+	DO_NOT_USE(0x0052E990);// Material_ElemCountForParamName
 
 	return TRUE;
 }
