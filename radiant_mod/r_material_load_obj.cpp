@@ -23,7 +23,8 @@ bool Material_UsingTechnique(int techType)
 {
 	ASSERT(techType < ARRAYSIZE(g_useTechnique));
 
-	return g_useTechnique[techType];
+	return ((bool *)0x0064B67C)[techType];
+	//return g_useTechnique[techType];
 }
 
 SRCLINE(2825)
@@ -45,7 +46,7 @@ bool Material_DefaultIndexRange(ShaderIndexRange *indexRangeRef, unsigned int ar
 
 	indexRangeSet->first		= indexRangeRef->first;
 	indexRangeSet->count		= indexRangeRef->count;
-	indexRangeSet->isImplicit	= 0;
+	indexRangeSet->isImplicit	= false;
 	return true;
 }
 
@@ -153,7 +154,7 @@ bool Material_CodeSamplerSource_r(const char **text, int offset, CodeSamplerSour
 	}
 	else
 	{
-		argSource->type			= 4;
+		argSource->type			= MTL_ARG_CODE_PIXEL_SAMPLER;
 		argSource->u.codeIndex	= offset + sourceTable[sourceIndex].source;
 
 		if (sourceTable[sourceIndex].arrayCount)
@@ -178,13 +179,15 @@ bool Material_ParseSamplerSource(const char **text, ShaderArgumentSource *argSou
 
 	if (!strcmp(token, "sampler"))
 		return Material_CodeSamplerSource_r(text, 0, s_codeSamplers, argSource);
+		// FIX
+		//return Material_CodeSamplerSource_r(text, 0, (CodeSamplerSource *)0x0064B7B0, argSource);
 
 	if (!strcmp(token, "material"))
 	{
 		if (!Material_MatchToken(text, "."))
 			return false;
 		
-		argSource->type						= 2;
+		argSource->type						= MTL_ARG_MATERIAL_PIXEL_SAMPLER;
 		argSource->u.literalConst			= (const float *)Material_RegisterString(Com_Parse(text));
 		argSource->indexRange.first			= 0;
 		argSource->indexRange.count			= 1;
@@ -211,7 +214,7 @@ bool Material_DefaultSamplerSourceFromTable(const char *constantName, ShaderInde
 			&& !strcmp(constantName, sourceTable[sourceIndex].name)
 			&& Material_DefaultIndexRange(indexRange, sourceTable[sourceIndex].arrayCount, &argSource->indexRange))
 		{
-			argSource->type			= 4;
+			argSource->type			= MTL_ARG_CODE_PIXEL_SAMPLER;
 			argSource->u.codeIndex	= LOWORD(sourceTable[sourceIndex].source);
 			return true;
 		}
@@ -224,6 +227,8 @@ SRCLINE(3606)
 bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
 	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource) != false;
+	// FIX
+	//return Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource) != false;
 }
 
 SRCLINE(3613)
@@ -288,8 +293,8 @@ MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *a
 		break;
 
 	case 4:
-		updateFreq = s_codeSamplerUpdateFreq[arg->u.codeSampler];
-
+		/*updateFreq = s_codeSamplerUpdateFreq[arg->u.codeSampler];
+		*/
 		//ASSERT((updateFreq == MTL_UPDATE_PER_OBJECT) || (updateFreq == MTL_UPDATE_RARELY) || (updateFreq == MTL_UPDATE_CUSTOM));
 		break;
 
@@ -390,7 +395,8 @@ unsigned int R_SetParameterDefArray(LPD3DXSHADER_CONSTANTTABLE constantTable, un
 		paramDef++;
 	}
 
-	return 1;//paramDefIndex;
+	printf("defIndx: %d\n", paramDefIndex);
+	return paramDefIndex;
 }
 
 int Material_PrepareToParseShaderArguments(D3DXSHADER_CONSTANTTABLE *constantTable, ShaderUniformDef *paramTable)
@@ -700,7 +706,7 @@ bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const cha
 		argSource->type = 2 * (shaderType != 0) + 3;
 		argSource->u.codeIndex = offset + sourceTable[sourceIndex].source;
 
-		//ASSERT((argSource->type == MTL_ARG_CODE_VERTEX_CONST) || s_codeConstUpdateFreq[argSource->u.codeIndex] != MTL_UPDATE_PER_PRIM);
+		ASSERT((argSource->type == MTL_ARG_CODE_VERTEX_CONST) || s_codeConstUpdateFreq[argSource->u.codeIndex] != MTL_UPDATE_PER_PRIM);
 
 		if (!sourceTable[sourceIndex].arrayCount)
 		{
@@ -735,7 +741,7 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 	float literal[4];
 	if (Material_ParseLiteral(text, token, literal))
 	{
-		argSource->type						= shaderType != MTL_VERTEX_SHADER ? 7 : 1;
+		argSource->type						= (shaderType == MTL_VERTEX_SHADER) ? MTL_ARG_LITERAL_VERTEX_CONST : MTL_ARG_LITERAL_PIXEL_CONST;
 		argSource->u.literalConst			= Material_RegisterLiteral(literal);
 		argSource->indexRange.first			= 0;
 		argSource->indexRange.count			= 1;
@@ -746,6 +752,8 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 
 	if (!strcmp(token, "constant"))
 		return Material_ParseCodeConstantSource_r(shaderType, text, 0, s_codeConsts, argSource);
+		// FIX
+		//return Material_ParseCodeConstantSource_r(shaderType, text, 0, (CodeConstantSource *)0x0064BCD0, argSource);
 
 	if (!strcmp(token, "material"))
 	{
@@ -753,7 +761,7 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 			return false;
 
 		token = Com_Parse(text);
-		argSource->type						= shaderType != MTL_VERTEX_SHADER ? 6 : 0;
+		argSource->type						= (shaderType == MTL_VERTEX_SHADER) ? MTL_ARG_MATERIAL_VERTEX_CONST : MTL_ARG_MATERIAL_PIXEL_CONST;
 		argSource->u.literalConst			= (const float *)Material_RegisterString(token);
 		argSource->indexRange.first			= 0;
 		argSource->indexRange.count			= 1;
@@ -785,7 +793,7 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 
 			if (sourceTable[sourceIndex].source < R_MAX_CODE_INDEX)
 			{
-				int count	= sourceTable[sourceIndex].arrayCount > 1 ? sourceTable[sourceIndex].arrayCount : 1;
+				int count	= (sourceTable[sourceIndex].arrayCount > 1) ? sourceTable[sourceIndex].arrayCount : 1;
 				arrayCount	= count;
 			}
 			else
@@ -799,10 +807,10 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 		}
 	}
 
-	argSource->type			= 2 * (shaderType != 0) + 3;
+	argSource->type			= (shaderType == MTL_VERTEX_SHADER) ? MTL_ARG_CODE_VERTEX_CONST : MTL_ARG_CODE_PIXEL_CONST;
 	argSource->u.codeIndex	= sourceTable[sourceIndex].source;
 
-	//ASSERT(((argSource->type == MTL_ARG_CODE_VERTEX_CONST) || s_codeConstUpdateFreq[argSource->u.codeIndex] != MTL_UPDATE_PER_PRIM));
+	ASSERT((argSource->type == MTL_ARG_CODE_VERTEX_CONST) || s_codeConstUpdateFreq[argSource->u.codeIndex] != MTL_UPDATE_PER_PRIM);
 	printf("DONE MATCH: %s\n", constantName);
 	return true;
 }
@@ -811,9 +819,13 @@ SRCLINE(3791)
 bool Material_DefaultConstantSource(MaterialShaderType shaderType, const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
 	if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_codeConsts, argSource))
+	// FIX
+	//if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064BCD0, argSource))
 		return true;
 
 	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_defaultCodeConsts, argSource) != 0;
+	// FIX
+	//return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource) != false;
 }
 
 SRCLINE(3800)
@@ -828,13 +840,13 @@ bool Material_UnknownShaderworksConstantSource(MaterialShaderType shaderType, co
 	literalVal[2] = 0.0f;
 	literalVal[3] = 0.0f;
 
-	argSource->type						= shaderType != MTL_VERTEX_SHADER ? 7 : 1;
+	argSource->type						= (shaderType == MTL_VERTEX_SHADER) ? MTL_ARG_LITERAL_VERTEX_CONST : MTL_ARG_LITERAL_PIXEL_CONST;
 	argSource->u.literalConst			= Material_RegisterLiteral(literalVal);
 	argSource->indexRange.first			= indexRange->first;
 	argSource->indexRange.count			= indexRange->count;
 	argSource->indexRange.isImplicit	= true;
 
-	return argSource->u.literalConst != 0;
+	return argSource->u.literalConst != nullptr;
 }
 
 SRCLINE(3815)
@@ -1026,7 +1038,7 @@ ShaderUniformDef *Material_GetShaderArgumentDest(const char *paramName, unsigned
 SRCLINE(4083)
 bool MaterialAddShaderArgument(const char *shaderName, const char *paramName, MaterialShaderArgument *arg, char (*registerUsage)[64])
 {
-	if (arg->type > 1 && arg->type != 3)
+	if (arg->type > MTL_ARG_LITERAL_VERTEX_CONST && arg->type != MTL_ARG_CODE_VERTEX_CONST)
 		return true;
 
 	if (arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
@@ -1055,7 +1067,7 @@ SRCLINE(4112)
 bool Material_AddShaderArgumentFromLiteral(const char *shaderName, const char *paramName, unsigned __int16 type, const float *literal, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64])
 {
 	//ASSERT(type != 7 && arg->dest < R_MAX_PIXEL_SHADER_CONSTS);
-	if (type == 7 && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
+	if (type == MTL_ARG_LITERAL_PIXEL_CONST && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
 		ASSERT(false);
 
 	arg->type			= type;
@@ -1068,30 +1080,29 @@ bool Material_AddShaderArgumentFromLiteral(const char *shaderName, const char *p
 SRCLINE(4129)
 bool Material_AddShaderArgumentFromCodeConst(const char *shaderName, const char *paramName, unsigned __int16 type, unsigned int codeIndex, unsigned int offset, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64])
 {
-	if (type == 5 && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
+	if (type == MTL_ARG_CODE_PIXEL_CONST && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
 		ASSERT(false);
 	//if (type == 5)
 	//	ASSERT(arg->dest < R_MAX_PIXEL_SHADER_CONSTS);
 
-	arg->type					= type;
-	arg->dest					= dest->resourceDest;
-	arg->u.codeConst.rowCount	= 1;
+	arg->type = type;
+	arg->dest = dest->resourceDest;
 
 	if (codeIndex < R_MAX_CODE_INDEX)
 	{
 		arg->u.codeConst.index		= offset + codeIndex;
 		arg->u.codeConst.firstRow	= 0;
+		arg->u.codeConst.rowCount	= 1;
 	}
 	else
 	{
-		printf("TRANSPOSED: %d\n", (int)dest->isTransposed);
-
 		if (dest->isTransposed)
 			arg->u.codeConst.index = ((codeIndex - R_MAX_CODE_INDEX) ^ 2) + R_MAX_CODE_INDEX;
 		else
 			arg->u.codeConst.index = codeIndex;
 
 		arg->u.codeConst.firstRow = offset;
+		arg->u.codeConst.rowCount = 1;
 	}
 
 	return MaterialAddShaderArgument(shaderName, paramName, arg, registerUsage);
@@ -1108,7 +1119,7 @@ void Material_AddShaderArgumentFromCodeSampler(unsigned __int16 type, unsigned i
 SRCLINE(4166)
 bool Material_AddShaderArgumentFromMaterial(const char *shaderName, const char *paramName, unsigned __int16 type, const char *name, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64])
 {
-	if (type == 6 && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
+	if (type == MTL_ARG_MATERIAL_PIXEL_CONST && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
 		ASSERT(false);
 
 	Material_RegisterString(name);
@@ -1149,8 +1160,8 @@ bool Material_AddShaderArgument(const char *shaderName, ShaderArgumentSource *ar
 
 	switch (argSource->type)
 	{
-	case 1:
-	case 7:
+	case MTL_ARG_LITERAL_VERTEX_CONST:
+	case MTL_ARG_LITERAL_PIXEL_CONST:
 	{
 		if (argDest->indexRange.count != 1)
 		{
@@ -1181,10 +1192,10 @@ bool Material_AddShaderArgument(const char *shaderName, ShaderArgumentSource *ar
 		return true;
 	}
 
-	case 3:
-	case 5:
+	case MTL_ARG_CODE_VERTEX_CONST:
+	case MTL_ARG_CODE_PIXEL_CONST:
 	{
-		for (unsigned int indexOffset = 0; indexOffset < argDest->indexRange.count; ++indexOffset)
+		for (unsigned int indexOffset = 0; indexOffset < argDest->indexRange.count; indexOffset++)
 		{
 			ShaderUniformDef *dest = Material_GetShaderArgumentDest(
 				argDest->paramName,
@@ -1199,7 +1210,7 @@ bool Material_AddShaderArgument(const char *shaderName, ShaderArgumentSource *ar
 				shaderName,
 				argDest->paramName,
 				argSource->type,
-				LOWORD(argSource->u.literalConst),
+				argSource->u.codeIndex,
 				indexOffset + argSource->indexRange.first,
 				dest,
 				&argTable[*usedCount],
@@ -1212,7 +1223,7 @@ bool Material_AddShaderArgument(const char *shaderName, ShaderArgumentSource *ar
 		return true;
 	}
 
-	case 4:
+	case MTL_ARG_CODE_PIXEL_SAMPLER:
 	{
 		for (unsigned int indexOffset = 0; indexOffset < argDest->indexRange.count; indexOffset++)
 		{
@@ -1237,9 +1248,9 @@ bool Material_AddShaderArgument(const char *shaderName, ShaderArgumentSource *ar
 		return true;
 	}
 
-	case 0:
-	case 2:
-	case 6:
+	case MTL_ARG_MATERIAL_VERTEX_CONST:
+	case MTL_ARG_MATERIAL_PIXEL_SAMPLER:
+	case MTL_ARG_MATERIAL_PIXEL_CONST:
 	{
 		if (argDest->indexRange.count != 1)
 		{
@@ -1443,7 +1454,7 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 					foliageConsts[2] = 83;
 					foliageConsts[3] = 84;
 
-					if (CodeConstIsOneOf(v15, (const unsigned __int16 *)foliageConsts, 4))
+					if (CodeConstIsOneOf(v15, foliageConsts, 4))
 						*techFlags |= 0x20u;
 				}
 			}
@@ -1561,7 +1572,7 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 	// Try loading the black ops version first
 	//
 	int shaderDataSize	= 0;
-	FILE *shaderFile	= nullptr;//Material_OpenShader_BlackOps(shaderName, shaderVersion);
+	FILE *shaderFile	= Material_OpenShader_BlackOps(shaderName, shaderVersion);
 	
 	if (shaderFile)
 	{
@@ -1720,7 +1731,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	// Create a file path using normal techsets and read data
 	//
 	char filename[MAX_PATH];
-	Com_sprintf(filename, MAX_PATH, "pimp/techsets/%s.techset", name);
+	Com_sprintf(filename, MAX_PATH, "techsets/%s.techset", name);
 
 	void *fileData;
 	int fileSize = FS_ReadFile(filename, (void **)&fileData);
@@ -1730,8 +1741,8 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 		//
 		// Try loading with PIMP enabled
 		//
-		//Com_sprintf(filename, MAX_PATH, "pimp/techsets/%s.techset", name);
-		//fileSize = FS_ReadFile(filename, (void **)&fileData);
+		Com_sprintf(filename, MAX_PATH, "pimp/techsets/%s.techset", name);
+		fileSize = FS_ReadFile(filename, (void **)&fileData);
 
 		if (fileSize < 0)
 		{
