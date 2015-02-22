@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 SRCLINE(2158)
-const float *__cdecl Material_RegisterLiteral(const float *literal)
+const float *Material_RegisterLiteral(const float *literal)
 {
 	static DWORD dwCall = 0x0052CC60;
 
@@ -33,6 +33,95 @@ bool Material_MatchToken(const char **text, const char *match)
 	return Com_MatchToken(text, match, 1) != 0;
 }
 
+SRCLINE(3168)
+const char *Material_NameForStreamDest(char dest)
+{
+  int result; // eax@2
+
+  switch ( dest )
+  {
+    case 0:
+      result = (int)"position";
+      break;
+    case 1:
+      result = (int)"normal";
+      break;
+    case 2:
+      result = (int)"color[0]";
+      break;
+    case 3:
+      result = (int)"color[1]";
+      break;
+    case 4:
+      result = (int)"depth";
+      break;
+    case 5:
+      result = (int)"texcoord[0]";
+      break;
+    case 6:
+      result = (int)"texcoord[1]";
+      break;
+    case 7:
+      result = (int)"texcoord[2]";
+      break;
+    case 8:
+      result = (int)"texcoord[3]";
+      break;
+    case 9:
+      result = (int)"texcoord[4]";
+      break;
+    case 0xA:
+      result = (int)"texcoord[5]";
+      break;
+    case 0xB:
+      result = (int)"texcoord[6]";
+      break;
+    case 0xC:
+      result = (int)"texcoord[7]";
+      break;
+    case 0xD:
+      result = (int)"blendweight";
+      break;
+    default:
+      result = (int)"";
+      break;
+  }
+  return (const char *)result;
+
+	/*
+	switch (dest)
+	{
+	case 0:	return "position";
+	case 1:	return "normal";
+	case 2:	return "color[0]";
+	case 3:	return "color[1]";
+	case 4:	return "depth";
+	case 5:	return "texcoord[0]";
+	case 6:	return "texcoord[1]";
+	case 7:	return "texcoord[2]";
+	case 8:	return "texcoord[3]";
+	case 9:	return "texcoord[4]";
+	case 10:return "texcoord[5]";
+	case 11:return "texcoord[6]";
+	case 12:return "texcoord[7]";
+	case 13:return "texcoord[8]";
+	case 14:return "texcoord[9]";
+	case 15:return "texcoord[10]";
+	case 16:return "texcoord[11]";
+	case 17:return "texcoord[12]";
+	case 18:return "texcoord[13]";
+	case 19:return "blendweight";
+
+	default:
+		ASSERT(false && "Unhandled case");
+		break;
+	}
+
+	return "";
+	*/
+}
+
+
 SRCLINE(3419)
 bool Material_DefaultIndexRange(ShaderIndexRange *indexRangeRef, unsigned int arrayCount, ShaderIndexRange *indexRangeSet)
 {
@@ -56,6 +145,7 @@ bool Material_ParseIndexRange(const char **text, unsigned int arrayCount, Shader
 	if (*Com_Parse(text) != '[')
 	{
 		Com_UngetToken();
+
 		indexRange->first		= 0;
 		indexRange->count		= arrayCount;
 		indexRange->isImplicit	= true;
@@ -87,6 +177,12 @@ bool Material_ParseIndexRange(const char **text, unsigned int arrayCount, Shader
 
 	Com_ScriptError("index %i is not in the range [0, %i]\n", indexRange->first, arrayCount - 1);
 	return false;
+}
+
+SRCLINE(3480)
+void *BufferOffset(void *buffer, int offset)
+{
+	return (char *)buffer + offset;
 }
 
 SRCLINE(3487)
@@ -295,7 +391,8 @@ MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *a
 	case 4:
 		/*updateFreq = s_codeSamplerUpdateFreq[arg->u.codeSampler];
 		*/
-		//ASSERT((updateFreq == MTL_UPDATE_PER_OBJECT) || (updateFreq == MTL_UPDATE_RARELY) || (updateFreq == MTL_UPDATE_CUSTOM));
+		
+		ASSERT((updateFreq == MTL_UPDATE_PER_OBJECT) || (updateFreq == MTL_UPDATE_RARELY) || (updateFreq == MTL_UPDATE_CUSTOM));
 		break;
 
 	case 5:
@@ -305,7 +402,7 @@ MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *a
 		break;
 
 	default:
-		updateFreq = 2;
+		updateFreq = MTL_UPDATE_RARELY;
 		break;
 	}
 
@@ -352,305 +449,6 @@ char Material_CountArgsWithUpdateFrequency(MaterialUpdateFrequency updateFreq, M
 	return matchCount;
 }
 
-void *BufferOffset(void *buffer, int offset)
-{
-	return (char *)buffer + offset;
-}
-
-unsigned int R_SetParameterDefArray(LPD3DXSHADER_CONSTANTTABLE constantTable, unsigned int constantIndex, ShaderUniformDef *paramDef)
-{
-	CHECK_SIZE(D3DXSHADER_CONSTANTINFO, 20);
-
-	LPD3DXSHADER_CONSTANTINFO constantInfoTable = (LPD3DXSHADER_CONSTANTINFO)BufferOffset(constantTable, constantTable->ConstantInfo);
-	LPD3DXSHADER_CONSTANTINFO constantInfo		= &constantInfoTable[constantIndex];
-
-	LPD3DXSHADER_TYPEINFO typeInfo	= (LPD3DXSHADER_TYPEINFO)BufferOffset(constantTable, constantInfo->TypeInfo);
-	const char *name				= (const char *)BufferOffset(constantTable, constantInfo->Name);
-	bool isTransposed				= typeInfo->Class == D3DXPC_MATRIX_COLUMNS;
-
-	ShaderParamType type;
-	switch (typeInfo->Type)
-	{
-	case D3DXPT_BOOL:		type = SHADER_PARAM_FLOAT4;			break;
-	case D3DXPT_FLOAT:		type = SHADER_PARAM_FLOAT4;			break;
-	case D3DXPT_SAMPLER1D:	type = SHADER_PARAM_SAMPLER_1D;		break;
-	case D3DXPT_SAMPLER2D:	type = SHADER_PARAM_SAMPLER_2D;		break;
-	case D3DXPT_SAMPLER3D:	type = SHADER_PARAM_SAMPLER_3D;		break;
-	case D3DXPT_SAMPLERCUBE:type = SHADER_PARAM_SAMPLER_CUBE;	break;
-
-	default:
-		Com_ScriptError("Unknown constant type '%i' (%s)", typeInfo->Type, name);
-		return 0;
-	}
-
-	unsigned int paramDefIndex;
-	for (paramDefIndex = 0; paramDefIndex < constantInfo->RegisterCount; paramDefIndex++)
-	{
-		paramDef->type			= type;
-		paramDef->name			= name;
-		paramDef->index			= paramDefIndex;
-		paramDef->resourceDest	= paramDefIndex + constantInfo->RegisterIndex;
-		paramDef->isTransposed	= isTransposed;
-		paramDef->isAssigned	= false;
-		paramDef++;
-	}
-
-	printf("defIndx: %d\n", paramDefIndex);
-	return paramDefIndex;
-}
-
-int Material_PrepareToParseShaderArguments(D3DXSHADER_CONSTANTTABLE *constantTable, ShaderUniformDef *paramTable)
-{
-	int usedCount = 0;
-
-	printf("const count: %d\n", constantTable->Constants);
-
-	for (unsigned int constantIndex = 0; constantIndex < constantTable->Constants; constantIndex++)
-		usedCount += R_SetParameterDefArray(constantTable, constantIndex, &paramTable[usedCount]);
-  
-	printf("used count: %d\n", usedCount);
-
-	return usedCount;
-}
-
-const char *Material_NameForStreamDest(char dest)
-{
-  int result; // eax@2
-
-  switch ( dest )
-  {
-    case 0:
-      result = (int)"position";
-      break;
-    case 1:
-      result = (int)"normal";
-      break;
-    case 2:
-      result = (int)"color[0]";
-      break;
-    case 3:
-      result = (int)"color[1]";
-      break;
-    case 4:
-      result = (int)"depth";
-      break;
-    case 5:
-      result = (int)"texcoord[0]";
-      break;
-    case 6:
-      result = (int)"texcoord[1]";
-      break;
-    case 7:
-      result = (int)"texcoord[2]";
-      break;
-    case 8:
-      result = (int)"texcoord[3]";
-      break;
-    case 9:
-      result = (int)"texcoord[4]";
-      break;
-    case 0xA:
-      result = (int)"texcoord[5]";
-      break;
-    case 0xB:
-      result = (int)"texcoord[6]";
-      break;
-    case 0xC:
-      result = (int)"texcoord[7]";
-      break;
-    case 0xD:
-      result = (int)"blendweight";
-      break;
-    default:
-      result = (int)"";
-      break;
-  }
-  return (const char *)result;
-
-	/*
-	switch (dest)
-	{
-	case 0:	return "position";
-	case 1:	return "normal";
-	case 2:	return "color[0]";
-	case 3:	return "color[1]";
-	case 4:	return "depth";
-	case 5:	return "texcoord[0]";
-	case 6:	return "texcoord[1]";
-	case 7:	return "texcoord[2]";
-	case 8:	return "texcoord[3]";
-	case 9:	return "texcoord[4]";
-	case 10:return "texcoord[5]";
-	case 11:return "texcoord[6]";
-	case 12:return "texcoord[7]";
-	case 13:return "texcoord[8]";
-	case 14:return "texcoord[9]";
-	case 15:return "texcoord[10]";
-	case 16:return "texcoord[11]";
-	case 17:return "texcoord[12]";
-	case 18:return "texcoord[13]";
-	case 19:return "blendweight";
-
-	default:
-		ASSERT(false && "Unhandled case");
-		break;
-	}
-
-	return "";
-	*/
-}
-
-void Material_SetVaryingParameterDef(D3DXSEMANTIC *semantic, ShaderVaryingDef *paramDef)
-{
-	paramDef->streamDest	= Material_GetStreamDestForSemantic(semantic);
-	paramDef->resourceDest	= paramDef->streamDest;
-	paramDef->name			= Material_NameForStreamDest(paramDef->streamDest);
-	paramDef->isAssigned	= false;
-}
-
-bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderName, MaterialShaderType shaderType, const DWORD *program, unsigned __int16 *techFlags, ShaderParameterSet *paramSet, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args)
-{
-	HRESULT hr = S_OK;
-
-	//
-	// Create a constant table from the shader program
-	//
-	LPD3DXCONSTANTTABLE constants;
-
-	if (!SUCCEEDED(hr = D3DXGetShaderConstantTable(program, &constants)))
-		goto __d3dfail;
-
-	ASSERT(constants != nullptr);
-
-	//
-	// Get a pointer to the raw constant table
-	//
-	LPD3DXSHADER_CONSTANTTABLE constantTable	= (LPD3DXSHADER_CONSTANTTABLE)constants->GetBufferPointer();
-	paramSet->uniformInputCount					= Material_PrepareToParseShaderArguments(constantTable, paramSet->uniformInputs);
-
-	//
-	// Parse all shader arguments
-	//
-	bool success = Material_ParseShaderArguments(
-			text,
-			shaderName,
-			shaderType,
-			paramSet->uniformInputs,
-			paramSet->uniformInputCount,
-			techFlags,
-			argLimit,
-			argCount,
-			args);
-
-	constants->Release();
-
-	if (success)
-	{
-		//
-		// Gather the input and output shader semantic tables
-		//
-		D3DXSEMANTIC inputSemantics[512];
-		D3DXSEMANTIC outputSemantics[16];
-
-		UINT inputCount;
-		if (!SUCCEEDED(hr = D3DXGetShaderInputSemantics(program, inputSemantics, &inputCount)))
-			goto __d3dfail;
-		
-		UINT outputCount;
-		if (!SUCCEEDED(hr = D3DXGetShaderOutputSemantics(program, outputSemantics, &outputCount)))
-			goto __d3dfail;
-
-		//
-		// Set each varying parameter for inputs/outputs
-		//
-		paramSet->varyingInputCount = 0;
-
-		for (UINT semanticIndex = 0; semanticIndex < inputCount; semanticIndex++)
-			Material_SetVaryingParameterDef(&inputSemantics[semanticIndex], &paramSet->varyingInputs[paramSet->varyingInputCount++]);
-
-		paramSet->outputCount = 0;
-
-		for (UINT semanticIndex = 0; semanticIndex < outputCount; semanticIndex++)
-		{
-			if (outputSemantics[semanticIndex].Usage)
-			{
-				if (outputSemantics[semanticIndex].Usage != 11)// D3DDECLUSAGE_FOG ?
-					Material_SetVaryingParameterDef(&outputSemantics[semanticIndex], &paramSet->outputs[paramSet->outputCount++]);
-			}
-		}
-
-		return true;
-	}
-
-	Com_ScriptError("Unable to parse shader arguments\n");
-	return false;
-
-__d3dfail:
-	Com_ScriptError("Material_SetPassShaderArguments_DX D3D Error: %s (%08x)\n", R_ErrorDescription(hr), hr);
-	return false;
-}
-
-char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
-{
-	static DWORD dwCall = 0x0052FDB0;
-
-	__asm
-	{
-		mov eax, semantic
-		call [dwCall]
-	}
-
-	/*
-	bool v2; // zf@8
-
-	switch (semantic->Usage)
-	{
-	case 0:
-		if (semantic->UsageIndex)
-			goto LABEL_19;
-		return 0;
-
-	case 3:
-		if (semantic->UsageIndex)
-			goto LABEL_19;
-		return 1;
-
-	case 10:
-		v2 = semantic->UsageIndex == 0;
-
-		if (semantic->UsageIndex >= 2)
-			goto LABEL_19;
-
-		return semantic->UsageIndex + 2;
-
-	case 12:
-		if (semantic->UsageIndex)
-			goto LABEL_19;
-		return 4;
-
-	case 5:
-		v2 = semantic->UsageIndex == 0;
-
-		if (semantic->UsageIndex >= 14)
-			goto LABEL_19;
-
-		return semantic->UsageIndex + 5;
-
-	case 1:
-		if (semantic->UsageIndex)
-			goto LABEL_19;
-		return 19;
-
-	default:
-	LABEL_19:
-		Com_Error(ERR_DROP, "Unknown shader input/output usage %i:%i\n", semantic->Usage, semantic->UsageIndex);
-		return 0;
-	}
-
-	return 0;
-	*/
-}
-
 SRCLINE(3657)
 bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const char **text, int offset, CodeConstantSource *sourceTable, ShaderArgumentSource *argSource)
 {
@@ -658,79 +456,73 @@ bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const cha
 	ASSERT(sourceTable != nullptr);
 	ASSERT(argSource != nullptr);
 
-	if (Material_MatchToken(text, "."))
+	if (!Material_MatchToken(text, "."))
+		return false;
+
+	const char *token = Com_Parse(text);
+
+	int sourceIndex;
+	for (sourceIndex = 0;; sourceIndex++)
 	{
-		const char *token = Com_Parse(text);
-
-		int sourceIndex;
-		for (sourceIndex = 0;; sourceIndex++)
+		if (!sourceTable[sourceIndex].name)
 		{
-			if (!sourceTable[sourceIndex].name)
-			{
-				Com_ScriptError("unknown constant source '%s'\n", token);
-				return false;
-			}
-
-			if (!strcmp(token, sourceTable[sourceIndex].name))
-				break;
+			Com_ScriptError("unknown constant source '%s'\n", token);
+			return false;
 		}
-		if (sourceTable[sourceIndex].arrayCount)
-		{
-			//ASSERT(sourceTable[sourceIndex].subtable || (sourceTable[sourceIndex].source < CONST_SRC_FIRST_CODE_MATRIX && sourceTable[sourceIndex].arrayStride == 1));
 
-			if (sourceTable[sourceIndex].subtable)
-			{
-				int additionalOffset;
-
-				if (!Material_ParseArrayOffset(
-					text,
-					sourceTable[sourceIndex].arrayCount,
-					sourceTable[sourceIndex].arrayStride,
-					&additionalOffset))
-					return false;
-
-				offset += additionalOffset;
-			}
-			else
-			{
-				ASSERT(sourceTable[sourceIndex].arrayStride == 1);
-
-				if (!Material_ParseIndexRange(text, sourceTable[sourceIndex].arrayCount, &argSource->indexRange))
-					return false;
-			}
-		}
+		if (!strcmp(token, sourceTable[sourceIndex].name))
+			break;
+	}
+	if (sourceTable[sourceIndex].arrayCount)
+	{
+		//ASSERT(sourceTable[sourceIndex].subtable || (sourceTable[sourceIndex].source < CONST_SRC_FIRST_CODE_MATRIX && sourceTable[sourceIndex].arrayStride == 1));
 
 		if (sourceTable[sourceIndex].subtable)
-			return Material_ParseCodeConstantSource_r(shaderType, text, offset, sourceTable[sourceIndex].subtable, argSource);
-
-		argSource->type = 2 * (shaderType != 0) + 3;
-		argSource->u.codeIndex = offset + sourceTable[sourceIndex].source;
-
-		ASSERT((argSource->type == MTL_ARG_CODE_VERTEX_CONST) || s_codeConstUpdateFreq[argSource->u.codeIndex] != MTL_UPDATE_PER_PRIM);
-
-		if (!sourceTable[sourceIndex].arrayCount)
 		{
-			if (argSource->u.codeIndex >= R_MAX_CODE_INDEX)
-			{
-				if (!Material_ParseIndexRange(text, 4, &argSource->indexRange))
-					return false;
-			}
-			else
-			{
-				argSource->indexRange.first			= 0;
-				argSource->indexRange.count			= 1;
-				argSource->indexRange.isImplicit	= false;
-			}
+			int additionalOffset;
+
+			if (!Material_ParseArrayOffset(
+				text,
+				sourceTable[sourceIndex].arrayCount,
+				sourceTable[sourceIndex].arrayStride,
+				&additionalOffset))
+				return false;
+
+			offset += additionalOffset;
 		}
+		else
+		{
+			ASSERT(sourceTable[sourceIndex].arrayStride == 1);
 
-		return true;
+			if (!Material_ParseIndexRange(text, sourceTable[sourceIndex].arrayCount, &argSource->indexRange))
+				return false;
+		}
 	}
-	else
+
+	if (sourceTable[sourceIndex].subtable)
+		return Material_ParseCodeConstantSource_r(shaderType, text, offset, sourceTable[sourceIndex].subtable, argSource);
+
+	argSource->type = 2 * (shaderType != 0) + 3;
+	argSource->u.codeIndex = offset + sourceTable[sourceIndex].source;
+
+	ASSERT((argSource->type == MTL_ARG_CODE_VERTEX_CONST) || s_codeConstUpdateFreq[argSource->u.codeIndex] != MTL_UPDATE_PER_PRIM);
+
+	if (!sourceTable[sourceIndex].arrayCount)
 	{
-		return false;
+		if (argSource->u.codeIndex >= R_MAX_CODE_INDEX)
+		{
+			if (!Material_ParseIndexRange(text, 4, &argSource->indexRange))
+				return false;
+		}
+		else
+		{
+			argSource->indexRange.first			= 0;
+			argSource->indexRange.count			= 1;
+			argSource->indexRange.isImplicit	= false;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 SRCLINE(3722)
@@ -811,7 +603,6 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 	argSource->u.codeIndex	= sourceTable[sourceIndex].source;
 
 	ASSERT((argSource->type == MTL_ARG_CODE_VERTEX_CONST) || s_codeConstUpdateFreq[argSource->u.codeIndex] != MTL_UPDATE_PER_PRIM);
-	printf("DONE MATCH: %s\n", constantName);
 	return true;
 }
 
@@ -918,6 +709,63 @@ bool Material_DefaultArgumentSource(MaterialShaderType shaderType, const char *c
 		return true;
 
 	return Material_UnknownShaderworksConstantSource(shaderType, constantName, indexRange, argSource);
+}
+
+SRCLINE(3895)
+unsigned int R_SetParameterDefArray(LPD3DXSHADER_CONSTANTTABLE constantTable, unsigned int constantIndex, ShaderUniformDef *paramDef)
+{
+	CHECK_SIZE(D3DXSHADER_CONSTANTINFO, 20);
+
+	LPD3DXSHADER_CONSTANTINFO constantInfoTable = (LPD3DXSHADER_CONSTANTINFO)BufferOffset(constantTable, constantTable->ConstantInfo);
+	LPD3DXSHADER_CONSTANTINFO constantInfo		= &constantInfoTable[constantIndex];
+
+	LPD3DXSHADER_TYPEINFO typeInfo	= (LPD3DXSHADER_TYPEINFO)BufferOffset(constantTable, constantInfo->TypeInfo);
+	const char *name				= (const char *)BufferOffset(constantTable, constantInfo->Name);
+	bool isTransposed				= typeInfo->Class == D3DXPC_MATRIX_COLUMNS;
+
+	ShaderParamType type;
+	switch (typeInfo->Type)
+	{
+	case D3DXPT_BOOL:		type = SHADER_PARAM_FLOAT4;			break;
+	case D3DXPT_FLOAT:		type = SHADER_PARAM_FLOAT4;			break;
+	case D3DXPT_SAMPLER1D:	type = SHADER_PARAM_SAMPLER_1D;		break;
+	case D3DXPT_SAMPLER2D:	type = SHADER_PARAM_SAMPLER_2D;		break;
+	case D3DXPT_SAMPLER3D:	type = SHADER_PARAM_SAMPLER_3D;		break;
+	case D3DXPT_SAMPLERCUBE:type = SHADER_PARAM_SAMPLER_CUBE;	break;
+
+	default:
+		Com_ScriptError("Unknown constant type '%i' (%s)", typeInfo->Type, name);
+		return 0;
+	}
+
+	unsigned int paramDefIndex;
+	for (paramDefIndex = 0; paramDefIndex < constantInfo->RegisterCount; paramDefIndex++)
+	{
+		paramDef->type			= type;
+		paramDef->name			= name;
+		paramDef->index			= paramDefIndex;
+		paramDef->resourceDest	= paramDefIndex + constantInfo->RegisterIndex;
+		paramDef->isTransposed	= isTransposed;
+		paramDef->isAssigned	= false;
+		paramDef++;
+	}
+
+	return paramDefIndex;
+}
+
+SRCLINE(3967)
+int Material_PrepareToParseShaderArguments(D3DXSHADER_CONSTANTTABLE *constantTable, ShaderUniformDef *paramTable)
+{
+	int usedCount = 0;
+
+	printf("const count: %d\n", constantTable->Constants);
+
+	for (unsigned int constantIndex = 0; constantIndex < constantTable->Constants; constantIndex++)
+		usedCount += R_SetParameterDefArray(constantTable, constantIndex, &paramTable[usedCount]);
+
+	printf("used count: %d\n", usedCount);
+
+	return usedCount;
 }
 
 SRCLINE(3980)
@@ -1066,9 +914,7 @@ bool MaterialAddShaderArgument(const char *shaderName, const char *paramName, Ma
 SRCLINE(4112)
 bool Material_AddShaderArgumentFromLiteral(const char *shaderName, const char *paramName, unsigned __int16 type, const float *literal, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64])
 {
-	//ASSERT(type != 7 && arg->dest < R_MAX_PIXEL_SHADER_CONSTS);
-	if (type == MTL_ARG_LITERAL_PIXEL_CONST && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
-		ASSERT(false);
+	ASSERT(!(type == MTL_ARG_LITERAL_PIXEL_CONST && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS));
 
 	arg->type			= type;
 	arg->dest			= dest->resourceDest;
@@ -1080,10 +926,7 @@ bool Material_AddShaderArgumentFromLiteral(const char *shaderName, const char *p
 SRCLINE(4129)
 bool Material_AddShaderArgumentFromCodeConst(const char *shaderName, const char *paramName, unsigned __int16 type, unsigned int codeIndex, unsigned int offset, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64])
 {
-	if (type == MTL_ARG_CODE_PIXEL_CONST && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
-		ASSERT(false);
-	//if (type == 5)
-	//	ASSERT(arg->dest < R_MAX_PIXEL_SHADER_CONSTS);
+	ASSERT(!(type == MTL_ARG_CODE_PIXEL_CONST && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS));
 
 	arg->type = type;
 	arg->dest = dest->resourceDest;
@@ -1119,8 +962,7 @@ void Material_AddShaderArgumentFromCodeSampler(unsigned __int16 type, unsigned i
 SRCLINE(4166)
 bool Material_AddShaderArgumentFromMaterial(const char *shaderName, const char *paramName, unsigned __int16 type, const char *name, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64])
 {
-	if (type == MTL_ARG_MATERIAL_PIXEL_CONST && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS)
-		ASSERT(false);
+	ASSERT(!(type == MTL_ARG_MATERIAL_PIXEL_CONST && arg->dest >= R_MAX_PIXEL_SHADER_CONSTS));
 
 	Material_RegisterString(name);
 
@@ -1448,11 +1290,7 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 				v10 = *techFlags;
 				if (!(v10 & 0x20))
 				{
-					unsigned short foliageConsts[4];
-					foliageConsts[0] = 81;
-					foliageConsts[1] = 82;
-					foliageConsts[2] = 83;
-					foliageConsts[3] = 84;
+					static unsigned short foliageConsts[4] = { 81, 82, 83, 84 };
 
 					if (CodeConstIsOneOf(v15, foliageConsts, 4))
 						*techFlags |= 0x20u;
@@ -1461,9 +1299,7 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 
 			if (v14 == 3 && !(*techFlags & 0x200))
 			{
-				unsigned short scorchConsts[2];
-				scorchConsts[0] = 114;
-				scorchConsts[1] = 118;
+				static unsigned short scorchConsts[2] = { 114, 118 };
 
 				if (CodeConstIsOneOf(v15, scorchConsts, 2))
 					*techFlags |= 0x200u;
@@ -1619,6 +1455,160 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 	fclose(shaderFile);
 	Z_Free(shaderMemory);
 	return shader;
+}
+
+SRCLINE(7866)
+char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
+{
+	static DWORD dwCall = 0x0052FDB0;
+
+	__asm
+	{
+		mov eax, semantic
+		call [dwCall]
+	}
+
+	/*
+	bool v2; // zf@8
+
+	switch (semantic->Usage)
+	{
+	case 0:
+		if (semantic->UsageIndex)
+			goto LABEL_19;
+		return 0;
+
+	case 3:
+		if (semantic->UsageIndex)
+			goto LABEL_19;
+		return 1;
+
+	case 10:
+		v2 = semantic->UsageIndex == 0;
+
+		if (semantic->UsageIndex >= 2)
+			goto LABEL_19;
+
+		return semantic->UsageIndex + 2;
+
+	case 12:
+		if (semantic->UsageIndex)
+			goto LABEL_19;
+		return 4;
+
+	case 5:
+		v2 = semantic->UsageIndex == 0;
+
+		if (semantic->UsageIndex >= 14)
+			goto LABEL_19;
+
+		return semantic->UsageIndex + 5;
+
+	case 1:
+		if (semantic->UsageIndex)
+			goto LABEL_19;
+		return 19;
+
+	default:
+	LABEL_19:
+		Com_Error(ERR_DROP, "Unknown shader input/output usage %i:%i\n", semantic->Usage, semantic->UsageIndex);
+		return 0;
+	}
+
+	return 0;
+	*/
+}
+
+SRCLINE(7929)
+void Material_SetVaryingParameterDef(D3DXSEMANTIC *semantic, ShaderVaryingDef *paramDef)
+{
+	paramDef->streamDest	= Material_GetStreamDestForSemantic(semantic);
+	paramDef->resourceDest	= paramDef->streamDest;
+	paramDef->name			= Material_NameForStreamDest(paramDef->streamDest);
+	paramDef->isAssigned	= false;
+}
+
+SRCLINE(7950)
+bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderName, MaterialShaderType shaderType, const DWORD *program, unsigned __int16 *techFlags, ShaderParameterSet *paramSet, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args)
+{
+	HRESULT hr = S_OK;
+
+	//
+	// Create a constant table from the shader program
+	//
+	LPD3DXCONSTANTTABLE constants;
+
+	if (!SUCCEEDED(hr = D3DXGetShaderConstantTable(program, &constants)))
+		goto __d3dfail;
+
+	ASSERT(constants != nullptr);
+
+	//
+	// Get a pointer to the raw constant table
+	//
+	LPD3DXSHADER_CONSTANTTABLE constantTable	= (LPD3DXSHADER_CONSTANTTABLE)constants->GetBufferPointer();
+	paramSet->uniformInputCount					= Material_PrepareToParseShaderArguments(constantTable, paramSet->uniformInputs);
+
+	//
+	// Parse all shader arguments
+	//
+	bool success = Material_ParseShaderArguments(
+		text,
+		shaderName,
+		shaderType,
+		paramSet->uniformInputs,
+		paramSet->uniformInputCount,
+		techFlags,
+		argLimit,
+		argCount,
+		args);
+
+	constants->Release();
+
+	if (success)
+	{
+		//
+		// Gather the input and output shader semantic tables
+		//
+		D3DXSEMANTIC inputSemantics[512];
+		D3DXSEMANTIC outputSemantics[16];
+
+		UINT inputCount;
+		if (!SUCCEEDED(hr = D3DXGetShaderInputSemantics(program, inputSemantics, &inputCount)))
+			goto __d3dfail;
+
+		UINT outputCount;
+		if (!SUCCEEDED(hr = D3DXGetShaderOutputSemantics(program, outputSemantics, &outputCount)))
+			goto __d3dfail;
+
+		//
+		// Set each varying parameter for inputs/outputs
+		//
+		paramSet->varyingInputCount = 0;
+
+		for (UINT semanticIndex = 0; semanticIndex < inputCount; semanticIndex++)
+			Material_SetVaryingParameterDef(&inputSemantics[semanticIndex], &paramSet->varyingInputs[paramSet->varyingInputCount++]);
+
+		paramSet->outputCount = 0;
+
+		for (UINT semanticIndex = 0; semanticIndex < outputCount; semanticIndex++)
+		{
+			if (outputSemantics[semanticIndex].Usage)
+			{
+				if (outputSemantics[semanticIndex].Usage != 11)// D3DDECLUSAGE_FOG ?
+					Material_SetVaryingParameterDef(&outputSemantics[semanticIndex], &paramSet->outputs[paramSet->outputCount++]);
+			}
+		}
+
+		return true;
+	}
+
+	Com_ScriptError("Unable to parse shader arguments\n");
+	return false;
+
+__d3dfail:
+	Com_ScriptError("Material_SetPassShaderArguments_DX D3D Error: %s (%08x)\n", R_ErrorDescription(hr), hr);
+	return false;
 }
 
 SRCLINE(8710)
@@ -1837,7 +1827,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 					break;
 				}
 
-				for (int techTypeIndex = 0; techTypeIndex < techTypeCount; ++techTypeIndex)
+				for (int techTypeIndex = 0; techTypeIndex < techTypeCount; techTypeIndex++)
 					*(DWORD *)&techniqueSet[4 * techType[techTypeIndex] + 12] = (DWORD)technique;
 			}
 

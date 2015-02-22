@@ -1,5 +1,5 @@
 #pragma once
 
-#define ASSERT(cond) if(!(cond)) assert(__FILE__, __LINE__, (cond), #cond);
+#define ASSERT(cond) if(!(cond)) assert(__FILE__, __LINE__, #cond);
 
-void assert(const char *File, int Line, bool Condition, const char *Format, ...);
+void assert(const char *File, int Line, const char *Format, ...);

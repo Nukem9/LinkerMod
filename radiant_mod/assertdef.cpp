@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-void assert(const char *File, int Line, bool Condition, const char *Format, ...)
+void assert(const char *File, int Line, const char *Format, ...)
 {
 	char buffer[4096];
 	char message[4096];
@@ -11,7 +11,7 @@ void assert(const char *File, int Line, bool Condition, const char *Format, ...)
 	_vsnprintf_s(buffer, _TRUNCATE, Format, ap);
 	sprintf_s(message, "%s(%d):\n\n%s", File, Line, buffer);
 
-	MessageBoxA(nullptr, message, "ASSERTION", 0);
+	MessageBoxA(nullptr, message, "ASSERTION", MB_ICONERROR);
 
 	ExitProcess(1);
 }

@@ -1,7 +1,8 @@
 #pragma once
 
 #define R_MAX_PIXEL_SHADER_CONSTS	256
-#define R_MAX_CODE_INDEX			197
+//#define R_MAX_CODE_INDEX			197
+#define R_MAX_CODE_INDEX			105
 
 enum MaterialShaderType
 {
@@ -66,15 +67,30 @@ enum MaterialTextureSource
 	TEXTURE_SRC_CODE_HEATMAP = 0x2A,
 	TEXTURE_SRC_CODE_COUNT = 0x2B,
 };
+*/
 
-enum MaterialUpdateFrequency
+enum MaterialUpdateFrequency_FIX
 {
 	MTL_UPDATE_PER_PRIM = 0x0,
 	MTL_UPDATE_PER_OBJECT = 0x1,
 	MTL_UPDATE_RARELY = 0x2,
 	MTL_UPDATE_CUSTOM = 0x3,
 };
-*/
+
+enum MaterialArgumentSourceType
+{
+	MTL_ARG_MATERIAL_VERTEX_CONST = 0x0,
+	MTL_ARG_LITERAL_VERTEX_CONST = 0x1,
+	MTL_ARG_MATERIAL_PIXEL_SAMPLER = 0x2,
+	MTL_ARG_CODE_PRIM_BEGIN = 0x3,
+	MTL_ARG_CODE_VERTEX_CONST = 0x3,
+	MTL_ARG_CODE_PIXEL_SAMPLER = 0x4,
+	MTL_ARG_CODE_PIXEL_CONST = 0x5,
+	MTL_ARG_CODE_PRIM_END = 0x6,
+	MTL_ARG_MATERIAL_PIXEL_CONST = 0x6,
+	MTL_ARG_LITERAL_PIXEL_CONST = 0x7,
+	MLT_ARG_COUNT = 0x8,
+};
 
 typedef int MaterialUpdateFrequency;
 typedef int MaterialTextureSource;
@@ -95,6 +111,7 @@ struct CodeSamplerSource
 	int arrayCount;
 	int arrayStride;
 };
+CHECK_SIZE(CodeSamplerSource, 20);
 
 struct CodeConstantSource
 {
@@ -104,6 +121,7 @@ struct CodeConstantSource
 	int arrayCount;
 	int arrayStride;
 };
+CHECK_SIZE(CodeConstantSource, 20);
 
 struct ShaderArgumentSource
 {
@@ -182,12 +200,14 @@ struct ShaderArgumentDest
 };
 CHECK_SIZE(ShaderArgumentDest, 16);
 
-const float *__cdecl Material_RegisterLiteral(const float *literal);
+const float *Material_RegisterLiteral(const float *literal);
 const char *Material_RegisterString(const char *string);
 bool Material_UsingTechnique(int techType);
 bool Material_MatchToken(const char **text, const char *match);
+const char *Material_NameForStreamDest(char dest);
 bool Material_DefaultIndexRange(ShaderIndexRange *indexRangeRef, unsigned int arrayCount, ShaderIndexRange *indexRangeSet);
 bool Material_ParseIndexRange(const char **text, unsigned int arrayCount, ShaderIndexRange *indexRange);
+void *BufferOffset(void *buffer, int offset);
 bool Material_ParseArrayOffset(const char **text, int arrayCount, int arrayStride, int *offset);
 bool Material_CodeSamplerSource_r(const char **text, int offset, CodeSamplerSource *sourceTable, ShaderArgumentSource *argSource);
 bool Material_ParseSamplerSource(const char **text, ShaderArgumentSource *argSource);
@@ -204,6 +224,8 @@ bool Material_UnknownShaderworksConstantSource(MaterialShaderType shaderType, co
 unsigned int Material_ElemCountForParamName(const char *shaderName, ShaderUniformDef *paramTable, unsigned int paramCount, const char *name, ShaderParamType *paramType);
 bool Material_ParseArgumentSource(MaterialShaderType shaderType, const char **text, const char *shaderName, ShaderParamType paramType, ShaderArgumentSource *argSource);
 bool Material_DefaultArgumentSource(MaterialShaderType shaderType, const char *constantName, ShaderParamType paramType, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource);
+unsigned int R_SetParameterDefArray(LPD3DXSHADER_CONSTANTTABLE constantTable, unsigned int constantIndex, ShaderUniformDef *paramDef);
+int Material_PrepareToParseShaderArguments(D3DXSHADER_CONSTANTTABLE *constantTable, ShaderUniformDef *paramTable);
 int Material_CompareShaderArgumentsForCombining(const void *e0, const void *e1);
 bool Material_AttemptCombineShaderArguments(MaterialShaderArgument *arg0, MaterialShaderArgument *arg1);
 unsigned int Material_CombineShaderArguments(unsigned int usedCount, MaterialShaderArgument *localArgs);
@@ -219,6 +241,8 @@ bool CodeConstIsOneOf(unsigned __int16 constCodeIndex, const unsigned __int16 *c
 bool Material_ParseShaderArguments(const char **text, const char *shaderName, MaterialShaderType shaderType, ShaderUniformDef *paramTable, unsigned int paramCount, unsigned __int16 *techFlags, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args);
 bool Material_CopyTextToDXBuffer(void *cachedShader, unsigned int shaderLen, LPD3DXBUFFER *shader);
 void *Material_LoadShader(const char *shaderName, const char *shaderVersion);
+char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic);
+void Material_SetVaryingParameterDef(D3DXSEMANTIC *semantic, ShaderVaryingDef *paramDef);
 void *Material_RegisterTechnique(const char *name, int renderer);
 bool Material_IgnoreTechnique(const char *name);
 int Material_TechniqueTypeForName(const char *name);

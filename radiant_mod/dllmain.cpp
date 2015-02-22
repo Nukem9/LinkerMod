@@ -56,44 +56,6 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
-FILE *dumpFile;
-
-void DumpTable_Recurse(CodeConstantSource *Table, int Indent)
-{
-	//
-	// Cached buffer for indents
-	//
-	char indentBuf[16];
-	memset(indentBuf, 0, sizeof(indentBuf));
-
-	for (int i = 0; i < Indent; i++)
-		strcat_s(indentBuf, "\t");
-
-	//
-	// Enumerate all entries until nullptr is hit
-	//
-	for (;;)
-	{
-		CodeConstantSource *entry = Table++;
-
-		if (entry->name == nullptr)
-			break;
-
-		//
-		// Build the buffer
-		//
-		char buf[256];
-
-		sprintf_s(buf, "%s{ \"%s\", %d, %x, %d, %d },\n", indentBuf, entry->name, (int)entry->source, entry->subtable, entry->arrayCount, entry->arrayStride);
-		fprintf(dumpFile, buf);
-
-		if (entry->subtable)
-			DumpTable_Recurse(entry->subtable, Indent + 1);
-	}
-
-	fprintf(dumpFile, "\n");
-}
-
 BOOL RadiantMod_Init()
 {
 	printf("----> Loading radiant mod\n");
@@ -152,7 +114,7 @@ BOOL RadiantMod_Init()
 	// Debug INT3 to make sure specific functions are not called
 	//
 #define DO_NOT_USE(x) PatchMemory((x), (PBYTE)"\xCC", 1)
-	/*
+
 	DO_NOT_USE(0x0052EA20);// Material_ParseArgumentSource
 	DO_NOT_USE(0x0052E2C0);// Material_ParseSamplerSource
 	DO_NOT_USE(0x0052E6E0);// Material_ParseConstantSource
@@ -170,7 +132,7 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052E990);// Material_ElemCountForParamName
 	DO_NOT_USE(0x0052D140);// Material_UsingTechnique
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
-	*/
+
 	MessageBoxA(nullptr, "", "", 0);
 	return TRUE;
 }
