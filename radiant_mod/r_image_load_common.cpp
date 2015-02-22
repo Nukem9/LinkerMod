@@ -131,3 +131,29 @@ void Image_Upload3D_CopyData_PC(GfxImage *image, D3DFORMAT format, unsigned int 
 		add esp, 0xC
 	}
 }
+
+void Image_Reload() //0x0052BE30
+{
+	int (__cdecl* Image_Release)(GfxImage*) = (int (__cdecl*)(GfxImage*))0x0052ABC0;
+
+	unsigned int textureIter;
+	GfxImage* image;
+	GfxImage** textureTable = (GfxImage**)0x01547F28;
+	
+	textureIter = 0;
+
+	do
+	{
+		image = textureTable[textureIter];
+		if ( image && image->category == 3 )
+		{
+			Image_Release(image);
+			if (!Image_LoadFromFileWithReader( image, (int (__cdecl*)(const char*, int*))0x4BC190))
+			{
+				Com_Error(ERR_DROP,"failed to load image '%s'",image->name);
+			}
+		}
+		++textureIter;
+	}
+	while ( textureIter < 0x8000 );
+}
