@@ -29,5 +29,8 @@ static Z_Free_t Z_Free = (Z_Free_t)0x004C77B0;
 typedef void (__cdecl * I_strncpyz_t)(char *dest, const char *src, int destsize);
 static I_strncpyz_t I_strncpyz = (I_strncpyz_t)0x004D2E70;
 
+typedef int (__cdecl * I_strnicmp_t)(const char *s0, const char *s1, int n);
+static I_strnicmp_t I_strnicmp = (I_strnicmp_t)0x004D2EE0;
+
 typedef void (__cdecl * Com_PrintWarning_t)(int channel, const char *fmt, ...);
-static Com_PrintWarning_t Com_PrintWarning = (Com_PrintWarning_t)0x0;
+static Com_PrintWarning_t Com_PrintWarning = (Com_PrintWarning_t)0x00468400;

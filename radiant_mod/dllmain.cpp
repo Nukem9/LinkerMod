@@ -112,7 +112,9 @@ BOOL RadiantMod_Init()
 	//
 	// Hook any needed functions
 	//
-	Detours::X86::DetourFunction((PBYTE)0x5675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
+	Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
+
+	Detours::X86::DetourFunction((PBYTE)0x005675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
 	FixupFunction(0x004683F0, (ULONG_PTR)&hk_Com_Printf);
 
 	//
@@ -150,7 +152,7 @@ BOOL RadiantMod_Init()
 	// Debug INT3 to make sure specific functions are not called
 	//
 #define DO_NOT_USE(x) PatchMemory((x), (PBYTE)"\xCC", 1)
-
+	/*
 	DO_NOT_USE(0x0052EA20);// Material_ParseArgumentSource
 	DO_NOT_USE(0x0052E2C0);// Material_ParseSamplerSource
 	DO_NOT_USE(0x0052E6E0);// Material_ParseConstantSource
@@ -158,16 +160,18 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052E050);// Material_ParseIndexRange
 	DO_NOT_USE(0x0052EFB0);// Material_AddShaderArgument
 	DO_NOT_USE(0x0052ED40);// Material_SetShaderArguments
-
 	DO_NOT_USE(0x0052EA70);// Material_DefaultArgumentSource
 	DO_NOT_USE(0x0052E370);// Material_DefaultSamplerSourceFromTable
 	DO_NOT_USE(0x0052E800);// Material_DefaultConstantSourceFromTable
+	DO_NOT_USE(0x0052E430);// Material_DefaultSamplerSource
 	DO_NOT_USE(0x0052E910);// Material_UnknownShaderworksConstantSource
-
-	DO_NOT_USE(0x0052FDB0);// Material_GetStreamDestForSemantic
-	DO_NOT_USE(0x0052DA70);// Material_NameForStreamDest
+	//DO_NOT_USE(0x0052FDB0);// Material_GetStreamDestForSemantic
+	//DO_NOT_USE(0x0052DA70);// Material_NameForStreamDest
 	DO_NOT_USE(0x0052E990);// Material_ElemCountForParamName
-
+	DO_NOT_USE(0x0052D140);// Material_UsingTechnique
+	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
+	*/
+	MessageBoxA(nullptr, "", "", 0);
 	return TRUE;
 }
 

@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <intrin.h>
 
+#include "minidx9/Include/d3dx9.h"
+#pragma comment(lib, "minidx9/Lib/x86/d3dx9.lib")
+
 #pragma comment(lib, "detours/Detours.lib")
 #include "detours/Typedef.h"
 #include "detours/Detours.h"
@@ -15,7 +18,6 @@
 
 #include "assertdef.h"
 
-#include "d3dtypes.h"
 #include "T5.h"
 #include "q_parse.h"
 #include "com_files.h"
