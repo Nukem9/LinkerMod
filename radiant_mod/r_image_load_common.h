@@ -28,13 +28,13 @@ struct Picmip
 {
 	char platform[2];
 };
-static_assert(sizeof(Picmip) == 2, "Invalid Picmip size!");
+CHECK_SIZE(Picmip, 2);
 
 struct CardMemory
 {
 	int platform[2];
 };
-static_assert(sizeof(CardMemory) == 8, "Invalid CardMemory size!");
+CHECK_SIZE(CardMemory, 8);
 
 struct GfxImageFileHeader
 {
@@ -46,13 +46,13 @@ struct GfxImageFileHeader
 	float gamma;
 	int fileSizeForPicmip[8];
 };
-static_assert(sizeof(GfxImageFileHeader) == 48, "Invalid GfxImageFileHeader size!");
+CHECK_SIZE(GfxImageFileHeader, 48);
 
 union GfxTexture
 {
 	int *ptr;
 };
-static_assert(sizeof(GfxTexture) == 4, "Invalid GfxTexture size!");
+CHECK_SIZE(GfxTexture, 4);
 
 struct GfxImage
 {
@@ -71,7 +71,7 @@ struct GfxImage
 	char unk2[1];	// -- 31
 	const char *name;		// OK 32
 };
-static_assert(sizeof(GfxImage) == 36, "Invalid GfxImage size!");
+CHECK_SIZE(GfxImage, 36);
 
 /*
 struct GfxImage_BO
@@ -105,5 +105,3 @@ D3DCUBEMAP_FACES Image_CubemapFace(unsigned int faceIndex);
 void Image_Setup(GfxImage *image, int width, int height, int depth, unsigned int imageFlags, D3DFORMAT imageFormat);
 void Image_Upload2D_CopyData_PC(GfxImage *image, D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src);
 void Image_Upload3D_CopyData_PC(GfxImage *image, D3DFORMAT format, unsigned int mipLevel, const char *src);
-
-void Image_Reload();

@@ -25,6 +25,8 @@
 #include "xmodel_load_obj.h"
 
 #include "r_utils.h"
-#include "r_material_load_obj.h"
 #include "r_image_load_common.h"
 #include "r_image_load_obj.h"
+#include "r_image.h"
+#include "r_material_load_obj.h"
+#include "r_material.h"

@@ -1,7 +1,7 @@
 #pragma once
 
 typedef int (__cdecl * FS_FOpenFileRead_t)(const char *filename, int *file);
-static FS_FOpenFileRead_t FS_FOpenFileRead = (FS_FOpenFileRead_t)0x004BC170;
+static FS_FOpenFileRead_t FS_FOpenFileRead = (FS_FOpenFileRead_t)0x004BC190;
 
 typedef void (__cdecl * FS_FCloseFile_t)(int h);
 static FS_FCloseFile_t FS_FCloseFile = (FS_FCloseFile_t)0x004BB3C0;

@@ -79,8 +79,10 @@
     <ClCompile Include="assertdef.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="q_parse.cpp" />
+    <ClCompile Include="r_image.cpp" />
     <ClCompile Include="r_image_load_common.cpp" />
     <ClCompile Include="r_image_load_obj.cpp" />
+    <ClCompile Include="r_material.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_utils.cpp" />
     <ClCompile Include="xmodel_load_obj.cpp" />
@@ -91,8 +93,10 @@
     <ClInclude Include="detours\Detours.h" />
     <ClInclude Include="detours\Typedef.h" />
     <ClInclude Include="q_parse.h" />
+    <ClInclude Include="r_image.h" />
     <ClInclude Include="r_image_load_common.h" />
     <ClInclude Include="r_image_load_obj.h" />
+    <ClInclude Include="r_material.h" />
     <ClInclude Include="r_material_load_obj.h" />
     <ClInclude Include="r_utils.h" />
     <ClInclude Include="stdafx.h" />

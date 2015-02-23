@@ -11,14 +11,16 @@ enum errorParm_t
   ERR_LOCALIZATION = 0x6,
 };
 
+#define Com_Error(code, fmt, ...) Com_ErrorLine(__FILE__, __LINE__, code, fmt, __VA_ARGS__)
+
 typedef void (__cdecl * Com_PrintError_t)(int channel, const char *fmt, ...);
 static Com_PrintError_t Com_PrintError = (Com_PrintError_t)0x00468420;
 
 typedef int (__cdecl * Com_sprintf_t)(char *dest, int size, const char *fmt, ...);
 static Com_sprintf_t Com_sprintf = (Com_sprintf_t)0x004D3260;
 
-typedef void (__cdecl * Com_Error_t)(errorParm_t code, const char *fmt, ...);
-static Com_Error_t Com_Error = (Com_Error_t)0x004B8480;
+typedef void (__cdecl * Com_ErrorLine_t)(const char *file, int line, errorParm_t code, const char *fmt, ...);
+static Com_ErrorLine_t Com_ErrorLine = (Com_ErrorLine_t)0x004B8480;
 
 typedef void *(__cdecl * Z_Malloc_t)(int size);
 static Z_Malloc_t Z_Malloc = (Z_Malloc_t)0x004C7820;

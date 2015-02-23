@@ -48,6 +48,12 @@
     <ClInclude Include="xmodel_load_obj.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="r_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="r_material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -72,6 +78,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="xmodel_load_obj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="r_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="r_material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

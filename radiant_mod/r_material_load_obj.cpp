@@ -1450,7 +1450,7 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 	fread(shaderMemory, 1, shaderDataSize, shaderFile);
 
 	if (!Material_CopyTextToDXBuffer(shaderMemory, shaderDataSize, &shader))
-		ASSERT(false && "SHADER CREATION FAILED\n");
+		ASSERT(false && "SHADER UPLOAD FAILED\n");
 
 	fclose(shaderFile);
 	Z_Free(shaderMemory);

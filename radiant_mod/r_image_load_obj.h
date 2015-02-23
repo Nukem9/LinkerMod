@@ -1,6 +1,9 @@
 #pragma once
 
+#define PICMIP_PLATFORM_USED 0
+
 bool Image_ValidateHeader(GfxImageFileHeader *imageFile, const char *filepath);
+bool Image_LoadFromFile(GfxImage *image);
 bool Image_LoadFromFileWithReader(GfxImage *image, int(__cdecl * OpenFileRead)(const char *, int *));
 void Image_PrintTruncatedFileError(const char *filepath);
 void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *srcData, unsigned int allocFlags);

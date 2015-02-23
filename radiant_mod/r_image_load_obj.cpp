@@ -21,16 +21,21 @@ bool Image_ValidateHeader(GfxImageFileHeader *imageFile, const char *filepath)
 	return false;
 }
 
+bool Image_LoadFromFile(GfxImage *image)
+{
+	return Image_LoadFromFileWithReader(image, FS_FOpenFileRead);
+}
+
 bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(const char *, int *))
 {
 	ASSERT(image->category == IMG_CATEGORY_LOAD_FROM_FILE);
-	ASSERT(!image->texture.ptr);
+	ASSERT(image->texture.ptr == nullptr);
 
 	//
 	// Create and validate the IWI file path
 	//
 	char filepath[64];
-	if (Com_sprintf(filepath, ARRAYSIZE(filepath), "%s%s%s", "images/", image->name, ".iwi") < 0)
+	if (Com_sprintf(filepath, ARRAYSIZE(filepath), "images/%s.iwi", image->name) < 0)
 	{
 		Com_PrintError(8, "ERROR: filename '%s' too long\n", filepath);
 		return false;
@@ -40,8 +45,9 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 	// Get a handle to the file
 	//
 	int fileHandle;
-	strcpy_s(filepath, "images/default.iwi");
 	int fileSize = OpenFileRead(filepath, &fileHandle);
+
+	printf("File path: %s -- %d\n", filepath, fileSize);
 
 	if (fileSize == -1)
 	{
@@ -122,14 +128,14 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 		{
 			fileHeader.dimensions[0]	>>= streamedMipLevels;
 			fileHeader.dimensions[1]	>>= streamedMipLevels;
-			//image->skippedMipLevels		= streamedMipLevels;
+			//image->skippedMipLevels	= streamedMipLevels;
 		}
 
 		//
 		// Upload the raw data into a DirectX buffer
 		//
 		//image->loadedSize	= fileHeader.fileSizeForPicmip[streamedMipLevels] - 48;
-		//image->baseSize		= fileHeader.fileSizeForPicmip[0] - 48;
+		//image->baseSize	= fileHeader.fileSizeForPicmip[0] - 48;
 
 		Image_LoadFromData(image, &fileHeader, imageData, 2);
 		Z_Free(imageData);
@@ -155,7 +161,7 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 {
 	//image->loadedSize	= fileHeader->fileSizeForPicmip[image->skippedMipLevels] - 48;
 	//image->baseSize	= fileHeader->fileSizeForPicmip[0] - 48;
-	image->texture.ptr	= 0;
+	image->texture.ptr	= nullptr;
 
 	switch (fileHeader->format)
 	{
@@ -189,6 +195,14 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 // 	case 10:
 // 		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_A8, 1, allocFlags);
 // 		break;
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	case 10:
+		Image_LoadDxtc(image, fileHeader, srcData, D3DFMT_DXT1, 8, allocFlags);
+		break;
+
 	case 11:
 		Image_LoadDxtc(image, fileHeader, srcData, D3DFMT_DXT1, 8, allocFlags);
 		break;
@@ -202,7 +216,6 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 		Image_LoadDxtc(image, fileHeader, srcData, D3DFMT_A16B16G16R16F, 128, allocFlags);
 		break;
 	default:
-		printf("Case - %d\n", fileHeader->format);
 		ASSERT(false && "Unhandled case");
 		break;
 	}
@@ -210,8 +223,6 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 
 void Image_UploadData(GfxImage *image, _D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
 {
-	printf("%s START\n", image->name);
-
 	if (image->mapType != MAPTYPE_CUBE || !mipLevel || *(char *)0x13ACAD6)
 	{
 		if (image->mapType == MAPTYPE_3D)
@@ -219,8 +230,6 @@ void Image_UploadData(GfxImage *image, _D3DFORMAT format, D3DCUBEMAP_FACES face,
 		else
 			Image_Upload2D_CopyData_PC(image, format, face, mipLevel, src);
 	}
-
-	printf("END\n");
 }
 
 void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *data, D3DFORMAT format, int bytesPerPixel, int allocFlags)
@@ -231,7 +240,7 @@ void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *dat
 
 	Image_SetupFromFile(image, fileHeader, format, allocFlags);
 
-	signed int faceCount;
+	unsigned int faceCount;
 
 	if (image->mapType == MAPTYPE_CUBE)
 		faceCount = 6;
@@ -241,7 +250,7 @@ void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *dat
 	char *expandedData	= nullptr;
 	int expandedSize	= 4 * image->height * image->width * image->depth;
 	
-	if (format == 22)
+	if (format == D3DFMT_X8R8G8B8)
 		expandedData = (char *)Z_Malloc(expandedSize);
 	
 	int mipcount	= Image_CountMipmapsForFile(fileHeader);
@@ -272,14 +281,14 @@ void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *dat
 		{
 			D3DCUBEMAP_FACES face = Image_CubemapFace(faceIndex);
 
-			if (format == 22)
+			if (format == D3DFMT_X8R8G8B8)
 			{
 				Image_ExpandBgr(data, depth * height * width, expandedData);
 				Image_UploadData(image, D3DFMT_X8R8G8B8, face, mipLevel - picmip, expandedData);
 			}
 			else
 			{
-				//if (format == 21)
+				//if (format == D3DFMT_A8R8G8B8)
 				//	nullsub(data);
 
 				Image_UploadData(image, format, face, mipLevel - picmip, data);
@@ -302,7 +311,7 @@ void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char 
 
 	Image_SetupFromFile(image, fileHeader, format, allocFlags);
 
-	signed int faceCount;
+	unsigned int faceCount;
 
 	if (image->mapType == MAPTYPE_CUBE)
 		faceCount = 6;
@@ -382,7 +391,7 @@ void Image_SetupFromFile(GfxImage *image, GfxImageFileHeader *fileHeader, D3DFOR
 
 	Image_Setup(image, width, height, depth, fileHeader->flags, imageFormat);
 	
-	ASSERT(image->cardMemory.platform[/*PICMIP_PLATFORM_USED*/0] > 0);
+	ASSERT(image->cardMemory.platform[PICMIP_PLATFORM_USED] > 0);
 }
 
 int Image_CountMipmapsForFile(GfxImageFileHeader *fileHeader)
@@ -405,7 +414,7 @@ unsigned int Image_CountMipmaps(unsigned int imageFlags, unsigned int width, uns
 	while (mipRes < width || mipRes < height || mipRes < depth)
 	{
 		mipRes *= 2;
-		++mipCount;
+		mipCount++;
 	}
 
 	return mipCount;
@@ -427,7 +436,7 @@ char Image_GetPcStreamedMips(GfxImageFileHeader *fileHeader)
 			minDimension = fileHeader->dimensions[0];
 
 		for (; minDimension > 128; minDimension >>= 1)
-			++streamedMipLevels;
+			streamedMipLevels++;
 
 		return streamedMipLevels;
 	}
