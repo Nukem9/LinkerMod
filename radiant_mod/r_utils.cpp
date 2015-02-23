@@ -8,7 +8,7 @@ unsigned int R_HashAssetName(const char *name)
 	for (const char *pos = name; *pos; ++pos)
 	{
 		ASSERT(*pos < 'A' || *pos > 'Z');
-		ASSERT(*pos != '\\\\' || *pos == '/');
+		ASSERT(*pos != '\\' || *pos == '/');
 
 		hash = *pos ^ 33 * hash;
 	}
