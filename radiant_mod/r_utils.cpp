@@ -26,10 +26,3 @@ unsigned int R_HashString(const char *string)
 
 	return hash;
 }
-
-// R_Init.cpp
-SRCLINE(268)
-const char *R_ErrorDescription(HRESULT hr)
-{
-	return ((const char *(__cdecl *)(HRESULT))0x0051A970)(hr);
-}

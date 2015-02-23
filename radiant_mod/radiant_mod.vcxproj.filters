@@ -54,6 +54,9 @@
     <ClInclude Include="r_material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="r_init.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -84,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="r_material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="r_init.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
