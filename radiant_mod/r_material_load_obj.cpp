@@ -170,6 +170,7 @@ bool Material_ParseIndexRange(const char **text, unsigned int arrayCount, Shader
 		else
 		{
 			Com_UngetToken();
+
 			indexRange->count = 1;
 			return true;
 		}
@@ -502,8 +503,8 @@ bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const cha
 	if (sourceTable[sourceIndex].subtable)
 		return Material_ParseCodeConstantSource_r(shaderType, text, offset, sourceTable[sourceIndex].subtable, argSource);
 
-	argSource->type = 2 * (shaderType != 0) + 3;
-	argSource->u.codeIndex = offset + sourceTable[sourceIndex].source;
+	argSource->type			= (shaderType == MTL_VERTEX_SHADER) ? MTL_ARG_CODE_VERTEX_CONST : MTL_ARG_CODE_PIXEL_CONST;
+	argSource->u.codeIndex	= offset + sourceTable[sourceIndex].source;
 
 	ASSERT((argSource->type == MTL_ARG_CODE_VERTEX_CONST) || s_codeConstUpdateFreq[argSource->u.codeIndex] != MTL_UPDATE_PER_PRIM);
 
@@ -774,8 +775,8 @@ int Material_CompareShaderArgumentsForCombining(const void *e0, const void *e1)
 	MaterialShaderArgument *c1 = (MaterialShaderArgument *)e0;
 	MaterialShaderArgument *c2 = (MaterialShaderArgument *)e1;
 
-	int v4 = c1->type == 4 || c1->type == 2;
-	int v3 = c2->type == 4 || c2->type == 2;
+	int v4 = c1->type == MTL_ARG_CODE_PIXEL_SAMPLER || c1->type == MTL_ARG_MATERIAL_PIXEL_SAMPLER;
+	int v3 = c2->type == MTL_ARG_CODE_PIXEL_SAMPLER || c2->type == MTL_ARG_MATERIAL_PIXEL_SAMPLER;
 
 	if (v4 == v3)
 		return c1->dest - c2->dest;
@@ -789,7 +790,7 @@ bool Material_AttemptCombineShaderArguments(MaterialShaderArgument *arg0, Materi
 	if (arg0->type != arg1->type)
 		return false;
 
-	if (arg0->type != 3 && arg0->type != 5)
+	if (arg0->type != MTL_ARG_CODE_VERTEX_CONST && arg0->type != MTL_ARG_CODE_PIXEL_CONST)
 		return false;
 
 	if (arg0->u.codeConst.rowCount + arg0->dest != arg1->dest)
@@ -1424,7 +1425,7 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 		if (fread(&shaderDataSize, 4, 1, shaderFile) < 1)
 		{
 			fclose(shaderFile);
-			return 0;
+			return nullptr;
 		}
 	}
 	else
@@ -1435,12 +1436,12 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 		shaderFile = Material_OpenShader_WAW(shaderName, shaderVersion);
 
 		if (!shaderFile)
-			return 0;
+			return nullptr;
 
 		if (fread(&shaderDataSize, 4, 1, shaderFile) < 1)
 		{
 			fclose(shaderFile);
-			return 0;
+			return nullptr;
 		}
 	}
 

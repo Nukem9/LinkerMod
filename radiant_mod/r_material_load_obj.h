@@ -4,20 +4,6 @@
 //#define R_MAX_CODE_INDEX			197
 #define R_MAX_CODE_INDEX			105
 
-enum MaterialShaderType
-{
-	MTL_VERTEX_SHADER = 0x0,
-	MTL_PIXEL_SHADER = 0x1,
-};
-
-enum ShaderParamType
-{
-	SHADER_PARAM_FLOAT4 = 0x0,
-	SHADER_PARAM_SAMPLER_2D = 0x1,
-	SHADER_PARAM_SAMPLER_3D = 0x2,
-	SHADER_PARAM_SAMPLER_CUBE = 0x3,
-	SHADER_PARAM_SAMPLER_1D = 0x4,
-};
 /*
 enum MaterialTextureSource
 {
@@ -69,6 +55,12 @@ enum MaterialTextureSource
 };
 */
 
+enum MaterialShaderType
+{
+	MTL_VERTEX_SHADER = 0x0,
+	MTL_PIXEL_SHADER = 0x1,
+};
+
 enum MaterialUpdateFrequency_FIX
 {
 	MTL_UPDATE_PER_PRIM = 0x0,
@@ -90,6 +82,15 @@ enum MaterialArgumentSourceType
 	MTL_ARG_MATERIAL_PIXEL_CONST = 0x6,
 	MTL_ARG_LITERAL_PIXEL_CONST = 0x7,
 	MLT_ARG_COUNT = 0x8,
+};
+
+enum ShaderParamType
+{
+	SHADER_PARAM_FLOAT4 = 0x0,
+	SHADER_PARAM_SAMPLER_2D = 0x1,
+	SHADER_PARAM_SAMPLER_3D = 0x2,
+	SHADER_PARAM_SAMPLER_CUBE = 0x3,
+	SHADER_PARAM_SAMPLER_1D = 0x4,
 };
 
 typedef int MaterialUpdateFrequency;
