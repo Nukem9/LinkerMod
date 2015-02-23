@@ -221,7 +221,7 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 	}
 }
 
-void Image_UploadData(GfxImage *image, _D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
+void Image_UploadData(GfxImage *image, D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
 {
 	if (image->mapType != MAPTYPE_CUBE || !mipLevel || *(char *)0x13ACAD6)
 	{

@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 	//
 	// Disable STDOUT buffering
 	//
-	setbuf(stdout, NULL);
+	setbuf(stdout, nullptr);
 
 	if (argc < 3)
 	{
@@ -105,9 +105,9 @@ int main(int argc, char *argv[])
 	//
 	// Create a process job object to kill children on exit
 	//
-	HANDLE ghJob = CreateJobObject(NULL, NULL); // GLOBAL
+	HANDLE ghJob = CreateJobObject(nullptr, nullptr);// GLOBAL
 
-	if (ghJob == NULL)
+	if (ghJob == nullptr)
 	{
 		printf("Could not create job object\n");
 		return 1;
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 		// parent process does
 		//
 		jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-		if (0 == SetInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
+		if (!SetInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
 		{
 			printf("Could not SetInformationJobObject\n");
 			return 1;
@@ -141,7 +141,11 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	AssignProcessToJobObject(ghJob, processInfo.hProcess);
+	if (!AssignProcessToJobObject(ghJob, processInfo.hProcess))
+	{
+		printf("Unable to assign child process job object\n");
+		return 1;
+	}
 
 	//
 	// Inject the DLL
