@@ -56,6 +56,24 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
+
+//Detoured to allow for automatic cmdline map file arguments
+#include <shellapi.h>
+int (__thiscall* pCWinApp_Run)(void*) = NULL; //Pointer to Original Version of CWinApp::Run
+int (__thiscall* pMap_LoadFile)(void*) = (int (__thiscall*)(void*))0x0049FF90;
+int __fastcall CWinApp_Run(void *_this)
+{
+	{
+		int argc;
+		LPWSTR* argv = CommandLineToArgvW(GetCommandLine(), &argc);
+		char* path = new char[MAX_PATH];
+		wcstombs(path,argv[0],MAX_PATH);
+		pMap_LoadFile(path);
+		delete[] path;
+	}
+	return pCWinApp_Run(_this);
+}
+
 BOOL RadiantMod_Init()
 {
 	printf("----> Loading radiant mod\n");
@@ -76,6 +94,11 @@ BOOL RadiantMod_Init()
 	//
 	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
 	FixupFunction(0x004683F0, (ULONG_PTR)&hk_Com_Printf);
+
+	//
+	//Hook CWinApp::Run to allow for automatic map loading via commandline arguments
+	//
+	Detours::X86::DetourFunction((PBYTE)0x005BF26E, (PBYTE)&CWinApp_Run);
 
 	//
 	// Image loading functions
