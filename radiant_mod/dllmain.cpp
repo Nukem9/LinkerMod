@@ -98,7 +98,7 @@ BOOL RadiantMod_Init()
 	//
 	//Hook CWinApp::Run to allow for automatic map loading via commandline arguments
 	//
-	Detours::X86::DetourFunction((PBYTE)0x005BF26E, (PBYTE)&CWinApp_Run);
+	pCWinAppRun = (int (__thiscall*)(void*))Detours::X86::DetourFunction((PBYTE)0x005BF26E, (PBYTE)&CWinApp_Run);
 
 	//
 	// Image loading functions
