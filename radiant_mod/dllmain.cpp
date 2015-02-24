@@ -70,6 +70,7 @@ int __fastcall CWinApp_Run(void *_this)
 		wcstombs(path,argv[0],MAX_PATH);
 		pMap_LoadFile(path);
 		delete[] path;
+		LocalFree(argv);
 	}
 	return pCWinApp_Run(_this);
 }
