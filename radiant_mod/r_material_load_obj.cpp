@@ -33,6 +33,12 @@ bool Material_MatchToken(const char **text, const char *match)
 	return Com_MatchToken(text, match, 1) != 0;
 }
 
+SRCLINE(3124)
+MaterialStateMap *Material_RegisterStateMap(const char *name)
+{
+	return ((MaterialStateMap *(__fastcall *)(const char *))0x0052D950)(name);
+}
+
 SRCLINE(3140)
 bool Material_LoadPassStateMap(const char **text, MaterialStateMap **stateMap)
 {
@@ -258,12 +264,8 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 
 		return success;
 	}
-	else
-	{
-		return false;
-	}
 
-	return result;
+	return false;
 }
 
 SRCLINE(3419)
@@ -1540,8 +1542,8 @@ MaterialVertexShader *Material_RegisterVertexShader(const char *shaderName, char
 		push shaderVersion					// a3: shaderVersion
 		mov ecx, shaderName					// a2: shaderName
 
-		mov eax, dword ptr ds : [0x191D598]	// r_rendererInUse
-		mov eax, dword ptr ds : [eax + 0xC]	// a1: renderer
+		mov eax, dword ptr ds:[0x191D598]	// r_rendererInUse
+		mov eax, dword ptr ds:[eax + 0xC]	// a1: renderer
 		call [dwCall]
 		add esp, 0x4
 	}
@@ -1557,8 +1559,8 @@ MaterialPixelShader *Material_RegisterPixelShader(const char *shaderName, char s
 		push shaderVersion					// a3: shaderVersion
 		mov ecx, shaderName					// a2: shaderName
 
-		mov eax, dword ptr ds : [0x191D598]	// r_rendererInUse
-		mov eax, dword ptr ds : [eax + 0xC]	// a1: renderer
+		mov eax, dword ptr ds:[0x191D598]	// r_rendererInUse
+		mov eax, dword ptr ds:[eax + 0xC]	// a1: renderer
 		call [dwCall]
 		add esp, 0x4
 	}
@@ -1783,6 +1785,57 @@ bool Material_LoadPassPixelShader(const char **text, unsigned __int16 *techFlags
 		argCount,
 		args);
 }
+
+SRCLINE(8181)
+bool Material_HasMatchingParameter(char find, ShaderVaryingDef *paramTable, unsigned int paramCount)
+{
+	for (unsigned int paramIndex = 0; paramIndex < paramCount; paramIndex++)
+	{
+		if (paramTable[paramIndex].resourceDest == find)
+			return true;
+	}
+
+	return false;
+}
+
+SRCLINE(8197)
+bool Material_HasMatchingParameter_BuggySdkWorkaround(char find, ShaderVaryingDef *paramTable, unsigned int paramCount)
+{
+	if (find == 2)
+		return Material_HasMatchingParameter(3, paramTable, paramCount);
+	else if (find == 3)
+		return Material_HasMatchingParameter(2, paramTable, paramCount);
+
+	return false;
+}
+
+SRCLINE(8211)
+bool Material_ValidateShaderLinkage(ShaderVaryingDef *vertexOutputs, unsigned int vertexOutputCount, ShaderVaryingDef *pixelInputs, unsigned int pixelInputCount)
+{
+	bool isValid = true;
+
+	for (unsigned int paramIndex = 0; paramIndex < pixelInputCount; paramIndex++)
+	{
+		if (!Material_HasMatchingParameter(pixelInputs[paramIndex].resourceDest, vertexOutputs, vertexOutputCount)
+			&& !Material_HasMatchingParameter_BuggySdkWorkaround(pixelInputs[paramIndex].resourceDest, vertexOutputs, vertexOutputCount))
+		{
+			Com_ScriptError(
+				"Pixel shader input '%s' doesn't have a corresponding vertex shader output.\n",
+				pixelInputs[paramIndex].name);
+
+			isValid = false;
+		}
+	}
+
+	for (unsigned int paramIndex = 0; paramIndex < vertexOutputCount; paramIndex++)
+	{
+		if (!Material_HasMatchingParameter(vertexOutputs[paramIndex].resourceDest, pixelInputs, pixelInputCount))
+			Material_HasMatchingParameter_BuggySdkWorkaround(vertexOutputs[paramIndex].resourceDest, pixelInputs, pixelInputCount);
+	}
+
+	return isValid;
+}
+
 SRCLINE(8262)
 MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *arg)
 {

@@ -106,7 +106,9 @@ enum
 
 typedef int MaterialUpdateFrequency;
 typedef int MaterialTextureSource;
+
 typedef void MaterialVertexDeclaration;
+typedef void MaterialStateMap;
 
 struct ShaderIndexRange
 {
