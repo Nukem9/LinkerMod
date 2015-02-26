@@ -99,9 +99,8 @@ struct GfxImage_BO
 };
 */
 
-void Image_GetPicmip(GfxImage *image, Picmip *picmip);
-void Image_PicmipForSemantic(char semantic, Picmip *picmip);
-D3DCUBEMAP_FACES Image_CubemapFace(unsigned int faceIndex);
-void Image_Setup(GfxImage *image, int width, int height, int depth, unsigned int imageFlags, D3DFORMAT imageFormat);
 void Image_Upload2D_CopyData_PC(GfxImage *image, D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src);
 void Image_Upload3D_CopyData_PC(GfxImage *image, D3DFORMAT format, unsigned int mipLevel, const char *src);
+void Image_GetPicmip(GfxImage *image, Picmip *picmip);
+void Image_Setup(GfxImage *image, int width, int height, int depth, unsigned int imageFlags, D3DFORMAT imageFormat);
+D3DCUBEMAP_FACES Image_CubemapFace(unsigned int faceIndex);

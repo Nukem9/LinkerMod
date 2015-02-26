@@ -64,25 +64,25 @@ bool Material_LoadPassStateMap(const char **text, MaterialStateMap **stateMap)
 SRCLINE(3168)
 const char *Material_NameForStreamDest(char dest)
 {
-  switch (dest)
-  {
-    case 0:return "position";
-    case 1:return "normal";
-    case 2:return "color[0]";
-    case 3:return "color[1]";
-    case 4:return "depth";
-    case 5:return "texcoord[0]";
-    case 6:return "texcoord[1]";
-    case 7:return "texcoord[2]";
-    case 8:return "texcoord[3]";
-    case 9:return "texcoord[4]";
-    case 10:return "texcoord[5]";
-    case 11:return "texcoord[6]";
-    case 12:return "texcoord[7]";
-    case 13:return "blendweight";
-  }
+	switch (dest)
+	{
+	case 0:return "position";
+	case 1:return "normal";
+	case 2:return "color[0]";
+	case 3:return "color[1]";
+	case 4:return "depth";
+	case 5:return "texcoord[0]";
+	case 6:return "texcoord[1]";
+	case 7:return "texcoord[2]";
+	case 8:return "texcoord[3]";
+	case 9:return "texcoord[4]";
+	case 10:return "texcoord[5]";
+	case 11:return "texcoord[6]";
+	case 12:return "texcoord[7]";
+	case 13:return "blendweight";
+	}
 
-  return "";
+	return "";
 
 	/*
 	switch (dest)
@@ -254,6 +254,7 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 			vertexParamSet.varyingInputs,
 			vertexParamSet.varyingInputCount,
 			pass);
+
 		Material_LoadDeclTypes(text, pass);
 		strstr((char *)*text, "vertexDef");
 		if (v5)

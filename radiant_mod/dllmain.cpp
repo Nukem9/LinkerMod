@@ -77,7 +77,7 @@ BOOL RadiantMod_Init()
 	FixupFunction(0x004683F0, (ULONG_PTR)&hk_Com_Printf);
 
 	//
-	//Hook CWinApp::Run to allow for automatic map loading via commandline arguments
+	// Hook CWinApp::Run to allow for automatic map loading via command line arguments
 	//
 	Detours::X86::DetourClassFunction((PBYTE)0x005BF26E, &CWinApp::Run);
 
