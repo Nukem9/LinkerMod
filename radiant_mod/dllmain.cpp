@@ -56,25 +56,6 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
-
-//Detoured to allow for automatic cmdline map file arguments
-#include <shellapi.h>
-int (__thiscall* pCWinApp_Run)(void*) = NULL; //Pointer to Original Version of CWinApp::Run
-int (__thiscall* pMap_LoadFile)(void*) = (int (__thiscall*)(void*))0x0049FF90;
-int __fastcall CWinApp_Run(void *_this)
-{
-	{
-		int argc;
-		LPWSTR* argv = CommandLineToArgvW(GetCommandLine(), &argc);
-		char* path = new char[MAX_PATH];
-		wcstombs(path,argv[0],MAX_PATH);
-		pMap_LoadFile(path);
-		delete[] path;
-		LocalFree(argv);
-	}
-	return pCWinApp_Run(_this);
-}
-
 BOOL RadiantMod_Init()
 {
 	printf("----> Loading radiant mod\n");
@@ -93,16 +74,15 @@ BOOL RadiantMod_Init()
 	//
 	// Hook any needed functions
 	//
-	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
 	FixupFunction(0x004683F0, (ULONG_PTR)&hk_Com_Printf);
 
 	//
 	//Hook CWinApp::Run to allow for automatic map loading via commandline arguments
 	//
-	pCWinAppRun = (int (__thiscall*)(void*))Detours::X86::DetourFunction((PBYTE)0x005BF26E, (PBYTE)&CWinApp_Run);
+	Detours::X86::DetourClassFunction((PBYTE)0x005BF26E, &CWinApp::Run);
 
 	//
-	// Image loading functions
+	// Image loading
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0052BE30, (PBYTE)&Material_ReloadTextures);
 	Detours::X86::DetourFunction((PBYTE)0x005675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
@@ -110,6 +90,7 @@ BOOL RadiantMod_Init()
 	//
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
+	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
 	Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
 
