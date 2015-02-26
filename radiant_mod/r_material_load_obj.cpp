@@ -33,60 +33,50 @@ bool Material_MatchToken(const char **text, const char *match)
 	return Com_MatchToken(text, match, 1) != 0;
 }
 
+SRCLINE(3140)
+bool Material_LoadPassStateMap(const char **text, MaterialStateMap **stateMap)
+{
+	if (!Material_MatchToken(text, "stateMap"))
+		return false;
+
+	const char *token = Com_Parse(text);
+
+	if (!*token || *token == ';')
+	{
+		Com_ScriptError("missing stateMap filename\n");
+		return false;
+	}
+
+	*stateMap = Material_RegisterStateMap(token);
+
+	if (*stateMap)
+		return Material_MatchToken(text, ";");
+
+	return false;
+}
+
 SRCLINE(3168)
 const char *Material_NameForStreamDest(char dest)
 {
-  int result; // eax@2
-
-  switch ( dest )
+  switch (dest)
   {
-    case 0:
-      result = (int)"position";
-      break;
-    case 1:
-      result = (int)"normal";
-      break;
-    case 2:
-      result = (int)"color[0]";
-      break;
-    case 3:
-      result = (int)"color[1]";
-      break;
-    case 4:
-      result = (int)"depth";
-      break;
-    case 5:
-      result = (int)"texcoord[0]";
-      break;
-    case 6:
-      result = (int)"texcoord[1]";
-      break;
-    case 7:
-      result = (int)"texcoord[2]";
-      break;
-    case 8:
-      result = (int)"texcoord[3]";
-      break;
-    case 9:
-      result = (int)"texcoord[4]";
-      break;
-    case 0xA:
-      result = (int)"texcoord[5]";
-      break;
-    case 0xB:
-      result = (int)"texcoord[6]";
-      break;
-    case 0xC:
-      result = (int)"texcoord[7]";
-      break;
-    case 0xD:
-      result = (int)"blendweight";
-      break;
-    default:
-      result = (int)"";
-      break;
+    case 0:return "position";
+    case 1:return "normal";
+    case 2:return "color[0]";
+    case 3:return "color[1]";
+    case 4:return "depth";
+    case 5:return "texcoord[0]";
+    case 6:return "texcoord[1]";
+    case 7:return "texcoord[2]";
+    case 8:return "texcoord[3]";
+    case 9:return "texcoord[4]";
+    case 10:return "texcoord[5]";
+    case 11:return "texcoord[6]";
+    case 12:return "texcoord[7]";
+    case 13:return "blendweight";
   }
-  return (const char *)result;
+
+  return "";
 
 	/*
 	switch (dest)
@@ -121,6 +111,160 @@ const char *Material_NameForStreamDest(char dest)
 	*/
 }
 
+bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap)
+{
+	memset(pass, 0, sizeof(MaterialPass));
+
+	//
+	// State map
+	//
+	if (!Material_LoadPassStateMap(text, stateMap))
+		return false;
+
+	//
+	// Shader argument array instance
+	//
+	unsigned int argCount = 0;
+	MaterialShaderArgument args[128];
+
+	//
+	// Load the vertex shader pass
+	//
+	ShaderParameterSet vertexParamSet;
+
+	if (!Material_LoadPassVertexShader(text, techFlags, &vertexParamSet, pass, ARRAYSIZE(args), &argCount, args))
+		return false;
+	
+	if (argCount <= 0)
+	{
+		Com_ScriptError("material has no vertex arguments; it should at least have a transform matrix.\n");
+		return false;
+	}
+
+	//
+	// Load the pixel shader pass
+	//
+	ShaderParameterSet pixelParamSet;
+
+	if (!Material_LoadPassPixelShader(text, techFlags, &pixelParamSet, pass, ARRAYSIZE(args), &argCount, args))
+		return false;
+
+	//
+	// Sort arguments based on update frequency
+	//
+	qsort(args, argCount, sizeof(MaterialShaderArgument), Material_CompareShaderArgumentsForRuntime);
+
+	//
+	// Parse default material update frequency counts
+	//
+	unsigned int firstArg	= 0;
+	pass->perPrimArgCount	= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_PER_PRIM, args, argCount, &firstArg);
+	pass->perObjArgCount	= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_PER_OBJECT, args, argCount, &firstArg);
+	pass->stableArgCount	= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_RARELY, args, argCount, &firstArg);
+
+	//
+	// Parse custom material frequency arguments
+	//
+	{
+		MaterialShaderArgument *customArg	= &args[firstArg];
+		unsigned int customCount			= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_CUSTOM, args, argCount, &firstArg);
+		unsigned int customArgIndex			= 0;
+		pass->customSamplerFlags			= 0;
+
+		while (customArgIndex < customCount)
+		{
+			ASSERT(customArg->type == MTL_ARG_CODE_PIXEL_SAMPLER);
+			ASSERT(customArg->dest != SAMPLER_INDEX_INVALID);
+
+			int customSamplerIndex;
+			for (customSamplerIndex = 0; customSamplerIndex < CUSTOM_SAMPLER_COUNT; customSamplerIndex++)
+			{
+				if ((unsigned int *)customArg->u.literalConst == (&g_customSamplerSrc)[customSamplerIndex])
+				{
+					ASSERT(!(pass->customSamplerFlags & (1 << customSamplerIndex)));
+					ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
+
+					pass->customSamplerFlags |= 1 << customSamplerIndex;
+					break;
+				}
+			}
+
+			ASSERT(customSamplerIndex != CUSTOM_SAMPLER_COUNT);
+
+			customArgIndex++;
+			customArg++;
+		}
+	}
+	
+	//
+	// Allocate space for the local arguments
+	//
+	argCount		= pass->stableArgCount + pass->perObjArgCount + pass->perPrimArgCount;
+	pass->localArgs = (MaterialShaderArgument *)Material_Alloc(sizeof(MaterialShaderArgument) * argCount);
+
+	//
+	// Copy the data over to the pointer
+	//
+	memcpy(pass->localArgs, args, sizeof(MaterialShaderArgument) * argCount);
+
+	//
+	// DEBUG: Test/assert argument type indexes
+	//
+	MaterialShaderArgument *arg = pass->localArgs;
+	int argIndex				= 0;
+
+	while (argIndex < pass->perPrimArgCount)
+	{
+		ASSERT(arg->type >= MTL_ARG_CODE_PRIM_BEGIN);
+		ASSERT(arg->type < MTL_ARG_CODE_PRIM_END);
+
+		argIndex++;
+		arg++;
+	}
+
+	arg			= &pass->localArgs[pass->perPrimArgCount];
+	argIndex	= 0;
+
+	while (argIndex < pass->perObjArgCount)
+	{
+		ASSERT(arg->type >= MTL_ARG_CODE_PRIM_BEGIN);
+		ASSERT(arg->type < MTL_ARG_CODE_PRIM_END);
+
+		argIndex++;
+		arg++;
+	}
+
+	//
+	// Validate all shader parameters
+	//
+	if (Material_ValidateShaderLinkage(
+		vertexParamSet.outputs,
+		vertexParamSet.outputCount,
+		pixelParamSet.varyingInputs,
+		pixelParamSet.varyingInputCount))
+	{
+		bool success = Material_LoadPassVertexDecl(
+			text,
+			vertexParamSet.varyingInputs,
+			vertexParamSet.varyingInputCount,
+			pass);
+		Material_LoadDeclTypes(text, pass);
+		strstr((char *)*text, "vertexDef");
+		if (v5)
+		{
+			while (strcmp(";", Com_Parse(text)))
+				;
+		}
+
+		return success;
+	}
+	else
+	{
+		return false;
+	}
+
+	return result;
+}
 
 SRCLINE(3419)
 bool Material_DefaultIndexRange(ShaderIndexRange *indexRangeRef, unsigned int arrayCount, ShaderIndexRange *indexRangeSet)
@@ -376,78 +520,6 @@ bool Material_ParseLiteral(const char **text, const char *token, float *literal)
 		return false;
 
 	return true;
-}
-
-MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *arg)
-{
-	ASSERT(arg != nullptr);
-
-	MaterialUpdateFrequency updateFreq;
-	switch (arg->type)
-	{
-	case 3:
-		updateFreq = s_codeConstUpdateFreq[arg->u.codeConst.index];
-		break;
-
-	case 4:
-		/*updateFreq = s_codeSamplerUpdateFreq[arg->u.codeSampler];
-		*/
-		
-		ASSERT((updateFreq == MTL_UPDATE_PER_OBJECT) || (updateFreq == MTL_UPDATE_RARELY) || (updateFreq == MTL_UPDATE_CUSTOM));
-		break;
-
-	case 5:
-		updateFreq = s_codeConstUpdateFreq[arg->u.codeConst.index];
-
-		//ASSERT(updateFreq == MTL_UPDATE_RARELY);
-		break;
-
-	default:
-		updateFreq = MTL_UPDATE_RARELY;
-		break;
-	}
-
-	return updateFreq;
-}
-
-int Material_CompareShaderArgumentsForRuntime(const void *e0, const void *e1)
-{
-	MaterialShaderArgument *c1 = (MaterialShaderArgument *)e0;
-	MaterialShaderArgument *c2 = (MaterialShaderArgument *)e1;
-
-	MaterialUpdateFrequency updateFreq1 = Material_GetArgUpdateFrequency(c1);
-	MaterialUpdateFrequency updateFreq2 = Material_GetArgUpdateFrequency(c2);
-
-	if (updateFreq1 == updateFreq2)
-	{
-		if (c1->type == c2->type)
-		{
-			if (c1->type && c1->type != 6 && c1->type != 2)
-				return c1->dest - c2->dest;
-			
-			return c1->u.codeSampler < c2->u.codeSampler ? -1 : 1;
-		}
-
-		return c1->type - c2->type;
-	}
-	
-	return updateFreq1 - updateFreq2;
-}
-
-char Material_CountArgsWithUpdateFrequency(MaterialUpdateFrequency updateFreq, MaterialShaderArgument *args, unsigned int argCount, unsigned int *firstArg)
-{
-	args		= &args[*firstArg];
-	argCount	= argCount - *firstArg;
-
-	unsigned int matchCount;
-	for (matchCount = 0; matchCount < argCount; matchCount++)
-	{
-		if (Material_GetArgUpdateFrequency(&args[matchCount]) != updateFreq)
-			break;
-	}
-
-	*firstArg += matchCount;
-	return matchCount;
 }
 
 SRCLINE(3657)
@@ -1458,6 +1530,48 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 	return shader;
 }
 
+SRCLINE(7491)
+MaterialVertexShader *Material_RegisterVertexShader(const char *shaderName, char shaderVersion)
+{
+	static DWORD dwCall = 0x0052FBD0;
+
+	__asm
+	{
+		push shaderVersion					// a3: shaderVersion
+		mov ecx, shaderName					// a2: shaderName
+
+		mov eax, dword ptr ds : [0x191D598]	// r_rendererInUse
+		mov eax, dword ptr ds : [eax + 0xC]	// a1: renderer
+		call [dwCall]
+		add esp, 0x4
+	}
+}
+
+SRCLINE(7569)
+MaterialPixelShader *Material_RegisterPixelShader(const char *shaderName, char shaderVersion)
+{
+	static DWORD dwCall = 0x0052FCE0;
+
+	__asm
+	{
+		push shaderVersion					// a3: shaderVersion
+		mov ecx, shaderName					// a2: shaderName
+
+		mov eax, dword ptr ds : [0x191D598]	// r_rendererInUse
+		mov eax, dword ptr ds : [eax + 0xC]	// a1: renderer
+		call [dwCall]
+		add esp, 0x4
+	}
+}
+
+SRCLINE(7604)
+char Material_ParseShaderVersion(const char **text)
+{
+	float versionNumber = Com_ParseFloat(text);
+
+	return (signed int)floor((versionNumber * 10.0f) + 0.5);
+}
+
 SRCLINE(7866)
 char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 {
@@ -1532,7 +1646,7 @@ void Material_SetVaryingParameterDef(D3DXSEMANTIC *semantic, ShaderVaryingDef *p
 SRCLINE(7950)
 bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderName, MaterialShaderType shaderType, const DWORD *program, unsigned __int16 *techFlags, ShaderParameterSet *paramSet, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args)
 {
-	HRESULT hr = S_OK;
+	HRESULT hr = D3D_OK;
 
 	//
 	// Create a constant table from the shader program
@@ -1610,6 +1724,140 @@ bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderNam
 __d3dfail:
 	Com_ScriptError("Material_SetPassShaderArguments_DX D3D Error: %s (%08x)\n", R_ErrorDescription(hr), hr);
 	return false;
+}
+
+SRCLINE(8005)
+bool Material_LoadPassVertexShader(const char **text, unsigned __int16 *techFlags, ShaderParameterSet *paramSet, MaterialPass *pass, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args)
+{
+	memset(paramSet, 0, sizeof(ShaderParameterSet));
+
+	if (!Material_MatchToken(text, "vertexShader"))
+		return false;
+
+	char shaderVersion					= Material_ParseShaderVersion(text);
+	const char *shaderName				= Com_Parse(text);
+	MaterialVertexShader *mtlShader		= Material_RegisterVertexShader(shaderName, shaderVersion);
+
+	if (!mtlShader)
+		return false;
+
+	pass->vertexShader = mtlShader;
+
+	return Material_SetPassShaderArguments_DX(
+		text,
+		mtlShader->name,
+		MTL_VERTEX_SHADER,
+		mtlShader->loadDef.program,
+		techFlags,
+		paramSet,
+		argLimit,
+		argCount,
+		args);
+}
+
+SRCLINE(8132)
+bool Material_LoadPassPixelShader(const char **text, unsigned __int16 *techFlags, ShaderParameterSet *paramSet, MaterialPass *pass, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args)
+{
+	memset(paramSet, 0, sizeof(ShaderParameterSet));
+
+	if (!Material_MatchToken(text, "pixelShader"))
+		return false;
+
+	char shaderVersion				= Material_ParseShaderVersion(text);
+	const char *shaderName			= Com_Parse(text);
+	MaterialPixelShader *mtlShader	= Material_RegisterPixelShader(shaderName, shaderVersion);
+
+	if (!mtlShader)
+		return false;
+
+	pass->pixelShader = mtlShader;
+
+	return Material_SetPassShaderArguments_DX(
+		text,
+		mtlShader->name,
+		MTL_PIXEL_SHADER,
+		mtlShader->loadDef.program,
+		techFlags,
+		paramSet,
+		argLimit,
+		argCount,
+		args);
+}
+SRCLINE(8262)
+MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *arg)
+{
+	ASSERT(arg != nullptr);
+
+	MaterialUpdateFrequency updateFreq;
+	switch (arg->type)
+	{
+	case MTL_ARG_CODE_VERTEX_CONST:
+		updateFreq = s_codeConstUpdateFreq[arg->u.codeConst.index];
+		break;
+
+	case MTL_ARG_CODE_PIXEL_SAMPLER:
+		/*updateFreq = s_codeSamplerUpdateFreq[arg->u.codeSampler];
+		*/
+
+		ASSERT(false);
+		ASSERT((updateFreq == MTL_UPDATE_PER_OBJECT) || (updateFreq == MTL_UPDATE_RARELY) || (updateFreq == MTL_UPDATE_CUSTOM));
+		break;
+
+	case MTL_ARG_CODE_PIXEL_CONST:
+		updateFreq = s_codeConstUpdateFreq[arg->u.codeConst.index];
+
+		ASSERT(updateFreq == MTL_UPDATE_RARELY);
+		break;
+
+	default:
+		updateFreq = MTL_UPDATE_RARELY;
+		break;
+	}
+
+	return updateFreq;
+}
+
+
+SRCLINE(8288)
+int Material_CompareShaderArgumentsForRuntime(const void *e0, const void *e1)
+{
+	MaterialShaderArgument *c1 = (MaterialShaderArgument *)e0;
+	MaterialShaderArgument *c2 = (MaterialShaderArgument *)e1;
+
+	MaterialUpdateFrequency updateFreq1 = Material_GetArgUpdateFrequency(c1);
+	MaterialUpdateFrequency updateFreq2 = Material_GetArgUpdateFrequency(c2);
+
+	if (updateFreq1 == updateFreq2)
+	{
+		if (c1->type == c2->type)
+		{
+			if (c1->type && c1->type != MTL_ARG_MATERIAL_PIXEL_CONST && c1->type != MTL_ARG_MATERIAL_PIXEL_SAMPLER)
+				return c1->dest - c2->dest;
+
+			return c1->u.codeSampler < c2->u.codeSampler ? -1 : 1;
+		}
+
+		return c1->type - c2->type;
+	}
+
+	return updateFreq1 - updateFreq2;
+}
+
+SRCLINE(8306)
+char Material_CountArgsWithUpdateFrequency(MaterialUpdateFrequency updateFreq, MaterialShaderArgument *args, unsigned int argCount, unsigned int *firstArg)
+{
+	args		= &args[*firstArg];
+	argCount	= argCount - *firstArg;
+
+	unsigned int matchCount;
+	for (matchCount = 0; matchCount < argCount; matchCount++)
+	{
+		if (Material_GetArgUpdateFrequency(&args[matchCount]) != updateFreq)
+			break;
+	}
+
+	*firstArg += matchCount;
+	return matchCount;
 }
 
 SRCLINE(8710)

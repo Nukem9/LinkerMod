@@ -4,6 +4,8 @@
 //#define R_MAX_CODE_INDEX			197
 #define R_MAX_CODE_INDEX			105
 
+#define SAMPLER_INDEX_INVALID		255
+
 /*
 enum MaterialTextureSource
 {
@@ -93,8 +95,18 @@ enum ShaderParamType
 	SHADER_PARAM_SAMPLER_1D = 0x4,
 };
 
+enum
+{
+	CUSTOM_SAMPLER_REFLECTION_PROBE = 0x0,
+	CUSTOM_SAMPLER_LIGHTMAP_PRIMARY = 0x1,
+	CUSTOM_SAMPLER_LIGHTMAP_SECONDARY = 0x2,
+	CUSTOM_SAMPLER_LIGHTMAP_SECONDARYB = 0x3,
+	CUSTOM_SAMPLER_COUNT = 0x4,
+};
+
 typedef int MaterialUpdateFrequency;
 typedef int MaterialTextureSource;
+typedef void MaterialVertexDeclaration;
 
 struct ShaderIndexRange
 {
@@ -200,6 +212,29 @@ struct ShaderArgumentDest
 	const char *paramName;
 };
 CHECK_SIZE(ShaderArgumentDest, 16);
+
+struct MaterialPass
+{
+	MaterialVertexDeclaration *vertexDecl;
+	MaterialVertexShader *vertexShader;
+
+	union
+	{
+		MaterialPixelShader *pixelShader;
+		MaterialPixelShader *localPixelShader;
+	};
+	
+	char perPrimArgCount;
+	char perObjArgCount;
+	char stableArgCount;
+	char customSamplerFlags;
+
+	union
+	{
+		MaterialShaderArgument *localArgs;
+		MaterialShaderArgument *args;
+	};
+};
 
 const float *Material_RegisterLiteral(const float *literal);
 const char *Material_RegisterString(const char *string);

@@ -1,5 +1,11 @@
 #include "stdafx.h"
 
+SRCLINE(658)
+void *Material_Alloc(int size)
+{
+	return Hunk_Alloc(size, "Material_Alloc", 23);
+}
+
 SRCLINE(2210)
 void Material_ReloadTextures()
 {
