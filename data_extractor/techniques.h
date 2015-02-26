@@ -152,23 +152,13 @@ char* Technique_SourceToString(char source)
 	sourceStrings[7] = "normalTransform[0]";
 	sourceStrings[8] = "normalTransform[1]";
 	sourceStrings[9] = "blendweight";
-	//0 = position
-	//3 = normal
-	//4 = tangent
-	//1 = color
-	//2 = texcoord[0]
-	//5 6 = texcoord[1 2]
-	//7 8 = normalTransform[0 1]
-	//9 blendweight
 
-	//check Material_StreamSourceForName for more info
 	return sourceStrings[source];
 }
 
 char* Technique_DestToString(char dest)
 {
 	char* destStrings[20];
-	//if dest > 20 return should probably an error
 
 	destStrings[0] = "position";
 	destStrings[1] = "normal";
@@ -192,30 +182,7 @@ char* Technique_DestToString(char dest)
 	destStrings[19] = "blendweight";
 
 	return destStrings[dest];
-	// 0 = position
-	// 1 = normal
-	// 2 3 = color[0 1] 
-	// 4 = depth
-	// 5 - (5+13)[aka 18] = texcoord[0 - 13]
-	// 19 = blendweight
-	//else unknown
-
-	//check Material_StreamDestForName for more information
 }
-
-//enum MaterialWorldVertexFormat
-//{
-//  MTL_WORLDVERT_TEX_1_NRM_1 = 0x0,
-//  MTL_WORLDVERT_TEX_2_NRM_1 = 0x1,
-//  MTL_WORLDVERT_TEX_2_NRM_2 = 0x2,
-//  MTL_WORLDVERT_TEX_3_NRM_1 = 0x3,
-//  MTL_WORLDVERT_TEX_3_NRM_2 = 0x4,
-//  MTL_WORLDVERT_TEX_3_NRM_3 = 0x5,
-//  MTL_WORLDVERT_TEX_4_NRM_1 = 0x6,
-//  MTL_WORLDVERT_TEX_4_NRM_2 = 0x7,
-//  MTL_WORLDVERT_TEX_4_NRM_3 = 0x8,
-//};
-
 
 enum GfxBlend
 {
@@ -245,7 +212,6 @@ enum GfxBlendOp
   GFXS_BLENDOP_MASK = 0x7,
 };
 
-/*  306 */
 enum $B8A254328D12B632EF29D90876D26447
 {
   GFXS0_SRCBLEND_RGB_SHIFT = 0x0,
@@ -308,7 +274,6 @@ enum $B8A254328D12B632EF29D90876D26447
   GFXS1_STENCILOP_FRONTBACK_MASK = 0x1FF1FF00,
 };
 
-/*  307 */
 enum GfxTextureOp
 {
   GFXS_TEXOP_DISABLE = 0x0,
