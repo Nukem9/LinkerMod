@@ -61,6 +61,20 @@ bool Material_LoadPassStateMap(const char **text, MaterialStateMap **stateMap)
 	return false;
 }
 
+SRCLINE(3158)
+bool Material_ParseIndex(const char **text, int indexCount, int *index)
+{
+	if (!Material_MatchToken(text, "["))
+		return false;
+
+	*index = Com_ParseInt(text);
+
+	if (*index < 0 || *index >= indexCount)
+		Com_ScriptError("index '%i' is not in the range [0, %i]\n", *index, indexCount - 1);
+
+	return Material_MatchToken(text, "]");
+}
+
 SRCLINE(3168)
 const char *Material_NameForStreamDest(char dest)
 {
@@ -115,6 +129,71 @@ const char *Material_NameForStreamDest(char dest)
 
 	return "";
 	*/
+}
+
+bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable, unsigned int inputCount, MaterialPass *pass)
+{
+	//
+	// Material pass vertex stream routing
+	//
+	MaterialStreamRouting routing[16];
+	memset(routing, 0, sizeof(routing));
+
+	int routingIndex;
+	for (routingIndex = 0;; routingIndex++)
+	{
+		if (routingIndex >= 16)
+		{
+			Com_ScriptError("More than %i vertex mappings\n", routingIndex);
+			return false;
+		}
+
+		if (strcmp(Com_Parse(text), "vertex"))
+			break;
+
+		if (!Material_MatchToken(text, "."))
+			return false;
+
+		char dest[2];
+		if (!Material_StreamDestForName(text, Com_Parse(text), &dest[1]))
+			return false;
+
+		char resourceDest;
+		if (!Material_ResourceDestForStreamDest(dest[1], inputTable, inputCount, &resourceDest))
+			return false;
+
+		if (!Material_MatchToken(text, "=") || !Material_MatchToken(text, "code") || !Material_MatchToken(text, "."))
+			return false;
+
+		char source;
+		if (!Material_StreamSourceForName(text, Com_Parse(text), &source))
+			return false;
+
+		if (!Material_MatchToken(text, ";"))
+			return false;
+
+		int insertIndex;
+		for (insertIndex = routingIndex;
+			insertIndex > 0 && (dest[2 * insertIndex] >= source && (dest[2 * insertIndex] != source || dest[2 * insertIndex + 1] >= resourceDest));
+		insertIndex--)
+			routing[insertIndex] = *(MaterialStreamRouting *)&dest[2 * insertIndex];
+
+		routing[insertIndex].source = source;
+		routing[insertIndex].dest	= resourceDest;
+	}
+	
+	Com_UngetToken();
+
+	if (!Material_CheckUnspecifiedVertexInputs(inputTable, inputCount))
+		return false;
+
+	bool existing;
+	pass->vertexDecl = Material_AllocVertexDecl(routing, routingIndex, (bool *)&existing);
+
+	if (!existing)
+		Load_BuildVertexDecl(&pass->vertexDecl);
+
+	return true;
 }
 
 bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap)
@@ -267,6 +346,127 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 	}
 
 	return false;
+}
+
+SRCLINE(3221)
+bool Material_StreamDestForName(const char **text, const char *destName, char *dest)
+{
+	if (!strcmp(destName, "position"))
+		*dest = 0;
+	else if (!strcmp(destName, "normal"))
+		*dest = 1;
+	else if (!strcmp(destName, "color"))
+	{
+		int index;
+		if (!Material_ParseIndex(text, 2, &index))
+			return false;
+
+		*dest = index + 2;
+	}
+	else if (!strcmp(destName, "depth"))
+		*dest = 4;
+	else if (!strcmp(destName, "texcoord"))
+	{
+		int index;
+		if (!Material_ParseIndex(text, 14, &index))
+			return false;
+
+		*dest = index + 5;
+	}
+	else if (!strcmp(destName, "blendweight"))
+		*dest = 19;
+	else
+	{
+		Com_ScriptError("unknown stream destination '%s'\n", destName);
+		return false;
+	}
+
+	return true;
+}
+
+SRCLINE(3263)
+bool Material_StreamSourceForName(const char **text, const char *sourceName, char *source)
+{
+	if (!strcmp(sourceName, "position"))
+		*source = 0;
+	else if (!strcmp(sourceName, "normal"))
+		*source = 3;
+	else if (!strcmp(sourceName, "tangent"))
+		*source = 4;
+	else if (!strcmp(sourceName, "color"))
+		*source = 1;
+	else if (!strcmp(sourceName, "texcoord"))
+	{
+		int index;
+		if (!Material_ParseIndex(text, 3, &index))
+			return false;
+
+		if (index)
+			*source = index + 4;
+		else
+			*source = 2;
+	}
+	else if (!strcmp(sourceName, "normalTransform"))
+	{
+		int index;
+		if (!Material_ParseIndex(text, 2, &index))
+			return false;
+
+		*source = index + 7;
+	}
+	else if (!strcmp(sourceName, "blendweight"))
+		*source = 9;
+	else
+	{
+		Com_ScriptError("unknown stream source '%s'\n", sourceName);
+		return false;
+	}
+
+	return true;
+}
+
+SRCLINE(3314)
+bool Material_ResourceDestForStreamDest(char streamDest, ShaderVaryingDef *inputTable, unsigned int inputCount, char *resourceDest)
+{
+	unsigned int inputIndex;
+	for (inputIndex = 0;; inputIndex++)
+	{
+		if (inputIndex >= inputCount)
+		{
+			Com_ScriptError("vertex shader doesn't use input '%s'.\n", Material_NameForStreamDest(streamDest));
+			return false;
+		}
+
+		if (inputTable[inputIndex].streamDest == streamDest)
+			break;
+	}
+
+	if (inputTable[inputIndex].isAssigned)
+	{
+		Com_ScriptError("vertex input '%s' specified more than once.\n", inputTable[inputIndex].name);
+		return false;
+	}
+
+	inputTable[inputIndex].isAssigned	= true;
+	*resourceDest						= inputTable[inputIndex].resourceDest;
+	return true;
+}
+
+SRCLINE(3337)
+bool Material_CheckUnspecifiedVertexInputs(ShaderVaryingDef *inputTable, unsigned int inputCount)
+{
+	bool isValid = true;
+
+	for (unsigned int inputIndex = 0; inputIndex < inputCount; inputIndex++)
+	{
+		if (!inputTable[inputIndex].isAssigned)
+		{
+			Com_ScriptError("vertex input '%s' is not specified.\n", inputTable[inputIndex].name);
+			isValid = false;
+		}
+	}
+
+	return isValid;
 }
 
 SRCLINE(3419)
@@ -1540,7 +1740,9 @@ MaterialVertexShader *Material_RegisterVertexShader(const char *shaderName, char
 
 	__asm
 	{
-		push shaderVersion					// a3: shaderVersion
+		movzx ecx, shaderVersion
+		push ecx							// a3: shaderVersion
+
 		mov ecx, shaderName					// a2: shaderName
 
 		mov eax, dword ptr ds:[0x191D598]	// r_rendererInUse
@@ -1557,7 +1759,9 @@ MaterialPixelShader *Material_RegisterPixelShader(const char *shaderName, char s
 
 	__asm
 	{
-		push shaderVersion					// a3: shaderVersion
+		movzx ecx, shaderVersion
+		push ecx							// a3: shaderVersion
+
 		mov ecx, shaderName					// a2: shaderName
 
 		mov eax, dword ptr ds:[0x191D598]	// r_rendererInUse
@@ -1750,12 +1954,28 @@ bool Material_LoadPassVertexShader(const char **text, unsigned __int16 *techFlag
 		text,
 		mtlShader->name,
 		MTL_VERTEX_SHADER,
-		mtlShader->loadDef.program,
+		mtlShader->prog.loadDef.program,
 		techFlags,
 		paramSet,
 		argLimit,
 		argCount,
 		args);
+}
+
+SRCLINE(8049)
+bool Material_LoadDeclTypes(const char **text, MaterialPass *pass)
+{
+	ASSERT(pass->vertexShader != nullptr);
+
+	if (!strcmp(Com_Parse(text), "declTypes"))
+	{
+		while (strcmp("}", Com_Parse(text)))
+			/* Nothing */;
+	}
+	else
+		Com_UngetToken();
+
+	return true;
 }
 
 SRCLINE(8132)
@@ -1779,7 +1999,7 @@ bool Material_LoadPassPixelShader(const char **text, unsigned __int16 *techFlags
 		text,
 		mtlShader->name,
 		MTL_PIXEL_SHADER,
-		mtlShader->loadDef.program,
+		mtlShader->prog.loadDef.program,
 		techFlags,
 		paramSet,
 		argLimit,

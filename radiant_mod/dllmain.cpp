@@ -46,7 +46,7 @@ void __declspec(naked) hk_Com_Printf()
 		push [ebp + 0x14 + 0x20]
 		push [ebp + 0x10 + 0x20]
 		push [ebp + 0xC + 0x20]
-		; push[ebp + 0x8 + 0x20] (int level)
+		; push [ebp + 0x8 + 0x20] (int level)
 		call printf
 		add esp, 0x10
 

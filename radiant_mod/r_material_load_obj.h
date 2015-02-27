@@ -215,6 +215,49 @@ struct ShaderArgumentDest
 };
 CHECK_SIZE(ShaderArgumentDest, 16);
 
+struct MaterialStreamRouting
+{
+	char source;
+	char dest;
+};
+CHECK_SIZE(MaterialStreamRouting, 2);
+
+struct GfxVertexShaderLoadDef
+{
+	DWORD *program;
+	unsigned __int16 programSize;
+};
+
+struct MaterialVertexShaderProgram
+{
+	IDirect3DVertexShader9 *vs;
+	GfxVertexShaderLoadDef loadDef;
+};
+
+struct MaterialVertexShader
+{
+	const char *name;
+	MaterialVertexShaderProgram prog;
+};
+
+struct GfxPixelShaderLoadDef
+{
+	DWORD *program;
+	unsigned __int16 programSize;
+};
+
+struct MaterialPixelShaderProgram
+{
+	IDirect3DPixelShader9 *ps;
+	GfxPixelShaderLoadDef loadDef;
+};
+
+struct MaterialPixelShader
+{
+	const char *name;
+	MaterialPixelShaderProgram prog;
+};
+
 struct MaterialPass
 {
 	MaterialVertexDeclaration *vertexDecl;
@@ -237,6 +280,7 @@ struct MaterialPass
 		MaterialShaderArgument *args;
 	};
 };
+CHECK_SIZE(MaterialPass, 20);
 
 const float *Material_RegisterLiteral(const float *literal);
 const char *Material_RegisterString(const char *string);
