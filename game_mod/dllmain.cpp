@@ -114,6 +114,12 @@ BOOL GameMod_Init()
 	PatchMemory(0x0041EEC0, (PBYTE)"\xB0\x01\xC3", 3);
 
 	//
+	// Allow vid_restart_complete on a listen server
+	//
+	PatchMemory(0x005D2F59, (PBYTE)"\xEB", 1);
+
+
+	//
 	// Disable command restrictions
 	//
 	*(uint8_t **)&Cmd_ExecuteSingleCommandInternal = Detours::X86::DetourFunction((PBYTE)0x829AD0, (PBYTE)&hk_Cmd_ExecuteSingleCommandInternal);

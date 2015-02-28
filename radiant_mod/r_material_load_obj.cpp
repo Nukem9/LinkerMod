@@ -1128,7 +1128,7 @@ bool Material_SetShaderArguments(unsigned int usedCount, MaterialShaderArgument 
 		usedCount = Material_CombineShaderArguments(usedCount, localArgs);
 
 		// Copy all of the fixed arguments to the real table
-		memcpy((char *)&args[*argCount], (char *)localArgs, sizeof(MaterialShaderArgument) * usedCount);
+		memcpy(&args[*argCount], localArgs, sizeof(MaterialShaderArgument) * usedCount);
 
 		// Adjust the output count
 		*argCount += usedCount;
