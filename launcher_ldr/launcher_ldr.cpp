@@ -118,6 +118,15 @@ int main(int argc, char *argv[])
 		memset(&info, 0, sizeof(info));
 
 		//
+		// Query the information first
+		//
+		if (!QueryInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &info, sizeof(info), nullptr))
+		{
+			printf("Could not QueryInformationJobObject\n");
+			return 1;
+		}
+
+		//
 		// Configure all child processes associated with the job to terminate when the
 		// parent process does
 		//
@@ -136,7 +145,7 @@ int main(int argc, char *argv[])
 	FixCommandLine(argc, argv);
 	FixDirectory(argc, argv);
 
-	if(!CreateProcessA(nullptr, g_CommandLine, nullptr, nullptr, TRUE, CREATE_SUSPENDED, nullptr, g_ExeDirectory, &startupInfo, &processInfo))
+	if(!CreateProcessA(nullptr, g_CommandLine, nullptr, nullptr, TRUE, CREATE_BREAKAWAY_FROM_JOB | CREATE_SUSPENDED, nullptr, g_ExeDirectory, &startupInfo, &processInfo))
 	{
 		printf("Failed to create '%s' process\n", argv[2]);
 		return 1;
@@ -147,7 +156,7 @@ int main(int argc, char *argv[])
 	//
 	if (!AssignProcessToJobObject(ghJob, processInfo.hProcess))
 	{
-		printf("Unable to assign child process job object\n");
+		printf("Unable to assign child process job object (0x%X)\n", GetLastError());
 		return 1;
 	}
 
