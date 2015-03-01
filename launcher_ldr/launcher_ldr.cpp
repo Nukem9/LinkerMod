@@ -85,22 +85,22 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	STARTUPINFOA startupInfo;
-	memset(&startupInfo, 0, sizeof(STARTUPINFOA));
-
 	//
 	// Redirect output to this console
 	//
-	startupInfo.cb = sizeof(STARTUPINFOA);
-	startupInfo.hStdError = stderr;
-	startupInfo.hStdInput = stdin;
-	startupInfo.hStdOutput = stdout;
+	STARTUPINFOA startupInfo;
+	memset(&startupInfo, 0, sizeof(STARTUPINFOA));
+
+	startupInfo.cb			= sizeof(STARTUPINFOA);
+	startupInfo.hStdError	= stderr;
+	startupInfo.hStdInput	= stdin;
+	startupInfo.hStdOutput	= stdout;
 
 	//
 	// Process/thread handles
 	//
 	PROCESS_INFORMATION processInfo;
-	memset(&processInfo, 0 , sizeof(PROCESS_INFORMATION));
+	memset(&processInfo, 0, sizeof(PROCESS_INFORMATION));
 
 	//
 	// Create a process job object to kill children on exit
@@ -114,15 +114,16 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli;
-		memset(&jeli, 0, sizeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
+		JOBOBJECT_EXTENDED_LIMIT_INFORMATION info;
+		memset(&info, 0, sizeof(info));
 
 		//
 		// Configure all child processes associated with the job to terminate when the
 		// parent process does
 		//
-		jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-		if (!SetInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
+		info.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+
+		if (!SetInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &info, sizeof(info)))
 		{
 			printf("Could not SetInformationJobObject\n");
 			return 1;
@@ -135,12 +136,15 @@ int main(int argc, char *argv[])
 	FixCommandLine(argc, argv);
 	FixDirectory(argc, argv);
 
-	if(!CreateProcessA(nullptr, g_CommandLine, nullptr, nullptr, FALSE, CREATE_SUSPENDED, nullptr, g_ExeDirectory, &startupInfo, &processInfo))
+	if(!CreateProcessA(nullptr, g_CommandLine, nullptr, nullptr, TRUE, CREATE_SUSPENDED, nullptr, g_ExeDirectory, &startupInfo, &processInfo))
 	{
 		printf("Failed to create '%s' process\n", argv[2]);
 		return 1;
 	}
 
+	//
+	// Assign the job object
+	//
 	if (!AssignProcessToJobObject(ghJob, processInfo.hProcess))
 	{
 		printf("Unable to assign child process job object\n");
@@ -157,11 +161,6 @@ int main(int argc, char *argv[])
 		printf("DLL injection failed\n");
 		return 1;
 	}
-
-	//
-	// Flush IO
-	//
-	fflush(stdout);
 
 	//
 	// Resume the process
