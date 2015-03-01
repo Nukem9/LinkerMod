@@ -182,8 +182,18 @@ int main(int argc, char *argv[])
 	//
 	WaitForSingleObject(processInfo.hProcess, INFINITE);
 
+	//
+	// Determine the real process exit code
+	//
+	DWORD exitCode = 0;
+	GetExitCodeProcess(processInfo.hProcess, &exitCode);
+
 	CloseHandle(processInfo.hProcess);
 	CloseHandle(ghJob);
 
-	return 0;
+	//
+	// Send the exit code to the caller
+	//
+	ExitProcess(exitCode);
+	return exitCode;
 }

@@ -118,7 +118,6 @@ BOOL GameMod_Init()
 	//
 	PatchMemory(0x005D2F59, (PBYTE)"\xEB", 1);
 
-
 	//
 	// Disable command restrictions
 	//
