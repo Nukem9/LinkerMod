@@ -22,7 +22,7 @@ void assert(const char *File, int Line, bool Condition, const char *Format, ...)
 	va_start(ap, Format);
 
 	_vsnprintf_s(buffer, _TRUNCATE, Format, ap);
-	sprintf_s(message, "%s(%d):\n\n%s", File, Line, buffer);
+	sprintf_s(message, "%s(%d):\n\n%s\n\n0x%X", File, Line, buffer, _ReturnAddress());
 
 	MessageBoxA(nullptr, message, "ASSERTION", 0);
 
@@ -36,15 +36,21 @@ LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	printf("EX0: 0x%p\n", ExceptionInfo->ExceptionRecord->ExceptionInformation[0]);
 	printf("EX1: 0x%p\n", ExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
 	printf("\n\n");
-	fflush(stdout);
 
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
 BOOL LinkerMod_Init()
 {
+	//
+	// Disable STDOUT buffering
+	//
+	setbuf(stdout, nullptr);
+
+	//
+	// Logo to let the user know this loaded
+	//
 	printf("----> Loading custom linker\n");
-	fflush(stdout);
 
 	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
 

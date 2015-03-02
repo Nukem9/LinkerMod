@@ -50,8 +50,10 @@ void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex
 
 BOOL GameMod_Init()
 {
-	printf("----> Loading game mod\n");
-	fflush(stdout);
+	//
+	// Disable STDOUT buffering
+	//
+	setbuf(stdout, nullptr);
 
 	//
 	// Bypass CEG's code hashes

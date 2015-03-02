@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
 	if (argc < 3)
 	{
-		printf("USAGE: launcher_ldr DLL EXE ARGUMENTS\n");
+		printf("USAGE: launcher_ldr <DLL> <EXE> <ARGUMENTS>\n");
 		return 0;
 	}
 
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 	//
 	// Create a process job object to kill children on exit
 	//
-	HANDLE ghJob = CreateJobObject(nullptr, nullptr);// GLOBAL
+	HANDLE ghJob = CreateJobObject(nullptr, nullptr);
 
 	if (ghJob == nullptr)
 	{

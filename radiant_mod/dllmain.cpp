@@ -58,8 +58,10 @@ void __declspec(naked) hk_Com_Printf()
 
 BOOL RadiantMod_Init()
 {
-	printf("----> Loading radiant mod\n");
-	fflush(stdout);
+	//
+	// Disable STDOUT buffering
+	//
+	setbuf(stdout, nullptr);
 
 	//
 	// Create an external console for Radiant
