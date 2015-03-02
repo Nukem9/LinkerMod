@@ -17,10 +17,19 @@
     <ClCompile Include="CEG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Console.cpp">
+    <ClCompile Include="cl_main_mp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="r_vid_restart_complete.cpp">
+    <ClCompile Include="sv_ccmds_mp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dvar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cl_console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -31,10 +40,19 @@
     <ClInclude Include="CEG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Console.h">
+    <ClInclude Include="sv_ccmds_mp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="r_vid_restart_complete.h">
+    <ClInclude Include="dvar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cl_main_mp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cl_console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

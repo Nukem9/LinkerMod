@@ -11,4 +11,9 @@
 #include "detours/Detours.h"
 
 #include "CEG.h"
-#include "Console.h"
+
+#include "common.h"
+#include "dvar.h"
+#include "sv_ccmds_mp.h"
+#include "cl_main_mp.h"
+#include "cl_console.h"

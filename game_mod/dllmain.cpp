@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "r_vid_restart_complete.h"
 
 void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 {
@@ -151,7 +150,7 @@ BOOL GameMod_Init()
 	//
 	// CL_Vid_Restart_Complete_f hook to prevent crashes
 	//
-	*(uint8_t **)&pCL_Vid_Restart_Complete_f = Detours::X86::DetourFunction((PBYTE)0x005D2F00, (PBYTE)&CL_Vid_Restart_Complete_f); 
+	*(uint8_t **)&CL_Vid_Restart_Complete_f = Detours::X86::DetourFunction((PBYTE)0x005D2F00, (PBYTE)&hk_CL_Vid_Restart_Complete_f); 
 
 	return TRUE;
 }
