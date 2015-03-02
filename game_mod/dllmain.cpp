@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "r_vid_restart_complete.h"
 
 void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 {
@@ -114,11 +115,6 @@ BOOL GameMod_Init()
 	PatchMemory(0x0041EEC0, (PBYTE)"\xB0\x01\xC3", 3);
 
 	//
-	// Allow vid_restart_complete on a listen server
-	//
-	PatchMemory(0x005D2F59, (PBYTE)"\xEB", 1);
-
-	//
 	// Disable command restrictions
 	//
 	*(uint8_t **)&Cmd_ExecuteSingleCommandInternal = Detours::X86::DetourFunction((PBYTE)0x829AD0, (PBYTE)&hk_Cmd_ExecuteSingleCommandInternal);
@@ -149,6 +145,11 @@ BOOL GameMod_Init()
 	// Apply any game hooks
 	//
 	*(uint8_t **)&Com_Init = Detours::X86::DetourFunction((PBYTE)0x004069C0, (PBYTE)&hk_Com_Init);
+
+	//
+	// CL_Vid_Restart_Complete_f hook
+	//
+	*(uint8_t **)&pCL_Vid_Restart_Complete_f = Detours::X86::DetourFunction((PBYTE)0x005D2F00, (PBYTE)&CL_Vid_Restart_Complete_f); 
 
 	return TRUE;
 }
