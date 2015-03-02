@@ -123,6 +123,11 @@ const void *Com_LoadBspLump(const char *mapname, LumpType type, unsigned int ele
 	return comBspGlob->loadedLumpData;
 }
 
+void *Com_GetBspLump(LumpType type, unsigned int elemSize, unsigned int *count)
+{
+	return ((void *(__cdecl *)(LumpType, unsigned int, unsigned int *))0x004017D0)(type, elemSize, count);
+}
+
 void Com_UnloadBspLump(LumpType type)
 {
 	ASSERT(comBspGlob->loadedLumpData != nullptr);

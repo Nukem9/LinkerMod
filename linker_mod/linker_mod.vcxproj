@@ -84,7 +84,7 @@
     <ClInclude Include="detours\Detours.h" />
     <ClInclude Include="pathnode_load_obj.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="T6.h" />
+    <ClInclude Include="T5.h" />
     <ClInclude Include="Typedef.h" />
   </ItemGroup>
   <ItemGroup>
