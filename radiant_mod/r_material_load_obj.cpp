@@ -2322,7 +2322,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 				if (Material_UsingTechnique(techType[techTypeCount]))
 					usingTechnique = true;
 
-				++techTypeCount;
+				techTypeCount++;
 			}
 
 			if (!Material_MatchToken(&textData, ":"))

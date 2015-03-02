@@ -77,6 +77,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="assertdef.cpp" />
+    <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="CWinApp.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="q_parse.cpp" />
@@ -92,6 +93,7 @@
   <ItemGroup>
     <ClInclude Include="assertdef.h" />
     <ClInclude Include="com_files.h" />
+    <ClInclude Include="com_memory.h" />
     <ClInclude Include="CWinApp.h" />
     <ClInclude Include="detours\Detours.h" />
     <ClInclude Include="detours\Typedef.h" />

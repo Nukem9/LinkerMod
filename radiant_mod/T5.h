@@ -22,12 +22,6 @@ static Com_sprintf_t Com_sprintf = (Com_sprintf_t)0x004D3260;
 typedef void (__cdecl * Com_ErrorLine_t)(const char *file, int line, errorParm_t code, const char *fmt, ...);
 static Com_ErrorLine_t Com_ErrorLine = (Com_ErrorLine_t)0x004B8480;
 
-typedef void *(__cdecl * Z_Malloc_t)(int size);
-static Z_Malloc_t Z_Malloc = (Z_Malloc_t)0x004C7820;
-
-typedef void (__cdecl * Z_Free_t)(void *ptr);
-static Z_Free_t Z_Free = (Z_Free_t)0x004C77B0;
-
 typedef void (__cdecl * I_strncpyz_t)(char *dest, const char *src, int destsize);
 static I_strncpyz_t I_strncpyz = (I_strncpyz_t)0x004D2E70;
 

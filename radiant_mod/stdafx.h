@@ -22,9 +22,10 @@
 #include "CWinApp.h"
 
 #include "T5.h"
-#include "q_parse.h"
 #include "com_files.h"
+#include "com_memory.h"
 
+#include "q_parse.h"
 #include "xmodel_load_obj.h"
 
 #include "r_init.h"
