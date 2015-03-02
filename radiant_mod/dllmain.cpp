@@ -61,7 +61,7 @@ BOOL RadiantMod_Init()
 	//
 	// Disable STDOUT buffering
 	//
-	setbuf(stdout, nullptr);
+	setvbuf(stdout, nullptr, _IONBF, 0);
 
 	//
 	// Create an external console for Radiant

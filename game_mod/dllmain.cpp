@@ -53,7 +53,7 @@ BOOL GameMod_Init()
 	//
 	// Disable STDOUT buffering
 	//
-	setbuf(stdout, nullptr);
+	setvbuf(stdout, nullptr, _IONBF, 0);
 
 	//
 	// Bypass CEG's code hashes
@@ -119,7 +119,7 @@ BOOL GameMod_Init()
 	//
 	// Disable command restrictions
 	//
-	*(uint8_t **)&Cmd_ExecuteSingleCommandInternal = Detours::X86::DetourFunction((PBYTE)0x829AD0, (PBYTE)&hk_Cmd_ExecuteSingleCommandInternal);
+	*(uint8_t **)&Cmd_ExecuteSingleCommandInternal = Detours::X86::DetourFunction((PBYTE)0x00829AD0, (PBYTE)&hk_Cmd_ExecuteSingleCommandInternal);
 
 	//
 	// De-restrict Dvar_ForEachConsoleAccessName and
@@ -149,7 +149,7 @@ BOOL GameMod_Init()
 	*(uint8_t **)&Com_Init = Detours::X86::DetourFunction((PBYTE)0x004069C0, (PBYTE)&hk_Com_Init);
 
 	//
-	// CL_Vid_Restart_Complete_f hook
+	// CL_Vid_Restart_Complete_f hook to prevent crashes
 	//
 	*(uint8_t **)&pCL_Vid_Restart_Complete_f = Detours::X86::DetourFunction((PBYTE)0x005D2F00, (PBYTE)&CL_Vid_Restart_Complete_f); 
 

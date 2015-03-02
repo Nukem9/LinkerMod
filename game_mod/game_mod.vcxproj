@@ -79,10 +79,12 @@
     <ClCompile Include="CEG.cpp" />
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="r_vid_restart_complete.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CEG.h" />
     <ClInclude Include="Console.h" />
+    <ClInclude Include="r_vid_restart_complete.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

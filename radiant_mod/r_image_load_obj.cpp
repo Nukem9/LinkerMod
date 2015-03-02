@@ -35,6 +35,7 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 	// Create and validate the IWI file path
 	//
 	char filepath[64];
+
 	if (Com_sprintf(filepath, ARRAYSIZE(filepath), "images/%s.iwi", image->name) < 0)
 	{
 		Com_PrintError(8, "ERROR: filename '%s' too long\n", filepath);
@@ -141,15 +142,11 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 		Z_Free(imageData);
 		return true;
 	}
-	else
-	{
-		Image_PrintTruncatedFileError(filepath);
-		Z_Free(imageData);
-		FS_FCloseFile(fileHandle);
-		return false;
-	}
 
-	return true;
+	Image_PrintTruncatedFileError(filepath);
+	Z_Free(imageData);
+	FS_FCloseFile(fileHandle);
+	return false;
 }
 
 void Image_PrintTruncatedFileError(const char *filepath)

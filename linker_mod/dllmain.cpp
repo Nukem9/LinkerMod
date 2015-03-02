@@ -45,7 +45,7 @@ BOOL LinkerMod_Init()
 	//
 	// Disable STDOUT buffering
 	//
-	setbuf(stdout, nullptr);
+	setvbuf(stdout, nullptr, _IONBF, 0);
 
 	//
 	// Logo to let the user know this loaded

@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 	//
 	// Disable STDOUT buffering
 	//
-	setbuf(stdout, nullptr);
+	setvbuf(stdout, nullptr, _IONBF, 0);
 
 	if (argc < 3)
 	{

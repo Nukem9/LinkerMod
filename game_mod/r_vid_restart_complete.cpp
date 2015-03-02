@@ -84,7 +84,7 @@ struct dvar_s
 
 static dvar_s** p_com_sv_running = ((dvar_s**)0x0243FD3C);
 
-void __cdecl CL_Vid_Restart_Complete_f()
+void CL_Vid_Restart_Complete_f()
 {
 	if((*p_com_sv_running)->current.enabled)
 	{
