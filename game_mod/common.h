@@ -11,4 +11,7 @@ struct field_t
 	char buffer[256];
 };
 
+extern void (__cdecl * Com_Init)(char *commandLine);
+
+void hk_Com_Init(char *commandLine);
 void Field_Clear(field_t *edit);

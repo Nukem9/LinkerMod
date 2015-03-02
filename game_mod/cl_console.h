@@ -1,6 +1,6 @@
 #pragma once
 
-static field_t *g_consoleField = (field_t *)0xC72280;
+static field_t *g_consoleField = (field_t *)0x00C72280;
 
 bool Con_HasActiveAutoComplete();
 bool Con_CancelAutoComplete();

@@ -21,17 +21,6 @@ void FixupFunction(ULONG_PTR Address, ULONG_PTR CEGEaxAddress)
 	PatchMemory(Address + 1, (PBYTE)&data, 4);
 }
 
-void(__cdecl * Com_Init)(char *commandLine);
-void hk_Com_Init(char *commandLine)
-{
-	//
-	// Fix up the command line because devs removed it
-	//
-	commandLine = (char *)0x276D0D8;
-
-	Com_Init(commandLine);
-}
-
 void (__cdecl * Cmd_ExecuteSingleCommandInternal)(int localClientNum, int controllerIndex, void *item, const char *text, bool restrict);
 void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex, void *item, const char *text, bool restrict)
 {
@@ -116,11 +105,6 @@ BOOL GameMod_Init()
 	PatchMemory(0x0041EEC0, (PBYTE)"\xB0\x01\xC3", 3);
 
 	//
-	// Disable command restrictions
-	//
-	*(uint8_t **)&Cmd_ExecuteSingleCommandInternal = Detours::X86::DetourFunction((PBYTE)0x00829AD0, (PBYTE)&hk_Cmd_ExecuteSingleCommandInternal);
-
-	//
 	// De-restrict Dvar_ForEachConsoleAccessName and
 	// Cmd_ForEachConsoleAccessName
 	//
@@ -143,7 +127,12 @@ BOOL GameMod_Init()
 	PatchMemory(0x005A1700, (PBYTE)"\x90\x90", 2);
 
 	//
-	// Apply any game hooks
+	// Disable command restrictions
+	//
+	*(uint8_t **)&Cmd_ExecuteSingleCommandInternal = Detours::X86::DetourFunction((PBYTE)0x00829AD0, (PBYTE)&hk_Cmd_ExecuteSingleCommandInternal);
+
+	//
+	// Com_Init hook to actually enable the game's command line
 	//
 	*(uint8_t **)&Com_Init = Detours::X86::DetourFunction((PBYTE)0x004069C0, (PBYTE)&hk_Com_Init);
 
