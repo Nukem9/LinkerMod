@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 void (__cdecl * CL_Vid_Restart_Complete_f)();
+void (__cdecl * SV_MapRestart_f)() = (void (__cdecl *)())0x0048CF20;
 
 void hk_CL_Vid_Restart_Complete_f()
 {
@@ -13,6 +14,7 @@ void hk_CL_Vid_Restart_Complete_f()
 	CL_Vid_Restart_Complete_f();
 	
 	//
-	// TODO: Possible map_restart (frontend fix)
+	// map_restart (frontend fix)
 	//
+	SV_MapRestart_f();
 }
