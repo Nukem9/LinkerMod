@@ -94,7 +94,7 @@ bool XModelLoadConfigFile(const char **pos, int name, int config)
 	// collLod
 	*(DWORD *)(config + 4136) = *(DWORD *)v15;
 	*pos = v15 + 4;
-		
+
 	return true;
 }
 

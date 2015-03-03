@@ -11,11 +11,6 @@ void hk_CL_Vid_Restart_Complete_f()
 		SV_KillServer_f();
 
 	CL_Vid_Restart_Complete_f();
-	
-	//
-	// map_restart (frontend fix)
-	//
-	CL_CM_LoadMap("maps/frontend");
 }
 
 void CL_CM_LoadMap(const char *mapname)

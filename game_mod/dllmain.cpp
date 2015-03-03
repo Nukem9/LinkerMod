@@ -106,6 +106,12 @@ BOOL GameMod_Init()
 	PatchMemory(0x005A1700, (PBYTE)"\x90\x90", 2);
 
 	//
+	// CL_Vid_Restart_Complete_f black screen fix
+	//
+	char *data = "vid_restart_complete; wait; map frontend;\n";
+	PatchMemory(0x0045CD78, (PBYTE)&data, 4);
+
+	//
 	// Disable command restrictions
 	//
 	*(uint8_t **)&Cmd_ExecuteSingleCommandInternal = Detours::X86::DetourFunction((PBYTE)0x00829AD0, (PBYTE)&hk_Cmd_ExecuteSingleCommandInternal);
