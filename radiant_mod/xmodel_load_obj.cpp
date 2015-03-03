@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+#define XMODEL_READ_BYTE(dest)		*(BYTE *)(dest) = *(BYTE *)(*pos); *pos += sizeof(BYTE);
+#define XMODEL_READ_FLOAT(dest)		*(float *)(dest) = *(float *)(*pos); *pos += sizeof(float);
+#define XMODEL_READ_STRING(dest)	XModelLoadConfigString(pos, (char *)(dest));
+
 void XModelLoadConfigString(const char **pos, char *buffer)
 {
 	strcpy(buffer, *pos);
@@ -32,39 +36,28 @@ bool XModelLoadConfigFile(const char **pos, int name, int config)
 		*pos += 3;
 
 	// Flags
-	*(BYTE *)(config + 4140) = *(BYTE *)(*pos);
-	*pos += 1;
+	XMODEL_READ_BYTE(config + 4140);
 
 	// Mins
-	*(float *)(config + 4112) = *(float *)(*pos);
-	*pos += 4;
-
-	*(float *)(config + 4116) = *(float *)(*pos);
-	*pos += 4;
-
-	*(float *)(config + 4120) = *(float *)(*pos);
-	*pos += 4;
+	XMODEL_READ_FLOAT(config + 4112);
+	XMODEL_READ_FLOAT(config + 4116);
+	XMODEL_READ_FLOAT(config + 4120);
 
 	// Maxs
-	*(float *)(config + 4124) = *(float *)(*pos);
-	*pos += 4;
-
-	*(float *)(config + 4128) = *(float *)(*pos);
-	*pos += 4;
-
-	*(float *)(config + 4132) = *(float *)(*pos);
-	*pos += 4;
+	XMODEL_READ_FLOAT(config + 4112);
+	XMODEL_READ_FLOAT(config + 4128);
+	XMODEL_READ_FLOAT(config + 4132);
 
 	// collMapFilename?
-	XModelLoadConfigString(pos, (char *)(config + 0x102D));
+	XMODEL_READ_STRING(config + 0x102D);
 
 	// physicsPresetFilename?
-	XModelLoadConfigString(pos, (char *)(config + 0x142D));
+	XMODEL_READ_STRING(config + 0x142D);
 
 	if (xmodelVersion == 62)
 	{
 		char physicsConstraintsFilename[1024];
-		XModelLoadConfigString(pos, physicsConstraintsFilename);
+		XMODEL_READ_STRING(physicsConstraintsFilename);
 
 		// Skip a float
 		*pos += 4;
