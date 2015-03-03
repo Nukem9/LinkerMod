@@ -15,6 +15,9 @@ sub_661450_t sub_661450_o;
 typedef void(__thiscall * sub_4E9880_t)(void *thisptr, DWORD address, size_t scanSize);
 sub_4E9880_t sub_4E9880_o;
 
+typedef void(__thiscall * sub_640020_t)(void *thisptr, DWORD address, size_t scanSize);
+sub_640020_t sub_640020_o;
+
 LPVOID g_MemoryBuffer;
 ULONG_PTR g_ImageBase;
 ULONG_PTR g_ImageEnd;
@@ -32,6 +35,7 @@ void Patch_CEG()
 	sub_5CBF00_o = (sub_5CBF00_t)Detours::X86::DetourFunction((PBYTE)0x5CBF00, (PBYTE)&sub_5CBF00);
 	sub_661450_o = (sub_661450_t)Detours::X86::DetourFunction((PBYTE)0x661450, (PBYTE)&sub_661450);
 	sub_4E9880_o = (sub_4E9880_t)Detours::X86::DetourFunction((PBYTE)0x4E9880, (PBYTE)&sub_4E9880);
+	sub_640020_o = (sub_640020_t)Detours::X86::DetourFunction((PBYTE)0x640020, (PBYTE)&sub_640020);
 
 	Detours::X86::DetourFunction((PBYTE)0x967760, (PBYTE)&hk_memcpy);
 	Detours::X86::DetourFunction((PBYTE)0x8EF04F, (PBYTE)&hk_inline_memcpy);
@@ -129,4 +133,13 @@ void __fastcall sub_4E9880(void *thisptr, PVOID _EDX, DWORD address, size_t scan
 	CEG_DEBUG_PRINT;
 
 	sub_4E9880_o(thisptr, dwNew, scanSize);
+}
+
+void __fastcall sub_640020(void *thisptr, PVOID _EDX, DWORD address, size_t scanSize)
+{
+	DWORD dwNew = GetNewAddress(address);
+
+	CEG_DEBUG_PRINT;
+
+	sub_640020_o(thisptr, dwNew, scanSize);
 }
