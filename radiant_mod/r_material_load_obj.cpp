@@ -264,7 +264,7 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 			int customSamplerIndex;
 			for (customSamplerIndex = 0; customSamplerIndex < CUSTOM_SAMPLER_COUNT; customSamplerIndex++)
 			{
-				if ((unsigned int *)customArg->u.literalConst == (&g_customSamplerSrc)[customSamplerIndex])
+				if (customArg->u.codeSampler == g_customSamplerSrc[customSamplerIndex])
 				{
 					ASSERT(!(pass->customSamplerFlags & (1 << customSamplerIndex)));
 					ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
@@ -351,13 +351,14 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 SRCLINE(3221)
 bool Material_StreamDestForName(const char **text, const char *destName, char *dest)
 {
+	int index;
+
 	if (!strcmp(destName, "position"))
 		*dest = 0;
 	else if (!strcmp(destName, "normal"))
 		*dest = 1;
 	else if (!strcmp(destName, "color"))
 	{
-		int index;
 		if (!Material_ParseIndex(text, 2, &index))
 			return false;
 
@@ -367,7 +368,6 @@ bool Material_StreamDestForName(const char **text, const char *destName, char *d
 		*dest = 4;
 	else if (!strcmp(destName, "texcoord"))
 	{
-		int index;
 		if (!Material_ParseIndex(text, 14, &index))
 			return false;
 
@@ -387,6 +387,8 @@ bool Material_StreamDestForName(const char **text, const char *destName, char *d
 SRCLINE(3263)
 bool Material_StreamSourceForName(const char **text, const char *sourceName, char *source)
 {
+	int index;
+
 	if (!strcmp(sourceName, "position"))
 		*source = 0;
 	else if (!strcmp(sourceName, "normal"))
@@ -397,7 +399,6 @@ bool Material_StreamSourceForName(const char **text, const char *sourceName, cha
 		*source = 1;
 	else if (!strcmp(sourceName, "texcoord"))
 	{
-		int index;
 		if (!Material_ParseIndex(text, 3, &index))
 			return false;
 
@@ -408,7 +409,6 @@ bool Material_StreamSourceForName(const char **text, const char *sourceName, cha
 	}
 	else if (!strcmp(sourceName, "normalTransform"))
 	{
-		int index;
 		if (!Material_ParseIndex(text, 2, &index))
 			return false;
 
@@ -2070,10 +2070,8 @@ MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *a
 		break;
 
 	case MTL_ARG_CODE_PIXEL_SAMPLER:
-		/*updateFreq = s_codeSamplerUpdateFreq[arg->u.codeSampler];
-		*/
+		updateFreq = s_codeSamplerUpdateFreq[arg->u.codeSampler];
 
-		ASSERT(false);
 		ASSERT((updateFreq == MTL_UPDATE_PER_OBJECT) || (updateFreq == MTL_UPDATE_RARELY) || (updateFreq == MTL_UPDATE_CUSTOM));
 		break;
 
@@ -2410,6 +2408,16 @@ void __declspec(naked) hk_Material_LoadShader()
 	}
 }
 
+unsigned int g_customSamplerSrc[4] =
+{
+	27, 4, 5, 33,
+};
+
+unsigned int g_customSamplerDest[4] =
+{
+	15, 12, 13, 14,
+};
+
 const MaterialUpdateFrequency s_codeConstUpdateFreq[197] =
 {
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -2431,6 +2439,16 @@ const MaterialUpdateFrequency s_codeConstUpdateFreq[197] =
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2,
+};
+
+const MaterialUpdateFrequency s_codeSamplerUpdateFreq[43] =
+{
+	2, 2, 2, 2, 3, 3, 2, 2, 1, 2,
+	2, 2, 2, 2, 2, 2, 1, 2, 2, 2,
+	2, 2, 1, 1, 1, 1, 1, 3, 2, 1,
+	1, 1, 1, 3, 2, 2, 2, 2, 2, 2,
+	2, 1, 2,
 };
 
 const bool g_useTechnique[130] =

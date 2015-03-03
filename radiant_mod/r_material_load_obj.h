@@ -333,7 +333,10 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer);
 bool hk_Material_SetPassShaderArguments_DX();
 void hk_Material_LoadShader();
 
+extern unsigned int g_customSamplerSrc[4];
+extern unsigned int g_customSamplerDest[4];
 extern const MaterialUpdateFrequency s_codeConstUpdateFreq[197];
+extern const MaterialUpdateFrequency s_codeSamplerUpdateFreq[43];
 extern const bool g_useTechnique[130];
 extern CodeSamplerSource s_codeSamplers[];
 extern CodeSamplerSource s_defaultCodeSamplers[];

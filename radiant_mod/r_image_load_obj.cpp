@@ -115,8 +115,8 @@ void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *dat
 	if (format == D3DFMT_X8R8G8B8)
 		expandedData = (char *)Z_Malloc(expandedSize);
 
-	int mipcount = Image_CountMipmapsForFile(fileHeader);
-	int picmip = image->picmip.platform[/*useFastFile->current.enabled == 0*/0];
+	int mipcount	= Image_CountMipmapsForFile(fileHeader);
+	int picmip		= image->picmip.platform[/*useFastFile->current.enabled == 0*/0];
 
 	for (int mipLevel = mipcount - 1; mipLevel >= picmip; mipLevel--)
 	{
