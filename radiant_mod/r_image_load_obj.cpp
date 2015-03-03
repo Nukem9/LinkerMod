@@ -269,7 +269,7 @@ void Image_PrintTruncatedFileError(const char *filepath)
 SRCLINE(1039)
 void Image_UploadData(GfxImage *image, D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
 {
-	if (image->mapType != MAPTYPE_CUBE || !mipLevel || *(char *)0x13ACAD6)
+	if (image->mapType != MAPTYPE_CUBE || !mipLevel || *r_supportCubedMipMaps)
 	{
 		if (image->mapType == MAPTYPE_3D)
 			Image_Upload3D_CopyData_PC(image, format, mipLevel, src);
