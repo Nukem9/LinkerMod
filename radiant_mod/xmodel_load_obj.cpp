@@ -6,7 +6,7 @@
 
 void XModelLoadConfigString(const char **pos, char *buffer)
 {
-	strcpy(buffer, *pos);
+	strcpy_s(buffer, 1024, *pos);
 
 	*pos += strlen(buffer) + 1;
 }

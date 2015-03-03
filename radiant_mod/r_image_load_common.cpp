@@ -33,6 +33,24 @@ void Image_Upload3D_CopyData_PC(GfxImage *image, D3DFORMAT format, unsigned int 
 	}
 }
 
+SRCLINE(1080)
+unsigned int Image_CountMipmaps(unsigned int imageFlags, unsigned int width, unsigned int height, unsigned int depth)
+{
+	if (imageFlags & 2)
+		return 1;
+
+	unsigned int mipCount	= 1;
+	unsigned int mipRes		= 1;
+
+	while (mipRes < width || mipRes < height || mipRes < depth)
+	{
+		mipRes *= 2;
+		mipCount++;
+	}
+
+	return mipCount;
+}
+
 SRCLINE(1471)
 void Image_GetPicmip(GfxImage *image, Picmip *picmip)
 {
