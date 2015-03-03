@@ -7,19 +7,10 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{51395b2a-8a4a-464e-af94-e02e1fe32dc1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="detours">
-      <UniqueIdentifier>{f69522b0-50bc-4285-97b6-21a77bf68d40}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="detours\Detours.h">
-      <Filter>detours</Filter>
-    </ClInclude>
-    <ClInclude Include="detours\Typedef.h">
-      <Filter>detours</Filter>
     </ClInclude>
     <ClInclude Include="r_image_load_obj.h">
       <Filter>Header Files</Filter>
@@ -31,9 +22,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="r_image_load_common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="assertdef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="r_material_load_obj.h">
@@ -72,9 +60,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="r_image_load_common.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="assertdef.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="r_material_load_obj.cpp">

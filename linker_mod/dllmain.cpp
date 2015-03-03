@@ -1,34 +1,5 @@
 #include "stdafx.h"
 
-void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
-{
-	DWORD d = 0;
-	VirtualProtect((LPVOID)Address, Size, PAGE_EXECUTE_READWRITE, &d);
-
-	for (SIZE_T i = 0; i < Size; i++)
-		*(volatile BYTE *)(Address + i) = *Data++;
-
-	VirtualProtect((LPVOID)Address, Size, d, &d);
-
-	FlushInstructionCache(GetCurrentProcess(), (LPVOID)Address, Size);
-}
-
-void assert(const char *File, int Line, bool Condition, const char *Format, ...)
-{
-	char buffer[4096];
-	char message[4096];
-
-	va_list ap;
-	va_start(ap, Format);
-
-	_vsnprintf_s(buffer, _TRUNCATE, Format, ap);
-	sprintf_s(message, "%s(%d):\n\n%s\n\n0x%X", File, Line, buffer, _ReturnAddress());
-
-	MessageBoxA(nullptr, message, "ASSERTION", 0);
-
-	ExitProcess(1);
-}
-
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 {
 	printf("\n\nEXCEPTION DETECTED:\n");

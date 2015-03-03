@@ -1,7 +1,5 @@
 #pragma once
 
-#define ASSERT(cond) if(!(cond)) assert(__FILE__, __LINE__, (cond), #cond);
-
 typedef void (__cdecl * Com_Printf_t)(int level, const char *fmt, ...);
 static Com_Printf_t Com_Printf = (Com_Printf_t)0x416B30;
 

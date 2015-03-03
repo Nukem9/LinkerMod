@@ -1,26 +1,5 @@
 #include "stdafx.h"
 
-void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
-{
-	DWORD d = 0;
-	VirtualProtect((LPVOID)Address, Size, PAGE_EXECUTE_READWRITE, &d);
-
-	for (SIZE_T i = 0; i < Size; i++)
-		*(volatile BYTE *)(Address + i) = *Data++;
-
-	VirtualProtect((LPVOID)Address, Size, d, &d);
-
-	FlushInstructionCache(GetCurrentProcess(), (LPVOID)Address, Size);
-}
-
-void FixupFunction(ULONG_PTR Address, ULONG_PTR CEGEaxAddress)
-{
-	DWORD data = (CEGEaxAddress - Address - 5);
-
-	PatchMemory(Address + 0, (PBYTE)"\xE9", 1);
-	PatchMemory(Address + 1, (PBYTE)&data, 4);
-}
-
 void (__cdecl * Cmd_ExecuteSingleCommandInternal)(int localClientNum, int controllerIndex, void *item, const char *text, bool restrict);
 void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex, void *item, const char *text, bool restrict)
 {

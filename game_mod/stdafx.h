@@ -6,9 +6,13 @@
 #include <intrin.h>
 #include <Psapi.h>
 
-#pragma comment(lib, "detours/Detours.lib")
-#include "detours/Typedef.h"
-#include "detours/Detours.h"
+//
+// Shared files
+//
+#include "../shared/utility.h"
+//
+// 
+//
 
 #include "CEG.h"
 

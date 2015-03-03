@@ -9,9 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="detours">
-      <UniqueIdentifier>{ab0b2b65-9acd-415f-b134-a76469d73246}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -19,12 +16,6 @@
     </ClInclude>
     <ClInclude Include="crc32.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Typedef.h">
-      <Filter>detours</Filter>
-    </ClInclude>
-    <ClInclude Include="detours\Detours.h">
-      <Filter>detours</Filter>
     </ClInclude>
     <ClInclude Include="pathnode_load_obj.h">
       <Filter>Header Files</Filter>

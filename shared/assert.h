@@ -1,6 +1,8 @@
-#include "stdafx.h"
+#pragma once
 
-void assert(const char *File, int Line, const char *Format, ...)
+#define ASSERT(cond) if(!(cond)) assert(__FILE__, __LINE__, #cond);
+
+static void assert(const char *File, int Line, const char *Format, ...)
 {
 	char buffer[4096];
 	char message[4096];

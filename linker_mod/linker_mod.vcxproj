@@ -81,11 +81,9 @@
     <ClInclude Include="com_bsp_lump.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="crc32.h" />
-    <ClInclude Include="detours\Detours.h" />
     <ClInclude Include="pathnode_load_obj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />
-    <ClInclude Include="Typedef.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="com_bsp_load_obj.cpp" />

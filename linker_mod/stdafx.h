@@ -5,11 +5,13 @@
 #include <stdio.h>
 #include <intrin.h>
 
-#pragma comment(lib, "detours/Detours.lib")
-#include "detours/Typedef.h"
-#include "detours/Detours.h"
-
-void assert(const char *File, int Line, bool Condition, const char *Format, ...);
+//
+// Shared files
+//
+#include "../shared/utility.h"
+//
+// 
+//
 
 #include "T5.h"
 #include "crc32.h"

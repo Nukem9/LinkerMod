@@ -7,17 +7,19 @@
 #include <intrin.h>
 #include <shellapi.h>
 
-#include "minidx9/Include/d3dx9.h"
-#pragma comment(lib, "minidx9/Lib/x86/d3dx9.lib")
+//
+// Shared files
+//
+#include "../shared/utility.h"
 
-#pragma comment(lib, "detours/Detours.lib")
-#include "detours/Typedef.h"
-#include "detours/Detours.h"
+#include "../shared/minidx9/Include/d3dx9.h"
+#pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
+//
+// 
+//
 
 #define SRCLINE(x)
 #define CHECK_SIZE(Type, Size) static_assert(sizeof(Type) == Size, "Invalid type size!");
-
-#include "assertdef.h"
 
 #include "CWinApp.h"
 
