@@ -107,7 +107,6 @@ enum
 typedef int MaterialUpdateFrequency;
 typedef int MaterialTextureSource;
 
-typedef void MaterialVertexDeclaration;
 typedef void MaterialStateMap;
 
 struct ShaderIndexRange
@@ -217,8 +216,16 @@ CHECK_SIZE(ShaderArgumentDest, 16);
 
 struct MaterialStreamRouting
 {
-	char source;
-	char dest;
+	union
+	{
+		struct
+		{
+			char source;
+			char dest;
+		};
+
+		char data[2];
+	};
 };
 CHECK_SIZE(MaterialStreamRouting, 2);
 
@@ -257,6 +264,21 @@ struct MaterialPixelShader
 	const char *name;
 	MaterialPixelShaderProgram prog;
 };
+
+struct MaterialVertexStreamRouting
+{
+	MaterialStreamRouting data[16];
+	LPDIRECT3DVERTEXDECLARATION9 decl[16];
+};
+
+struct MaterialVertexDeclaration
+{
+	char streamCount;
+	bool hasOptionalSource;
+	bool isLoaded;
+	MaterialVertexStreamRouting routing;
+};
+CHECK_SIZE(MaterialVertexDeclaration, 100);
 
 struct MaterialPass
 {

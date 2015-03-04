@@ -131,6 +131,100 @@ const char *Material_NameForStreamDest(char dest)
 	*/
 }
 
+unsigned int Material_HashVertexDecl(MaterialStreamRouting *routingData, int streamCount)
+{
+	int hash = 0;
+
+	for (unsigned int byteIndex = 0; byteIndex < 2 * streamCount; byteIndex++)
+		hash += (byteIndex + 0x77) * routingData->data[byteIndex];
+	
+	return hash & 63;
+}
+
+MaterialVertexDeclaration *Material_AllocVertexDecl(MaterialStreamRouting *routingData, int streamCount, bool *existing)
+{
+	ASSERT((2 * streamCount) < ARRAYSIZE(routingData->data));
+	ASSERT(streamCount);
+
+	//
+	// Calculate a hash for lookup
+	//
+	unsigned int hashIndex = Material_HashVertexDecl(routingData, streamCount);
+
+	//
+	// Iterate all possible declaration slots
+	//
+	MaterialVertexDeclaration *mvd = &materialVertexDeclarations[hashIndex];
+
+	for (; mvd->streamCount; mvd = &materialVertexDeclarations[hashIndex])
+	{
+		if (mvd->streamCount == streamCount && !memcmp(&mvd->routing, routingData, 2 * streamCount))
+		{
+			*existing = true;
+			return mvd;
+		}
+
+		hashIndex = (hashIndex + 1) & 63;
+	}
+
+	//
+	// Maximum index check
+	//
+	if (*materialVertexDeclCount == 63)
+		Com_Error(ERR_DROP, "More than %i vertex declarations in use", 63);
+
+	(*materialVertexDeclCount)++;
+
+	//
+	// Zero the struct and then copy the routing data
+	//
+	memset(&mvd->streamCount, 0, sizeof(MaterialVertexDeclaration));
+	memcpy(&mvd->routing, &routingData->source, 2 * streamCount);
+	
+	//
+	// Sanity checks
+	//
+	ASSERT_MSG(streamCount < ARRAYSIZE(mvd->routing.data), "streamCount doesn't index ARRAY_COUNT(mvd->routing.data)");
+
+	mvd->streamCount = streamCount;
+
+	ASSERT(mvd->streamCount == streamCount);
+
+	//
+	// Set flags for any optional vertex routings
+	//
+	for (int routingIndex = 0; routingIndex < streamCount; routingIndex++)
+	{
+		if (mvd->routing.data[routingIndex].source >= 5)
+		{
+			mvd->hasOptionalSource = true;
+			break;
+		}
+	}
+
+	*existing = false;
+	return mvd;
+}
+
+void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl)
+{
+	MaterialStreamRouting data[16];
+	memcpy(data, &(*mtlVertDecl)->routing, sizeof(data));
+
+	for (int vertDeclType = 0; vertDeclType < 16; vertDeclType++)
+	{
+		if (*(BYTE *)(*(DWORD *)0x0191D574 + 12))
+			(*mtlVertDecl)->routing.decl[vertDeclType] = Material_BuildVertexDecl(
+			data,
+			(*mtlVertDecl)->streamCount,
+			s_streamSourceInfo[vertDeclType]);
+		else
+			(*mtlVertDecl)->routing.decl[vertDeclType] = nullptr;
+	}
+
+	(*mtlVertDecl)->isLoaded = true;
+}
+
 bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable, unsigned int inputCount, MaterialPass *pass)
 {
 	//
@@ -142,7 +236,7 @@ bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable
 	int routingIndex;
 	for (routingIndex = 0;; routingIndex++)
 	{
-		if (routingIndex >= 16)
+		if (routingIndex >= ARRAYSIZE(routing))
 		{
 			Com_ScriptError("More than %i vertex mappings\n", routingIndex);
 			return false;
@@ -172,10 +266,16 @@ bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable
 		if (!Material_MatchToken(text, ";"))
 			return false;
 
+		// WARNING TODO: THIS ARRAY GOES OUT OF BOUNDS
+		ASSERT(false);
+
 		int insertIndex;
 		for (insertIndex = routingIndex;
-			insertIndex > 0 && (dest[2 * insertIndex] >= source && (dest[2 * insertIndex] != source || dest[2 * insertIndex + 1] >= resourceDest));
-		insertIndex--)
+			(insertIndex > 0 &&
+			(dest[2 * insertIndex] >= source &&
+			(dest[2 * insertIndex] != source ||
+			(dest[2 * insertIndex + 1] >= resourceDest))));
+			insertIndex--)
 			routing[insertIndex] = *(MaterialStreamRouting *)&dest[2 * insertIndex];
 
 		routing[insertIndex].source = source;
@@ -335,11 +435,11 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 			pass);
 
 		Material_LoadDeclTypes(text, pass);
-		strstr((char *)*text, "vertexDef");
-		if (v5)
+
+		if (strstr(*text, "vertexDef"))
 		{
 			while (strcmp(";", Com_Parse(text)))
-				;
+				/* Nothing */;
 		}
 
 		return success;
@@ -978,6 +1078,7 @@ bool Material_DefaultArgumentSource(MaterialShaderType shaderType, const char *c
 		if (paramType > SHADER_PARAM_FLOAT4 && paramType <= SHADER_PARAM_SAMPLER_1D)
 			return Material_DefaultSamplerSource(constantName, indexRange, argSource);
 
+		ASSERT(false && "Unknown default constant type");
 		return false;
 	}
 
