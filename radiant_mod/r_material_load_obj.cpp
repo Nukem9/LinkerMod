@@ -3,16 +3,18 @@
 SRCLINE(900)
 LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *routingData, int streamCount, stream_source_info_t *sourceTable)
 {
-	D3DVERTEXELEMENT9 elemTable[256];
+	CHECK_SIZE(D3DVERTEXELEMENT9, 8);
+
+	//
+	// Vertex declaration array
+	//
+	D3DVERTEXELEMENT9 elemTable[256 + 1];
 	memset(elemTable, 0, sizeof(elemTable));
 
-	D3DVERTEXELEMENT9 declEnd;
-	declEnd.Stream = 255;
-	declEnd.Offset = 0;
-	declEnd.Type = 17;
-	declEnd.Method = 0;
-	declEnd.Usage = 0;
-	declEnd.UsageIndex = 0;
+	//
+	// Initialize the ending marker with default values
+	//
+	elemTable[0] = D3DDECL_END();
 
 	int elemIndex = 0;
 
@@ -28,30 +30,27 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 		stream_dest_info_t *destInfo = &s_streamDestInfo[routingData->dest];
 
 		int elemIndexInsert = elemIndex;
-		for (; elemIndexInsert > 0 && *(&declEnd.Stream + 4 * elemIndexInsert) > sourceInfo->Stream; elemIndexInsert--)
-		{
-			int v4 = *((DWORD *)&declEnd.Type + 2 * elemIndexInsert);
-			*(DWORD *)&elemTable[elemIndexInsert].Stream = *((DWORD *)&declEnd.Stream + 2 * elemIndexInsert);
-			*(DWORD *)&elemTable[elemIndexInsert].Type = v4;
-		}
+		for (;elemIndexInsert > 0 && elemTable[elemIndexInsert].Stream > sourceInfo->Stream; elemIndexInsert--)
+			memcpy(&elemTable[elemIndexInsert + 1], &elemTable[elemIndexInsert], sizeof(D3DVERTEXELEMENT9));
 
-		elemTable[elemIndexInsert].Stream = sourceInfo->Stream;
-		elemTable[elemIndexInsert].Offset = sourceInfo->Offset;
-		elemTable[elemIndexInsert].Type = sourceInfo->Type;
-		elemTable[elemIndexInsert].Method = 0;
-		elemTable[elemIndexInsert].Usage = destInfo->Usage;
-		elemTable[elemIndexInsert].UsageIndex = destInfo->UsageIndex;
+		elemTable[elemIndexInsert + 1].Stream		= sourceInfo->Stream;
+		elemTable[elemIndexInsert + 1].Offset		= sourceInfo->Offset;
+		elemTable[elemIndexInsert + 1].Type			= sourceInfo->Type;
+		elemTable[elemIndexInsert + 1].Method		= D3DDECLMETHOD_DEFAULT;
+		elemTable[elemIndexInsert + 1].Usage		= destInfo->Usage;
+		elemTable[elemIndexInsert + 1].UsageIndex	= destInfo->UsageIndex;
 
 		elemIndex++;
 		routingData++;
 		streamCount--;
 	}
 
-	int v5 = elemIndex;
-	*(DWORD *)&elemTable[elemIndex].Stream	= *(DWORD *)&declEnd;
-	*(DWORD *)&elemTable[v5].Type			= *(DWORD *)&declEnd.Type;
+	//
+	// Copy the ending marker over, to the actual array end
+	//
+	memcpy(&elemTable[elemIndex + 1], &elemTable[0], sizeof(D3DVERTEXELEMENT9));
 
-	IDirect3DDevice9 *d3d_device;
+	IDirect3DDevice9 *d3d_device = *(IDirect3DDevice9 **)0x13A15A0;
 
 	if (d3d_device)
 	{
@@ -2233,7 +2232,7 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 				if (customArg->u.codeSampler == g_customSamplerSrc[customSamplerIndex])
 				{
 					ASSERT(!(pass->customSamplerFlags & (1 << customSamplerIndex)));
-					ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
+					//ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
 
 					pass->customSamplerFlags |= 1 << customSamplerIndex;
 					break;
