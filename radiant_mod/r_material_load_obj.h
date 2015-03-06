@@ -4,7 +4,7 @@
 //#define R_MAX_CODE_INDEX			197
 #define R_MAX_CODE_INDEX			105
 
-#define SAMPLER_INDEX_INVALID		255
+#define SAMPLER_INDEX_INVALID		(-1)
 
 /*
 enum MaterialTextureSource
@@ -304,11 +304,36 @@ struct MaterialPass
 };
 CHECK_SIZE(MaterialPass, 20);
 
+struct stream_source_info_t
+{
+	char Stream;
+	char Offset;
+	char Type;
+};
+
+struct stream_dest_info_t
+{
+	char Usage;
+	char UsageIndex;
+};
+
+LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *routingData, int streamCount, stream_source_info_t *sourceTable);
+void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl);
+unsigned int Material_HashVertexDecl(MaterialStreamRouting *routingData, int streamCount);
+MaterialVertexDeclaration *Material_AllocVertexDecl(MaterialStreamRouting *routingData, int streamCount, bool *existing);
 const float *Material_RegisterLiteral(const float *literal);
 const char *Material_RegisterString(const char *string);
 bool Material_UsingTechnique(int techType);
 bool Material_MatchToken(const char **text, const char *match);
+MaterialStateMap *Material_RegisterStateMap(const char *name);
+bool Material_LoadPassStateMap(const char **text, MaterialStateMap **stateMap);
+bool Material_ParseIndex(const char **text, int indexCount, int *index);
 const char *Material_NameForStreamDest(char dest);
+bool Material_StreamDestForName(const char **text, const char *destName, char *dest);
+bool Material_StreamSourceForName(const char **text, const char *sourceName, char *source);
+bool Material_ResourceDestForStreamDest(char streamDest, ShaderVaryingDef *inputTable, unsigned int inputCount, char *resourceDest);
+bool Material_CheckUnspecifiedVertexInputs(ShaderVaryingDef *inputTable, unsigned int inputCount);
+bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable, unsigned int inputCount, MaterialPass *pass);
 bool Material_DefaultIndexRange(ShaderIndexRange *indexRangeRef, unsigned int arrayCount, ShaderIndexRange *indexRangeSet);
 bool Material_ParseIndexRange(const char **text, unsigned int arrayCount, ShaderIndexRange *indexRange);
 void *BufferOffset(void *buffer, int offset);
@@ -319,7 +344,6 @@ bool Material_DefaultSamplerSourceFromTable(const char *constantName, ShaderInde
 bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource);
 bool Material_ParseVector(const char **text, int elemCount, float *vector);
 bool Material_ParseLiteral(const char **text, const char *token, float *literal);
-char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic);
 bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const char **text, int offset, CodeConstantSource *sourceTable, ShaderArgumentSource *argSource);
 bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **text, ShaderArgumentSource *argSource);
 bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, const char *constantName, ShaderIndexRange *indexRange, CodeConstantSource *sourceTable, ShaderArgumentSource *argSource);
@@ -335,7 +359,7 @@ bool Material_AttemptCombineShaderArguments(MaterialShaderArgument *arg0, Materi
 unsigned int Material_CombineShaderArguments(unsigned int usedCount, MaterialShaderArgument *localArgs);
 bool Material_SetShaderArguments(unsigned int usedCount, MaterialShaderArgument *localArgs, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args);
 ShaderUniformDef *Material_GetShaderArgumentDest(const char *paramName, unsigned int paramIndex, ShaderUniformDef *paramTable, unsigned int paramCount);
-bool MaterialAddShaderArgument(const char *shaderName, const char *paramName, MaterialShaderArgument *arg, char (*registerUsage)[64]);
+bool MaterialAddShaderArgument(const char *shaderName, const char *paramName, MaterialShaderArgument *arg, char(*registerUsage)[64]);
 bool Material_AddShaderArgumentFromLiteral(const char *shaderName, const char *paramName, unsigned __int16 type, const float *literal, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64]);
 bool Material_AddShaderArgumentFromCodeConst(const char *shaderName, const char *paramName, unsigned __int16 type, unsigned int codeIndex, unsigned int offset, ShaderUniformDef *dest, MaterialShaderArgument *arg, char(*registerUsage)[64]);
 void Material_AddShaderArgumentFromCodeSampler(unsigned __int16 type, unsigned int codeSampler, ShaderUniformDef *dest, MaterialShaderArgument *arg);
@@ -345,8 +369,22 @@ bool CodeConstIsOneOf(unsigned __int16 constCodeIndex, const unsigned __int16 *c
 bool Material_ParseShaderArguments(const char **text, const char *shaderName, MaterialShaderType shaderType, ShaderUniformDef *paramTable, unsigned int paramCount, unsigned __int16 *techFlags, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args);
 bool Material_CopyTextToDXBuffer(void *cachedShader, unsigned int shaderLen, LPD3DXBUFFER *shader);
 void *Material_LoadShader(const char *shaderName, const char *shaderVersion);
+MaterialVertexShader *Material_RegisterVertexShader(const char *shaderName, char shaderVersion);
+MaterialPixelShader *Material_RegisterPixelShader(const char *shaderName, char shaderVersion);
+char Material_ParseShaderVersion(const char **text);
 char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic);
 void Material_SetVaryingParameterDef(D3DXSEMANTIC *semantic, ShaderVaryingDef *paramDef);
+bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderName, MaterialShaderType shaderType, const DWORD *program, unsigned __int16 *techFlags, ShaderParameterSet *paramSet, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args);
+bool Material_LoadPassVertexShader(const char **text, unsigned __int16 *techFlags, ShaderParameterSet *paramSet, MaterialPass *pass, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args);
+bool Material_LoadDeclTypes(const char **text, MaterialPass *pass);
+bool Material_LoadPassPixelShader(const char **text, unsigned __int16 *techFlags, ShaderParameterSet *paramSet, MaterialPass *pass, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args);
+bool Material_HasMatchingParameter(char find, ShaderVaryingDef *paramTable, unsigned int paramCount);
+bool Material_HasMatchingParameter_BuggySdkWorkaround(char find, ShaderVaryingDef *paramTable, unsigned int paramCount);
+bool Material_ValidateShaderLinkage(ShaderVaryingDef *vertexOutputs, unsigned int vertexOutputCount, ShaderVaryingDef *pixelInputs, unsigned int pixelInputCount);
+MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *arg);
+int Material_CompareShaderArgumentsForRuntime(const void *e0, const void *e1);
+char Material_CountArgsWithUpdateFrequency(MaterialUpdateFrequency updateFreq, MaterialShaderArgument *args, unsigned int argCount, unsigned int *firstArg);
+bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap);
 void *Material_RegisterTechnique(const char *name, int renderer);
 bool Material_IgnoreTechnique(const char *name);
 int Material_TechniqueTypeForName(const char *name);
@@ -355,6 +393,8 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer);
 bool hk_Material_SetPassShaderArguments_DX();
 void hk_Material_LoadShader();
 
+extern stream_source_info_t s_streamSourceInfo[16][10];
+extern stream_dest_info_t s_streamDestInfo[20];
 extern unsigned int g_customSamplerSrc[4];
 extern unsigned int g_customSamplerDest[4];
 extern const MaterialUpdateFrequency s_codeConstUpdateFreq[197];

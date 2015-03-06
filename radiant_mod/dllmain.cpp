@@ -72,6 +72,7 @@ BOOL RadiantMod_Init()
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
 	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
+	Detours::X86::DetourFunction((PBYTE)0x00530550, (PBYTE)&Material_LoadPass);
 	Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
 

@@ -1,5 +1,175 @@
 #include "stdafx.h"
 
+SRCLINE(900)
+LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *routingData, int streamCount, stream_source_info_t *sourceTable)
+{
+	D3DVERTEXELEMENT9 elemTable[256];
+	memset(elemTable, 0, sizeof(elemTable));
+
+	D3DVERTEXELEMENT9 declEnd;
+	declEnd.Stream = 255;
+	declEnd.Offset = 0;
+	declEnd.Type = 17;
+	declEnd.Method = 0;
+	declEnd.Usage = 0;
+	declEnd.UsageIndex = 0;
+
+	int elemIndex = 0;
+
+	while (streamCount)
+	{
+		ASSERT_MSG(routingData->source < 10, "routingData->source doesn't index STREAM_SRC_COUNT\n\t%i not in [0, 10)");
+
+		stream_source_info_t *sourceInfo = &sourceTable[routingData->source];
+
+		if (sourceInfo->Stream == SAMPLER_INDEX_INVALID)
+			return nullptr;
+
+		stream_dest_info_t *destInfo = &s_streamDestInfo[routingData->dest];
+
+		int elemIndexInsert = elemIndex;
+		for (; elemIndexInsert > 0 && *(&declEnd.Stream + 4 * elemIndexInsert) > sourceInfo->Stream; elemIndexInsert--)
+		{
+			int v4 = *((DWORD *)&declEnd.Type + 2 * elemIndexInsert);
+			*(DWORD *)&elemTable[elemIndexInsert].Stream = *((DWORD *)&declEnd.Stream + 2 * elemIndexInsert);
+			*(DWORD *)&elemTable[elemIndexInsert].Type = v4;
+		}
+
+		elemTable[elemIndexInsert].Stream = sourceInfo->Stream;
+		elemTable[elemIndexInsert].Offset = sourceInfo->Offset;
+		elemTable[elemIndexInsert].Type = sourceInfo->Type;
+		elemTable[elemIndexInsert].Method = 0;
+		elemTable[elemIndexInsert].Usage = destInfo->Usage;
+		elemTable[elemIndexInsert].UsageIndex = destInfo->UsageIndex;
+
+		elemIndex++;
+		routingData++;
+		streamCount--;
+	}
+
+	int v5 = elemIndex;
+	*(DWORD *)&elemTable[elemIndex].Stream	= *(DWORD *)&declEnd;
+	*(DWORD *)&elemTable[v5].Type			= *(DWORD *)&declEnd.Type;
+
+	IDirect3DDevice9 *d3d_device;
+
+	if (d3d_device)
+	{
+		LPDIRECT3DVERTEXDECLARATION9 decl	= nullptr;
+		HRESULT hr							= d3d_device->CreateVertexDeclaration(elemTable, &decl);
+
+		if (!SUCCEEDED(hr))
+		{
+			//++g_disableRendering;
+			(*(DWORD *)0xEE4F80)++;
+
+			Com_Error(ERR_FATAL, "dx.device->CreateVertexDeclaration( elemTable, &decl ) failed: %s\n", R_ErrorDescription(hr));
+		}
+
+		ASSERT(decl != nullptr);
+		return decl;
+	}
+
+	return nullptr;
+}
+
+SRCLINE(962)
+void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl)
+{
+	MaterialStreamRouting data[16];
+	memcpy(data, &(*mtlVertDecl)->routing, sizeof(data));
+
+	for (int vertDeclType = 0; vertDeclType < 16; vertDeclType++)
+	{
+		if (*(BYTE *)(*(DWORD *)0x0191D574 + 12))
+			(*mtlVertDecl)->routing.decl[vertDeclType] = Material_BuildVertexDecl(
+			data,
+			(*mtlVertDecl)->streamCount,
+			s_streamSourceInfo[vertDeclType]);
+		else
+			(*mtlVertDecl)->routing.decl[vertDeclType] = nullptr;
+	}
+
+	(*mtlVertDecl)->isLoaded = true;
+}
+
+SRCLINE(2094)
+unsigned int Material_HashVertexDecl(MaterialStreamRouting *routingData, int streamCount)
+{
+	int hash = 0;
+
+	for (unsigned int byteIndex = 0; byteIndex < 2 * streamCount; byteIndex++)
+		hash += (byteIndex + 0x77) * routingData->data[byteIndex];
+
+	return hash & 63;
+}
+
+SRCLINE(2115)
+MaterialVertexDeclaration *Material_AllocVertexDecl(MaterialStreamRouting *routingData, int streamCount, bool *existing)
+{
+	ASSERT((2 * streamCount) < ARRAYSIZE(routingData->data));
+	ASSERT(streamCount);
+
+	//
+	// Calculate a hash for lookup
+	//
+	unsigned int hashIndex = Material_HashVertexDecl(routingData, streamCount);
+
+	//
+	// Iterate all possible declaration slots
+	//
+	MaterialVertexDeclaration *mvd = &materialVertexDeclarations[hashIndex];
+
+	for (; mvd->streamCount; mvd = &materialVertexDeclarations[hashIndex])
+	{
+		if (mvd->streamCount == streamCount && !memcmp(&mvd->routing, routingData, 2 * streamCount))
+		{
+			*existing = true;
+			return mvd;
+		}
+
+		hashIndex = (hashIndex + 1) & 63;
+	}
+
+	//
+	// Maximum index check
+	//
+	if (*materialVertexDeclCount == 63)
+		Com_Error(ERR_DROP, "More than %i vertex declarations in use", 63);
+
+	(*materialVertexDeclCount)++;
+
+	//
+	// Zero the struct and then copy the routing data
+	//
+	memset(&mvd->streamCount, 0, sizeof(MaterialVertexDeclaration));
+	memcpy(&mvd->routing, &routingData->source, 2 * streamCount);
+
+	//
+	// Sanity checks
+	//
+	ASSERT_MSG(streamCount < ARRAYSIZE(mvd->routing.data), "streamCount doesn't index ARRAY_COUNT(mvd->routing.data)");
+
+	mvd->streamCount = streamCount;
+
+	ASSERT(mvd->streamCount == streamCount);
+
+	//
+	// Set flags for any optional vertex routings
+	//
+	for (int routingIndex = 0; routingIndex < streamCount; routingIndex++)
+	{
+		if (mvd->routing.data[routingIndex].source >= 5)
+		{
+			mvd->hasOptionalSource = true;
+			break;
+		}
+	}
+
+	*existing = false;
+	return mvd;
+}
+
 SRCLINE(2158)
 const float *Material_RegisterLiteral(const float *literal)
 {
@@ -36,7 +206,13 @@ bool Material_MatchToken(const char **text, const char *match)
 SRCLINE(3124)
 MaterialStateMap *Material_RegisterStateMap(const char *name)
 {
-	return ((MaterialStateMap *(__fastcall *)(const char *))0x0052D950)(name);
+	static DWORD dwCall = 0x0052D950;
+
+	__asm
+	{
+		mov eax, name
+		call [dwCall]
+	}
 }
 
 SRCLINE(3140)
@@ -131,323 +307,6 @@ const char *Material_NameForStreamDest(char dest)
 	*/
 }
 
-unsigned int Material_HashVertexDecl(MaterialStreamRouting *routingData, int streamCount)
-{
-	int hash = 0;
-
-	for (unsigned int byteIndex = 0; byteIndex < 2 * streamCount; byteIndex++)
-		hash += (byteIndex + 0x77) * routingData->data[byteIndex];
-	
-	return hash & 63;
-}
-
-MaterialVertexDeclaration *Material_AllocVertexDecl(MaterialStreamRouting *routingData, int streamCount, bool *existing)
-{
-	ASSERT((2 * streamCount) < ARRAYSIZE(routingData->data));
-	ASSERT(streamCount);
-
-	//
-	// Calculate a hash for lookup
-	//
-	unsigned int hashIndex = Material_HashVertexDecl(routingData, streamCount);
-
-	//
-	// Iterate all possible declaration slots
-	//
-	MaterialVertexDeclaration *mvd = &materialVertexDeclarations[hashIndex];
-
-	for (; mvd->streamCount; mvd = &materialVertexDeclarations[hashIndex])
-	{
-		if (mvd->streamCount == streamCount && !memcmp(&mvd->routing, routingData, 2 * streamCount))
-		{
-			*existing = true;
-			return mvd;
-		}
-
-		hashIndex = (hashIndex + 1) & 63;
-	}
-
-	//
-	// Maximum index check
-	//
-	if (*materialVertexDeclCount == 63)
-		Com_Error(ERR_DROP, "More than %i vertex declarations in use", 63);
-
-	(*materialVertexDeclCount)++;
-
-	//
-	// Zero the struct and then copy the routing data
-	//
-	memset(&mvd->streamCount, 0, sizeof(MaterialVertexDeclaration));
-	memcpy(&mvd->routing, &routingData->source, 2 * streamCount);
-	
-	//
-	// Sanity checks
-	//
-	ASSERT_MSG(streamCount < ARRAYSIZE(mvd->routing.data), "streamCount doesn't index ARRAY_COUNT(mvd->routing.data)");
-
-	mvd->streamCount = streamCount;
-
-	ASSERT(mvd->streamCount == streamCount);
-
-	//
-	// Set flags for any optional vertex routings
-	//
-	for (int routingIndex = 0; routingIndex < streamCount; routingIndex++)
-	{
-		if (mvd->routing.data[routingIndex].source >= 5)
-		{
-			mvd->hasOptionalSource = true;
-			break;
-		}
-	}
-
-	*existing = false;
-	return mvd;
-}
-
-void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl)
-{
-	MaterialStreamRouting data[16];
-	memcpy(data, &(*mtlVertDecl)->routing, sizeof(data));
-
-	for (int vertDeclType = 0; vertDeclType < 16; vertDeclType++)
-	{
-		if (*(BYTE *)(*(DWORD *)0x0191D574 + 12))
-			(*mtlVertDecl)->routing.decl[vertDeclType] = Material_BuildVertexDecl(
-			data,
-			(*mtlVertDecl)->streamCount,
-			s_streamSourceInfo[vertDeclType]);
-		else
-			(*mtlVertDecl)->routing.decl[vertDeclType] = nullptr;
-	}
-
-	(*mtlVertDecl)->isLoaded = true;
-}
-
-bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable, unsigned int inputCount, MaterialPass *pass)
-{
-	//
-	// Material pass vertex stream routing
-	//
-	MaterialStreamRouting routing[16];
-	memset(routing, 0, sizeof(routing));
-
-	int routingIndex;
-	for (routingIndex = 0;; routingIndex++)
-	{
-		if (routingIndex >= ARRAYSIZE(routing))
-		{
-			Com_ScriptError("More than %i vertex mappings\n", routingIndex);
-			return false;
-		}
-
-		if (strcmp(Com_Parse(text), "vertex"))
-			break;
-
-		if (!Material_MatchToken(text, "."))
-			return false;
-
-		char dest[2];
-		if (!Material_StreamDestForName(text, Com_Parse(text), &dest[1]))
-			return false;
-
-		char resourceDest;
-		if (!Material_ResourceDestForStreamDest(dest[1], inputTable, inputCount, &resourceDest))
-			return false;
-
-		if (!Material_MatchToken(text, "=") || !Material_MatchToken(text, "code") || !Material_MatchToken(text, "."))
-			return false;
-
-		char source;
-		if (!Material_StreamSourceForName(text, Com_Parse(text), &source))
-			return false;
-
-		if (!Material_MatchToken(text, ";"))
-			return false;
-
-		// WARNING TODO: THIS ARRAY GOES OUT OF BOUNDS
-		ASSERT(false);
-
-		int insertIndex;
-		for (insertIndex = routingIndex;
-			(insertIndex > 0 &&
-			(dest[2 * insertIndex] >= source &&
-			(dest[2 * insertIndex] != source ||
-			(dest[2 * insertIndex + 1] >= resourceDest))));
-			insertIndex--)
-			routing[insertIndex] = *(MaterialStreamRouting *)&dest[2 * insertIndex];
-
-		routing[insertIndex].source = source;
-		routing[insertIndex].dest	= resourceDest;
-	}
-	
-	Com_UngetToken();
-
-	if (!Material_CheckUnspecifiedVertexInputs(inputTable, inputCount))
-		return false;
-
-	bool existing;
-	pass->vertexDecl = Material_AllocVertexDecl(routing, routingIndex, (bool *)&existing);
-
-	if (!existing)
-		Load_BuildVertexDecl(&pass->vertexDecl);
-
-	return true;
-}
-
-bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap)
-{
-	memset(pass, 0, sizeof(MaterialPass));
-
-	//
-	// State map
-	//
-	if (!Material_LoadPassStateMap(text, stateMap))
-		return false;
-
-	//
-	// Shader argument array instance
-	//
-	unsigned int argCount = 0;
-	MaterialShaderArgument args[128];
-
-	//
-	// Load the vertex shader pass
-	//
-	ShaderParameterSet vertexParamSet;
-
-	if (!Material_LoadPassVertexShader(text, techFlags, &vertexParamSet, pass, ARRAYSIZE(args), &argCount, args))
-		return false;
-	
-	if (argCount <= 0)
-	{
-		Com_ScriptError("material has no vertex arguments; it should at least have a transform matrix.\n");
-		return false;
-	}
-
-	//
-	// Load the pixel shader pass
-	//
-	ShaderParameterSet pixelParamSet;
-
-	if (!Material_LoadPassPixelShader(text, techFlags, &pixelParamSet, pass, ARRAYSIZE(args), &argCount, args))
-		return false;
-
-	//
-	// Sort arguments based on update frequency
-	//
-	qsort(args, argCount, sizeof(MaterialShaderArgument), Material_CompareShaderArgumentsForRuntime);
-
-	//
-	// Parse default material update frequency counts
-	//
-	unsigned int firstArg	= 0;
-	pass->perPrimArgCount	= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_PER_PRIM, args, argCount, &firstArg);
-	pass->perObjArgCount	= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_PER_OBJECT, args, argCount, &firstArg);
-	pass->stableArgCount	= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_RARELY, args, argCount, &firstArg);
-
-	//
-	// Parse custom material frequency arguments
-	//
-	{
-		MaterialShaderArgument *customArg	= &args[firstArg];
-		unsigned int customCount			= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_CUSTOM, args, argCount, &firstArg);
-		unsigned int customArgIndex			= 0;
-		pass->customSamplerFlags			= 0;
-
-		while (customArgIndex < customCount)
-		{
-			ASSERT(customArg->type == MTL_ARG_CODE_PIXEL_SAMPLER);
-			ASSERT(customArg->dest != SAMPLER_INDEX_INVALID);
-
-			int customSamplerIndex;
-			for (customSamplerIndex = 0; customSamplerIndex < CUSTOM_SAMPLER_COUNT; customSamplerIndex++)
-			{
-				if (customArg->u.codeSampler == g_customSamplerSrc[customSamplerIndex])
-				{
-					ASSERT(!(pass->customSamplerFlags & (1 << customSamplerIndex)));
-					ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
-
-					pass->customSamplerFlags |= 1 << customSamplerIndex;
-					break;
-				}
-			}
-
-			ASSERT(customSamplerIndex != CUSTOM_SAMPLER_COUNT);
-
-			customArgIndex++;
-			customArg++;
-		}
-	}
-	
-	//
-	// Allocate space for the local arguments
-	//
-	argCount		= pass->stableArgCount + pass->perObjArgCount + pass->perPrimArgCount;
-	pass->localArgs = (MaterialShaderArgument *)Material_Alloc(sizeof(MaterialShaderArgument) * argCount);
-
-	//
-	// Copy the data over to the pointer
-	//
-	memcpy(pass->localArgs, args, sizeof(MaterialShaderArgument) * argCount);
-
-	//
-	// DEBUG: Test/assert argument type indexes
-	//
-	MaterialShaderArgument *arg = pass->localArgs;
-	int argIndex				= 0;
-
-	while (argIndex < pass->perPrimArgCount)
-	{
-		ASSERT(arg->type >= MTL_ARG_CODE_PRIM_BEGIN);
-		ASSERT(arg->type < MTL_ARG_CODE_PRIM_END);
-
-		argIndex++;
-		arg++;
-	}
-
-	arg			= &pass->localArgs[pass->perPrimArgCount];
-	argIndex	= 0;
-
-	while (argIndex < pass->perObjArgCount)
-	{
-		ASSERT(arg->type >= MTL_ARG_CODE_PRIM_BEGIN);
-		ASSERT(arg->type < MTL_ARG_CODE_PRIM_END);
-
-		argIndex++;
-		arg++;
-	}
-
-	//
-	// Validate all shader parameters
-	//
-	if (Material_ValidateShaderLinkage(
-		vertexParamSet.outputs,
-		vertexParamSet.outputCount,
-		pixelParamSet.varyingInputs,
-		pixelParamSet.varyingInputCount))
-	{
-		bool success = Material_LoadPassVertexDecl(
-			text,
-			vertexParamSet.varyingInputs,
-			vertexParamSet.varyingInputCount,
-			pass);
-
-		Material_LoadDeclTypes(text, pass);
-
-		if (strstr(*text, "vertexDef"))
-		{
-			while (strcmp(";", Com_Parse(text)))
-				/* Nothing */;
-		}
-
-		return success;
-	}
-
-	return false;
-}
-
 SRCLINE(3221)
 bool Material_StreamDestForName(const char **text, const char *destName, char *dest)
 {
@@ -528,8 +387,8 @@ bool Material_StreamSourceForName(const char **text, const char *sourceName, cha
 SRCLINE(3314)
 bool Material_ResourceDestForStreamDest(char streamDest, ShaderVaryingDef *inputTable, unsigned int inputCount, char *resourceDest)
 {
-	unsigned int inputIndex;
-	for (inputIndex = 0;; inputIndex++)
+	unsigned int inputIndex = 0;
+	for (;; inputIndex++)
 	{
 		if (inputIndex >= inputCount)
 		{
@@ -567,6 +426,78 @@ bool Material_CheckUnspecifiedVertexInputs(ShaderVaryingDef *inputTable, unsigne
 	}
 
 	return isValid;
+}
+
+SRCLINE(3358)
+bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable, unsigned int inputCount, MaterialPass *pass)
+{
+	//
+	// Material pass vertex stream routing
+	//
+	MaterialStreamRouting routing[16];
+	memset(routing, 0, sizeof(routing));
+
+	int routingIndex = 0;
+	for (;; routingIndex++)
+	{
+		if (routingIndex >= ARRAYSIZE(routing))
+		{
+			Com_ScriptError("More than %i vertex mappings\n", routingIndex);
+			return false;
+		}
+
+		if (strcmp(Com_Parse(text), "vertex"))
+			break;
+
+		if (!Material_MatchToken(text, "."))
+			return false;
+
+		char dest[2];
+		if (!Material_StreamDestForName(text, Com_Parse(text), &dest[1]))
+			return false;
+
+		char resourceDest;
+		if (!Material_ResourceDestForStreamDest(dest[1], inputTable, inputCount, &resourceDest))
+			return false;
+
+		if (!Material_MatchToken(text, "=") || !Material_MatchToken(text, "code") || !Material_MatchToken(text, "."))
+			return false;
+
+		char source;
+		if (!Material_StreamSourceForName(text, Com_Parse(text), &source))
+			return false;
+
+		if (!Material_MatchToken(text, ";"))
+			return false;
+
+		// WARNING TODO: THIS ARRAY GOES OUT OF BOUNDS
+		ASSERT(false);
+
+		int insertIndex = routingIndex;
+		for (;
+			(insertIndex > 0 &&
+			(dest[2 * insertIndex] >= source &&
+			(dest[2 * insertIndex] != source ||
+			(dest[2 * insertIndex + 1] >= resourceDest))));
+		insertIndex--)
+			routing[insertIndex] = *(MaterialStreamRouting *)&dest[2 * insertIndex];
+
+		routing[insertIndex].source = source;
+		routing[insertIndex].dest	= resourceDest;
+	}
+
+	Com_UngetToken();
+
+	if (!Material_CheckUnspecifiedVertexInputs(inputTable, inputCount))
+		return false;
+
+	bool existing		= false;
+	pass->vertexDecl	= Material_AllocVertexDecl(routing, routingIndex, &existing);
+
+	if (!existing)
+		Load_BuildVertexDecl(&pass->vertexDecl);
+
+	return true;
 }
 
 SRCLINE(3419)
@@ -665,8 +596,8 @@ bool Material_CodeSamplerSource_r(const char **text, int offset, CodeSamplerSour
 
 	const char *token = Com_Parse(text);
 
-	int sourceIndex;
-	for (sourceIndex = 0;; sourceIndex++)
+	int sourceIndex = 0;
+	for (;; sourceIndex++)
 	{
 		if (!sourceTable[sourceIndex].name)
 		{
@@ -782,7 +713,7 @@ bool Material_ParseVector(const char **text, int elemCount, float *vector)
 	{
 		int elemIndex = 0;
 
-		while (1)
+		while (true)
 		{
 			vector[elemIndex++] = Com_ParseFloat(text);
 
@@ -837,8 +768,8 @@ bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const cha
 
 	const char *token = Com_Parse(text);
 
-	int sourceIndex;
-	for (sourceIndex = 0;; sourceIndex++)
+	int sourceIndex = 0;
+	for (;; sourceIndex++)
 	{
 		if (!sourceTable[sourceIndex].name)
 		{
@@ -849,6 +780,7 @@ bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const cha
 		if (!strcmp(token, sourceTable[sourceIndex].name))
 			break;
 	}
+
 	if (sourceTable[sourceIndex].arrayCount)
 	{
 		//ASSERT(sourceTable[sourceIndex].subtable || (sourceTable[sourceIndex].source < CONST_SRC_FIRST_CODE_MATRIX && sourceTable[sourceIndex].arrayStride == 1));
@@ -947,8 +879,8 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 {
 	printf("CONST: %s\n", constantName);
 
-	int sourceIndex;
-	for (sourceIndex = 0;; sourceIndex++)
+	int sourceIndex = 0;
+	for (;; sourceIndex++)
 	{
 		if (!sourceTable[sourceIndex].name)
 			return false;
@@ -967,6 +899,7 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 			else
 			{
 				ASSERT(sourceTable[sourceIndex].arrayCount == 0);
+
 				arrayCount = 4;
 			}
 
@@ -1055,7 +988,7 @@ bool Material_ParseArgumentSource(MaterialShaderType shaderType, const char **te
 			if (paramType > SHADER_PARAM_FLOAT4 && paramType <= SHADER_PARAM_SAMPLER_1D)
 				return Material_ParseSamplerSource(text, argSource);
 		
-			ASSERT(false && "Unknown constant type");
+			ASSERT_MSG(false, "Unknown constant type");
 			return false;
 		}
 
@@ -1078,7 +1011,7 @@ bool Material_DefaultArgumentSource(MaterialShaderType shaderType, const char *c
 		if (paramType > SHADER_PARAM_FLOAT4 && paramType <= SHADER_PARAM_SAMPLER_1D)
 			return Material_DefaultSamplerSource(constantName, indexRange, argSource);
 
-		ASSERT(false && "Unknown default constant type");
+		ASSERT_MSG(false, "Unknown default constant type");
 		return false;
 	}
 
@@ -2233,6 +2166,159 @@ char Material_CountArgsWithUpdateFrequency(MaterialUpdateFrequency updateFreq, M
 	return matchCount;
 }
 
+SRCLINE(8375)
+bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap)
+{
+	memset(pass, 0, sizeof(MaterialPass));
+
+	//
+	// State map
+	//
+	if (!Material_LoadPassStateMap(text, stateMap))
+		return false;
+
+	//
+	// Shader argument array instance
+	//
+	unsigned int argCount = 0;
+	MaterialShaderArgument args[128];
+
+	//
+	// Load the vertex shader pass
+	//
+	ShaderParameterSet vertexParamSet;
+
+	if (!Material_LoadPassVertexShader(text, techFlags, &vertexParamSet, pass, ARRAYSIZE(args), &argCount, args))
+		return false;
+
+	if (argCount <= 0)
+	{
+		Com_ScriptError("material has no vertex arguments; it should at least have a transform matrix.\n");
+		return false;
+	}
+
+	//
+	// Load the pixel shader pass
+	//
+	ShaderParameterSet pixelParamSet;
+
+	if (!Material_LoadPassPixelShader(text, techFlags, &pixelParamSet, pass, ARRAYSIZE(args), &argCount, args))
+		return false;
+
+	//
+	// Sort arguments based on update frequency
+	//
+	qsort(args, argCount, sizeof(MaterialShaderArgument), Material_CompareShaderArgumentsForRuntime);
+
+	//
+	// Parse default material update frequency counts
+	//
+	unsigned int firstArg	= 0;
+	pass->perPrimArgCount	= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_PER_PRIM, args, argCount, &firstArg);
+	pass->perObjArgCount	= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_PER_OBJECT, args, argCount, &firstArg);
+	pass->stableArgCount	= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_RARELY, args, argCount, &firstArg);
+
+	//
+	// Parse custom material frequency arguments
+	//
+	{
+		MaterialShaderArgument *customArg	= &args[firstArg];
+		unsigned int customCount			= Material_CountArgsWithUpdateFrequency(MTL_UPDATE_CUSTOM, args, argCount, &firstArg);
+		unsigned int customArgIndex			= 0;
+		pass->customSamplerFlags			= 0;
+
+		while (customArgIndex < customCount)
+		{
+			ASSERT(customArg->type == MTL_ARG_CODE_PIXEL_SAMPLER);
+			ASSERT(customArg->dest != SAMPLER_INDEX_INVALID);
+
+			int customSamplerIndex = 0;
+			for (; customSamplerIndex < CUSTOM_SAMPLER_COUNT; customSamplerIndex++)
+			{
+				if (customArg->u.codeSampler == g_customSamplerSrc[customSamplerIndex])
+				{
+					ASSERT(!(pass->customSamplerFlags & (1 << customSamplerIndex)));
+					ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
+
+					pass->customSamplerFlags |= 1 << customSamplerIndex;
+					break;
+				}
+			}
+
+			ASSERT(customSamplerIndex != CUSTOM_SAMPLER_COUNT);
+
+			customArgIndex++;
+			customArg++;
+		}
+	}
+
+	//
+	// Allocate space for the local arguments
+	//
+	argCount		= pass->stableArgCount + pass->perObjArgCount + pass->perPrimArgCount;
+	pass->localArgs = (MaterialShaderArgument *)Material_Alloc(sizeof(MaterialShaderArgument) * argCount);
+
+	//
+	// Copy the data over to the pointer
+	//
+	memcpy(pass->localArgs, args, sizeof(MaterialShaderArgument) * argCount);
+
+	//
+	// DEBUG: Test/assert argument type indexes
+	//
+	MaterialShaderArgument *arg = pass->localArgs;
+	int argIndex				= 0;
+
+	while (argIndex < pass->perPrimArgCount)
+	{
+		ASSERT(arg->type >= MTL_ARG_CODE_PRIM_BEGIN);
+		ASSERT(arg->type < MTL_ARG_CODE_PRIM_END);
+
+		argIndex++;
+		arg++;
+	}
+
+	arg			= &pass->localArgs[pass->perPrimArgCount];
+	argIndex	= 0;
+
+	while (argIndex < pass->perObjArgCount)
+	{
+		ASSERT(arg->type >= MTL_ARG_CODE_PRIM_BEGIN);
+		ASSERT(arg->type < MTL_ARG_CODE_PRIM_END);
+
+		argIndex++;
+		arg++;
+	}
+
+	//
+	// Validate all shader parameters
+	//
+	if (Material_ValidateShaderLinkage(
+		vertexParamSet.outputs,
+		vertexParamSet.outputCount,
+		pixelParamSet.varyingInputs,
+		pixelParamSet.varyingInputCount))
+	{
+		bool success = Material_LoadPassVertexDecl(
+			text,
+			vertexParamSet.varyingInputs,
+			vertexParamSet.varyingInputCount,
+			pass);
+
+		Material_LoadDeclTypes(text, pass);
+
+		if (strstr(*text, "vertexDef"))
+		{
+			while (strcmp(";", Com_Parse(text)))
+				/* Nothing */;
+		}
+
+		return success;
+	}
+
+	return false;
+}
+
 SRCLINE(8710)
 void *Material_RegisterTechnique(const char *name, int renderer)
 {
@@ -2508,6 +2594,241 @@ void __declspec(naked) hk_Material_LoadShader()
 		retn
 	}
 }
+
+stream_source_info_t s_streamSourceInfo[16][10] =
+{
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 1 },
+		{ 0, 28, 5 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 5 },
+		{ 0, 24, 5 },
+		{ 0, 28, 5 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 1 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 1 },
+		{ -1, 0, 0 },
+		{ 1, 8, 8 },
+		{ -1, 0, 0 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 3 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 3 },
+		{ -1, 0, 0 },
+		{ 1, 16, 8 },
+		{ -1, 0, 0 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 3 },
+		{ -1, 0, 0 },
+		{ 1, 16, 8 },
+		{ 1, 20, 8 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 3 },
+		{ 1, 16, 1 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 3 },
+		{ 1, 16, 1 },
+		{ 1, 24, 8 },
+		{ -1, 0, 0 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 3 },
+		{ 1, 16, 1 },
+		{ 1, 24, 8 },
+		{ 1, 28, 8 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 3 },
+		{ 1, 16, 3 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 3 },
+		{ 1, 16, 3 },
+		{ 1, 32, 8 },
+		{ -1, 0, 0 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ 0, 16, 4 },
+		{ 0, 20, 3 },
+		{ 0, 36, 5 },
+		{ 0, 40, 5 },
+		{ 1, 0, 3 },
+		{ 1, 16, 3 },
+		{ 1, 32, 8 },
+		{ 1, 36, 8 },
+		{ 2, 0, 15 },
+	},
+
+	{
+		{ 0, 0, 3 },
+		{ -1, 0, 0 },
+		{ 0, 12, 1 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+	},
+
+	{
+		{ 0, 0, 5 },
+		{ 0, 8, 4 },
+		{ 0, 12, 5 },
+		{ 0, 4, 5 },
+		{ -1, 0, 0 },
+		{ 1, 0, 5 },
+		{ -1, 0, 0 },
+		{ 1, 4, 5 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+	},
+};
+
+stream_dest_info_t s_streamDestInfo[20] =
+{
+	{ 0, 0 },
+	{ 3, 0 },
+	{ 10, 0 },
+	{ 10, 1 },
+	{ 12, 0 },
+	{ 5, 0 },
+	{ 5, 1 },
+	{ 5, 2 },
+	{ 5, 3 },
+	{ 5, 4 },
+	{ 5, 5 },
+	{ 5, 6 },
+	{ 5, 7 },
+	{ 5, 8 },
+	{ 5, 9 },
+	{ 5, 10 },
+	{ 5, 11 },
+	{ 5, 12 },
+	{ 5, 13 },
+	{ 1, 0 },
+};
 
 unsigned int g_customSamplerSrc[4] =
 {
