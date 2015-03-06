@@ -107,7 +107,6 @@ unsigned int Material_HashVertexDecl(MaterialStreamRouting *routingData, int str
 SRCLINE(2115)
 MaterialVertexDeclaration *Material_AllocVertexDecl(MaterialStreamRouting *routingData, int streamCount, bool *existing)
 {
-	ASSERT((2 * streamCount) < ARRAYSIZE(routingData->data));
 	ASSERT(streamCount);
 
 	//
@@ -452,12 +451,11 @@ bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable
 		if (!Material_MatchToken(text, "."))
 			return false;
 
-		char dest[2];
-		if (!Material_StreamDestForName(text, Com_Parse(text), &dest[1]))
+		if (!Material_StreamDestForName(text, Com_Parse(text), &routing[0].dest))
 			return false;
 
 		char resourceDest;
-		if (!Material_ResourceDestForStreamDest(dest[1], inputTable, inputCount, &resourceDest))
+		if (!Material_ResourceDestForStreamDest(routing[0].dest, inputTable, inputCount, &resourceDest))
 			return false;
 
 		if (!Material_MatchToken(text, "=") || !Material_MatchToken(text, "code") || !Material_MatchToken(text, "."))
@@ -470,20 +468,17 @@ bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable
 		if (!Material_MatchToken(text, ";"))
 			return false;
 
-		// WARNING TODO: THIS ARRAY GOES OUT OF BOUNDS
-		ASSERT(false);
-
 		int insertIndex = routingIndex;
 		for (;
-			(insertIndex > 0 &&
-			(dest[2 * insertIndex] >= source &&
-			(dest[2 * insertIndex] != source ||
-			(dest[2 * insertIndex + 1] >= resourceDest))));
-		insertIndex--)
-			routing[insertIndex] = *(MaterialStreamRouting *)&dest[2 * insertIndex];
+			insertIndex > 0
+			&& routing[insertIndex].source	>= source
+			&& (routing[insertIndex].source != source
+			|| routing[insertIndex].dest	>= resourceDest);
+			insertIndex--)
+			routing[insertIndex + 1] = routing[insertIndex];
 
-		routing[insertIndex].source = source;
-		routing[insertIndex].dest	= resourceDest;
+		routing[insertIndex + 1].source = source;
+		routing[insertIndex + 1].dest	= resourceDest;
 	}
 
 	Com_UngetToken();
