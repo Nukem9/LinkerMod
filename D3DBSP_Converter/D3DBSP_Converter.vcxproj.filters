@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Lump Conversions">
+      <UniqueIdentifier>{67959d92-96ea-473a-9d5b-8ec5e41bb377}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Lump Conversions">
+      <UniqueIdentifier>{809ec55e-80a3-4553-9a9f-6bb0d3906cab}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D3DBSP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lump.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Convert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PrimaryLights.cpp">
+      <Filter>Source Files\Lump Conversions</Filter>
+    </ClCompile>
+    <ClCompile Include="BrushModels.cpp">
+      <Filter>Source Files\Lump Conversions</Filter>
+    </ClCompile>
+    <ClCompile Include="Lightmaps.cpp">
+      <Filter>Source Files\Lump Conversions</Filter>
+    </ClCompile>
+    <ClCompile Include="LightGridColors.cpp">
+      <Filter>Source Files\Lump Conversions</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectionProbes.cpp">
+      <Filter>Source Files\Lump Conversions</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D3DBSP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lump.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimaryLights.h">
+      <Filter>Header Files\Lump Conversions</Filter>
+    </ClInclude>
+    <ClInclude Include="BrushModels.h">
+      <Filter>Header Files\Lump Conversions</Filter>
+    </ClInclude>
+    <ClInclude Include="Lightmaps.h">
+      <Filter>Header Files\Lump Conversions</Filter>
+    </ClInclude>
+    <ClInclude Include="LightGridColors.h">
+      <Filter>Header Files\Lump Conversions</Filter>
+    </ClInclude>
+    <ClInclude Include="ReflectionProbes.h">
+      <Filter>Header Files\Lump Conversions</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgumentHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
