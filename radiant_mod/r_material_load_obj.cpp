@@ -55,7 +55,7 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 	if (d3d_device)
 	{
 		LPDIRECT3DVERTEXDECLARATION9 decl	= nullptr;
-		HRESULT hr							= d3d_device->CreateVertexDeclaration(elemTable, &decl);
+		HRESULT hr							= d3d_device->CreateVertexDeclaration(&elemTable[1], &decl);
 
 		if (!SUCCEEDED(hr))
 		{
@@ -254,27 +254,6 @@ const char *Material_NameForStreamDest(char dest)
 {
 	switch (dest)
 	{
-	case 0:return "position";
-	case 1:return "normal";
-	case 2:return "color[0]";
-	case 3:return "color[1]";
-	case 4:return "depth";
-	case 5:return "texcoord[0]";
-	case 6:return "texcoord[1]";
-	case 7:return "texcoord[2]";
-	case 8:return "texcoord[3]";
-	case 9:return "texcoord[4]";
-	case 10:return "texcoord[5]";
-	case 11:return "texcoord[6]";
-	case 12:return "texcoord[7]";
-	case 13:return "blendweight";
-	}
-
-	return "";
-
-	/*
-	switch (dest)
-	{
 	case 0:	return "position";
 	case 1:	return "normal";
 	case 2:	return "color[0]";
@@ -297,12 +276,11 @@ const char *Material_NameForStreamDest(char dest)
 	case 19:return "blendweight";
 
 	default:
-		ASSERT(false && "Unhandled case");
+		ASSERT_MSG(false, "Unhandled case");
 		break;
 	}
 
 	return "";
-	*/
 }
 
 SRCLINE(3221)
@@ -1431,7 +1409,7 @@ bool Material_AddShaderArgument(const char *shaderName, ShaderArgumentSource *ar
 	}
 
 	default:
-		ASSERT(false && "Unhandled case");
+		ASSERT_MSG(false, "Unhandled case");
 		break;
 	}
 
@@ -1810,6 +1788,7 @@ char Material_ParseShaderVersion(const char **text)
 SRCLINE(7866)
 char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 {
+	/*
 	static DWORD dwCall = 0x0052FDB0;
 
 	__asm
@@ -1817,8 +1796,7 @@ char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 		mov eax, semantic
 		call [dwCall]
 	}
-
-	/*
+	*/
 	bool v2; // zf@8
 
 	switch (semantic->Usage)
@@ -1866,7 +1844,6 @@ char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 	}
 
 	return 0;
-	*/
 }
 
 SRCLINE(7929)
