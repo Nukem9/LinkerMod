@@ -1,4 +1,6 @@
 #pragma once
+#include <WTypes.h>
+#include "r_material.h"
 
 enum XAssetType
 {
@@ -52,11 +54,11 @@ enum XAssetType
 
 union XAssetHeader
 {
-	//Material *material;
-	//MaterialPixelShader *pixelShader;
-	//MaterialVertexShader *vertexShader;
-	//MaterialTechniqueSet *techniqueSet;
-	//GfxImage *image;
+	Material *material;
+	MaterialPixelShader *pixelShader;
+	MaterialVertexShader *vertexShader;
+	MaterialTechniqueSet *techniqueSet;
+	GfxImage *image;
 	void *data;
 };
 
@@ -82,5 +84,27 @@ union XAssetEntryPoolEntry
 	XAssetEntryPoolEntry *next;
 };
 
+enum FF_DIR
+{
+  FFD_DEFAULT = 0x0,
+  FFD_MOD_DIR = 0x1,
+  FFD_USER_MAP = 0x2,
+};
+
+struct XZoneName
+{
+  char name[64];
+  int flags;
+  int fileSize;
+  FF_DIR dir;
+  bool loaded;
+};
+
+static BYTE* db_hashTable = nullptr;
+static XAssetEntryPoolEntry* g_assetEntryPool = nullptr;
+XZoneName* g_zoneNames = nullptr;
+
 const char * DB_GetXAssetTypeName(int type);
 unsigned int DB_HashForName(const char *name, XAssetType type);
+const char* DB_GetXAssetName(XAsset *asset);
+XAssetEntry* DB_FindXAssetEntry(XAssetType type, const char *name);

@@ -9,7 +9,7 @@ public:
 
 	bool operator==(void* address) {return pAddress == address};
 
-	T operator*(void)
+	T operator*(void) const
 	{
 		T out;
 		SIZE_T numofbytesread = 0;
@@ -17,7 +17,7 @@ public:
 		return out;
 	};
 	
-	T operator[](int index)
+	T operator[](int index) const
 	{
 		T out;
 		SIZE_T numofbytesread = 0;
@@ -25,8 +25,14 @@ public:
 		return out;
 	};
 
+	T* operator->(void) const
+	{
+		return (T*)pAddress;
+	}
+
 	ForeignPointer<T>(void) {};
 	ForeignPointer<T>(void* address) : pAddress(address) {};
+	ForeignPointer<T>(T* address) : pAddress(address) {};
 	~ForeignPointer<T>(void) {};
 };
 

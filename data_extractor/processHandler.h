@@ -1,5 +1,7 @@
 #include <WTypes.h>
 
+static HANDLE g_hProcess = NULL;
+
 enum PROCESS_TYPE
 {
 	PROCESS_UNKNOWN,
