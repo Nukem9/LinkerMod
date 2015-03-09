@@ -1,6 +1,6 @@
+#pragma once
 #include <WTypes.h>
-
-static HANDLE g_hProcess = NULL;
+#include "db_registry.h"
 
 enum PROCESS_TYPE
 {

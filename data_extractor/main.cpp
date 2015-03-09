@@ -1,5 +1,6 @@
 #include "global.h"
 #include <TlHelp32.h>
+
 #include "processHandler.h"
 
 int main(int argc, char** argv)
@@ -10,7 +11,14 @@ int main(int argc, char** argv)
 
 	if(DWORD processID = GetSupportedProcess())
 	{
-		g_hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
+		g_hProcess = OpenProcess(PROCESS_VM_READ, FALSE, processID);
+		
+		//shaders
+		//techniques
+		//techsets
+
+		DB_ListAssetPool(ASSET_TYPE_TECHNIQUE_SET);
+
 		CloseHandle(g_hProcess);
 	}
 

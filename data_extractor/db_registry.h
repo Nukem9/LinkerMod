@@ -100,11 +100,14 @@ struct XZoneName
   bool loaded;
 };
 
-static BYTE* db_hashTable = nullptr;
-static XAssetEntryPoolEntry* g_assetEntryPool = nullptr;
-XZoneName* g_zoneNames = nullptr;
+extern HANDLE g_hProcess;
+
+extern BYTE* db_hashTable;
+extern XAssetEntryPoolEntry* g_assetEntryPool;
+extern XZoneName* g_zoneNames;
 
 const char * DB_GetXAssetTypeName(int type);
-unsigned int DB_HashForName(const char *name, XAssetType type);
+//unsigned int DB_HashForName(const char *name, XAssetType type);
 const char* DB_GetXAssetName(XAsset *asset);
-XAssetEntry* DB_FindXAssetEntry(XAssetType type, const char *name);
+//XAssetEntry* DB_FindXAssetEntry(XAssetType type, const char *name);
+void DB_ListAssetPool(XAssetType type);

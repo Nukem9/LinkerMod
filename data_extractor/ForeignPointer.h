@@ -1,9 +1,13 @@
 #pragma once
 #include "global.h"
 
+extern HANDLE g_hProcess;
+
 template<typename T>
 class ForeignPointer
 {
+private: 
+	T content;
 public:
 	T* pAddress;
 
@@ -27,12 +31,15 @@ public:
 
 	T* operator->(void) const
 	{
-		return (T*)pAddress;
+		SIZE_T numofbytesread;
+		ReadProcessMemory(g_hProcess,(void*)pAddress,(void*)&content,sizeof(T),&numofbytesread);
+		return (T*)&content;
 	}
 
 	ForeignPointer<T>(void) {};
-	ForeignPointer<T>(void* address) : pAddress(address) {};
 	ForeignPointer<T>(T* address) : pAddress(address) {};
+	//ForeignPointer<T>(ForeignPointer<T>& arg) : pAddress(arg.pAddress) {};
+	//ForeignPointer<T>(void* address) : pAddress(address) {};
 	~ForeignPointer<T>(void) {};
 };
 
