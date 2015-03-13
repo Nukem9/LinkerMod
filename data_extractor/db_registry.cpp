@@ -1,5 +1,4 @@
 #include "db_registry.h"
-#include "global.h"
 #include "ForeignPointer.h"
 
 const char* g_assetNames[] = 
@@ -85,9 +84,9 @@ const char* DB_GetXAssetName(XAsset *asset)
 	case ASSET_TYPE_TECHNIQUE_SET:
 		ReadProcessMemory(g_hProcess,ForeignPointer<MaterialTechniqueSet>(header.techniqueSet)->name,str,256,&numofbytesread);
 		return str;
-	case ASSET_TYPE_PIXEL_SHADER:
+	//case ASSET_TYPE_PIXEL_SHADER:
 	default:
-		strcpy(str,"unsupported asset type");
+		strcpy_s(str,"unsupported asset type");
 		return str;
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
-#include "global.h"
+#include <WTypes.h>
+#include <iostream>
 
 extern HANDLE g_hProcess;
 
