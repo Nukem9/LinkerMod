@@ -1,4 +1,6 @@
+#pragma once
 #include <WTypes.h>
+#include "db_registry.h"
 
 enum PROCESS_TYPE
 {
