@@ -82,7 +82,7 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004DFAA0, (PBYTE)&hk_XModelLoadConfigFile);
 
 	PatchMemory(0x004E09DB, (PBYTE)"\xEB", 1);// Xmodelsurfs version check
-	PatchMemory(0x004DF7F6, (PBYTE)"\xEB", 1);// Xmpdelparts version check
+	PatchMemory(0x004DF7F6, (PBYTE)"\xEB", 1);// Xmodelparts version check
 	PatchMemory(0x005351A2, (PBYTE)"\x08", 1);// 4 byte xmodelsurfs file adjustment (MagicNumber)
 
 	//
