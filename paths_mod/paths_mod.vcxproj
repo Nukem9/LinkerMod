@@ -10,6 +10,30 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="com_files.h" />
+    <ClInclude Include="com_memory.h" />
+    <ClInclude Include="q_parse.h" />
+    <ClInclude Include="r_image.h" />
+    <ClInclude Include="r_image_load_common.h" />
+    <ClInclude Include="r_image_load_obj.h" />
+    <ClInclude Include="r_init.h" />
+    <ClInclude Include="r_utils.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="T5.h" />
+    <ClInclude Include="xmodel_load_obj.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="com_memory.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="q_parse.cpp" />
+    <ClCompile Include="r_image.cpp" />
+    <ClCompile Include="r_image_load_common.cpp" />
+    <ClCompile Include="r_image_load_obj.cpp" />
+    <ClCompile Include="r_init.cpp" />
+    <ClCompile Include="r_utils.cpp" />
+    <ClCompile Include="xmodel_load_obj.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -74,12 +98,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="stdafx.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

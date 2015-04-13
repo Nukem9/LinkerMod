@@ -9,11 +9,13 @@ void *Hunk_Alloc(int size, const char *name, int type)
 SRCLINE(1894)
 void Z_Free(void *ptr)
 {
-	((void(__cdecl *)(void *))0x006C48AF)(ptr);
+	free(ptr); //Directly using free and malloc appears to be safer
+	//((void(__cdecl *)(void *))0x006C48AF)(ptr);
 }
 
 SRCLINE(1913)
 void *Z_Malloc(int size)
 {
-	return ((void *(__cdecl *)(int))0x00554A6D)(size);
+	return malloc(size);
+	//return ((void *(__cdecl *)(int))0x00554A6D)(size);
 }
