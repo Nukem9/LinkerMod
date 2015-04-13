@@ -73,10 +73,15 @@ BOOL PathMod_Init()
 	PatchMemory(0x00686F2B, (PBYTE)"\x08", 1);// 4 byte xmodelsurfs file adjustment (MagicNumber)
 
 	//
-	// Redirect for default t4 xanims
+	// Redirect for default t4 xanims (deprecated)
 	//
-	static char* xanim_path_fmt = "xanim/t4/%s";
-	PatchMemory(0x00576A20, (PBYTE)&xanim_path_fmt, 4);
+	//static char* xanim_path_fmt = "xanim/t4/%s";
+	//PatchMemory(0x00576A20, (PBYTE)&xanim_path_fmt, 4);
+
+	//
+	// Patch to allow for loading of Black Ops xanims (loses support for waw xanims)
+	//
+	PatchMemory(0x00576A9D, (PBYTE)"\x13", 1);
 
 	return TRUE;
 }
