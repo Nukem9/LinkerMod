@@ -73,3 +73,39 @@ int ConvertLump_WAWtoBO_PrimaryLights(Lump* wawLump, Lump* boLump)
 
 	return 0;
 }
+
+int ConvertLump_BOtoWAW_PrimaryLights(Lump* boLump, Lump* wawLump)
+{
+	DWORD PrimaryLightCount = boLump->size / sizeof(DiskPrimaryLight_BO);
+
+	DiskPrimaryLight_BO* BOLights = (DiskPrimaryLight_BO*)boLump->content;
+	DiskPrimaryLight_WAW* WAWLights = (DiskPrimaryLight_WAW*)wawLump->AllocateMemory(sizeof(DiskPrimaryLight_WAW) * PrimaryLightCount);
+
+	for(DWORD lightIndex = 0; lightIndex < PrimaryLightCount; lightIndex++)
+	{
+		memset(&WAWLights[lightIndex],0,sizeof(DiskPrimaryLight_WAW));
+
+		WAWLights[lightIndex].type = BOLights[lightIndex].type;
+		WAWLights[lightIndex].canUseShadowMap = BOLights[lightIndex].canUseShadowMap;
+		WAWLights[lightIndex].cullDist = BOLights[lightIndex].cullDist;
+		WAWLights[lightIndex].priority = BOLights[lightIndex].priority;
+		WAWLights[lightIndex].color[0] = BOLights[lightIndex].color[0];
+		WAWLights[lightIndex].color[1] = BOLights[lightIndex].color[1];
+		WAWLights[lightIndex].color[2] = BOLights[lightIndex].color[2];
+		WAWLights[lightIndex].dir[0] = BOLights[lightIndex].dir[0];
+		WAWLights[lightIndex].dir[1] = BOLights[lightIndex].dir[1];
+		WAWLights[lightIndex].dir[2] = BOLights[lightIndex].dir[2];
+		WAWLights[lightIndex].origin[0] = BOLights[lightIndex].origin[0];
+		WAWLights[lightIndex].origin[1] = BOLights[lightIndex].origin[1];
+		WAWLights[lightIndex].origin[2] = BOLights[lightIndex].origin[2];
+		WAWLights[lightIndex].radius = BOLights[lightIndex].radius;
+		WAWLights[lightIndex].cosHalfFovOuter = BOLights[lightIndex].cosHalfFovOuter;
+		WAWLights[lightIndex].cosHalfFovInner = BOLights[lightIndex].cosHalfFovInner;
+		WAWLights[lightIndex].rotationLimit = BOLights[lightIndex].rotationLimit;
+		WAWLights[lightIndex].translationLimit = BOLights[lightIndex].translationLimit;
+
+		memcpy(WAWLights[lightIndex].defName,BOLights[lightIndex].defName,64);
+	}
+
+	return 0;
+}

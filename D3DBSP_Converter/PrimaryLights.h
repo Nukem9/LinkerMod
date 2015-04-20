@@ -65,4 +65,5 @@ struct DiskPrimaryLight_WAW
 	char defName[64];
 };
 
-int ConvertLump_WAWtoBO_PrimaryLights(Lump* wawLump,Lump* boLump);
+int ConvertLump_WAWtoBO_PrimaryLights(Lump* wawLump, Lump* boLump);
+int ConvertLump_BOtoWAW_PrimaryLights(Lump* boLump, Lump* wawLump);

@@ -6,7 +6,7 @@ struct BO1_LMAP_PEL
 	float B;
 	float G;
 	float R;
-	float A; 
+	float A;
 };
 
 struct WAW_LMAP_PEL
@@ -27,6 +27,16 @@ struct WAW_LMAP_PEL
 	}
 };
 
+static WAW_LMAP_PEL BO1toWAW_LMAP_PEL(BO1_LMAP_PEL boPel)
+{ 
+	WAW_LMAP_PEL out;
+	out.R = (BYTE)(255.0 * boPel.R);
+	out.G = (BYTE)(255.0 * boPel.G);
+	out.B = (BYTE)(255.0 * boPel.B);
+	out.A = (BYTE)(255.0 * boPel.A);
+	return out;
+}
+
 struct BO1_LMAP
 {
 	BO1_LMAP_PEL small_lmap_1[512*512];
@@ -42,3 +52,4 @@ struct WAW_LMAP
 };
 
 int ConvertLump_WAWtoBO_Lightmaps(Lump* wawLump, Lump* boLump);
+int ConvertLump_BOtoWAW_Lightmaps(Lump* boLump, Lump* wawLump);

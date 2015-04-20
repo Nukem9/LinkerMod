@@ -12,3 +12,4 @@ struct DiskGfxLightGridColors_BO
 };
 
 int ConvertLump_WAWtoBO_LightGridColors(Lump* wawLump, Lump* boLump);
+int ConvertLump_BOtoWAW_LightGridColors(Lump* boLump, Lump* wawLump);

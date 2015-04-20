@@ -27,3 +27,4 @@ struct DiskBrushModel_WAW
 };
 
 int ConvertLump_WAWtoBO_BrushModels(Lump* wawLump, Lump* boLump);
+int ConvertLump_BOtoWAW_BrushModels(Lump* boLump, Lump* wawLump);

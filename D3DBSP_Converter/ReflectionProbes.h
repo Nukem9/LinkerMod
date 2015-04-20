@@ -21,4 +21,5 @@ struct DiskGfxReflectionProbe_WAW
   BYTE pixels[131064];  //64x64 cubemap with 7 mips using uncompressed RGBA8
 };
 
-int ConvertLump_WAWtoBO_ReflectionProbes(Lump* wawLump,Lump* boLump);
+int ConvertLump_WAWtoBO_ReflectionProbes(Lump* wawLump, Lump* boLump);
+int ConvertLump_BOtoWAW_ReflectionProbes(Lump* boLump, Lump* wawLump);

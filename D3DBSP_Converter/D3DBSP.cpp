@@ -125,17 +125,20 @@ int D3DBSP::Write(const char* filepath)
 
 int D3DBSP::ConvertFrom(D3DBSP* inputBSP, BSPVERSION_TYPE targetVersion)
 {
+	printf("target %d and input %d\n\n\n", targetVersion,inputBSP->bspVersion);
 	if(inputBSP->bspVersion == targetVersion)
 	{
 		return ConvertBSP_Copy(inputBSP,this);
 	}
 
 	this->bspVersion = targetVersion;
-	
+
 	switch(inputBSP->bspVersion)
 	{
 	case BSPVERSION_COD_WAW:
 		return ConvertBSP_WAWtoBO(inputBSP,this);
+	case BSPVERSION_COD_BO:
+		return ConvertBSP_BOtoWAW(inputBSP,this);
 	default:
 		return 1;
 	}
