@@ -26,6 +26,18 @@ bool StrDel(char* Source, char* Needle, char StopAt)
 	return true;
 }
 
+int StrContainsChar(char* str, char c)
+{
+	int len = strlen(str);
+	for(int i = 0; i < len; i++)
+	{
+		if(str[i] == c)
+			return i;
+	}
+
+	return -1;
+}
+
 void FixCommandLine(int argc, char *argv[])
 {
 	// Get the current directory
@@ -41,7 +53,22 @@ void FixCommandLine(int argc, char *argv[])
 	for(int i = 3; i < argc; i++)
 	{
 		strcat_s(g_CommandLine, " ");
-		strcat_s(g_CommandLine, argv[i]);
+
+		//Fix for arguments in quotes being split into multiple args
+		char buf[8192];
+		if(StrContainsChar(argv[i], ' ') != -1)
+		{
+			strcpy_s(buf,"");
+			strcat_s(buf,"\"");
+			strcat_s(buf,argv[i]);
+			strcat_s(buf,"\"");
+		}
+		else
+		{
+			strcpy_s(buf,argv[i]);
+		}
+
+		strcat_s(g_CommandLine, buf);
 	}
 
 	// If this is Black Ops, fix the fs_game variable
