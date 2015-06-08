@@ -129,8 +129,14 @@ BOOL GameMod_Init()
 	//
 	// DB_ModXFileHandle hook to enable loading maps from mods
 	//
-	DetourFunction((PBYTE)0x007A3610,(PBYTE)&DB_ModXFileHandle_hk);
+	DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
 
+	//
+	// DB_LoadGraphicsAssetsForPC hook to automatically attempt to load frontend_patch.ff
+	// which is can be used to enable the mods button on the main menu
+	//
+	DetourFunction((PBYTE)0x00571DB0, (PBYTE)&DB_LoadGraphicsAssetsForPC);
+	
 	return TRUE;
 }
 

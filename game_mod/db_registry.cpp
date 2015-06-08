@@ -1,5 +1,62 @@
 #include "stdafx.h"
 
+void DB_SyncXAssets()
+{
+	R_BeginRemoveScreenUpdate();
+	Sys_SyncDatabase();
+	R_EndRemoteScreenUpdate(0);
+	SocketRouter_EmergencyFrame("DB_SyncXAssets");
+	DB_PostLoadXZone();
+}
+
+void DB_LoadGraphicsAssetsForPC()
+{
+	unsigned int zoneCount = 1;
+	
+	XZoneInfo zoneInfo[6];
+	zoneInfo[0].name = "code_post_gfx";
+	zoneInfo[0].allocFlags = 1;
+	zoneInfo[0].freeFlags = 0x80000000;
+
+	printf("DB_LoadXAssets\n");
+	DB_LoadXAssets(zoneInfo, zoneCount, 0);
+	printf("DB_SyncXAssets\n");
+	DB_SyncXAssets();
+
+	zoneInfo[0].name = "patch";
+	zoneInfo[0].allocFlags = 8;
+	zoneInfo[0].freeFlags = 0;
+
+	if(DB_ModFileExists())
+	{
+		zoneInfo[zoneCount].name = "mod";
+		zoneInfo[zoneCount].allocFlags = 32;
+		zoneInfo[zoneCount].freeFlags = 0;
+		zoneCount++;
+	}
+
+	//Add frontend_patch to the zone list
+	zoneInfo[zoneCount].name = "frontend_patch";
+	zoneInfo[zoneCount].allocFlags = 32;
+	zoneInfo[zoneCount].freeFlags = 0;
+	zoneCount++;
+
+	DB_LoadXAssets(zoneInfo, zoneCount, 0);
+}
+
+void __declspec(naked) DB_ModXFileHandle_hk()
+{
+	__asm
+	{
+		push edx //zoneDir
+		push esi //zoneName
+		push edi //zoneFile
+		call DB_ModXFileHandle
+		add esp, 12
+		retn
+	}
+}
+
 void DB_ModXFileHandle(HANDLE *zoneFile, char* zoneName, FF_DIR *zoneDir)
 {
 	printf("DB_MoxXFileHandle\n");
@@ -44,15 +101,3 @@ void DB_ModXFileHandle(HANDLE *zoneFile, char* zoneName, FF_DIR *zoneDir)
 	}
 }
 
-void __declspec(naked) DB_ModXFileHandle_hk()
-{
-	__asm
-	{
-		push edx //zoneDir
-		push esi //zoneName
-		push edi //zoneFile
-		call DB_ModXFileHandle
-		add esp, 12
-		retn
-	}
-}
