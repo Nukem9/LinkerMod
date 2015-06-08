@@ -19,6 +19,19 @@ static void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 	FlushInstructionCache(GetCurrentProcess(), (LPVOID)Address, Size);
 }
 
+static void PatchMemory_WithNOP(ULONG_PTR Address, SIZE_T Size)
+{
+	DWORD d = 0;
+	VirtualProtect((LPVOID)Address, Size, PAGE_EXECUTE_READWRITE, &d);
+
+	for (SIZE_T i = 0; i < Size; i++)
+		*(volatile BYTE *)(Address + i) = 0x90; //0x90 == opcode for NOP
+
+	VirtualProtect((LPVOID)Address, Size, d, &d);
+
+	FlushInstructionCache(GetCurrentProcess(), (LPVOID)Address, Size);
+}
+
 static void FixupFunction(ULONG_PTR Address, ULONG_PTR DestAddress)
 {
 	DWORD data = (DestAddress - Address - 5);

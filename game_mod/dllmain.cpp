@@ -137,6 +137,11 @@ BOOL GameMod_Init()
 	//
 	DetourFunction((PBYTE)0x00571DB0, (PBYTE)&DB_LoadGraphicsAssetsForPC);
 	
+	//
+	// Enable loading of patches for custom maps
+	//
+	PatchMemory_WithNOP(0x00632350, 0x21);
+
 	return TRUE;
 }
 
