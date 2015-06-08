@@ -21,3 +21,4 @@
 #include "sv_ccmds_mp.h"
 #include "cl_main_mp.h"
 #include "cl_console.h"
+#include "db_registry.h"

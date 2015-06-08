@@ -126,6 +126,11 @@ BOOL GameMod_Init()
 	//
 	*(uint8_t **)&CL_Vid_Restart_Complete_f = Detours::X86::DetourFunction((PBYTE)0x005D2F00, (PBYTE)&hk_CL_Vid_Restart_Complete_f); 
 
+	//
+	// DB_ModXFileHandle hook to enable loading maps from mods
+	//
+	DetourFunction((PBYTE)0x007A3610,(PBYTE)&DB_ModXFileHandle_hk);
+
 	return TRUE;
 }
 
