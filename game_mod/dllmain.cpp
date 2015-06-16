@@ -127,15 +127,20 @@ BOOL GameMod_Init()
 	*(uint8_t **)&CL_Vid_Restart_Complete_f = Detours::X86::DetourFunction((PBYTE)0x005D2F00, (PBYTE)&hk_CL_Vid_Restart_Complete_f); 
 
 	//
+	// UI_LoadModArenas hook to prevent leaked handles to mod.arena
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0084D2A0, (PBYTE)&UI_LoadModArenas); 
+
+	//
 	// DB_ModXFileHandle hook to enable loading maps from mods
 	//
-	DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
+	Detours::X86::DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
 
 	//
 	// DB_LoadGraphicsAssetsForPC hook to automatically attempt to load frontend_patch.ff
 	// which is can be used to enable the mods button on the main menu
 	//
-	DetourFunction((PBYTE)0x00571DB0, (PBYTE)&DB_LoadGraphicsAssetsForPC);
+	Detours::X86::DetourFunction((PBYTE)0x00571DB0, (PBYTE)&DB_LoadGraphicsAssetsForPC);
 	
 	//
 	// Enable loading of patches for custom maps

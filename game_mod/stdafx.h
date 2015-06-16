@@ -17,8 +17,10 @@
 #include "CEG.h"
 
 #include "common.h"
+#include "com_files.h"
 #include "dvar.h"
 #include "sv_ccmds_mp.h"
 #include "cl_main_mp.h"
 #include "cl_console.h"
 #include "db_registry.h"
+#include "ui_main_pc.h"
