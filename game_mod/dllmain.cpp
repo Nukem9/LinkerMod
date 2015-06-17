@@ -78,10 +78,9 @@ BOOL GameMod_Init()
 	PatchMemory(0x00618D21, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 
 	//
-	// PLATFORM_MISSINGMAP (DLC needs to be purchased)
-	// RETURN TRUE
+	// PLATFORM_MISSINGMAP Fix
 	//
-	PatchMemory(0x0041EEC0, (PBYTE)"\xB0\x01\xC3", 3);
+	SV_ValidateMap_o = DetourFunction((PBYTE)0x0041EEC0,(PBYTE)&SV_ValidateMap);
 
 	//
 	// De-restrict Dvar_ForEachConsoleAccessName and
