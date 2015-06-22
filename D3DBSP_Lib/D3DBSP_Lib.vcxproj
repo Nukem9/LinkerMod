@@ -74,11 +74,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="D3DBSP_Lib.cpp" />
+    <ClCompile Include="BrushModels.cpp" />
+    <ClCompile Include="ConsoleLog.cpp" />
+    <ClCompile Include="Convert.cpp" />
+    <ClCompile Include="D3DBSP.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="LightGridColors.cpp" />
+    <ClCompile Include="Lightmaps.cpp" />
+    <ClCompile Include="Lump.cpp" />
+    <ClCompile Include="PrimaryLights.cpp" />
+    <ClCompile Include="ReflectionProbes.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BrushModels.h" />
+    <ClInclude Include="ConsoleLog.h" />
+    <ClInclude Include="Convert.h" />
+    <ClInclude Include="D3DBSP.h" />
     <ClInclude Include="D3DBSP_Lib.h" />
+    <ClInclude Include="LightGridColors.h" />
+    <ClInclude Include="Lightmaps.h" />
+    <ClInclude Include="Lump.h" />
+    <ClInclude Include="PrimaryLights.h" />
+    <ClInclude Include="ReflectionProbes.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

@@ -1,5 +1,5 @@
 #include "FileHandler.h"
-#include "ConsoleLog.h"
+#include "../D3DBSP_Lib/ConsoleLog.h"
 
 int File_Backup(const char* originalFilePath, BOOL overwriteOldBackup)
 {

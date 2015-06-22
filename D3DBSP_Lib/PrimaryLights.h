@@ -1,4 +1,3 @@
-#include <WTypes.h>
 #include "Lump.h"
 
 enum GfxLightType

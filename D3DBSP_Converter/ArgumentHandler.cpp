@@ -1,5 +1,5 @@
 #include "ArgumentHandler.h"
-#include "ConsoleLog.h"
+#include "../D3DBSP_Lib/ConsoleLog.h"
 
 int strcmp_case_insensitive(const char* str1, const char* str2)
 {

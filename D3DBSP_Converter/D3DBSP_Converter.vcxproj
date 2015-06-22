@@ -75,30 +75,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ArgumentHandler.cpp" />
-    <ClCompile Include="BrushModels.cpp" />
-    <ClCompile Include="ConsoleLog.cpp" />
     <ClCompile Include="FileHandler.cpp" />
-    <ClCompile Include="LightGridColors.cpp" />
-    <ClCompile Include="Lightmaps.cpp" />
-    <ClCompile Include="PrimaryLights.cpp" />
-    <ClCompile Include="Convert.cpp" />
-    <ClCompile Include="D3DBSP.cpp" />
-    <ClCompile Include="Lump.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ReflectionProbes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgumentHandler.h" />
-    <ClInclude Include="ConsoleLog.h" />
-    <ClInclude Include="Convert.h" />
     <ClInclude Include="FileHandler.h" />
-    <ClInclude Include="LightGridColors.h" />
-    <ClInclude Include="Lightmaps.h" />
-    <ClInclude Include="D3DBSP.h" />
-    <ClInclude Include="Lump.h" />
-    <ClInclude Include="BrushModels.h" />
-    <ClInclude Include="PrimaryLights.h" />
-    <ClInclude Include="ReflectionProbes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

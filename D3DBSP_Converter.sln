@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3DBSP_Converter", "D3DBSP_Converter\D3DBSP_Converter.vcxproj", "{831B70A9-1E75-48C8-A17F-3B3C1749F764}"
+	ProjectSection(ProjectDependencies) = postProject
+		{869269E0-21CD-4263-A965-EB169A246BE7} = {869269E0-21CD-4263-A965-EB169A246BE7}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3DBSP_Lib", "D3DBSP_Lib\D3DBSP_Lib.vcxproj", "{869269E0-21CD-4263-A965-EB169A246BE7}"
 EndProject

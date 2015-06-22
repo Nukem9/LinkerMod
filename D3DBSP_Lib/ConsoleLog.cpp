@@ -18,7 +18,7 @@ WORD GetConsoleTextAttribute (HANDLE hCon)
 }
 
 
-int Con_Init()
+int D3DBSP_LIB_API Con_Init()
 {
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	defaultConsoleAttributes = GetConsoleTextAttribute(hConsole);
@@ -28,38 +28,42 @@ int Con_Init()
 	return 0;
 }
 
-int Con_Init(const char* logfilePath, LOGFILE_MODE mode)
+int D3DBSP_LIB_API Con_Init(const char* logfilePath, LOGFILE_MODE mode)
 {
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	defaultConsoleAttributes = GetConsoleTextAttribute(hConsole);
 	return Log_Init(logfilePath, mode);
 }
 
-int Log_Init(const char* logfilePath, LOGFILE_MODE mode)
+int D3DBSP_LIB_API Log_Init(const char* logfilePath, LOGFILE_MODE mode)
 {
 	int result = fopen_s(&hLogfile,logfilePath,FILEMODE_STRINGS[mode]);
 	Log_Printf("Logfile Initialized!\n");
 	return result;
 }
 
-int Con_Printf(const char* fmt, ...)
+int D3DBSP_LIB_API Con_Printf(const char* fmt, ...)
 {
 	SetConsoleTextAttribute(hConsole, defaultConsoleAttributes);
 	va_list ap;
 	va_start(ap, fmt);
-	int out = vprintf(fmt, ap);	
+	int out = 1;
+	if(hConsole)
+		out = vprintf(fmt, ap);	
 	if(hLogfile)
 		vfprintf(hLogfile,fmt,ap);
 	va_end(ap);
 	return out;
 }
 
-int Con_Warning(const char* fmt, ...)
+int D3DBSP_LIB_API Con_Warning(const char* fmt, ...)
 {
 	SetConsoleTextAttribute(hConsole, 0xE);
 	va_list ap;
 	va_start(ap, fmt);
-	int out = vprintf(fmt, ap);
+	int out = 1;
+	if(hConsole)
+		out = vprintf(fmt, ap);	
 	if(hLogfile)
 		vfprintf(hLogfile,fmt,ap);
 	va_end(ap);
@@ -68,12 +72,14 @@ int Con_Warning(const char* fmt, ...)
 	return out;
 }
 
-int Con_Error(const char* fmt, ...)
+int D3DBSP_LIB_API Con_Error(const char* fmt, ...)
 {
 	SetConsoleTextAttribute(hConsole, 0xC);
 	va_list ap;
 	va_start(ap, fmt);
-	int out = vprintf(fmt, ap);
+	int out = 1;
+	if(hConsole)
+		out = vprintf(fmt, ap);	
 	if(hLogfile)
 		vfprintf(hLogfile,fmt,ap);	
 	va_end(ap);
@@ -82,7 +88,7 @@ int Con_Error(const char* fmt, ...)
 	return out;
 }
 
-int Log_Printf(const char* fmt, ...)
+int D3DBSP_LIB_API Log_Printf(const char* fmt, ...)
 {
 	int out = 1;
 	va_list ap;
@@ -93,17 +99,17 @@ int Log_Printf(const char* fmt, ...)
 	return out;
 }
 
-DWORD Con_ErrorCount(void)
+DWORD D3DBSP_LIB_API Con_ErrorCount(void)
 {
 	return dwErrorCount;
 }
 
-DWORD Con_WarningCount(void)
+DWORD D3DBSP_LIB_API Con_WarningCount(void)
 {
 	return dwWarningCount;
 }
 
-int Con_Restore(void)
+int D3DBSP_LIB_API Con_Restore(void)
 {
 	if(hLogfile)
 		fclose(hLogfile);

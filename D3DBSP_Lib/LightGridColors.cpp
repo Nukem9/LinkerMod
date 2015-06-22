@@ -35,7 +35,7 @@ int ConvertLump_BOtoWAW_LightGridColors(Lump* boLump, Lump* wawLump)
 
 	for(DWORD i = 0; i < LightGridColorCount * 56 * 3; i++)
 	{
-		dst[i] = src[i];
+		dst[i] = (BYTE)src[i];
 	}
 
 	return 0;

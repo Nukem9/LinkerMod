@@ -2,6 +2,12 @@
 #include "Convert.h"
 #include "ConsoleLog.h"
 
+struct LumpIndexEntry
+{
+	LUMP_TYPE type;
+	DWORD length;
+};
+
 unsigned int padding_size(unsigned int i)
 {
 	return ((i+3) & 0xFFFFFFFC)-i;
