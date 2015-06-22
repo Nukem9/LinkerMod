@@ -1,9 +1,11 @@
-D3DBSP_Converter.sdf
-D3DBSP_Converter.suo
-/D3DBSP_Converter/D3DBSP_Converter.vcxproj.user
+*.sdf
+*.opensdf
+*.suo
+*.vcxproj.user
+*.vcxproj.filters
 /Debug
 /D3DBSP_Converter/Debug
 /Release
 /D3DBSP_Converter/Release
 /ipch
-/D3DBSP_Converter/converter.log
+*.log
