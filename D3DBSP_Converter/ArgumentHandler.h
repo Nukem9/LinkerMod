@@ -1,8 +1,3 @@
-//inputfile -log -backup
-
-//-logfile
-//-l 
-
 #include <string>
 int strcmp_case_insensitive(const char* str1, const char* str2);
 
