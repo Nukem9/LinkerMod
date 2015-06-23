@@ -1,6 +1,7 @@
 #include "D3DBSP.h"
 #include "Convert.h"
 #include "ConsoleLog.h"
+#include "IBUF.h"
 
 struct LumpIndexEntry
 {
@@ -37,7 +38,7 @@ int D3DBSP::Load(const char* filepath)
 	std::ifstream ifile(filepath, std::ios::in | std::ios::binary);
 
 	DWORD magicValue = 0;
-	ifile.read((char*)&magicValue,sizeof(DWORD));
+	ifile.read((char*)&magicValue, sizeof(DWORD));
 	if(magicValue != 'PSBI')
 	{
 		ifile.close();
@@ -65,13 +66,61 @@ int D3DBSP::Load(const char* filepath)
 		std::streamoff cLoc = ifile.tellg();
 		ifile.seekg(lumpOffset);
 		
-		ifile.read((char*)this->lumps[indexEntry.type].content,indexEntry.length);
+		ifile.read((char*)this->lumps[indexEntry.type].content, indexEntry.length);
 		
 		ifile.seekg(cLoc);
 		lumpOffset += padded(indexEntry.length);
 	}
 
 	ifile.close();
+	return 0;
+}
+
+int D3DBSP::Load(BYTE* pBuf)
+{
+	BYTE* BSpBuf = pBuf;
+
+	DWORD magicValue = 0;
+	memcpy(&magicValue,pBuf,sizeof(DWORD));
+	if(magicValue != 'PSBI')
+	{
+		Con_Error("ERROR: Buffer does not contain D3DBSP data\n");
+		return 2; //ERR_NOT_A_D3DBSP_FILE
+	}
+
+	pBuf+=sizeof(DWORD);
+
+	memcpy((char*)&this->bspVersion, pBuf, sizeof(DWORD));
+	pBuf+=sizeof(DWORD);
+	memcpy((char*)&this->diskLumpCount, pBuf, sizeof(DWORD));
+	pBuf+=sizeof(DWORD);
+
+	this->diskLumpOrderSize = this->diskLumpCount;
+	this->diskLumpOrder = new LUMP_TYPE[this->diskLumpOrderSize];
+
+	DWORD lumpOffset = sizeof(DWORD)*3 + sizeof(LumpIndexEntry)*this->diskLumpCount;
+	for(DWORD i = 0; i < this->diskLumpCount; i++)
+	{
+		LumpIndexEntry indexEntry;
+		
+		memcpy((char*)&indexEntry, pBuf, sizeof(LumpIndexEntry));
+		pBuf+=sizeof(LumpIndexEntry);
+
+		this->diskLumpOrder[i] = indexEntry.type;
+
+		this->lumps[indexEntry.type].size = indexEntry.length;
+		this->lumps[indexEntry.type].content = new BYTE[indexEntry.length];
+		this->lumps[indexEntry.type].isEmpty = false;
+
+		BYTE* cLoc = pBuf;
+		pBuf = BSpBuf + lumpOffset;
+		
+		memcpy((char*)this->lumps[indexEntry.type].content, pBuf, indexEntry.length);
+		
+		pBuf = cLoc;
+		lumpOffset += padded(indexEntry.length);
+	}
+
 	return 0;
 }
 
@@ -84,7 +133,7 @@ int D3DBSP::Write(const char* filepath)
 		return 1; //ERR_COULD_NOT_OPEN_FILE
 	}
 
-	ofile.write("IBSP",4);
+	ofile.write("IBSP", 4);
 	ofile.write((char*)&this->bspVersion, sizeof(DWORD));
 	ofile.write((char*)&this->diskLumpCount, sizeof(DWORD));
 
@@ -98,7 +147,7 @@ int D3DBSP::Write(const char* filepath)
 			indexEntry.length = pLump->size;
 			indexEntry.type = this->diskLumpOrder[i];
 			
-			ofile.write((char*)&indexEntry,sizeof(LumpIndexEntry));
+			ofile.write((char*)&indexEntry, sizeof(LumpIndexEntry));
 		}
 	}
 
@@ -109,18 +158,18 @@ int D3DBSP::Write(const char* filepath)
 		if(!pLump->isEmpty)
 		{
 #if _DEBUG
-			Log_Printf("Writing Lump [0x%X] %s\n",this->diskLumpOrder[i],LUMP_NAMES[this->diskLumpOrder[i]]);
-			Log_Printf("	Start: 0x%X (Size: 0x%X)\n",(DWORD)ofile.tellp(),pLump->size);
+			Log_Printf("Writing Lump [0x%X] %s\n", this->diskLumpOrder[i], LUMP_NAMES[this->diskLumpOrder[i]]);
+			Log_Printf("	Start: 0x%X (Size: 0x%X)\n", (DWORD)ofile.tellp(), pLump->size);
 #endif
-			ofile.write((char*)pLump->content,pLump->size);
+			ofile.write((char*)pLump->content, pLump->size);
 			if(padding_size(pLump->size))
 			{
 				int ps = padding_size(pLump->size);
 				DWORD pad = '\0\0\0\0';
-				ofile.write((char*)&pad,padding_size(pLump->size));
+				ofile.write((char*)&pad, padding_size(pLump->size));
 			}
 #if _DEBUG
-			Log_Printf("	End: 0x%X\n",(DWORD)ofile.tellp());
+			Log_Printf("	End: 0x%X\n", (DWORD)ofile.tellp());
 #endif
 		}
 	}
@@ -129,12 +178,76 @@ int D3DBSP::Write(const char* filepath)
 	return 0;
 }
 
+int D3DBSP::Write(BYTE* pBuf)
+{
+	IBUF iBuf(pBuf);
+
+	iBuf.write("IBSP",4);
+	iBuf.write((char*)&this->bspVersion, sizeof(DWORD));
+	iBuf.write((char*)&this->diskLumpCount, sizeof(DWORD));
+
+	for(DWORD i = 0; i < this->diskLumpOrderSize; i++)
+	{
+		Lump* pLump = &this->lumps[this->diskLumpOrder[i]];
+
+		if(!pLump->isEmpty)
+		{
+			LumpIndexEntry indexEntry;
+			indexEntry.length = pLump->size;
+			indexEntry.type = this->diskLumpOrder[i];
+			
+			iBuf.write((char*)&indexEntry, sizeof(LumpIndexEntry));
+		}
+	}
+
+	for(DWORD i = 0; i < this->diskLumpOrderSize; i++)
+	{
+		Lump* pLump = &this->lumps[this->diskLumpOrder[i]];
+
+		if(!pLump->isEmpty)
+		{
+			iBuf.write((char*)pLump->content, pLump->size);
+			if(padding_size(pLump->size))
+			{
+				int ps = padding_size(pLump->size);
+				DWORD pad = '\0\0\0\0';
+				iBuf.write((char*)&pad, padding_size(pLump->size));
+			}
+		}
+	}
+
+	return 0;
+}
+
+unsigned int D3DBSP::PotentialFileSize()
+{
+	unsigned int size = 0;
+	size += sizeof(DWORD)*3;
+	size += this->diskLumpOrderSize * sizeof(LumpIndexEntry);
+
+	for(DWORD i = 0; i < this->diskLumpOrderSize; i++)
+	{
+		Lump* pLump = &this->lumps[this->diskLumpOrder[i]];
+
+		if(!pLump->isEmpty)
+		{
+			size += pLump->size;
+			if(padding_size(pLump->size))
+			{
+				size += padding_size(pLump->size);
+			}
+		}
+	}
+
+	return size;
+}
+
 int D3DBSP::ConvertFrom(D3DBSP* inputBSP, BSPVERSION_TYPE targetVersion)
 {
-	printf("target %d and input %d\n\n\n", targetVersion,inputBSP->bspVersion);
+	printf("target %d and input %d\n\n\n", targetVersion, inputBSP->bspVersion);
 	if(inputBSP->bspVersion == targetVersion)
 	{
-		return ConvertBSP_Copy(inputBSP,this);
+		return ConvertBSP_Copy(inputBSP, this);
 	}
 
 	this->bspVersion = targetVersion;
@@ -142,9 +255,9 @@ int D3DBSP::ConvertFrom(D3DBSP* inputBSP, BSPVERSION_TYPE targetVersion)
 	switch(inputBSP->bspVersion)
 	{
 	case BSPVERSION_COD_WAW:
-		return ConvertBSP_WAWtoBO(inputBSP,this);
+		return ConvertBSP_WAWtoBO(inputBSP, this);
 	case BSPVERSION_COD_BO:
-		return ConvertBSP_BOtoWAW(inputBSP,this);
+		return ConvertBSP_BOtoWAW(inputBSP, this);
 	default:
 		return 1;
 	}

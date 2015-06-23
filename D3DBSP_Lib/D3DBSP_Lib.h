@@ -153,7 +153,11 @@ public:
 	Lump lumps[INFO_LUMP_TYPE_COUNT];
 
 	int Load(const char* filepath);
+	int Load(BYTE* pBuf);
 	int Write(const char* filepath);
+	int Write(BYTE* pBuf);
+
+	size_t PotentialFileSize();
 
 	int ConvertFrom(D3DBSP*, BSPVERSION_TYPE);
 

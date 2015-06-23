@@ -79,6 +79,7 @@
     <ClCompile Include="Convert.cpp" />
     <ClCompile Include="D3DBSP.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="IBUF.cpp" />
     <ClCompile Include="LightGridColors.cpp" />
     <ClCompile Include="Lightmaps.cpp" />
     <ClCompile Include="Lump.cpp" />
@@ -91,6 +92,7 @@
     <ClInclude Include="Convert.h" />
     <ClInclude Include="D3DBSP.h" />
     <ClInclude Include="D3DBSP_Lib.h" />
+    <ClInclude Include="IBUF.h" />
     <ClInclude Include="LightGridColors.h" />
     <ClInclude Include="Lightmaps.h" />
     <ClInclude Include="Lump.h" />
