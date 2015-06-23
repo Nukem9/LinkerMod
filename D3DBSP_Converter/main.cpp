@@ -12,7 +12,6 @@
 
 int main(int argc, char** argv)
 {
-	Con_Init();
 	Con_Printf("\n");
 
 	if(argc < 2)
@@ -26,7 +25,6 @@ int main(int argc, char** argv)
 		//Con_Printf("Verbose Logfile:  -logfile+ OR -l+\n");
 		//Con_Printf("Verbose Messages: -verbose  OR -v\n\n");
 		
-		Con_Restore();
 		return 0;
 	}
 	else if(argc > 1)
@@ -37,7 +35,6 @@ int main(int argc, char** argv)
 		if(HasArg_Restore(argc,argv))
 		{
 			int result = File_RestoreBackup(argv[1]);
-			Con_Restore();
 			return result;
 		}
 
@@ -52,7 +49,6 @@ int main(int argc, char** argv)
 		if(iBSP.Load(argv[1]) != 0)
 		{
 			Con_Error("Failed!\n\n");
-			Con_Restore();
 			return 1;
 		}
 		Con_Printf("Success!\n\n");
@@ -68,7 +64,6 @@ int main(int argc, char** argv)
 		if(oBSP.Write(argv[1]) != 0)
 		{
 			Con_Error("Failed!\n\n");
-			Con_Restore();
 			return 1;
 		}
 		Con_Printf("Success!\n\n");
@@ -79,6 +74,5 @@ int main(int argc, char** argv)
 		Con_Printf("Wrote File In: %d ms\n",writeTime);
 	}
 
-	Con_Restore();
 	return 0;
 }

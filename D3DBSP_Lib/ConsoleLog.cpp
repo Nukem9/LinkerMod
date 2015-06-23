@@ -20,26 +20,38 @@ WORD GetConsoleTextAttribute (HANDLE hCon)
 
 int D3DBSP_LIB_API Con_Init()
 {
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	defaultConsoleAttributes = GetConsoleTextAttribute(hConsole);
+	if(!hConsole)
+	{
+		hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		defaultConsoleAttributes = GetConsoleTextAttribute(hConsole);
 
-	hLogfile = nullptr;
+		hLogfile = nullptr;
+	}
 
 	return 0;
 }
 
 int D3DBSP_LIB_API Con_Init(const char* logfilePath, LOGFILE_MODE mode)
 {
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	defaultConsoleAttributes = GetConsoleTextAttribute(hConsole);
+	if(!hConsole)
+	{
+		hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		defaultConsoleAttributes = GetConsoleTextAttribute(hConsole);
+	}
+
 	return Log_Init(logfilePath, mode);
 }
 
 int D3DBSP_LIB_API Log_Init(const char* logfilePath, LOGFILE_MODE mode)
 {
-	int result = fopen_s(&hLogfile,logfilePath,FILEMODE_STRINGS[mode]);
-	Log_Printf("Logfile Initialized!\n");
-	return result;
+	if(!hLogfile)
+	{
+		int result = fopen_s(&hLogfile,logfilePath,FILEMODE_STRINGS[mode]);
+		Log_Printf("Logfile Initialized!\n");
+		return result;
+	}
+
+	return 0;
 }
 
 int D3DBSP_LIB_API Con_Printf(const char* fmt, ...)
@@ -113,5 +125,8 @@ int D3DBSP_LIB_API Con_Restore(void)
 {
 	if(hLogfile)
 		fclose(hLogfile);
-	return SetConsoleTextAttribute(hConsole, defaultConsoleAttributes);
+	if(hConsole)
+		return SetConsoleTextAttribute(hConsole, defaultConsoleAttributes);
+
+	return 0;
 }
