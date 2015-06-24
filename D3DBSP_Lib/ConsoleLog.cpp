@@ -18,7 +18,7 @@ WORD GetConsoleTextAttribute (HANDLE hCon)
 }
 
 
-int D3DBSP_LIB_API Con_Init()
+int Con_Init()
 {
 	if(!hConsole)
 	{
@@ -31,7 +31,7 @@ int D3DBSP_LIB_API Con_Init()
 	return 0;
 }
 
-int D3DBSP_LIB_API Con_Init(const char* logfilePath, LOGFILE_MODE mode)
+int Con_Init(const char* logfilePath, LOGFILE_MODE mode)
 {
 	if(!hConsole)
 	{
@@ -42,7 +42,7 @@ int D3DBSP_LIB_API Con_Init(const char* logfilePath, LOGFILE_MODE mode)
 	return Log_Init(logfilePath, mode);
 }
 
-int D3DBSP_LIB_API Log_Init(const char* logfilePath, LOGFILE_MODE mode)
+int Log_Init(const char* logfilePath, LOGFILE_MODE mode)
 {
 	if(!hLogfile)
 	{
@@ -54,7 +54,7 @@ int D3DBSP_LIB_API Log_Init(const char* logfilePath, LOGFILE_MODE mode)
 	return 0;
 }
 
-int D3DBSP_LIB_API Con_Printf(const char* fmt, ...)
+int Con_Printf(const char* fmt, ...)
 {
 	SetConsoleTextAttribute(hConsole, defaultConsoleAttributes);
 	va_list ap;
@@ -68,7 +68,7 @@ int D3DBSP_LIB_API Con_Printf(const char* fmt, ...)
 	return out;
 }
 
-int D3DBSP_LIB_API Con_Warning(const char* fmt, ...)
+int Con_Warning(const char* fmt, ...)
 {
 	SetConsoleTextAttribute(hConsole, 0xE);
 	va_list ap;
@@ -84,7 +84,7 @@ int D3DBSP_LIB_API Con_Warning(const char* fmt, ...)
 	return out;
 }
 
-int D3DBSP_LIB_API Con_Error(const char* fmt, ...)
+int Con_Error(const char* fmt, ...)
 {
 	SetConsoleTextAttribute(hConsole, 0xC);
 	va_list ap;
@@ -100,7 +100,7 @@ int D3DBSP_LIB_API Con_Error(const char* fmt, ...)
 	return out;
 }
 
-int D3DBSP_LIB_API Log_Printf(const char* fmt, ...)
+int Log_Printf(const char* fmt, ...)
 {
 	int out = 1;
 	va_list ap;
@@ -111,17 +111,17 @@ int D3DBSP_LIB_API Log_Printf(const char* fmt, ...)
 	return out;
 }
 
-DWORD D3DBSP_LIB_API Con_ErrorCount(void)
+DWORD Con_ErrorCount(void)
 {
 	return dwErrorCount;
 }
 
-DWORD D3DBSP_LIB_API Con_WarningCount(void)
+DWORD Con_WarningCount(void)
 {
 	return dwWarningCount;
 }
 
-int D3DBSP_LIB_API Con_Restore(void)
+int Con_Restore(void)
 {
 	if(hLogfile)
 		fclose(hLogfile);

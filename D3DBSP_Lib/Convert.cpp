@@ -206,7 +206,6 @@ int ConvertLump_BOtoWAW(Lump* boLump, Lump* wawLump, LUMP_TYPE type)
 
 int ConvertBSP_BOtoWAW(D3DBSP* boBSP, D3DBSP* wawBSP)
 {
-	printf("GOOGfdhdfhkldjfhlkdjhdfOG");
 	wawBSP->diskLumpOrderSize = boBSP->diskLumpOrderSize;
 	wawBSP->diskLumpOrder = new LUMP_TYPE[wawBSP->diskLumpOrderSize];
 	memcpy(wawBSP->diskLumpOrder,boBSP->diskLumpOrder,sizeof(LUMP_TYPE)*boBSP->diskLumpOrderSize);

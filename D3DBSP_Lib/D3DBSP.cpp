@@ -244,7 +244,6 @@ unsigned int D3DBSP::PotentialFileSize()
 
 int D3DBSP::ConvertFrom(D3DBSP* inputBSP, BSPVERSION_TYPE targetVersion)
 {
-	printf("target %d and input %d\n\n\n", targetVersion, inputBSP->bspVersion);
 	if(inputBSP->bspVersion == targetVersion)
 	{
 		return ConvertBSP_Copy(inputBSP, this);

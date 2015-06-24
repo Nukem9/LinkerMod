@@ -1,11 +1,5 @@
 #pragma once
 
-#ifdef D3DBSP_LIB_EXPORTS
-#define D3DBSP_LIB_API __declspec(dllexport)
-#else
-#define D3DBSP_LIB_API __declspec(dllimport)
-#endif
-
 enum LOGFILE_MODE
 {
 	LOGFILE_READ_ONLY,
@@ -16,18 +10,18 @@ enum LOGFILE_MODE
 	LOGFILE_UPDATE_APPEND
 };
 
-int D3DBSP_LIB_API Con_Init(void);
-int D3DBSP_LIB_API Con_Init(const char* logfilePath, LOGFILE_MODE mode);
-int D3DBSP_LIB_API Log_Init(const char* logfilePath, LOGFILE_MODE mode);
-int D3DBSP_LIB_API Con_Printf(const char* fmt, ...);
-int D3DBSP_LIB_API Con_Warning(const char* fmt, ...);
-int D3DBSP_LIB_API Con_Error(const char* fmt, ...);
-int D3DBSP_LIB_API Log_Printf(const char* fmt, ...);
-DWORD D3DBSP_LIB_API Con_ErrorCount(void);
-DWORD D3DBSP_LIB_API Con_WarningCount(void);
-int D3DBSP_LIB_API Con_Restore(void);
+int Con_Init(void);
+int Con_Init(const char* logfilePath, LOGFILE_MODE mode);
+int Log_Init(const char* logfilePath, LOGFILE_MODE mode);
+int Con_Printf(const char* fmt, ...);
+int Con_Warning(const char* fmt, ...);
+int Con_Error(const char* fmt, ...);
+int Log_Printf(const char* fmt, ...);
+DWORD Con_ErrorCount(void);
+DWORD Con_WarningCount(void);
+int Con_Restore(void);
 
-class D3DBSP_LIB_API Lump
+class Lump
 {
 public:
 	bool isEmpty;
@@ -141,7 +135,7 @@ enum BSPVERSION_TYPE
 	BSPVERSION_COD_BO = 45
 };
 
-class D3DBSP_LIB_API D3DBSP
+class D3DBSP
 {
 public:
 	DWORD diskLumpCount;

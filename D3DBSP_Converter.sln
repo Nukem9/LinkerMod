@@ -3,10 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3DBSP_Converter", "D3DBSP_Converter\D3DBSP_Converter.vcxproj", "{831B70A9-1E75-48C8-A17F-3B3C1749F764}"
 	ProjectSection(ProjectDependencies) = postProject
-		{869269E0-21CD-4263-A965-EB169A246BE7} = {869269E0-21CD-4263-A965-EB169A246BE7}
+		{F9BA1B1B-9BF9-4365-8A18-531F80C8847F} = {F9BA1B1B-9BF9-4365-8A18-531F80C8847F}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3DBSP_Lib", "D3DBSP_Lib\D3DBSP_Lib.vcxproj", "{869269E0-21CD-4263-A965-EB169A246BE7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3DBSP_Lib", "D3DBSP_Lib\D3DBSP_Lib.vcxproj", "{F9BA1B1B-9BF9-4365-8A18-531F80C8847F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,10 +18,10 @@ Global
 		{831B70A9-1E75-48C8-A17F-3B3C1749F764}.Debug|Win32.Build.0 = Debug|Win32
 		{831B70A9-1E75-48C8-A17F-3B3C1749F764}.Release|Win32.ActiveCfg = Release|Win32
 		{831B70A9-1E75-48C8-A17F-3B3C1749F764}.Release|Win32.Build.0 = Release|Win32
-		{869269E0-21CD-4263-A965-EB169A246BE7}.Debug|Win32.ActiveCfg = Debug|Win32
-		{869269E0-21CD-4263-A965-EB169A246BE7}.Debug|Win32.Build.0 = Debug|Win32
-		{869269E0-21CD-4263-A965-EB169A246BE7}.Release|Win32.ActiveCfg = Release|Win32
-		{869269E0-21CD-4263-A965-EB169A246BE7}.Release|Win32.Build.0 = Release|Win32
+		{F9BA1B1B-9BF9-4365-8A18-531F80C8847F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F9BA1B1B-9BF9-4365-8A18-531F80C8847F}.Debug|Win32.Build.0 = Debug|Win32
+		{F9BA1B1B-9BF9-4365-8A18-531F80C8847F}.Release|Win32.ActiveCfg = Release|Win32
+		{F9BA1B1B-9BF9-4365-8A18-531F80C8847F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
