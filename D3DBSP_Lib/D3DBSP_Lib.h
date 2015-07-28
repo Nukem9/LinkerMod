@@ -153,6 +153,7 @@ public:
 
 	size_t PotentialFileSize();
 
+	int Convert(BSPVERSION_TYPE);
 	int ConvertFrom(D3DBSP*, BSPVERSION_TYPE);
 
 	D3DBSP(void);

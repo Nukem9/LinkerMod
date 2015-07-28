@@ -262,6 +262,13 @@ int D3DBSP::ConvertFrom(D3DBSP* inputBSP, BSPVERSION_TYPE targetVersion)
 	}
 }
 
+int D3DBSP::Convert(BSPVERSION_TYPE targetVersion)
+{
+	D3DBSP oBSP;
+	oBSP.ConvertFrom(this, targetVersion);
+	return this->ConvertFrom(&oBSP, targetVersion);
+}
+
 D3DBSP::D3DBSP(void)
 {
 	this->diskLumpOrderSize = 0;
