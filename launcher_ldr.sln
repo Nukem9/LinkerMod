@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linker_mod", "linker_mod\li
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "radiant_mod", "radiant_mod\radiant_mod.vcxproj", "{6A3FB8CD-BEA3-42F1-B551-A0F56ED9B266}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "path_mod", "paths_mod\paths_mod.vcxproj", "{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -33,10 +31,6 @@ Global
 		{6A3FB8CD-BEA3-42F1-B551-A0F56ED9B266}.Debug|Win32.Build.0 = Debug|Win32
 		{6A3FB8CD-BEA3-42F1-B551-A0F56ED9B266}.Release|Win32.ActiveCfg = Release|Win32
 		{6A3FB8CD-BEA3-42F1-B551-A0F56ED9B266}.Release|Win32.Build.0 = Release|Win32
-		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Debug|Win32.Build.0 = Debug|Win32
-		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Release|Win32.ActiveCfg = Release|Win32
-		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
