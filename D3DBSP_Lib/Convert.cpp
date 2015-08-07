@@ -238,6 +238,10 @@ int ConvertBSP_Copy(D3DBSP* inputBSP, D3DBSP* targetBSP)
 		{
 			targetBSP->lumps[typeIndex] = inputBSP->lumps[typeIndex];
 		}
+		else
+		{
+			targetBSP->lumps[typeIndex].FreeMemory();
+		}
 	}
 
 	return 0;
