@@ -7,13 +7,13 @@ int File_Backup(const char* originalFilePath, BOOL overwriteOldBackup)
 
 	if(sprintf_s(backupFilepath,"%s.cod5.bak",originalFilePath) == -1)
 	{
-		Con_Error("ERROR: Buffer Error\n");
+		Con_Error("Buffer Error\n");
 		return 1;
 	}
 
 	if(!CopyFileA(originalFilePath,backupFilepath,overwriteOldBackup) && !overwriteOldBackup)
 	{
-		Con_Error("ERROR: Could Not Create Backup File\n");
+		Con_Error("Could Not Create Backup File\n");
 		return 2;
 	}
 	
@@ -26,13 +26,13 @@ int File_RestoreBackup(const char* originalFilePath)
 
 	if(sprintf_s(backupFilepath,"%s.cod5.bak",originalFilePath) == -1)
 	{
-		Con_Error("ERROR: Buffer Error\n");
+		Con_Error("Buffer Error\n");
 		return 1;
 	}
 
 	if(!CopyFileA(backupFilepath,originalFilePath,false))
 	{
-		Con_Error("ERROR: Could Not Restore File\n");
+		Con_Error("Could Not Restore File\n");
 		return 2;
 	}
 

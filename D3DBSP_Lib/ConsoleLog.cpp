@@ -71,6 +71,7 @@ int Con_Printf(const char* fmt, ...)
 int Con_Warning(const char* fmt, ...)
 {
 	SetConsoleTextAttribute(hConsole, 0xE);
+	printf("WARNING: ");
 	va_list ap;
 	va_start(ap, fmt);
 	int out = 1;
@@ -87,6 +88,7 @@ int Con_Warning(const char* fmt, ...)
 int Con_Error(const char* fmt, ...)
 {
 	SetConsoleTextAttribute(hConsole, 0xC);
+	printf("ERROR: ");
 	va_list ap;
 	va_start(ap, fmt);
 	int out = 1;

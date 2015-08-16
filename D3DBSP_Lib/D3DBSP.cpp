@@ -28,7 +28,8 @@ int D3DBSP::Load(const char* filepath)
 	struct stat* results = new struct stat;
 	if (stat(filepath, results) != 0)
 	{
-		printf("\nERROR: File not found\n");
+		Con_Printf("\n");
+		Con_Error("File not found\n");
 		delete results;
 		return 1;// ERR_FILE_NOT_FOUND;
 	}
@@ -84,7 +85,7 @@ int D3DBSP::Load(BYTE* pBuf)
 	memcpy(&magicValue,pBuf,sizeof(DWORD));
 	if(magicValue != 'PSBI')
 	{
-		Con_Error("ERROR: Buffer does not contain D3DBSP data\n");
+		Con_Error("Buffer does not contain D3DBSP data\n");
 		return 2; //ERR_NOT_A_D3DBSP_FILE
 	}
 
