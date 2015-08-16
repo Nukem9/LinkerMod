@@ -10,7 +10,7 @@ struct BO1_LMAP_PEL
 	float R;
 	float A;
 
-	WAW_LMAP_PEL toWAW_LMAP_PEL();
+	operator WAW_LMAP_PEL() const;
 };
 
 struct WAW_LMAP_PEL
@@ -20,7 +20,7 @@ struct WAW_LMAP_PEL
 	BYTE R;
 	BYTE A;
 
-	BO1_LMAP_PEL toBO1_LMAP_PEL();
+	operator BO1_LMAP_PEL() const;
 };
 
 struct BO1_LMAP
