@@ -92,8 +92,6 @@ int ConvertLump_WAWtoBO(Lump* wawLump, Lump* boLump, LUMP_TYPE type)
 		boLump->FreeMemory();
 		return 1;
 	}
-
-	return 2;
 }
 
 int ConvertBSP_WAWtoBO(D3DBSP* wawBSP, D3DBSP* boBSP)
@@ -200,8 +198,6 @@ int ConvertLump_BOtoWAW(Lump* boLump, Lump* wawLump, LUMP_TYPE type)
 		wawLump->FreeMemory();
 		return 1;
 	}
-
-	return 2;
 }
 
 int ConvertBSP_BOtoWAW(D3DBSP* boBSP, D3DBSP* wawBSP)

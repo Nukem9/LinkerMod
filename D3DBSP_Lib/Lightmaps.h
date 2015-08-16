@@ -1,12 +1,16 @@
 #include <WTypes.h>
 #include "Lump.h"
 
+struct WAW_LMAP_PEL;
+
 struct BO1_LMAP_PEL
 {
 	float B;
 	float G;
 	float R;
 	float A;
+
+	WAW_LMAP_PEL toWAW_LMAP_PEL();
 };
 
 struct WAW_LMAP_PEL
@@ -16,26 +20,8 @@ struct WAW_LMAP_PEL
 	BYTE R;
 	BYTE A;
 
-	BO1_LMAP_PEL toBO1_LMAP_PEL()
-	{
-		BO1_LMAP_PEL out;
-		out.R = (1.0f/255.0f) * this->R;
-		out.G = (1.0f/255.0f) * this->G;
-		out.B = (1.0f/255.0f) * this->B;
-		out.A = (1.0f/255.0f) * this->A;
-		return out;
-	}
+	BO1_LMAP_PEL toBO1_LMAP_PEL();
 };
-
-static WAW_LMAP_PEL BO1toWAW_LMAP_PEL(BO1_LMAP_PEL boPel)
-{ 
-	WAW_LMAP_PEL out;
-	out.R = (BYTE)(255.0 * boPel.R);
-	out.G = (BYTE)(255.0 * boPel.G);
-	out.B = (BYTE)(255.0 * boPel.B);
-	out.A = (BYTE)(255.0 * boPel.A);
-	return out;
-}
 
 struct BO1_LMAP
 {

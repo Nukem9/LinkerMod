@@ -38,7 +38,7 @@ public:
 	~Lump(void);
 };
 
-enum LUMP_TYPE : DWORD
+enum LUMP_TYPE
 {
   LUMP_MATERIALS = 0x0,
   LUMP_LIGHTBYTES = 0x1,

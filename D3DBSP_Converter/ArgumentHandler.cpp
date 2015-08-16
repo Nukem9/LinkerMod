@@ -7,14 +7,14 @@ int strcmp_case_insensitive(const char* str1, const char* str2)
 	memcpy(tmp_str1,str1,strlen(str1)+1);
 	for(DWORD i = 0; i < strlen(tmp_str1); i++)
 	{
-		tmp_str1[i] = toupper(tmp_str1[i]);
+		tmp_str1[i] = (char)toupper(tmp_str1[i]);
 	}
 
 	char* tmp_str2 = new char[strlen(str2)+1];
 	memcpy(tmp_str2,str2,strlen(str2)+1);
 	for(DWORD i = 0; i < strlen(tmp_str2); i++)
 	{
-		tmp_str2[i] = toupper(tmp_str2[i]);
+		tmp_str2[i] = (char)toupper(tmp_str2[i]);
 	}
 
 	int result = strcmp(tmp_str1,tmp_str2);
