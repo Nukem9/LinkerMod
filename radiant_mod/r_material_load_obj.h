@@ -1,8 +1,8 @@
 #pragma once
 
 #define R_MAX_PIXEL_SHADER_CONSTS	256
-//#define R_MAX_CODE_INDEX			197
-#define R_MAX_CODE_INDEX			105
+#define R_MAX_CODE_INDEX			197
+//#define R_MAX_CODE_INDEX			105
 
 #define SAMPLER_INDEX_INVALID		(-1)
 
@@ -268,7 +268,7 @@ struct MaterialPixelShader
 struct MaterialVertexStreamRouting
 {
 	MaterialStreamRouting data[16];
-	LPDIRECT3DVERTEXDECLARATION9 decl[16];
+	LPDIRECT3DVERTEXDECLARATION9 decl[18];
 };
 
 struct MaterialVertexDeclaration
@@ -278,7 +278,7 @@ struct MaterialVertexDeclaration
 	bool isLoaded;
 	MaterialVertexStreamRouting routing;
 };
-CHECK_SIZE(MaterialVertexDeclaration, 100);
+CHECK_SIZE(MaterialVertexDeclaration, 108);
 
 struct MaterialPass
 {
@@ -390,10 +390,9 @@ bool Material_IgnoreTechnique(const char *name);
 int Material_TechniqueTypeForName(const char *name);
 void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer);
 
-bool hk_Material_SetPassShaderArguments_DX();
 void hk_Material_LoadShader();
 
-extern stream_source_info_t s_streamSourceInfo[16][10];
+extern stream_source_info_t s_streamSourceInfo[18][10];
 extern stream_dest_info_t s_streamDestInfo[20];
 extern unsigned int g_customSamplerSrc[4];
 extern unsigned int g_customSamplerDest[4];

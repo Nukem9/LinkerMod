@@ -263,7 +263,7 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 SRCLINE(627)
 void Image_PrintTruncatedFileError(const char *filepath)
 {
-	Com_PrintError(8, "ERROR: image '%s' is truncated.  Delete the file and run converter to fix.\n", filepath);
+	Com_PrintError(8, "ERROR: image '%s' is truncated. Delete the file and run converter to fix.\n", filepath);
 }
 
 SRCLINE(1039)

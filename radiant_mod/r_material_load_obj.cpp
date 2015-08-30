@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#define STREAM_SRC_COUNT 10
+
 SRCLINE(900)
 LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *routingData, int streamCount, stream_source_info_t *sourceTable)
 {
@@ -8,19 +10,20 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 	//
 	// Vertex declaration array
 	//
-	D3DVERTEXELEMENT9 elemTable[256 + 1];
+	D3DVERTEXELEMENT9 elemTable[256];
 	memset(elemTable, 0, sizeof(elemTable));
 
 	//
 	// Initialize the ending marker with default values
 	//
-	elemTable[0] = D3DDECL_END();
+	D3DVERTEXELEMENT9 endDecl = D3DDECL_END();
 
 	int elemIndex = 0;
 
-	while (streamCount)
+	printf("new -- 0x%X\n", elemTable);
+	while (streamCount > 0)
 	{
-		ASSERT_MSG(routingData->source < 10, "routingData->source doesn't index STREAM_SRC_COUNT\n\t%i not in [0, 10)");
+		ASSERT_MSG((unsigned)(routingData->source) < (unsigned)(STREAM_SRC_COUNT), "routingData->source doesn't index STREAM_SRC_COUNT\n\t%i not in [0, 10)");
 
 		stream_source_info_t *sourceInfo = &sourceTable[routingData->source];
 
@@ -30,15 +33,17 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 		stream_dest_info_t *destInfo = &s_streamDestInfo[routingData->dest];
 
 		int elemIndexInsert = elemIndex;
-		for (;elemIndexInsert > 0 && elemTable[elemIndexInsert].Stream > sourceInfo->Stream; elemIndexInsert--)
-			memcpy(&elemTable[elemIndexInsert + 1], &elemTable[elemIndexInsert], sizeof(D3DVERTEXELEMENT9));
+		for (; elemIndexInsert > 0 && elemTable[elemIndexInsert].Stream > sourceInfo->Stream; elemIndexInsert--)
+			memcpy(&elemTable[elemIndexInsert], &endDecl, sizeof(D3DVERTEXELEMENT9));
 
-		elemTable[elemIndexInsert + 1].Stream		= sourceInfo->Stream;
-		elemTable[elemIndexInsert + 1].Offset		= sourceInfo->Offset;
-		elemTable[elemIndexInsert + 1].Type			= sourceInfo->Type;
-		elemTable[elemIndexInsert + 1].Method		= D3DDECLMETHOD_DEFAULT;
-		elemTable[elemIndexInsert + 1].Usage		= destInfo->Usage;
-		elemTable[elemIndexInsert + 1].UsageIndex	= destInfo->UsageIndex;
+		printf("Type: %d %d\n", sourceInfo->Type, destInfo->Usage);
+
+		elemTable[elemIndexInsert].Stream		= sourceInfo->Stream;
+		elemTable[elemIndexInsert].Offset		= sourceInfo->Offset;
+		elemTable[elemIndexInsert].Type			= sourceInfo->Type;
+		elemTable[elemIndexInsert].Method		= D3DDECLMETHOD_DEFAULT;
+		elemTable[elemIndexInsert].Usage		= destInfo->Usage;
+		elemTable[elemIndexInsert].UsageIndex	= destInfo->UsageIndex;
 
 		elemIndex++;
 		routingData++;
@@ -48,14 +53,14 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 	//
 	// Copy the ending marker over, to the actual array end
 	//
-	memcpy(&elemTable[elemIndex + 1], &elemTable[0], sizeof(D3DVERTEXELEMENT9));
+	memcpy(&elemTable[elemIndex], &endDecl, sizeof(D3DVERTEXELEMENT9));
 
 	IDirect3DDevice9 *d3d_device = *(IDirect3DDevice9 **)0x13A15A0;
 
 	if (d3d_device)
 	{
 		LPDIRECT3DVERTEXDECLARATION9 decl	= nullptr;
-		HRESULT hr							= d3d_device->CreateVertexDeclaration(&elemTable[1], &decl);
+		HRESULT hr							= d3d_device->CreateVertexDeclaration(elemTable, &decl);
 
 		if (!SUCCEEDED(hr))
 		{
@@ -78,15 +83,19 @@ void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl)
 	MaterialStreamRouting data[16];
 	memcpy(data, &(*mtlVertDecl)->routing, sizeof(data));
 
-	for (int vertDeclType = 0; vertDeclType < 16; vertDeclType++)
+	for (int vertDeclType = 0; vertDeclType < 18; vertDeclType++)
 	{
 		if (*(BYTE *)(*(DWORD *)0x0191D574 + 12))
+		{
 			(*mtlVertDecl)->routing.decl[vertDeclType] = Material_BuildVertexDecl(
-			data,
-			(*mtlVertDecl)->streamCount,
-			s_streamSourceInfo[vertDeclType]);
+				data,
+				(*mtlVertDecl)->streamCount,
+				s_streamSourceInfo[vertDeclType]);
+		}
 		else
+		{
 			(*mtlVertDecl)->routing.decl[vertDeclType] = nullptr;
+		}
 	}
 
 	(*mtlVertDecl)->isLoaded = true;
@@ -107,6 +116,12 @@ SRCLINE(2115)
 MaterialVertexDeclaration *Material_AllocVertexDecl(MaterialStreamRouting *routingData, int streamCount, bool *existing)
 {
 	ASSERT(streamCount);
+
+	//
+	// Static array of vertex declarations (NOTE: WAW struct size is smaller)
+	//
+	static MaterialVertexDeclaration materialVertexDeclarations[64];
+	static int materialVertexDeclCount = 0;
 
 	//
 	// Calculate a hash for lookup
@@ -132,10 +147,10 @@ MaterialVertexDeclaration *Material_AllocVertexDecl(MaterialStreamRouting *routi
 	//
 	// Maximum index check
 	//
-	if (*materialVertexDeclCount == 63)
+	if (materialVertexDeclCount == 63)
 		Com_Error(ERR_DROP, "More than %i vertex declarations in use", 63);
 
-	(*materialVertexDeclCount)++;
+	materialVertexDeclCount++;
 
 	//
 	// Zero the struct and then copy the routing data
@@ -410,7 +425,7 @@ bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable
 	//
 	// Material pass vertex stream routing
 	//
-	MaterialStreamRouting routing[16];
+	MaterialStreamRouting routing[16 + 1];
 	memset(routing, 0, sizeof(routing));
 
 	int routingIndex = 0;
@@ -464,7 +479,7 @@ bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable
 		return false;
 
 	bool existing		= false;
-	pass->vertexDecl	= Material_AllocVertexDecl(routing, routingIndex, &existing);
+	pass->vertexDecl	= Material_AllocVertexDecl(&routing[1], routingIndex, &existing);
 
 	if (!existing)
 		Load_BuildVertexDecl(&pass->vertexDecl);
@@ -755,6 +770,7 @@ bool Material_ParseCodeConstantSource_r(MaterialShaderType shaderType, const cha
 
 	if (sourceTable[sourceIndex].arrayCount)
 	{
+		ASSERT(sourceTable[sourceIndex].subtable || (sourceTable[sourceIndex].source < 0xC2 && sourceTable[sourceIndex].arrayStride == 1));
 		//ASSERT(sourceTable[sourceIndex].subtable || (sourceTable[sourceIndex].source < CONST_SRC_FIRST_CODE_MATRIX && sourceTable[sourceIndex].arrayStride == 1));
 
 		if (sourceTable[sourceIndex].subtable)
@@ -1077,6 +1093,8 @@ bool Material_AttemptCombineShaderArguments(MaterialShaderArgument *arg0, Materi
 	if (arg0->u.codeConst.rowCount + arg0->dest != arg1->dest)
 		return false;
 
+	ASSERT((signed int)LOWORD(arg0->u.literalConst) == arg0->u.codeConst.index);
+
 	if ((signed int)LOWORD(arg0->u.literalConst) < R_MAX_CODE_INDEX)
 		return false;
 
@@ -1161,7 +1179,7 @@ ShaderUniformDef *Material_GetShaderArgumentDest(const char *paramName, unsigned
 		}
 	}
 
-	ASSERT(false && "unfound name should be caught earlier");
+	ASSERT_MSG(false, "unfound name should be caught earlier");
 	return nullptr;
 }
 
@@ -1200,7 +1218,7 @@ bool Material_AddShaderArgumentFromLiteral(const char *shaderName, const char *p
 
 	arg->type			= type;
 	arg->dest			= dest->resourceDest;
-	arg->u.codeSampler	= (unsigned int)literal;
+	arg->u.literalConst	= literal;
 
 	return MaterialAddShaderArgument(shaderName, paramName, arg, registerUsage);
 }
@@ -1407,12 +1425,9 @@ bool Material_AddShaderArgument(const char *shaderName, ShaderArgumentSource *ar
 		(*usedCount)++;
 		return true;
 	}
-
-	default:
-		ASSERT_MSG(false, "Unhandled case");
-		break;
 	}
 
+	ASSERT_MSG(false, "Unhandled case");
 	return false;
 }
 
@@ -1459,7 +1474,7 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 	ShaderArgumentSource argSource;
 
 	unsigned int usedCount = 0;
-	while (1)
+	while (true)
 	{
 		const char *token = Com_Parse(text);
 
@@ -1732,7 +1747,7 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 	fread(shaderMemory, 1, shaderDataSize, shaderFile);
 
 	if (!Material_CopyTextToDXBuffer(shaderMemory, shaderDataSize, &shader))
-		ASSERT(false && "SHADER UPLOAD FAILED\n");
+		ASSERT_MSG(false, "SHADER UPLOAD FAILED\n");
 
 	fclose(shaderFile);
 	Z_Free(shaderMemory);
@@ -1788,61 +1803,47 @@ char Material_ParseShaderVersion(const char **text)
 SRCLINE(7866)
 char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 {
-	/*
-	static DWORD dwCall = 0x0052FDB0;
-
-	__asm
-	{
-		mov eax, semantic
-		call [dwCall]
-	}
-	*/
-	bool v2; // zf@8
-
 	switch (semantic->Usage)
 	{
-	case 0:
+	case D3DDECLUSAGE_POSITION:
 		if (semantic->UsageIndex)
-			goto LABEL_19;
+			break;
+
 		return 0;
 
-	case 3:
+	case D3DDECLUSAGE_BLENDWEIGHT:
 		if (semantic->UsageIndex)
-			goto LABEL_19;
-		return 1;
+			break;
 
-	case 10:
-		v2 = semantic->UsageIndex == 0;
+		return 19;
 
-		if (semantic->UsageIndex >= 2)
-			goto LABEL_19;
-
-		return semantic->UsageIndex + 2;
-
-	case 12:
-		if (semantic->UsageIndex)
-			goto LABEL_19;
-		return 4;
-
-	case 5:
-		v2 = semantic->UsageIndex == 0;
-
-		if (semantic->UsageIndex >= 14)
-			goto LABEL_19;
+	case D3DDECLUSAGE_TEXCOORD:
+		printf("TEXCOORD! %d %d\n", semantic->Usage, semantic->UsageIndex);
+		if (semantic->UsageIndex < 0 || semantic->UsageIndex >= 14)
+			break;
 
 		return semantic->UsageIndex + 5;
 
-	case 1:
+	case D3DDECLUSAGE_NORMAL:
 		if (semantic->UsageIndex)
-			goto LABEL_19;
-		return 19;
+			break;
 
-	default:
-	LABEL_19:
-		Com_Error(ERR_DROP, "Unknown shader input/output usage %i:%i\n", semantic->Usage, semantic->UsageIndex);
-		return 0;
+		return 1;
+
+	case D3DDECLUSAGE_COLOR:
+		if (semantic->UsageIndex < 0 || semantic->UsageIndex >= 2)
+			break;
+
+		return semantic->UsageIndex + 2;
+
+	case D3DDECLUSAGE_DEPTH:
+		if (semantic->UsageIndex)
+			break;
+
+		return 4;
 	}
 
+	Com_Error(ERR_DROP, "Unknown shader input/output usage %i:%i\n", semantic->Usage, semantic->UsageIndex);
 	return 0;
 }
 
@@ -1898,7 +1899,7 @@ bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderNam
 		// Gather the input and output shader semantic tables
 		//
 		D3DXSEMANTIC inputSemantics[512];
-		D3DXSEMANTIC outputSemantics[16];
+		D3DXSEMANTIC outputSemantics[MAXD3DDECLLENGTH];
 
 		UINT inputCount;
 		if (!SUCCEEDED(hr = D3DXGetShaderInputSemantics(program, inputSemantics, &inputCount)))
@@ -1922,7 +1923,7 @@ bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderNam
 		{
 			if (outputSemantics[semanticIndex].Usage)
 			{
-				if (outputSemantics[semanticIndex].Usage != 11)// D3DDECLUSAGE_FOG ?
+				if (outputSemantics[semanticIndex].Usage != D3DDECLUSAGE_FOG)
 					Material_SetVaryingParameterDef(&outputSemantics[semanticIndex], &paramSet->outputs[paramSet->outputCount++]);
 			}
 		}
@@ -2126,12 +2127,9 @@ char Material_CountArgsWithUpdateFrequency(MaterialUpdateFrequency updateFreq, M
 	args		= &args[*firstArg];
 	argCount	= argCount - *firstArg;
 
-	unsigned int matchCount;
-	for (matchCount = 0; matchCount < argCount; matchCount++)
-	{
-		if (Material_GetArgUpdateFrequency(&args[matchCount]) != updateFreq)
-			break;
-	}
+	unsigned int matchCount = 0;
+	for (; matchCount < argCount && Material_GetArgUpdateFrequency(&args[matchCount]) == updateFreq; matchCount++)
+		/* Do nothing */;
 
 	*firstArg += matchCount;
 	return matchCount;
@@ -2209,7 +2207,7 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 				if (customArg->u.codeSampler == g_customSamplerSrc[customSamplerIndex])
 				{
 					ASSERT(!(pass->customSamplerFlags & (1 << customSamplerIndex)));
-					//ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
+					ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
 
 					pass->customSamplerFlags |= 1 << customSamplerIndex;
 					break;
@@ -2400,6 +2398,8 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	// Create a file path using normal techsets and read data
 	//
 	char filename[MAX_PATH];
+	name = "2d";
+
 	Com_sprintf(filename, MAX_PATH, "techsets/%s.techset", name);
 
 	void *fileData;
@@ -2410,8 +2410,8 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 		//
 		// Try loading with PIMP enabled
 		//
-		Com_sprintf(filename, MAX_PATH, "pimp/techsets/%s.techset", name);
-		fileSize = FS_ReadFile(filename, (void **)&fileData);
+		//Com_sprintf(filename, MAX_PATH, "pimp/techsets/%s.techset", name);
+		//fileSize = FS_ReadFile(filename, (void **)&fileData);
 
 		if (fileSize < 0)
 		{
@@ -2525,30 +2525,6 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	return techniqueSet;
 }
 
-bool __declspec(naked) hk_Material_SetPassShaderArguments_DX()
-{
-	__asm
-	{
-		push ebp
-		mov ebp, esp
-
-		push [ebp + 0x24]		// a9: args
-		push [ebp + 0x20]		// a8: argCount
-		push [ebp + 0x1C]		// a7: argLimit
-		push esi				// a6: paramSet
-		push [ebp + 0x18]		// a5: techFlags
-		push [ebp + 0x14]		// a4: program
-		push [ebp + 0x10]		// a3: shaderType
-		push [ebp + 0x0C]		// a2: shaderName
-		push [ebp + 0x08]		// a1: text
-		call Material_SetPassShaderArguments_DX
-		add esp, 0x24
-
-		pop ebp
-		retn
-	}
-}
-
 void __declspec(naked) hk_Material_LoadShader()
 {
 	__asm
@@ -2566,7 +2542,7 @@ void __declspec(naked) hk_Material_LoadShader()
 	}
 }
 
-stream_source_info_t s_streamSourceInfo[16][10] =
+stream_source_info_t s_streamSourceInfo[18][10] =
 {
 	{
 		{ 0, 0, 3 },
@@ -2764,6 +2740,19 @@ stream_source_info_t s_streamSourceInfo[16][10] =
 	},
 
 	{
+		{ 0, 0, 2 },
+		{ 0, 12, 4 },
+		{ 0, 16, 5 },
+		{ 0, 20, 5 },
+		{ 0, 24, 5 },
+		{ 0, 28, 5 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+	},
+
+	{
 		{ 0, 0, 5 },
 		{ 0, 8, 4 },
 		{ 0, 12, 5 },
@@ -2772,6 +2761,19 @@ stream_source_info_t s_streamSourceInfo[16][10] =
 		{ 1, 0, 5 },
 		{ -1, 0, 0 },
 		{ 1, 4, 5 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+	},
+
+	{
+		{ 0, 0, 10 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
+		{ -1, 0, 0 },
 		{ -1, 0, 0 },
 		{ -1, 0, 0 },
 	},
@@ -2898,7 +2900,6 @@ CodeSamplerSource s_codeSamplers[] =
 	{ "floatZ", 19, 0, 0, 0 },
 	{ "processedFloatZ", 20, 0, 0, 0 },
 	{ "rawFloatZ", 21, 0, 0, 0 },
-	{ "caseTexture", 22, 0, 0, 0 },
 	{ "codeTexture0", 34, 0, 0, 0 },
 	{ "codeTexture1", 35, 0, 0, 0 },
 	{ "codeTexture2", 36, 0, 0, 0 },
