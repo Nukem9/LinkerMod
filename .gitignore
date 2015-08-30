@@ -1,3 +1,6 @@
 *.user
 *.suo
 *.sdf
+*.ipch
+
+!detours.lib
