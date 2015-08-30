@@ -104,7 +104,7 @@ void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl)
 SRCLINE(2094)
 unsigned int Material_HashVertexDecl(MaterialStreamRouting *routingData, int streamCount)
 {
-	int hash = 0;
+	unsigned int hash = 0;
 
 	for (unsigned int byteIndex = 0; byteIndex < 2 * streamCount; byteIndex++)
 		hash += (byteIndex + 0x77) * routingData->data[byteIndex];
@@ -337,7 +337,7 @@ bool Material_StreamDestForName(const char **text, const char *destName, char *d
 SRCLINE(3263)
 bool Material_StreamSourceForName(const char **text, const char *sourceName, char *source)
 {
-	int index;
+	int index = 0;
 
 	if (!strcmp(sourceName, "position"))
 		*source = 0;
@@ -379,6 +379,7 @@ SRCLINE(3314)
 bool Material_ResourceDestForStreamDest(char streamDest, ShaderVaryingDef *inputTable, unsigned int inputCount, char *resourceDest)
 {
 	unsigned int inputIndex = 0;
+
 	for (;; inputIndex++)
 	{
 		if (inputIndex >= inputCount)

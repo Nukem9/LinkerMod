@@ -1,8 +1,13 @@
 #pragma once
 
+#define BO1_BUILD
+
+#ifdef BO1_BUILD
 #define R_MAX_PIXEL_SHADER_CONSTS	256
 #define R_MAX_CODE_INDEX			197
-//#define R_MAX_CODE_INDEX			105
+#else
+#define R_MAX_CODE_INDEX			105
+#endif // BO1_BUILD
 
 #define SAMPLER_INDEX_INVALID		(-1)
 
