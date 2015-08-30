@@ -78,9 +78,9 @@ BOOL GameMod_Init()
 	PatchMemory(0x00618D21, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 
 	//
-	// PLATFORM_MISSINGMAP Fix
+	// PLATFORM_MISSINGMAP fix
 	//
-	SV_ValidateMap_o = DetourFunction((PBYTE)0x0041EEC0,(PBYTE)&SV_ValidateMap);
+	SV_ValidateMap_o = Detours::X86::DetourFunction((PBYTE)0x0041EEC0, (PBYTE)&SV_ValidateMap);
 
 	//
 	// De-restrict Dvar_ForEachConsoleAccessName and

@@ -118,12 +118,14 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052E800);// Material_DefaultConstantSourceFromTable
 	DO_NOT_USE(0x0052E430);// Material_DefaultSamplerSource
 	DO_NOT_USE(0x0052E910);// Material_UnknownShaderworksConstantSource
-	//DO_NOT_USE(0x0052FDB0);// Material_GetStreamDestForSemantic
-	//DO_NOT_USE(0x0052DA70);// Material_NameForStreamDest
+	DO_NOT_USE(0x0052FDB0);// Material_GetStreamDestForSemantic
+	DO_NOT_USE(0x0052DA70);// Material_NameForStreamDest
 	DO_NOT_USE(0x0052E990);// Material_ElemCountForParamName
 	DO_NOT_USE(0x0052D140);// Material_UsingTechnique
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
 	*/
+#undef DO_NOT_USE
+
 	MessageBoxA(nullptr, "", "", 0);
 	return TRUE;
 }

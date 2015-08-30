@@ -164,11 +164,8 @@ void __cdecl Path_BuildNodeVis(char *visbuf, int iVisCacheSize)
 {
 	signed int v2; // eax@9
 	signed int v3; // ST20_4@9
-	int j; // [sp+Ch] [bp-44h]@6
-	int ja; // [sp+Ch] [bp-44h]@16
 	signed int entry; // [sp+10h] [bp-40h]@19
 	int nodeCount[2]; // [sp+34h] [bp-1Ch]@16
-	int i; // [sp+44h] [bp-Ch]@4
 
 	Com_Printf(18, "Building node vis...\n");
 
@@ -180,14 +177,14 @@ void __cdecl Path_BuildNodeVis(char *visbuf, int iVisCacheSize)
 
 	int count = 0;
 	int prevPercent = 0;
-	for (i = 0; i < GameWorldCurrent->path.nodeCount; ++i)
+	for (unsigned int i = 0; i < GameWorldCurrent->path.nodeCount; ++i)
 	{
 		float start[3];
 		float end[3];
 
 		GetNodeAttackPoint(&GameWorldCurrent->path.nodes[i], start);
 
-		for (j = i + 1; j < GameWorldCurrent->path.nodeCount; ++j)
+		for (unsigned int j = i + 1; j < GameWorldCurrent->path.nodeCount; ++j)
 		{
 			GetNodeAttackPoint(&GameWorldCurrent->path.nodes[j], end);
 			int hitNum = CM_BoxSightTrace(0, start, end, vec3_origin, vec3_origin, 0, 0x2809803);
@@ -209,11 +206,11 @@ void __cdecl Path_BuildNodeVis(char *visbuf, int iVisCacheSize)
 		}
 	}
 
-	for (i = 0; i < GameWorldCurrent->path.nodeCount; ++i)
+	for (unsigned int i = 0; i < GameWorldCurrent->path.nodeCount; ++i)
 	{
 		*(DWORD *)nodeNums = i;
 		nodeCount[0] = Path_GetExpandedNodeNums_r(i, 256.0, (int *)nodeNums, 1);
-		for (ja = i + 1; ja < GameWorldCurrent->path.nodeCount; ++ja)
+		for (unsigned int ja = i + 1; ja < GameWorldCurrent->path.nodeCount; ++ja)
 		{
 			entry = ExpandedNodeVisCacheEntry_0(ja, i);
 			if (!((1 << (entry & 7)) & (unsigned __int8)visbuf[entry >> 3]))
@@ -249,7 +246,7 @@ BYTE nodeAttackOffset[21 * 4] =
 };
 
 float __real3 = 0.00;
-float __real4 = 0.017453292;
+float __real4 = 0.017453292f;
 float AI_LEAN_DIST = 44.0;
 float ACTOR_EYE_OFFSET = 64.0;
 __declspec(naked) void __cdecl GetNodeAttackPoint(pathnode_t *node, float *attackPos)

@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "launcher_ldr", "launcher_ldr\launcher_ldr.vcxproj", "{E543772A-4051-499E-8DC6-B5501043DA7B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "launcher_ldr", "components\launcher_ldr\launcher_ldr.vcxproj", "{E543772A-4051-499E-8DC6-B5501043DA7B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game_mod", "game_mod\game_mod.vcxproj", "{69B41EFB-E992-4351-AA29-FDC61F4DBDE0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlackOpsSP", "components\BlackOpsSP\BlackOpsSP.vcxproj", "{69B41EFB-E992-4351-AA29-FDC61F4DBDE0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linker_mod", "linker_mod\linker_mod.vcxproj", "{3A1FA19B-CC11-4725-AC86-6B3CF539E1B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linker_pc", "components\linker_pc\linker_pc.vcxproj", "{3A1FA19B-CC11-4725-AC86-6B3CF539E1B2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "radiant_mod", "radiant_mod\radiant_mod.vcxproj", "{6A3FB8CD-BEA3-42F1-B551-A0F56ED9B266}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "radiant", "components\radiant\radiant.vcxproj", "{6A3FB8CD-BEA3-42F1-B551-A0F56ED9B266}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
