@@ -67,7 +67,7 @@ void Com_LoadBsp(const char *filename)
 		Z_Free(comBspGlob->header);
 		comBspGlob->header = nullptr;
 
-		Com_Printf(0, "EXE_ERR_WRONG_MAP_VERSION_NUM\x15%s", filename);
+		Com_Error(0, "EXE_ERR_WRONG_MAP_VERSION_NUM\x15%s", filename);
 	}
 
 	//
