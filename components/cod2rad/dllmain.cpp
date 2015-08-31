@@ -107,8 +107,10 @@ void __declspec(naked) hk_ForEachQuantumMultiThreaded()
 	}
 }
 
-DWORD newDword = 0;
-BYTE newData[36 * 12];
+BYTE newData[4 + 36 * 12 + 4000000];
+
+BYTE blockAllocData[36 * 32 * 2];
+BYTE blockAllocData2[36 * 32];
 
 BOOL cod2rad_Init()
 {
@@ -124,64 +126,61 @@ BOOL cod2rad_Init()
 	//
 	printf("----> Loading custom cod2rad\n");
 
-	//AddVectoredExceptionHandler(TRUE, (PVECTORED_EXCEPTION_HANDLER)MyUnhandledExceptionFilter);
+	AddVectoredExceptionHandler(TRUE, (PVECTORED_EXCEPTION_HANDLER)MyUnhandledExceptionFilter);
 
 	//
 	// Threading patches (4 threads -> 32 threads)
 	//
-	//PatchMemory(0x00440BDB, (PBYTE)"\x20", 1);// PCL_Threads
-	//PatchMemory(0x00440A50, (PBYTE)"\x20", 1);// SetDefaultOptions
-	//PatchMemory(0x00440A54, (PBYTE)"\x20", 1);// SetDefaultOptions
+	PatchMemory(0x00440BDB, (PBYTE)"\x20", 1);// PCL_Threads
+	PatchMemory(0x00440A50, (PBYTE)"\x20", 1);// SetDefaultOptions
+	PatchMemory(0x00440A54, (PBYTE)"\x20", 1);// SetDefaultOptions
 
 	Detours::X86::DetourFunction((PBYTE)0x004291D0, (PBYTE)&hk_ForEachQuantumMultiThreaded);
+	Detours::X86::DetourFunction((PBYTE)0x0043EDB5, (PBYTE)&RadiTest, Detours::X86Option::USE_CALL);
 
-	//Detours::X86::DetourFunction((PBYTE)0x0043EDB5, (PBYTE)&RadiTest, Detours::X86Option::USE_CALL);
+	// geoGlob.hunk[threadIndex]
+	{
+		REMAP(0x0043CBD3, 0x16E99368, (ULONG_PTR)&geoGlob_hunk);
 
-	// RELATED
-	//REMAP(0x0043CBD3, 0x16E99368, (ULONG_PTR)&geoGlob_hunk);
+		REMAP(0x00437FB6, 0x16E9936C, (ULONG_PTR)&geoGlob_hunk + (0x16E9936C - 0x16E99368));
+		REMAP(0x0043CBC1, 0x16E9936C, (ULONG_PTR)&geoGlob_hunk + (0x16E9936C - 0x16E99368));
 
-	//REMAP(0x00437FB6, 0x16E9936C, (ULONG_PTR)&geoGlob_hunk + (0x16E9936C - 0x16E99368));
-	//REMAP(0x0043CBC1, 0x16E9936C, (ULONG_PTR)&geoGlob_hunk + (0x16E9936C - 0x16E99368));
+		REMAP(0x00437F33, 0x16E99370, (ULONG_PTR)&geoGlob_hunk + (0x16E99370 - 0x16E99368));
+		REMAP(0x0043CBCC, 0x16E99370, (ULONG_PTR)&geoGlob_hunk + (0x16E99370 - 0x16E99368));
 
-	//REMAP(0x00437F33, 0x16E99370, (ULONG_PTR)&geoGlob_hunk + (0x16E99370 - 0x16E99368));
-	//REMAP(0x0043CBCC, 0x16E99370, (ULONG_PTR)&geoGlob_hunk + (0x16E99370 - 0x16E99368));
-	// END RELATED
+		//PageGuard_Monitor(0x16E99368, 4 * 12);
+	}
 
-	// RELATED
-	REMAP(0x00437EB0, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043C5E0, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043C67B, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043C6AC, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043C3B0, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043C3F7, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043C447, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043FD21, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043FDD8, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x004300E8, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043FF26, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x00430227, 0x15999350, (ULONG_PTR)&newDword);
-	REMAP(0x0043C8A3, 0x15999350, (ULONG_PTR)&newDword);
+	// Unknown
+	{
+		REMAP(0x00439EE7, 0x15999354, (ULONG_PTR)&newData);
+		REMAP(0x0043A65F, 0x15999354, (ULONG_PTR)&newData);
+		REMAP(0x0043B482, 0x15999354, (ULONG_PTR)&newData);
+		REMAP(0x0043C12C, 0x15999354, (ULONG_PTR)&newData);
+		REMAP(0x0043C57D, 0x15999354, (ULONG_PTR)&newData);
+		REMAP(0x0043C5FD, 0x15999354, (ULONG_PTR)&newData);
+		REMAP(0x00448B6F, 0x15999354, (ULONG_PTR)&newData);
 
-	REMAP(0x0043C5FD, 0x15999354, (ULONG_PTR)&newData);
-	REMAP(0x0043A65F, 0x15999354, (ULONG_PTR)&newData);
-	REMAP(0x0043C12C, 0x15999354, (ULONG_PTR)&newData);
-	REMAP(0x0043B482, 0x15999354, (ULONG_PTR)&newData);
-	REMAP(0x00439EE7, 0x15999354, (ULONG_PTR)&newData);
+		REMAP(0x0043C3FF, 0x15999370, (ULONG_PTR)&newData + (0x15999370 - 0x15999354));
 
-	REMAP(0x0043C3FF, 0x15999370, (ULONG_PTR)&newData + (0x15999370 - 0x15999354));
+		REMAP(0x0043D52F, 0x15999372, (ULONG_PTR)&newData + (0x15999372 - 0x15999354));
 
-	REMAP(0x0043D52F, 0x15999372, (ULONG_PTR)&newData + (0x15999372 - 0x15999354));
+		REMAP(0x0043A657, 0x15999373, (ULONG_PTR)&newData + (0x15999373 - 0x15999354));
+		REMAP(0x0043B47A, 0x15999373, (ULONG_PTR)&newData + (0x15999373 - 0x15999354));
+		REMAP(0x0043C124, 0x15999373, (ULONG_PTR)&newData + (0x15999373 - 0x15999354));
 
-	REMAP(0x0043A657, 0x15999373, (ULONG_PTR)&newData + (0x15999373 - 0x15999354));
-	REMAP(0x0043C124, 0x15999373, (ULONG_PTR)&newData + (0x15999373 - 0x15999354));
-	REMAP(0x0043B47A, 0x15999373, (ULONG_PTR)&newData + (0x15999373 - 0x15999354));
-	// END RELATED
+		//PageGuard_Monitor(0x15999354, 36 * 4);
+	}
 
-	printf("----> Loading custom cod2rad\n");
-	printf("----> Loading custom cod2rad\n");
-	printf("----> Loading custom cod2rad\n");
+	// BlockAlloc structure
+	{
+		REMAP(0x0043E529, 0x153C9224, (ULONG_PTR)&blockAllocData);
+		REMAP(0x0043E6E7, 0x153C92B4, (ULONG_PTR)&blockAllocData + (36 * 32));
+		REMAP(0x0043E540, 0x00000090, 0x480); // 0x480 = sizeof(blockAllocData)/2
 
-	//PageGuard_Monitor(0x16E99368, 4 * 12);
+		//PageGuard_Monitor(0x153C9224, 4 * 36);
+		//PageGuard_Monitor(0x153C92B4, 4 * 36);
+	}
 
 	return TRUE;
 }
