@@ -146,6 +146,14 @@ BOOL GameMod_Init()
 	//
 	PatchMemory_WithNOP(0x00632350, 0x21);
 
+	//
+	// Enable mod verification when joining session or accepting invite
+	//
+	Session_Modify = (Session_Modify_t*)Detours::X86::DetourFunction((PBYTE)0x00611930, (PBYTE)&Session_Modify_Fix);
+	Detours::X86::DetourFunction((PBYTE)0x00480CAC, (PBYTE)&Live_JoinSessionInProgressComplete_CheckMod);
+	Detours::X86::DetourFunction((PBYTE)0x0046B314, (PBYTE)&Live_AcceptInviteAsyncComplete_CheckMod);
+	PatchMemory_WithNOP(0x004521EE, 0x13);
+
 	return TRUE;
 }
 

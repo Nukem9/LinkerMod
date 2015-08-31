@@ -24,3 +24,4 @@
 #include "cl_console.h"
 #include "db_registry.h"
 #include "ui_main_pc.h"
+#include "live_win.h"
