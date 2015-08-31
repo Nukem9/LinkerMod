@@ -87,6 +87,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
     <ClCompile Include="live_win.cpp" />
+    <ClCompile Include="reflection_fix.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="ui_main_pc.cpp" />
   </ItemGroup>
@@ -99,6 +100,7 @@
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
     <ClInclude Include="live_win.h" />
+    <ClInclude Include="reflection_fix.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv_ccmds_mp.h" />
     <ClInclude Include="ui_main_pc.h" />

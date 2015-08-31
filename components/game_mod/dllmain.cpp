@@ -15,8 +15,11 @@ void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex
 	Cmd_ExecuteSingleCommandInternal(localClientNum, controllerIndex, item, text, false);
 }
 
+bool g_initted = false;
 BOOL GameMod_Init()
 {
+	if(g_initted)
+		return TRUE;
 	//
 	// Disable STDOUT buffering
 	//
@@ -154,6 +157,10 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0046B314, (PBYTE)&Live_AcceptInviteAsyncComplete_CheckMod);
 	PatchMemory_WithNOP(0x004521EE, 0x13);
 
+	if(IsReflectionMode())
+		ReflectionMod_Init();
+
+	g_initted = true;
 	return TRUE;
 }
 

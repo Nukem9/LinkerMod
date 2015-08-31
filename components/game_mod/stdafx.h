@@ -25,3 +25,4 @@
 #include "db_registry.h"
 #include "ui_main_pc.h"
 #include "live_win.h"
+#include "reflection_fix.h"
