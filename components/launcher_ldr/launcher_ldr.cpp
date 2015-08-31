@@ -76,8 +76,8 @@ void FixCommandLine(int argc, char *argv[])
 	{
 		StrDel(g_CommandLine, "+set fs_game raw", '\0');
 
-		if (StrDel(g_CommandLine, "+set fs_game dev", '\0'))
-			strcat_s(g_CommandLine, "+set fs_game raw");
+		if (StrDel(g_CommandLine, "+set fs_game dev ", '\0'))
+			strcat_s(g_CommandLine, " +set fs_game raw");
 	}
 }
 
@@ -222,6 +222,8 @@ int main(int argc, char *argv[])
 	//
 	DWORD exitCode = 0;
 	GetExitCodeProcess(processInfo.hProcess, &exitCode);
+
+	//printf("Exited with code: 0x%X\n",exitCode);
 
 	CloseHandle(processInfo.hProcess);
 	CloseHandle(ghJob);
