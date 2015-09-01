@@ -27,15 +27,18 @@ struct GfxViewParms
 
 struct GfxParticleCloud
 {
-	char a[0x40];
+	char data[0x40];
 };
 
 struct GfxSModelCachedVertex
 {
-	char a[0x20];
+	char data[0x20];
 };
 
-typedef int GfxModelLightingPatch;
+struct GfxModelLightingPatch
+{
+	char data[0x4C];
+};
 
 typedef int GfxBackEndPrimitiveData;
 
