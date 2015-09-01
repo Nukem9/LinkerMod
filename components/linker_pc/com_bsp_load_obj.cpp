@@ -67,7 +67,7 @@ void Com_LoadBsp(const char *filename)
 		Z_Free(comBspGlob->header);
 		comBspGlob->header = nullptr;
 
-		Com_Printf(0, "EXE_ERR_WRONG_MAP_VERSION_NUM\x15%s", filename);
+		Com_Error(0, "EXE_ERR_WRONG_MAP_VERSION_NUM\x15%s", filename);
 	}
 
 	//
@@ -113,7 +113,7 @@ const void *Com_LoadBspLump(const char *mapname, LumpType type, unsigned int ele
 
 		Hunk_CheckTempMemoryHighClear();
 
-		ASSERT(false && "Unhandled BSP load type");
+		ASSERT_MSG(false, "Unhandled BSP load type");
 		comBspGlob->loadedLumpData = nullptr;//Com_ReadLumpOutOfBsp(fileHandle, type, elemSize, count);
 
 		FS_FCloseFile(fileHandle);

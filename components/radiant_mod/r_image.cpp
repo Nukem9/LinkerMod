@@ -14,7 +14,7 @@ void Image_PicmipForSemantic(char semantic, Picmip *picmip)
 	switch (semantic)
 	{
 	default:
-		ASSERT(false && "Unhandled case");
+		ASSERT_MSG(false, "Unhandled case");
 
 	case 0:
 	case 1:

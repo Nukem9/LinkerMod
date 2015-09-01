@@ -301,8 +301,6 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 	int fileHandle;
 	int fileSize = OpenFileRead(filepath, &fileHandle);
 
-	printf("File path: %s -- %d\n", filepath, fileSize);
-
 	if (fileSize == -1)
 	{
 		Com_PrintError(8, "ERROR: image '%s' is missing\n", filepath);
