@@ -86,7 +86,7 @@ BOOL RadiantMod_Init()
 	PatchMemory(0x005351A2, (PBYTE)"\x08", 1);// 4 byte xmodelsurfs file adjustment (MagicNumber)
 
 	//
-	// FixRegistryEntries to prevent collision with CoDWAWRadiant - DEV
+	// FixRegistryEntries to prevent collision with CoDWAWRadiant
 	//
 	strcpy_safe((char *)0x006F8688, "Software\\iw\\CoDBORadiantModTool\\CoDBORadiantModTool");
 	strcpy_safe((char *)0x006F0CD0, "Software\\iw\\CoDBORadiantModTool\\IniPrefs");
@@ -126,7 +126,6 @@ BOOL RadiantMod_Init()
 	*/
 #undef DO_NOT_USE
 
-	MessageBoxA(nullptr, "", "", 0);
 	return TRUE;
 }
 
