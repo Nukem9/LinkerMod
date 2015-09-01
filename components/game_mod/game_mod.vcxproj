@@ -85,8 +85,9 @@
     <ClCompile Include="cl_console.cpp" />
     <ClCompile Include="db_registry.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="dvar.cpp" />
     <ClCompile Include="live_win.cpp" />
+    <ClCompile Include="reflection_fix.cpp" />
+    <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="ui_main_pc.cpp" />
   </ItemGroup>
@@ -99,8 +100,14 @@
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
     <ClInclude Include="live_win.h" />
+    <ClInclude Include="reflection_fix.h" />
+    <ClInclude Include="r_reflection_probe.h" />
+    <ClInclude Include="r_rendercmds.h" />
+    <ClInclude Include="r_scene.h" />
+    <ClInclude Include="r_screenshot.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv_ccmds_mp.h" />
+    <ClInclude Include="sys_cmds.h" />
     <ClInclude Include="ui_main_pc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
