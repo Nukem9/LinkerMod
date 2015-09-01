@@ -9,6 +9,7 @@ BYTE	g_GeoGlob[12 * MAX_THREADS];
 BYTE	g_TrisData[4 + 36 * 12 + 4000000];
 BYTE	g_BlockAllocData[2 * 36 * MAX_THREADS];
 DWORD	g_SuppressedLightingSamples[MAX_THREADS];
+DWORD	g_RadiosityBounce[MAX_THREADS];
 
 //
 // Internal thread callbacks
@@ -81,26 +82,28 @@ void __declspec(naked) hk_ForEachQuantumMultiThreaded()
 	}
 }
 
-void __declspec(naked) RadiTest()
-{
-	__asm
-	{
-		mov dword ptr ds:[0x153C9000], 4
-		mov esi, 4
-
-		mov eax, 0x0043EBB0
-		jmp eax
-	}
-}
-
 void __declspec(naked) hk_SuppressedLightingInit()
 {
-	// @ 0042FF78
 	memset(&g_SuppressedLightingSamples, 0xFF, sizeof(g_SuppressedLightingSamples));
 
 	*(DWORD *)0x16E99F88 = 0;
 
 	__asm retn
+}
+
+void __declspec(naked) hk_RadiosityInit()
+{
+	__asm pushad
+
+	memset(&g_RadiosityBounce, 0, sizeof(g_RadiosityBounce));
+
+	__asm
+	{
+		popad
+
+		mov eax, 0x0043EBD8
+		jmp eax
+	}
 }
 
 void FixupGeoHunk()
@@ -163,6 +166,40 @@ void FixupSuppressedLightingSamples()
 	//PageGuard_Monitor(0x16E99F78, 4 * 4);
 }
 
+void FixupRadiosityBounce()
+{
+	// radiosityBounce[threadIndex]
+	REMAP(0x0043D835, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043D84C, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043EBC4, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043EC50, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043EC5A, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043EC6E, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043EC80, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043EC94, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043ECA6, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043ECBA, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043ECCC, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043ECE0, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043ED00, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043ED0A, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043ED1E, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+	REMAP(0x0043ED2D, 0x153C920C, (ULONG_PTR)&g_RadiosityBounce);
+
+	REMAP(0x0043EBC9, 0x153C9210, (ULONG_PTR)&g_RadiosityBounce + (0x153C9210 - 0x153C920C));
+	REMAP(0x0043EC76, 0x153C9210, (ULONG_PTR)&g_RadiosityBounce + (0x153C9210 - 0x153C920C));
+
+	REMAP(0x0043EBCE, 0x153C9214, (ULONG_PTR)&g_RadiosityBounce + (0x153C9214 - 0x153C920C));
+	REMAP(0x0043EC9C, 0x153C9214, (ULONG_PTR)&g_RadiosityBounce + (0x153C9214 - 0x153C920C));
+
+	REMAP(0x0043EBD3, 0x153C9218, (ULONG_PTR)&g_RadiosityBounce + (0x153C9218 - 0x153C920C));
+	REMAP(0x0043ECC2, 0x153C9218, (ULONG_PTR)&g_RadiosityBounce + (0x153C9218 - 0x153C920C));
+
+	Detours::X86::DetourFunction((PBYTE)0x0043EBC4, (PBYTE)&hk_RadiosityInit);
+
+	//PageGuard_Monitor(0x153C920C, 4 * 4);
+}
+
 void PatchThreading()
 {
 	PatchMemory(0x00440BDB, (PBYTE)&MAX_THREADS, 1);// PCL_Threads
@@ -170,10 +207,10 @@ void PatchThreading()
 	PatchMemory(0x00440A54, (PBYTE)&MAX_THREADS, 1);// SetDefaultOptions
 
 	Detours::X86::DetourFunction((PBYTE)0x004291D0, (PBYTE)&hk_ForEachQuantumMultiThreaded);
-	Detours::X86::DetourFunction((PBYTE)0x0043EDB5, (PBYTE)&RadiTest, Detours::X86Option::USE_CALL);
 
 	FixupGeoHunk();
 	FixupGlobalTris();
 	FixupBlockAlloc();
 	FixupSuppressedLightingSamples();
+	FixupRadiosityBounce();
 }
