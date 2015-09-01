@@ -5,6 +5,7 @@
 #include <shellapi.h>
 
 char g_mapName[256];
+bool g_reflectionsUpdated = false;
 
 BOOL IsReflectionMode()
 {
@@ -59,6 +60,14 @@ BOOL ReflectionMod_Init()
 	PatchMemory(0x006CF379, (PBYTE)"\x90\x90", 2);
 	PatchMemory(0x006CF382, (PBYTE)"\x90\x90", 2);
 	PatchMemory(0x006CF388, (PBYTE)"\x90\x90", 2);
+
+	//
+	// Check g_reflectionsUpdated for ReflectionExit (mov [g_reflectionsUpdate], 1)
+	//
+	BYTE buf[7] = {0xC6,0x05,0xFF,0xFF,0xFF,0xFF,0x01};
+	bool* pTmp = &g_reflectionsUpdated;
+	memcpy(buf+2,&pTmp,4);
+	PatchMemory(0x006CF383, buf, 7);
 
 	return TRUE;
 }
