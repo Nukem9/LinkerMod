@@ -14,8 +14,6 @@ LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 
 BOOL cod2rad_Init()
 {
-	MessageBoxA(nullptr, "", "", 0);
-
 	//
 	// Disable STDOUT buffering
 	//

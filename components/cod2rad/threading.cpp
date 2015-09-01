@@ -71,7 +71,7 @@ void ForEachQuantumMultiThreaded(ULONG ThreadCount, void(__cdecl *Callback)(int,
 
 void __declspec(naked) hk_ForEachQuantumMultiThreaded()
 {
-	_asm
+	__asm
 	{
 		push dword ptr ss:[esp + 4]
 		push edi
