@@ -112,6 +112,18 @@ BYTE newData[4 + 36 * 12 + 4000000];
 BYTE blockAllocData[36 * 32 * 2];
 BYTE blockAllocData2[36 * 32];
 
+DWORD randomData[32];
+
+void __declspec(naked) testhook()
+{
+	// @ 0042FF78
+	memset(&randomData, 0xFF, sizeof(randomData));
+
+	*(DWORD *)0x16E99F88 = 0;
+
+	__asm retn
+}
+
 BOOL cod2rad_Init()
 {
 	MessageBoxA(nullptr, "", "", 0);
@@ -137,6 +149,7 @@ BOOL cod2rad_Init()
 
 	Detours::X86::DetourFunction((PBYTE)0x004291D0, (PBYTE)&hk_ForEachQuantumMultiThreaded);
 	Detours::X86::DetourFunction((PBYTE)0x0043EDB5, (PBYTE)&RadiTest, Detours::X86Option::USE_CALL);
+
 
 	// geoGlob.hunk[threadIndex]
 	{
@@ -175,11 +188,23 @@ BOOL cod2rad_Init()
 	// BlockAlloc structure
 	{
 		REMAP(0x0043E529, 0x153C9224, (ULONG_PTR)&blockAllocData);
+		REMAP(0x0043E68E, 0x153C9224, (ULONG_PTR)&blockAllocData);
 		REMAP(0x0043E6E7, 0x153C92B4, (ULONG_PTR)&blockAllocData + (36 * 32));
 		REMAP(0x0043E540, 0x00000090, 0x480); // 0x480 = sizeof(blockAllocData)/2
 
 		//PageGuard_Monitor(0x153C9224, 4 * 36);
 		//PageGuard_Monitor(0x153C92B4, 4 * 36);
+	}
+
+	// Unknown 2
+	{
+		REMAP(0x0042F3F8, 0x16E99F78, (ULONG_PTR)&randomData);
+		REMAP(0x0042F471, 0x16E99F78, (ULONG_PTR)&randomData);
+		REMAP(0x0042FF78, 0x16E99F78, (ULONG_PTR)&randomData);
+
+		Detours::X86::DetourFunction((PBYTE)0x0042FF78, (PBYTE)&testhook);
+
+		//PageGuard_Monitor(0x16E99F78, 4 * 4);
 	}
 
 	return TRUE;
