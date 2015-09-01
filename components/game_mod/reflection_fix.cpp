@@ -8,6 +8,11 @@ char g_mapName[256];
 bool g_reflectionsUpdated = false;
 char g_ffDir[MAX_PATH] = "\0";
 
+BOOL ReflectionsWereUpdated()
+{
+	return g_reflectionsUpdated;
+}
+
 BOOL IsReflectionMode()
 {
 	static bool hasChecked = false;
@@ -40,6 +45,31 @@ BOOL IsReflectionMode()
 		}
 	}
 	return isReflectionMode;
+}
+
+BOOL IsInjectionMode()
+{
+	static bool hasChecked = false;
+	static bool isInjectionMode = false;
+
+	if (!hasChecked)
+	{
+		int argc = 0;
+		LPWSTR* argv = CommandLineToArgvW(GetCommandLine(), &argc);
+
+		for (int i = 0; i < argc - 2; i++)
+		{
+			if (wcscmp(argv[i], L"+set") == 0 && wcscmp(argv[i + 1], L"r_reflectionProbeInjectImages") == 0)
+			{
+				if (wcscmp(argv[i + 2], L"1") == 0)
+				{
+					isInjectionMode = true;
+					return isInjectionMode;
+				}
+			}
+		}
+	}
+	return isInjectionMode;
 }
 
 BOOL ReflectionMod_Init()
@@ -142,4 +172,9 @@ void __cdecl R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData)
 	}
 
 	R_CreateReflectionRawDataFromCubemapShot(probeRawData);
+}
+
+BOOL InjectReflections()
+{
+	return TRUE;
 }
