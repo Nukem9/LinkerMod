@@ -13,3 +13,5 @@
 //
 
 #include "PageGuard.h"
+#include "console.h"
+#include "threading.h"
