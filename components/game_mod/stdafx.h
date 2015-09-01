@@ -25,4 +25,11 @@
 #include "db_registry.h"
 #include "ui_main_pc.h"
 #include "live_win.h"
+
+#include "r_rendercmds.h"
+#include "sys_cmds.h"
+#include "r_screenshot.h"
+#include "r_scene.h"
+#include "r_reflection_probe.h"
+
 #include "reflection_fix.h"
