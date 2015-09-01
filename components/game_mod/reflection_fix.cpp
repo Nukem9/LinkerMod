@@ -6,6 +6,7 @@
 
 char g_mapName[256];
 bool g_reflectionsUpdated = false;
+char g_ffDir[MAX_PATH] = "\0";
 
 BOOL IsReflectionMode()
 {
@@ -61,6 +62,8 @@ BOOL ReflectionMod_Init()
 	PatchMemory(0x006CF382, (PBYTE)"\x90\x90", 2);
 	PatchMemory(0x006CF388, (PBYTE)"\x90\x90", 2);
 
+	Detours::X86::DetourFunction((PBYTE)0x006CEE30, (PBYTE)R_GenerateReflectionRawData);
+
 	//
 	// Check g_reflectionsUpdated for ReflectionExit (mov [g_reflectionsUpdate], 1)
 	//
@@ -70,4 +73,73 @@ BOOL ReflectionMod_Init()
 	PatchMemory(0x006CF383, buf, 7);
 
 	return TRUE;
+}
+
+void __cdecl R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData)
+{
+	if (!*g_ffDir)
+	{
+		sprintf_s(g_ffDir, "%s/%s/", Dvar_GetString("fs_basepath"), Dvar_GetString("fs_game"));
+	}
+
+	refdef_s refdef;
+	char* ptr = *((char**)0x02FF5354);
+	refdef_s* refsrc = (refdef_s*)(ptr + 0x8C100);
+	memcpy(&refdef, refsrc, sizeof(refdef_s));
+
+	refdef.vieworg[1] = probeRawData->origin[0];
+	refdef.vieworg[2] = probeRawData->origin[1];
+	refdef.yaw = probeRawData->origin[2];
+
+	R_InitPrimaryLights(refdef.primaryLights[0].dir);
+
+	for (int cubemapShot = 1; cubemapShot < 7; cubemapShot++)
+	{
+		R_BeginCubemapShot(256, 0);
+		R_BeginFrame();
+
+		GfxCmdArray* s_cmdList = *(GfxCmdArray**)0x03B370C0;
+		GfxBackEndData* frontEndDataOut = *(GfxBackEndData**)0x03B3708C;
+		frontEndDataOut->cmds = &s_cmdList->cmds[s_cmdList->usedTotal];
+		frontEndDataOut->viewInfo[frontEndDataOut->viewInfoCount].cmds = NULL;
+
+		R_ClearScene(0);
+		FX_BeginUpdate(0);
+		R_CalcCubeMapViewValues(&refdef, cubemapShot, 256);
+
+		float* vec = (float*)0x3AC3060;
+		vec[0] = refdef.vieworg[0];
+		vec[1] = refdef.vieworg[1];
+		vec[2] = refdef.vieworg[2];
+
+		int* unk1 = (int*)0x3AC3058;		*unk1 = refdef.time;
+		float* unk2 = (float*)0x3AC305C;	*unk2 = refdef.time * 0.001f;
+
+		R_UpdateFrameFog(refdef.localClientNum);
+		R_UpdateFrameSun();
+
+		float zFar = R_GetFarPlaneDist();
+		FxCameraUpdate fxUpdateCmd;
+		memset(&fxUpdateCmd, 0, sizeof(FxCameraUpdate));
+		FxCmd cmd;
+		memset(&cmd, 0, sizeof(FxCmd));
+
+		FX_GetCameraUpdateFromRefdefAndZFar(&fxUpdateCmd, &refdef, zFar);
+		FX_SetNextUpdateCamera(0, &fxUpdateCmd);
+		FX_FillUpdateCmd(0, &cmd);
+		Sys_ResetUpdateSpotLightEffectEvent();
+		Sys_AddWorkerCmdInternal((void*)0x00BA5420, &cmd, 0);
+		Sys_ResetUpdateNonDependentEffectsEvent();
+		Sys_AddWorkerCmdInternal((void*)0x00BA52E0, &cmd, 0);
+		Sys_AddWorkerCmdInternal((void*)0x00BA5300, &cmd, 0);
+		Sys_AddWorkerCmdInternal((void*)0x00BA5330, &cmd, 0);
+
+		R_RenderScene(&refdef, 0);
+		R_EndFrame();
+
+		R_IssueRenderCommands(3);
+		R_EndCubemapShot(cubemapShot);
+	}
+
+	R_CreateReflectionRawDataFromCubemapShot(probeRawData);
 }
