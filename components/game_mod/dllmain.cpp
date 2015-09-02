@@ -157,6 +157,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0046B314, (PBYTE)&Live_AcceptInviteAsyncComplete_CheckMod);
 	PatchMemory_WithNOP(0x004521EE, 0x13);
 
+	//
+	// Nullify Sys_SetBlockSystemHotkeys (SetWindowsHookExA blocking)
+	//
+	PatchMemory(0x0040B397, (PBYTE)"\xEB", 1);
+	PatchMemory(0x00868414, (PBYTE)"\xEB", 1);
+
 	if(IsReflectionMode())
 		ReflectionMod_Init();
 
