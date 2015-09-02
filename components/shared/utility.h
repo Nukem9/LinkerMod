@@ -6,6 +6,9 @@
 
 #include "../shared/assert.h"
 
+#include <Windows.h>
+#include <string>
+
 static void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 {
 	DWORD d = 0;
@@ -38,4 +41,16 @@ static void FixupFunction(ULONG_PTR Address, ULONG_PTR DestAddress)
 
 	PatchMemory(Address + 0, (PBYTE)"\xE9", 1);
 	PatchMemory(Address + 1, (PBYTE)&data, 4);
+}
+
+static bool StrEndsWith (std::string str, std::string substr)
+{
+    if (str.length() >= substr.length())
+	{
+        return (0 == str.compare (str.length() - substr.length(), substr.length(), substr));
+    }
+	else
+	{
+        return false;
+    }
 }
