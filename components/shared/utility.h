@@ -46,11 +46,7 @@ static void FixupFunction(ULONG_PTR Address, ULONG_PTR DestAddress)
 static bool StrEndsWith (std::string str, std::string substr)
 {
     if (str.length() >= substr.length())
-	{
         return (0 == str.compare (str.length() - substr.length(), substr.length(), substr));
-    }
 	else
-	{
         return false;
-    }
 }
