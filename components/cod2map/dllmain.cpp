@@ -10,6 +10,11 @@ int __cdecl hk_FS_ReadFile(const char* path, BYTE** fileData)
 	
 	if(StrEndsWith(path,".d3dbsp"))
 	{
+		D3DBSP iBSP;
+		iBSP.Load(*fileData);
+		iBSP.Convert(BSPVERSION_COD_WAW);
+		iBSP.Write(*fileData);
+		result = iBSP.PotentialFileSize();
 	}
 
 	return result;
@@ -17,6 +22,25 @@ int __cdecl hk_FS_ReadFile(const char* path, BYTE** fileData)
 
 int __cdecl ConvertBSP_Post(FILE* h)
 {
+	long len = cod2map_ftell(h);
+	BYTE* buf = new BYTE[len];
+
+	cod2map_fseek(h, 0, SEEK_SET);
+	cod2map_fread(buf, 1, len, h);
+
+	D3DBSP* iBSP = new D3DBSP;
+	iBSP->Load(buf);
+	delete[] buf;
+
+	iBSP->Convert(BSPVERSION_COD_BO);
+	len = iBSP->PotentialFileSize();
+	buf = new BYTE[len];
+	iBSP->Write(buf);
+	delete iBSP;
+
+	cod2map_fseek(h, 0, SEEK_SET);
+	cod2map_fwrite(buf, 1, len, h);
+
 	return cod2map_fclose(h);
 }
 
@@ -69,7 +93,7 @@ void Init_MapMod()
 	//
 	// Com_SaveBSP Hooks which enforce bsp version before saving
 	//
-	Detours::X86::DetourFunction((PBYTE)0x00409509, (PBYTE)&hk_ConvertBSP_Post);
+	Detours::X86::DetourFunction((PBYTE)0x00409509, (PBYTE)&hk_ConvertBSP_Post); 
 	Detours::X86::DetourFunction((PBYTE)0x0040947A, (PBYTE)&hk_ConvertBSP_Update_Post);
 
 	g_modInitialized = true;
@@ -87,3 +111,4 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call,LPVOID lpReser
 	}
 	return TRUE;
 }
+
