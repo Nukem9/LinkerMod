@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <shellapi.h>
+#include <time.h>
 
 char g_mapName[256];
 bool g_reflectionsUpdated = false;
@@ -92,6 +93,7 @@ BOOL ReflectionMod_Init()
 	PatchMemory(0x006CF382, (PBYTE)"\x90\x90", 2);
 	PatchMemory(0x006CF388, (PBYTE)"\x90\x90", 2);
 
+	Detours::X86::DetourFunction((PBYTE)0x006CF150, (PBYTE)&hk_R_GenerateReflectionRawDataAll);
 	Detours::X86::DetourFunction((PBYTE)0x006CEE30, (PBYTE)R_GenerateReflectionRawData);
 
 	//
@@ -103,6 +105,73 @@ BOOL ReflectionMod_Init()
 	PatchMemory(0x006CF383, buf, 7);
 
 	return TRUE;
+}
+
+char* formatTime(int seconds)
+{
+	static int index = 0;
+	static char str[4][256]; //in case called by nested functions
+	
+	index = (index + 1) & 3;
+
+	int hrs = seconds / 3600;
+	seconds %= 3600;
+	int mins = seconds / 60;
+	seconds %= 60;
+
+	if (hrs)
+	{
+		sprintf_s(str[index], "%d:%02d:%02d", hrs, mins, seconds);
+	}
+	else if (mins)
+	{
+		sprintf_s(str[index], "%d:%02d", mins, seconds);
+	}
+	else
+	{
+		sprintf_s(str[index], "%d seconds", seconds);
+	}
+
+	return str[index];
+}
+
+void __cdecl R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData, int probeCount, bool *generateProbe)
+{
+	printf("----------------------------------------\n");
+	printf("Compiling reflections...\n");
+
+	time_t initTime;
+	time_t cTime;
+	time(&initTime);
+
+	for (int probeIndex = 0; probeIndex < probeCount; probeIndex++)
+	{
+		if (generateProbe[probeIndex])
+			R_GenerateReflectionRawData(&probeRawData[probeIndex]);
+
+		time(&cTime);
+		float percentComplete = (float)(probeIndex + 1) / (float)probeCount;
+		float elapsedTime = (float)difftime(cTime, initTime);
+		float remainingTime = elapsedTime / percentComplete - elapsedTime;
+
+		printf("%.1f%% complete, %s done, %s remaining\r", percentComplete * 100.0f, formatTime((int)elapsedTime), formatTime((int)remainingTime));
+	}
+
+	printf("Finished in %s.\n", formatTime((int)difftime(cTime, initTime)));
+	printf("----------------------------------------\n");
+}
+
+void __declspec(naked) hk_R_GenerateReflectionRawDataAll()
+{
+	__asm
+	{
+		push[esp + 8]	//generateProbe
+		push[esp + 8]	//probeCount
+		push eax		//probeRawData
+		call R_GenerateReflectionRawDataAll
+		add esp, 12
+		retn
+	}
 }
 
 void __cdecl R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData)
