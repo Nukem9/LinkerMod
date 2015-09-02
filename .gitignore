@@ -8,6 +8,10 @@
 /build
 /ipch
 
+components/cod2map/Debug
+components/cod2map/Release
+components/cod2rad/Debug
+components/cod2rad/Release
 components/game_mod/Debug
 components/game_mod/Release
 components/launcher_ldr/Debug
