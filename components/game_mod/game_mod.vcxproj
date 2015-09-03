@@ -85,6 +85,7 @@
     <ClCompile Include="cl_console.cpp" />
     <ClCompile Include="db_registry.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="dvar.cpp" />
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="reflection_fix.cpp" />
     <ClCompile Include="r_screenshot.cpp" />

@@ -163,6 +163,11 @@ BOOL GameMod_Init()
 	PatchMemory(0x0040B397, (PBYTE)"\xEB", 1);
 	PatchMemory(0x00868414, (PBYTE)"\xEB", 1);
 
+	//
+	// Enable Custom Render Dvars
+	//
+	Detours::X86::DetourFunction((PBYTE)0x006CA27B, (PBYTE)&mfh_R_RegisterDvars);
+
 	if(IsReflectionMode())
 		ReflectionMod_Init();
 
