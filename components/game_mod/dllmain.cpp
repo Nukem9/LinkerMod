@@ -177,6 +177,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		DisableThreadLibraryCalls(hModule);
 		return GameMod_Init(); 
 	}
+	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
+	{
+		if (ReflectionsWereUpdated() && IsInjectionMode())
+			return InjectReflections();
+	}
 
 	return TRUE;
 }
