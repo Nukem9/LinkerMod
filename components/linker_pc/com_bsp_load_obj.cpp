@@ -26,8 +26,10 @@ void Com_LoadBsp(const char *filename)
 	ASSERT(!Com_IsBspLoaded());
 	ASSERT(comBspGlob->loadedLumpData == nullptr);
 
+#if _DEBUG
 	Com_Printf(0, "\n");
 	Com_Printf(0, "Com_LoadBsp(%s)\n", filename);
+#endif
 
 	//
 	// Get a handle to the file
@@ -56,8 +58,10 @@ void Com_LoadBsp(const char *filename)
 	//
 	comBspGlob->checksum = crc32_calculate((const char *)comBspGlob->header, comBspGlob->fileSize, 0);
 
+#if _DEBUG
 	Com_Printf(0, "\tSize:  %d\n", comBspGlob->fileSize);
 	Com_Printf(0, "\tCRC32: %X\n", comBspGlob->checksum);
+#endif
 
 	//
 	// Did the BSP load correctly, and is it a valid version?
@@ -79,8 +83,10 @@ void Com_LoadBsp(const char *filename)
 
 	ASSERT(Com_IsBspLoaded());
 
+#if _DEBUG
 	Com_Printf(0, "Com_LoadBsp: End\n");
 	Com_Printf(0, "\n");
+#endif
 }
 
 const void *Com_LoadBspLump(const char *mapname, LumpType type, unsigned int elemSize, unsigned int *count)

@@ -81,3 +81,19 @@ struct dvar_s
 };
 
 static dvar_s **com_sv_running = (dvar_s **)0x0243FD3C;
+
+typedef const char* Dvar_GetString_t(const char* dvarName);
+static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;
+
+typedef void __cdecl Dvar_SetString_t(dvar_s *dvar, const char *value);
+static Dvar_SetString_t* Dvar_SetString = (Dvar_SetString_t*)0x0044A2A0;
+
+typedef void __cdecl Dvar_SetStringByName_t(const char *dvarName, const char *value);
+static Dvar_SetStringByName_t* Dvar_SetStringByName = (Dvar_SetStringByName_t*)0x00666F30;
+
+typedef dvar_s *__cdecl Dvar_RegisterInt_t(const char *dvarName, int value, int min, int max, unsigned __int16 flags, const char *description);
+static Dvar_RegisterInt_t* Dvar_RegisterInt = (Dvar_RegisterInt_t*)0x00651910;
+
+void mfh_R_RegisterDvars();
+
+static dvar_s* sm_quality;

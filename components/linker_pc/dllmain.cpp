@@ -11,8 +11,12 @@ LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
+BOOL g_initted = FALSE;
 BOOL LinkerMod_Init()
 {
+	if (g_initted)
+		return TRUE;
+
 	//
 	// Disable STDOUT buffering
 	//
@@ -58,15 +62,16 @@ BOOL LinkerMod_Init()
 	//VirtualProtect((LPVOID)0x475B60, 1, PAGE_EXECUTE_READWRITE, &d);
 	//*(BYTE *)0x475B60 = 0xC3;
 
+	g_initted = TRUE;
 	return TRUE;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-	if(ul_reason_for_call == DLL_PROCESS_ATTACH)
+	if (ul_reason_for_call == DLL_PROCESS_ATTACH)
 	{
 		DisableThreadLibraryCalls(hModule);
-		return LinkerMod_Init(); 
+		return LinkerMod_Init();
 	}
 
 	return TRUE;

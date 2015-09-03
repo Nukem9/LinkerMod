@@ -18,9 +18,7 @@ void DB_LoadGraphicsAssetsForPC()
 	zoneInfo[0].allocFlags = 1;
 	zoneInfo[0].freeFlags = 0x80000000;
 
-	printf("DB_LoadXAssets\n");
 	DB_LoadXAssets(zoneInfo, zoneCount, 0);
-	printf("DB_SyncXAssets\n");
 	DB_SyncXAssets();
 
 	zoneInfo[0].name = "patch";
@@ -59,7 +57,6 @@ void __declspec(naked) DB_ModXFileHandle_hk()
 
 void DB_ModXFileHandle(HANDLE *zoneFile, char* zoneName, FF_DIR *zoneDir)
 {
-	printf("DB_MoxXFileHandle\n");
 	dvar_s** fs_gameDirVar = (dvar_s**)0x025FADE8;
 	dvar_s** fs_usermapDir = (dvar_s**)0x025FADE4;
 	dvar_s** fs_homepath = (dvar_s**)0x025FBF0C;

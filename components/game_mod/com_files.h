@@ -1,5 +1,12 @@
 #pragma once
 
+struct XFile
+{
+	unsigned int size;
+	unsigned int externalSize;
+	unsigned int blockSize[7];
+};
+
 typedef int (__cdecl* FS_FOpenFileRead_t)(const char *filename, int *file);
 static FS_FOpenFileRead_t FS_FOpenFileRead = (FS_FOpenFileRead_t)0x004C6E20;
 

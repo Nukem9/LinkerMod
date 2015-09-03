@@ -15,8 +15,11 @@ void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex
 	Cmd_ExecuteSingleCommandInternal(localClientNum, controllerIndex, item, text, false);
 }
 
+bool g_initted = false;
 BOOL GameMod_Init()
 {
+	if(g_initted)
+		return TRUE;
 	//
 	// Disable STDOUT buffering
 	//
@@ -146,6 +149,29 @@ BOOL GameMod_Init()
 	//
 	PatchMemory_WithNOP(0x00632350, 0x21);
 
+	//
+	// Enable mod verification when joining session or accepting invite
+	//
+	Session_Modify = (Session_Modify_t*)Detours::X86::DetourFunction((PBYTE)0x00611930, (PBYTE)&Session_Modify_Fix);
+	Detours::X86::DetourFunction((PBYTE)0x00480CAC, (PBYTE)&Live_JoinSessionInProgressComplete_CheckMod);
+	Detours::X86::DetourFunction((PBYTE)0x0046B314, (PBYTE)&Live_AcceptInviteAsyncComplete_CheckMod);
+	PatchMemory_WithNOP(0x004521EE, 0x13);
+
+	//
+	// Nullify Sys_SetBlockSystemHotkeys (SetWindowsHookExA blocking)
+	//
+	PatchMemory(0x0040B397, (PBYTE)"\xEB", 1);
+	PatchMemory(0x00868414, (PBYTE)"\xEB", 1);
+
+	//
+	// Enable Custom Render Dvars
+	//
+	Detours::X86::DetourFunction((PBYTE)0x006CA27B, (PBYTE)&mfh_R_RegisterDvars);
+
+	if(IsReflectionMode())
+		ReflectionMod_Init();
+
+	g_initted = true;
 	return TRUE;
 }
 
@@ -155,6 +181,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	{
 		DisableThreadLibraryCalls(hModule);
 		return GameMod_Init(); 
+	}
+	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
+	{
+		if (ReflectionsWereUpdated() && IsInjectionMode())
+			return InjectReflections();
 	}
 
 	return TRUE;
