@@ -162,6 +162,8 @@ void __cdecl R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData
 
 	printf("Finished in %s.\n", formatTime((int)difftime(cTime, initTime)));
 	printf("----------------------------------------\n");
+
+	g_reflectionsUpdated = true;
 }
 
 void __declspec(naked) hk_R_GenerateReflectionRawDataAll()
@@ -267,7 +269,7 @@ BOOL LoadBSPReflectionData(const char* bspPath, BYTE* dest, size_t destSize)
 
 	DWORD magic = 0;
 	fread(&magic, 4, 1, h);
-	if (magic != 'PBSI')
+	if (magic != 'PSBI')
 	{
 		printf("ERROR: File %s appears to be corrupt\n", bspPath);
 		fclose(h);
@@ -395,17 +397,72 @@ BOOL InjectReflections()
 	char bspPath[MAX_PATH] = "\0";
 	sprintf_s(bspPath, "raw/maps/%s.d3dbsp", g_mapName);
 
-	size_t reflectionDataSize = g_probeCount * 263904;
-	BYTE* reflectionData = new BYTE[padded(reflectionDataSize)];
+	size_t diskProbesSize = g_probeCount * sizeof(DiskGfxReflectionProbe);
+	DiskGfxReflectionProbe* diskProbes = new DiskGfxReflectionProbe[g_probeCount + 1]; //+1 adds extra space for disk padding
 
-	if (!LoadBSPReflectionData(bspPath, reflectionData, reflectionDataSize))
+	if (!LoadBSPReflectionData(bspPath, (BYTE*)diskProbes, diskProbesSize))
 	{
 		fclose(h);
 		FreeLibrary(zlib);
-		delete[] reflectionData;
+		delete[] diskProbes;
 		delete[] dBuf;
 		return FALSE;
 	}
+
+	BYTE* searchLoc = dBuf;
+	for (int i = 0; i < g_probeCount; i++)
+	{
+		//
+		// Generate Probe Key
+		//
+		char buf[MAX_PATH];
+		sprintf_s(buf, "*reflection_probe%i", i + 1); //*reflection_probe0 is static and always null
+		char key[32];
+		sprintf_s(key, "%.*s", 20, buf);
+		memcpy(&key[strlen(key) + 1], "\0\x4\0\0DXT1", 8);
+		int keyLen = strlen(key) + 9; //probename + null + [0x00 04 00 00] + DXT1
+
+		BYTE* ffProbeImage = findByteSequence(searchLoc, dSize, (BYTE*)key, keyLen); //Theres an extra DWORD after the DXT1 identifier
+		if (!ffProbeImage)
+		{
+			printf("ERROR: Could not find reflection probe %d of %d in %s\n", i, g_probeCount, filepath);
+			fclose(h);
+			FreeLibrary(zlib);
+			delete[] diskProbes;
+			delete[] dBuf;
+			return FALSE;
+		}
+
+		ffProbeImage += keyLen;
+		if (*(DWORD*)ffProbeImage != 262224)
+		{
+			printf("ERROR: Image for reflection probe %d has incorrect size\n", i);
+			fclose(h);
+			FreeLibrary(zlib);
+			delete[] diskProbes;
+			delete[] dBuf;
+			return FALSE;
+		}
+
+		ZoneCubemapFace256* zoneCubemap = (ZoneCubemapFace256*)(ffProbeImage + 4); //Ignore Extra DWORD after DXT1 Identifier
+		for (int f = 0; f < 6; f++)
+		{
+			DiskGfxCubemap256* diskCubemap = (DiskGfxCubemap256*)diskProbes[i].pixels;
+
+			memcpy(zoneCubemap[f].mip256, &diskCubemap->mip256[f], 32768);
+
+			memcpy(zoneCubemap[f].mip128, diskCubemap->mips[f].mip128, 8192);
+			memcpy(zoneCubemap[f].mip64, diskCubemap->mips[f].mip64, 2048);
+			memcpy(zoneCubemap[f].mip32, diskCubemap->mips[f].mip32, 512);
+			memcpy(zoneCubemap[f].mip16, diskCubemap->mips[f].mip16, 128);
+			memcpy(zoneCubemap[f].mip8, diskCubemap->mips[f].mip8, 32);
+			memcpy(zoneCubemap[f].mip4, diskCubemap->mips[f].mip4, 8);
+			memcpy(zoneCubemap[f].mip2, diskCubemap->mips[f].mip2, 8);
+			memcpy(zoneCubemap[f].mip1, diskCubemap->mips[f].mip1, 8);
+		}
+	}
+
+	delete[] diskProbes;
 
 	cSize = dSize;
 	cBuf = new BYTE[cSize];
