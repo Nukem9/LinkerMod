@@ -93,7 +93,7 @@ BOOL RadiantMod_Init()
 
 	PatchMemory(0x004E09DB, (PBYTE)"\xEB", 1);// Xmodelsurfs version check
 	PatchMemory(0x004DF7F6, (PBYTE)"\xEB", 1);// Xmodelparts version check
-	PatchMemory(0x005351A2, (PBYTE)"\x08", 1);// 4 byte xmodelsurfs file adjustment (MagicNumber)
+	Detours::X86::DetourFunction((PBYTE)0x0053519E, (PBYTE)&mfh_XModelReadSurface); // 4 byte xmodelsurfs file adjustment (MagicNumber)
 
 	//
 	// FixRegistryEntries to prevent collision with CoDWAWRadiant

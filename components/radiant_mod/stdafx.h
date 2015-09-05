@@ -29,6 +29,7 @@
 
 #include "q_parse.h"
 #include "xmodel_load_obj.h"
+#include "r_xsurface_load_obj.h"
 
 #include "r_init.h"
 #include "r_utils.h"
