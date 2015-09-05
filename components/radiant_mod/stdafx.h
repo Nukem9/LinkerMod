@@ -22,6 +22,7 @@
 #define CHECK_SIZE(Type, Size) static_assert(sizeof(Type) == Size, "Invalid type size!");
 
 #include "CWinApp.h"
+#include "win_main.h"
 
 #include "T5.h"
 #include "com_files.h"

@@ -136,6 +136,18 @@ BOOL RadiantMod_Init()
 	*/
 #undef DO_NOT_USE
 
+	//
+	// Increase the maximum number of files used by FS_ListFilteredFiles
+	//
+	int listSize = LISTSIZE_MAX - 1;
+	int listAllocSize = (LISTSIZE_MAX) * 4 + 4;
+	PatchMemory(0x004BD2E4, (PBYTE)&listAllocSize, 4);
+	PatchMemory(0x004BD0E7, (PBYTE)&listSize, 4);
+	PatchMemory(0x004D7072, (PBYTE)&listSize, 4);
+	Detours::X86::DetourFunction((PBYTE)0x004D7066, (PBYTE)&mfh1_Sys_ListFiles);
+	Detours::X86::DetourFunction((PBYTE)0x004D7093, (PBYTE)&mfh2_Sys_ListFiles);
+	Detours::X86::DetourFunction((PBYTE)0x004D70DB, (PBYTE)&mfh3_Sys_ListFiles);
+
 	g_Initted = true;
 
 	return TRUE;
