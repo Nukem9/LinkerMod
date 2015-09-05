@@ -35,8 +35,13 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
+bool g_Initted = false;
+
 BOOL RadiantMod_Init()
 {
+	if (g_Initted)
+		return FALSE;
+
 	//
 	// Disable STDOUT buffering
 	//
@@ -63,6 +68,11 @@ BOOL RadiantMod_Init()
 	//Detours::X86::DetourClassFunction((PBYTE)0x005BF26E, &CWinApp::Run);
 
 	//
+	// FS_ReadFile Hook - Set Up Fallback Location for Techsets and Techniques
+	//
+	o_FS_ReadFile = (FS_ReadFile_t)Detours::X86::DetourFunction((PBYTE)0x004BC840, (PBYTE)FS_ReadFile);
+
+	//
 	// Image loading
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0052BE30, (PBYTE)&Material_ReloadTextures);
@@ -72,9 +82,15 @@ BOOL RadiantMod_Init()
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
 	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
-	Detours::X86::DetourFunction((PBYTE)0x00530550, (PBYTE)&Material_LoadPass);
-	Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
+	//Detours::X86::DetourFunction((PBYTE)0x00530550, (PBYTE)&Material_LoadPass);
+	//Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
+
+	//
+	// Hooks for Techset remapping of broken materials
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00532AA6, (PBYTE)&mfh_MaterialLoad);
+	o_Material_LoadRaw = (Material_LoadRaw_t*)Detours::X86::DetourFunction((PBYTE)0x005325F0, (PBYTE)&Material_LoadRaw);
 
 	//
 	// Hook Xmodel loading functions to support Black Ops
@@ -83,7 +99,7 @@ BOOL RadiantMod_Init()
 
 	PatchMemory(0x004E09DB, (PBYTE)"\xEB", 1);// Xmodelsurfs version check
 	PatchMemory(0x004DF7F6, (PBYTE)"\xEB", 1);// Xmodelparts version check
-	PatchMemory(0x005351A2, (PBYTE)"\x08", 1);// 4 byte xmodelsurfs file adjustment (MagicNumber)
+	Detours::X86::DetourFunction((PBYTE)0x0053519E, (PBYTE)&mfh_XModelReadSurface); // 4 byte xmodelsurfs file adjustment (MagicNumber)
 
 	//
 	// FixRegistryEntries to prevent collision with CoDWAWRadiant
@@ -125,6 +141,20 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
 	*/
 #undef DO_NOT_USE
+
+	//
+	// Increase the maximum number of files used by FS_ListFilteredFiles
+	//
+	int listSize = LISTSIZE_MAX - 1;
+	int listAllocSize = (LISTSIZE_MAX) * 4 + 4;
+	PatchMemory(0x004BD2E4, (PBYTE)&listAllocSize, 4);
+	PatchMemory(0x004BD0E7, (PBYTE)&listSize, 4);
+	PatchMemory(0x004D7072, (PBYTE)&listSize, 4);
+	Detours::X86::DetourFunction((PBYTE)0x004D7066, (PBYTE)&mfh1_Sys_ListFiles);
+	Detours::X86::DetourFunction((PBYTE)0x004D7093, (PBYTE)&mfh2_Sys_ListFiles);
+	Detours::X86::DetourFunction((PBYTE)0x004D70DB, (PBYTE)&mfh3_Sys_ListFiles);
+
+	g_Initted = true;
 
 	return TRUE;
 }

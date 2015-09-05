@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="CWinApp.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -89,6 +90,8 @@
     <ClCompile Include="r_material.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_utils.cpp" />
+    <ClCompile Include="r_xsurface_load_obj.cpp" />
+    <ClCompile Include="win_main.cpp" />
     <ClCompile Include="xmodel_load_obj.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -103,8 +106,10 @@
     <ClInclude Include="r_material.h" />
     <ClInclude Include="r_material_load_obj.h" />
     <ClInclude Include="r_utils.h" />
+    <ClInclude Include="r_xsurface_load_obj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />
+    <ClInclude Include="win_main.h" />
     <ClInclude Include="xmodel_load_obj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
