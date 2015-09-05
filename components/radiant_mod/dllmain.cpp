@@ -68,15 +68,15 @@ BOOL RadiantMod_Init()
 	//Detours::X86::DetourClassFunction((PBYTE)0x005BF26E, &CWinApp::Run);
 
 	//
+	// FS_ReadFile Hook - Set Up Fallback Location for Techsets and Techniques
+	//
+	o_FS_ReadFile = (FS_ReadFile_t)Detours::X86::DetourFunction((PBYTE)0x004BC840, (PBYTE)FS_ReadFile);
+
+	//
 	// Image loading
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0052BE30, (PBYTE)&Material_ReloadTextures);
 	Detours::X86::DetourFunction((PBYTE)0x005675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
-
-	//
-	// Reroute /techsets/ and /techniques/ to /waw_pimp/techsets/ and /waw_pimp/techniques/
-	//
-	o_FS_ReadFile = (FS_ReadFile_t)Detours::X86::DetourFunction((PBYTE)0x004BC840, (PBYTE)FS_ReadFile);
 
 	//
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)

@@ -2399,9 +2399,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	// Create a file path using normal techsets and read data
 	//
 	char filename[MAX_PATH];
-	name = "2d";
-
-	Com_sprintf(filename, MAX_PATH, "techsets/%s.techset", name);
+	Com_sprintf(filename, MAX_PATH, "waw_pimp/techsets/%s.techset", name);
 
 	void *fileData;
 	int fileSize = FS_ReadFile(filename, (void **)&fileData);
@@ -2416,8 +2414,18 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 
 		if (fileSize < 0)
 		{
-			Com_PrintError(8, "^1ERROR: Couldn't open techniqueSet '%s'\n", filename);
-			return nullptr;
+			if (strcmp(name, "default") != 0)
+			{
+				void* result = Material_LoadTechniqueSet("default", renderer);
+				if (!result)
+					Com_PrintError(8, "^1ERROR: Couldn't override techniqueSet '%s' (\'default\' techniqueSet is missing)\n", filename);
+				return result;
+			}
+			else
+			{
+				Com_PrintError(8, "^1ERROR: Couldn't open techniqueSet '%s'\n", filename);
+				return nullptr;
+			}
 		}
 	}
 
@@ -3214,7 +3222,7 @@ void* rtn_MaterialLoad = (void*)0x00532AAE;
 //
 // Used to store the current materials rawfile size globally for use by Material_LoadRaw
 //
-void mfh_MaterialLoad()
+void __declspec(naked) mfh_MaterialLoad()
 {
 	_asm
 	{
@@ -3260,6 +3268,7 @@ blacklistEntry blacklist[] =
 	{ "l_sm_r0c0d0n0s0sc0x0_clrdtl_hero",	"l_sm_r0c0n0s0" },
 };
 
+Material_LoadRaw_t* o_Material_LoadRaw = (Material_LoadRaw_t *)0x005325F0;
 int Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType, int imageTrack)
 {
 	if (!mtlRaw->constantCount)

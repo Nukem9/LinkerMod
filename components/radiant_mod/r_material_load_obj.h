@@ -468,6 +468,6 @@ extern CodeConstantSource s_defaultCodeConsts[];
 void mfh_MaterialLoad();
 
 typedef int __cdecl Material_LoadRaw_t(MaterialRaw *mtlRaw, unsigned int materialType, int imageTrack);
-static Material_LoadRaw_t* o_Material_LoadRaw = nullptr;
+extern Material_LoadRaw_t* o_Material_LoadRaw;
 
 int Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType, int imageTrack);
