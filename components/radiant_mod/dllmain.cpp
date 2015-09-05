@@ -87,6 +87,12 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
 
 	//
+	// Hooks for Techset remapping of broken materials
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00532AA6, (PBYTE)&mfh_MaterialLoad);
+	o_Material_LoadRaw = (Material_LoadRaw_t*)Detours::X86::DetourFunction((PBYTE)0x005325F0, (PBYTE)&Material_LoadRaw);
+
+	//
 	// Hook Xmodel loading functions to support Black Ops
 	//
 	Detours::X86::DetourFunction((PBYTE)0x004DFAA0, (PBYTE)&hk_XModelLoadConfigFile);

@@ -322,6 +322,59 @@ struct stream_dest_info_t
 	char UsageIndex;
 };
 
+
+
+struct MaterialConstantDefRaw
+{
+	unsigned int nameOffset;
+	float literal[4];
+};
+
+struct MaterialTextureDefRaw
+{
+	unsigned int nameOffset;
+	char samplerState;
+	char semantic;
+	union
+	{
+		unsigned int imageNameOffset;
+		unsigned int waterDefOffset;
+	};
+};
+
+struct MaterialInfoRaw
+{
+	unsigned int nameOffset;
+	unsigned int refImageNameOffset;
+	char gameFlags;
+	char sortKey;
+	char textureAtlasRowCount;
+	char textureAtlasColumnCount;
+	float maxDeformMove;
+	char deformFlags;
+	char usage;
+	unsigned __int16 toolFlags;
+	unsigned int locale;
+	unsigned __int16 autoTexScaleWidth;
+	unsigned __int16 autoTexScaleHeight;
+	float tessSize;
+	int surfaceFlags;
+	int contents;
+};
+
+struct MaterialRaw
+{
+	MaterialInfoRaw info;
+	unsigned int refStateBits[2];
+	unsigned __int16 textureCount;
+	unsigned __int16 constantCount;
+	unsigned int techSetNameOffset;
+	unsigned int textureTableOffset;
+	unsigned int constantTableOffset;
+};
+
+
+
 LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *routingData, int streamCount, stream_source_info_t *sourceTable);
 void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl);
 unsigned int Material_HashVertexDecl(MaterialStreamRouting *routingData, int streamCount);
@@ -408,3 +461,13 @@ extern CodeSamplerSource s_codeSamplers[];
 extern CodeSamplerSource s_defaultCodeSamplers[];
 extern CodeConstantSource s_codeConsts[];
 extern CodeConstantSource s_defaultCodeConsts[];
+
+//
+// Used to store the current materials rawfile size globally for use by Material_LoadRaw
+//
+void mfh_MaterialLoad();
+
+typedef int __cdecl Material_LoadRaw_t(MaterialRaw *mtlRaw, unsigned int materialType, int imageTrack);
+static Material_LoadRaw_t* o_Material_LoadRaw = nullptr;
+
+int Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType, int imageTrack);

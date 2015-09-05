@@ -106,7 +106,7 @@ unsigned int Material_HashVertexDecl(MaterialStreamRouting *routingData, int str
 {
 	unsigned int hash = 0;
 
-	for (unsigned int byteIndex = 0; byteIndex < 2 * streamCount; byteIndex++)
+	for (int byteIndex = 0; byteIndex < 2 * streamCount; byteIndex++)
 		hash += (byteIndex + 0x77) * routingData->data[byteIndex];
 
 	return hash & 63;
@@ -3207,3 +3207,167 @@ CodeConstantSource s_defaultCodeConsts[] =
 
 	{ nullptr, 0, 0, 0, 0 },
 };
+
+size_t g_MaterialFileSize = 0;
+void* rtn_MaterialLoad = (void*)0x00532AAE;
+
+//
+// Used to store the current materials rawfile size globally for use by Material_LoadRaw
+//
+void mfh_MaterialLoad()
+{
+	_asm
+	{
+		mov g_MaterialFileSize, edi
+		push eax
+		push edi
+		push esi
+		call FS_Read
+
+		jmp rtn_MaterialLoad
+	}
+}
+
+void* MapOffsetToPointer(void* origin, int offset)
+{
+	return (void*)((char*)origin + offset);
+}
+
+DWORD MapPointerToOffset(void* origin, void* offset)
+{
+	return (DWORD)((char*)offset - (char*)origin);
+}
+
+struct blacklistEntry
+{
+	const char* key;
+	const char* replacement;
+};
+
+blacklistEntry blacklist[] =
+{
+	{ "l_sm_r0c0n0s0x0",					"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0n0s0_wpn_clrdtl_hero",		"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0n0s0sc0x0_clrdtl",			"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0n0s0_wpn_clrdtl",			"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0n0s0sc0x0_clrdtl",			"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0d0n0s0_wpn_clrdtl_hero",	"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0n0s0sc0x0",					"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0s0sc0x0",					"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0n0s0_hero",					"l_sm_r0c0n0s0" },
+	{ "l_sm_b0c0n0_hero",					"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0n0s0sc0x0_clrdtl_hero",		"l_sm_r0c0n0s0" },
+	{ "l_sm_r0c0d0n0s0sc0x0_clrdtl_hero",	"l_sm_r0c0n0s0" },
+};
+
+int Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType, int imageTrack)
+{
+	if (!mtlRaw->constantCount)
+		return o_Material_LoadRaw(mtlRaw, materialType, imageTrack);
+
+	const char* techsetOverride = nullptr;
+	for (int i = 0; i < ARRAYSIZE(blacklist); i++)
+	{
+		if (strcmp((char*)MapOffsetToPointer(mtlRaw, mtlRaw->techSetNameOffset), blacklist[i].key) == 0)
+		{
+			techsetOverride = blacklist[i].replacement;
+			break;
+		}
+	}
+
+	if (!techsetOverride)
+	{
+		return o_Material_LoadRaw(mtlRaw, materialType, imageTrack);
+	}
+
+	MaterialConstantDefRaw* constantTable = (MaterialConstantDefRaw*)MapOffsetToPointer(mtlRaw, mtlRaw->constantTableOffset);
+
+	bool insertConstant = true;
+	for (int i = 0; i < mtlRaw->constantCount; i++)
+	{
+		if (strcmp("envMapParms", (char*)MapOffsetToPointer(mtlRaw, constantTable[i].nameOffset)) == 0)
+		{
+			insertConstant = false;
+			break;
+		}
+	}
+
+	int newsize = g_MaterialFileSize + 32768;
+	MaterialRaw* mtlNew = (MaterialRaw*)Hunk_AllocTempMemory(newsize);
+	memcpy(mtlNew, mtlRaw, sizeof(MaterialRaw));
+	BYTE* dest = (BYTE*)&mtlNew[1];
+
+	MaterialTextureDefRaw* oldTextureTable = (MaterialTextureDefRaw*)MapOffsetToPointer(mtlRaw, mtlRaw->textureTableOffset);
+	MaterialTextureDefRaw* textureTable = (MaterialTextureDefRaw*)dest;
+	mtlNew->textureTableOffset = MapPointerToOffset(mtlNew, textureTable);
+	memcpy(dest, MapOffsetToPointer(mtlRaw, mtlRaw->textureTableOffset), sizeof(MaterialTextureDefRaw) * mtlRaw->textureCount);
+	dest += sizeof(MaterialTextureDefRaw) * mtlRaw->textureCount;
+
+	MaterialConstantDefRaw* oldConstantTable = (MaterialConstantDefRaw*)MapOffsetToPointer(mtlRaw, mtlRaw->constantTableOffset);
+	constantTable = (MaterialConstantDefRaw*)dest;
+	mtlNew->constantTableOffset = MapPointerToOffset(mtlNew, constantTable);
+	memcpy(dest, MapOffsetToPointer(mtlRaw, mtlRaw->constantTableOffset), sizeof(MaterialConstantDefRaw) * mtlRaw->constantCount);
+	dest += sizeof(MaterialConstantDefRaw) * mtlRaw->constantCount;
+
+	if (insertConstant)
+	{
+		MaterialConstantDefRaw def;
+		def.nameOffset = NULL;
+		def.literal[0] = 1.0f;
+		def.literal[1] = 1.0f;
+		def.literal[2] = 1.0f;
+		def.literal[3] = 1.0f;
+		memcpy(dest, &def, sizeof(MaterialConstantDefRaw));
+		dest += sizeof(MaterialConstantDefRaw);
+	}
+
+	char* techSetName = (char*)dest;
+	mtlNew->techSetNameOffset = MapPointerToOffset(mtlNew, techSetName);
+	strcpy((char*)dest, techsetOverride);
+	dest += strlen(techSetName) + 1;
+
+	char* name = (char*)dest;
+	mtlNew->info.nameOffset = MapPointerToOffset(mtlNew, name);
+	strcpy((char*)dest, (char*)MapOffsetToPointer(mtlRaw, mtlRaw->info.nameOffset));
+	dest += strlen(name) + 1;
+
+	char* refImageName = (char*)dest;
+	mtlNew->info.refImageNameOffset = MapPointerToOffset(mtlNew, refImageName);
+	strcpy((char*)dest, (char*)MapOffsetToPointer(mtlRaw, mtlRaw->info.refImageNameOffset));
+	dest += strlen(refImageName) + 1;
+
+	for (int i = 0; i < mtlRaw->textureCount; i++)
+	{
+		char* textureName = (char*)dest; //contains strings like "colorMap", "normalMap" etc.
+		textureTable[i].nameOffset = MapPointerToOffset(mtlNew, textureName);
+		strcpy((char*)dest, (char*)MapOffsetToPointer(mtlRaw, oldTextureTable[i].nameOffset));
+		dest += strlen(textureName) + 1;
+
+		char* imageName = (char*)dest;
+		textureTable[i].imageNameOffset = MapPointerToOffset(mtlNew, imageName);
+		strcpy((char*)dest, (char*)MapOffsetToPointer(mtlRaw, oldTextureTable[i].imageNameOffset));
+		dest += strlen(imageName) + 1;
+	}
+
+	for (int i = 0; i < mtlRaw->constantCount; i++)
+	{
+		name = (char*)dest;
+		constantTable[i].nameOffset = MapPointerToOffset(mtlNew, name);
+		strcpy((char*)dest, (char*)MapOffsetToPointer(mtlRaw, oldConstantTable[i].nameOffset));
+		dest += strlen(name) + 1;
+	}
+
+	if (insertConstant)
+	{
+		name = (char*)dest;
+		constantTable[mtlNew->constantCount].nameOffset = MapPointerToOffset(mtlNew, name);
+		strcpy((char*)dest, "envMapParms");
+		dest += strlen(name) + 1;
+		mtlNew->constantCount = mtlRaw->constantCount + 1;
+	}
+
+	int result = o_Material_LoadRaw(mtlNew, materialType, imageTrack);
+	Hunk_FreeTempMemory(mtlNew);
+
+	return result;
+}
