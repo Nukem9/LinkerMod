@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-int __cdecl hk_FS_ReadFile(const char *qpath, void **buffer)
+int __cdecl FS_ReadFile(const char *qpath, void **buffer)
 {
 	int result = o_FS_ReadFile(qpath, buffer);
 

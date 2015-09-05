@@ -31,6 +31,6 @@ void __declspec(naked) mfh_XModelReadSurface()
 		pop ecx
 		add ecx, eax
 		pop eax
-		jmp rtn_test
+		jmp rtn_XModelReadSurface
 	}
 }
