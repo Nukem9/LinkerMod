@@ -3254,6 +3254,7 @@ struct blacklistEntry
 
 blacklistEntry blacklist[] =
 {
+	// Techset Key						//  Techset Replacement
 	{ "l_sm_r0c0n0s0x0",					"l_sm_r0c0n0s0" },
 	{ "l_sm_r0c0n0s0_wpn_clrdtl_hero",		"l_sm_r0c0n0s0" },
 	{ "l_sm_r0c0n0s0sc0x0_clrdtl",			"l_sm_r0c0n0s0" },
@@ -3263,9 +3264,10 @@ blacklistEntry blacklist[] =
 	{ "l_sm_r0c0n0s0sc0x0",					"l_sm_r0c0n0s0" },
 	{ "l_sm_r0c0s0sc0x0",					"l_sm_r0c0n0s0" },
 	{ "l_sm_r0c0n0s0_hero",					"l_sm_r0c0n0s0" },
-	{ "l_sm_b0c0n0_hero",					"l_sm_r0c0n0s0" },
+	{ "l_sm_b0c0n0_hero",					"l_sm_b0c0"		}, //Fix for Zombie_Wolf Fur
 	{ "l_sm_r0c0n0s0sc0x0_clrdtl_hero",		"l_sm_r0c0n0s0" },
 	{ "l_sm_r0c0d0n0s0sc0x0_clrdtl_hero",	"l_sm_r0c0n0s0" },
+	{ "sm_treecanopy_sway",					"l_sm_b0c0"		}, //Fix for Foliage (Currently has a blue tint)
 };
 
 Material_LoadRaw_t* o_Material_LoadRaw = (Material_LoadRaw_t *)0x005325F0;
