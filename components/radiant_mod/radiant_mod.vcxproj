@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="CWinApp.cpp" />
     <ClCompile Include="dllmain.cpp" />

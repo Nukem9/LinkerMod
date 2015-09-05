@@ -35,8 +35,13 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
+bool g_Initted = false;
+
 BOOL RadiantMod_Init()
 {
+	if (g_Initted)
+		return FALSE;
+
 	//
 	// Disable STDOUT buffering
 	//
@@ -69,11 +74,16 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x005675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
 
 	//
+	// Reroute /techsets/ and /techniques/ to /waw_pimp/techsets/ and /waw_pimp/techniques/
+	//
+	o_FS_ReadFile = (FS_ReadFile_t)Detours::X86::DetourFunction((PBYTE)0x004BC840, (PBYTE)FS_ReadFile);
+
+	//
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
 	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
-	Detours::X86::DetourFunction((PBYTE)0x00530550, (PBYTE)&Material_LoadPass);
-	Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
+	//Detours::X86::DetourFunction((PBYTE)0x00530550, (PBYTE)&Material_LoadPass);
+	//Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
 
 	//
@@ -125,6 +135,8 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
 	*/
 #undef DO_NOT_USE
+
+	g_Initted = true;
 
 	return TRUE;
 }

@@ -10,7 +10,9 @@ typedef int (__cdecl * FS_Read_t)(void *buffer, int len, int h);
 static FS_Read_t FS_Read = (FS_Read_t)0x004BC4B0;
 
 typedef int (__cdecl * FS_ReadFile_t)(const char *qpath, void **buffer);
-static FS_ReadFile_t FS_ReadFile = (FS_ReadFile_t)0x004BC840;
+static FS_ReadFile_t o_FS_ReadFile = (FS_ReadFile_t)0x004BC840;
 
 typedef void (__cdecl * FS_FreeFile_t)(void *buffer);
 static FS_FreeFile_t FS_FreeFile = (FS_FreeFile_t)0x004BC910;
+
+int __cdecl FS_ReadFile(const char *qpath, void **buffer);
