@@ -56,17 +56,17 @@ BOOL PathMod_Init()
 	//
 	// Image loading
 	//
-	DetourFunction((PBYTE)0x006A2150, (PBYTE)&hk_Image_LoadFromFileWithReader);
+	Detours::X86::DetourFunction((PBYTE)0x006A2150, (PBYTE)&hk_Image_LoadFromFileWithReader);
 
 	//
 	// Reroute Techset / Shader / Technique Directories to use Black Ops Dir Structure in-case of Failure
 	//
-	FS_ReadFile_o = (FS_ReadFile_t)DetourFunction((PBYTE)0x0054EC65, (PBYTE) FS_ReadFile);
+	FS_ReadFile_o = (FS_ReadFile_t)Detours::X86::DetourFunction((PBYTE)0x0054EC65, (PBYTE)FS_ReadFile);
 
 	//
 	// Hook Xmodel loading functions to support Black Ops
 	//
-	DetourFunction((PBYTE)0x00578B4B, (PBYTE)&hk_XModelLoadConfigFile);
+	Detours::X86::DetourFunction((PBYTE)0x00578B4B, (PBYTE)&hk_XModelLoadConfigFile);
 
 	PatchMemory(0x00579519, (PBYTE)"\xEB", 1);// Xmodelsurfs version check
 	PatchMemory(0x0057892B, (PBYTE)"\xEB", 1);// Xmodelparts version check
