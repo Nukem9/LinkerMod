@@ -23,4 +23,4 @@ components/linker_pc/Release
 components/radiant_mod/Debug
 components/radiant_mod/Release
 
-!detours.lib
+!*.lib
