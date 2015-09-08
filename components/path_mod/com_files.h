@@ -29,7 +29,7 @@ static int __cdecl FS_ReadFile(const char *qpath, void **buffer)
 		}
 		else
 		{
-			printf("NOOooooooooooo Coulndt load %s\n",qpath);
+			printf("ERROR: Could not load %s\n", qpath);
 		}
 	}
 
