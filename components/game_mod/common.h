@@ -21,3 +21,5 @@ static Com_PrintWarning_t Com_PrintWarning = (Com_PrintWarning_t)0x0051CE50;
 
 typedef char *va_t(const char *format, ...);
 static va_t* va = (va_t*)0x0057CDD0;
+
+int nullsub(int);

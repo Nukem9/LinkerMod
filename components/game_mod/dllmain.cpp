@@ -168,6 +168,12 @@ BOOL GameMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x006CA27B, (PBYTE)&mfh_R_RegisterDvars);
 
+	//
+	// Misc Bug Fixes
+	//
+	Detours::X86::DetourFunction((PBYTE)0x007D9590, (PBYTE)&nullsub);
+	
+
 	if(IsReflectionMode())
 		ReflectionMod_Init();
 
