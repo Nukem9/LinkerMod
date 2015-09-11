@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="com_bsp_load_obj.h" />
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="q_parse.h" />
@@ -24,6 +25,7 @@
     <ClInclude Include="xmodel_load_obj.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="com_bsp_load_obj.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="q_parse.cpp" />

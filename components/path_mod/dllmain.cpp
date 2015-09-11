@@ -83,15 +83,25 @@ BOOL PathMod_Init()
 	//
 	PatchMemory(0x00576A9D, (PBYTE)"\x13", 1);
 
+	//
+	// Enforce WAW D3DBSP Format on loaded D3DBSP
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00521066, (PBYTE)&mfh_Com_LoadBsp);
+
 	return TRUE;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-	if(ul_reason_for_call == DLL_PROCESS_ATTACH)
+	switch (ul_reason_for_call)
 	{
+	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hModule);
+		Con_Init();
 		return PathMod_Init(); 
+	case DLL_PROCESS_DETACH:
+		Con_Restore();
+		return TRUE;
 	}
 
 	return TRUE;

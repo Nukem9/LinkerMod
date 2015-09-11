@@ -21,6 +21,7 @@
 #include "T5.h"
 #include "com_files.h"
 #include "com_memory.h"
+#include "com_bsp_load_obj.h"
 
 #include "q_parse.h"
 #include "xmodel_load_obj.h"
