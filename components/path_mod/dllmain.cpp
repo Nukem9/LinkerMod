@@ -37,31 +37,28 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
+bool g_initted = false;
+
 BOOL PathMod_Init()
 {
+	if (g_initted)
+		return TRUE;
+
 	//
 	// Disable STDOUT buffering
 	//
 	setvbuf(stdout, nullptr, _IONBF, 0);
 
-	
-	// Create an external console for Path
-	
-	if (AllocConsole())
-	{
-		freopen("CONOUT$", "w", stdout);
-		freopen("CONOUT$", "w", stderr);
-		freopen("CONIN$", "r", stdin);
-	}
 	//
 	// Image loading
 	//
 	Detours::X86::DetourFunction((PBYTE)0x006A2150, (PBYTE)&hk_Image_LoadFromFileWithReader);
 
 	//
-	// Reroute Techset / Shader / Technique Directories to use Black Ops Dir Structure in-case of Failure
+	// Reroute Techset / Shader / Technique / UI Directories to use Black Ops Dir Structure
 	//
 	FS_ReadFile_o = (FS_ReadFile_t)Detours::X86::DetourFunction((PBYTE)0x0054EC65, (PBYTE)FS_ReadFile);
+	fopen_o = (fopen_t)Detours::X86::DetourFunction((PBYTE)0x006C5F61, (PBYTE)fopen_custom);
 
 	//
 	// Hook Xmodel loading functions to support Black Ops
@@ -83,15 +80,29 @@ BOOL PathMod_Init()
 	//
 	PatchMemory(0x00576A9D, (PBYTE)"\x13", 1);
 
+	//
+	// Enforce WAW D3DBSP Format on loaded D3DBSP
+	// and BO1 D3DBSP Format on saved D3DBSP
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00521066, (PBYTE)&mfh_Com_LoadBsp);
+	Detours::X86::DetourFunction((PBYTE)0x0052CBF9, (PBYTE)&SV_SavePaths);
+
+	g_initted = true;
+
 	return TRUE;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-	if(ul_reason_for_call == DLL_PROCESS_ATTACH)
+	switch (ul_reason_for_call)
 	{
+	case DLL_PROCESS_ATTACH:
 		DisableThreadLibraryCalls(hModule);
+		Con_Init();
 		return PathMod_Init(); 
+	case DLL_PROCESS_DETACH:
+		Con_Restore();
+		return TRUE;
 	}
 
 	return TRUE;
