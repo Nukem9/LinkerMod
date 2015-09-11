@@ -37,8 +37,13 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
+bool g_initted = false;
+
 BOOL PathMod_Init()
 {
+	if (g_initted)
+		return TRUE;
+
 	//
 	// Disable STDOUT buffering
 	//
@@ -87,6 +92,8 @@ BOOL PathMod_Init()
 	// Enforce WAW D3DBSP Format on loaded D3DBSP
 	//
 	Detours::X86::DetourFunction((PBYTE)0x00521066, (PBYTE)&mfh_Com_LoadBsp);
+
+	g_initted = true;
 
 	return TRUE;
 }
