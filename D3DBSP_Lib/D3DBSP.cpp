@@ -196,6 +196,8 @@ int D3DBSP::Write(BYTE* pBuf)
 			indexEntry.length = pLump->size;
 			indexEntry.type = this->diskLumpOrder[i];
 			
+			Con_Printf("Doing %s\n", LUMP_NAMES[this->diskLumpOrder[i]]);
+
 			iBuf.write((char*)&indexEntry, sizeof(LumpIndexEntry));
 		}
 	}
@@ -266,6 +268,21 @@ int D3DBSP::Convert(BSPVERSION_TYPE targetVersion)
 	D3DBSP oBSP;
 	oBSP.ConvertFrom(this, targetVersion);
 	return this->ConvertFrom(&oBSP, targetVersion);
+}
+
+Lump* D3DBSP::AddLump(LUMP_TYPE type, Lump& lump)
+{
+	LUMP_TYPE* newDiskLumpOrder = new LUMP_TYPE[diskLumpCount + 1];
+	memcpy(newDiskLumpOrder, this->diskLumpOrder, sizeof(LUMP_TYPE) * diskLumpCount);
+	delete[] this->diskLumpOrder;
+	
+	this->diskLumpOrder = newDiskLumpOrder;
+	diskLumpOrder[this->diskLumpCount] = type;
+	this->lumps[type] = lump;
+
+	this->diskLumpCount++;
+	this->diskLumpOrderSize = diskLumpCount;
+	return &this->lumps[type];
 }
 
 D3DBSP::D3DBSP(void)

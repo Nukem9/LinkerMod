@@ -146,6 +146,8 @@ public:
 	DWORD bspVersion;
 	Lump lumps[INFO_LUMP_TYPE_COUNT];
 
+	Lump* AddLump(LUMP_TYPE, Lump&);
+
 	int Load(const char* filepath);
 	int Load(BYTE* pBuf);
 	int Write(const char* filepath);
