@@ -18,5 +18,6 @@ static FS_FreeFile_t FS_FreeFile = (FS_FreeFile_t)0x0054D029;
 typedef FILE* (__cdecl* fopen_t)(const char* filename, const char* mode);
 extern fopen_t fopen_o;
 
+
 int __cdecl FS_ReadFile(const char *qpath, void **buffer);
 FILE *__cdecl fopen_custom(const char* filename, const char* mode);

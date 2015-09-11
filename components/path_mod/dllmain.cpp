@@ -49,15 +49,6 @@ BOOL PathMod_Init()
 	//
 	setvbuf(stdout, nullptr, _IONBF, 0);
 
-	
-	// Create an external console for Path
-	
-	if (AllocConsole())
-	{
-		freopen("CONOUT$", "w", stdout);
-		freopen("CONOUT$", "w", stderr);
-		freopen("CONIN$", "r", stdin);
-	}
 	//
 	// Image loading
 	//

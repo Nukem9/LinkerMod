@@ -1,16 +1,16 @@
 #include "stdafx.h"
 
-static FS_ReadFile_t FS_ReadFile_o = (FS_ReadFile_t)0x0054EC65;
+FS_ReadFile_t FS_ReadFile_o = (FS_ReadFile_t)0x0054EC65;
 fopen_t fopen_o = (fopen_t)0x006C5F61;
 
-static int __cdecl FS_ReadFile(const char *qpath, void **buffer)
+int __cdecl FS_ReadFile(const char *qpath, void **buffer)
 {
 	int result = 0;
 
 	if (strncmp(qpath, "techsets", strlen("techsets")) == 0 || strncmp(qpath, "techniques", strlen("techniques")) == 0)
 	{
 		char npath[MAX_PATH];
-		sprintf("waw_pimp/%s", qpath);
+		sprintf_s(npath, "waw_pimp/%s", qpath);
 		result = FS_ReadFile_o(npath, buffer);
 	}
 	else
