@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="com_bsp_load_obj.cpp" />
+    <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="q_parse.cpp" />

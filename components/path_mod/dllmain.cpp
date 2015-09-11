@@ -64,9 +64,10 @@ BOOL PathMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x006A2150, (PBYTE)&hk_Image_LoadFromFileWithReader);
 
 	//
-	// Reroute Techset / Shader / Technique Directories to use Black Ops Dir Structure in-case of Failure
+	// Reroute Techset / Shader / Technique / UI Directories to use Black Ops Dir Structure
 	//
 	FS_ReadFile_o = (FS_ReadFile_t)Detours::X86::DetourFunction((PBYTE)0x0054EC65, (PBYTE)FS_ReadFile);
+	fopen_o = (fopen_t)Detours::X86::DetourFunction((PBYTE)0x006C5F61, (PBYTE)fopen_custom);
 
 	//
 	// Hook Xmodel loading functions to support Black Ops
