@@ -24,6 +24,7 @@ int __cdecl FS_ReadFile(const char *qpath, void **buffer)
 FILE *__cdecl fopen_custom(const char* filename, const char* mode)
 {
 	char* substr = (char*)filename;
+
 	if (substr = (char*)strstr(filename, "\\ui_mp\\"))
 	{
 		substr[0] = 0;

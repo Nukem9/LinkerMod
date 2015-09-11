@@ -82,8 +82,10 @@ BOOL PathMod_Init()
 
 	//
 	// Enforce WAW D3DBSP Format on loaded D3DBSP
+	// and BO1 D3DBSP Format on saved D3DBSP
 	//
 	Detours::X86::DetourFunction((PBYTE)0x00521066, (PBYTE)&mfh_Com_LoadBsp);
+	Detours::X86::DetourFunction((PBYTE)0x0052CBF9, (PBYTE)&SV_SavePaths);
 
 	g_initted = true;
 

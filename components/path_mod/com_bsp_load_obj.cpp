@@ -35,15 +35,25 @@ void __declspec(naked) mfh_Com_LoadBsp()
 void __cdecl SV_SavePaths(char* buf, int size)
 {
 	char path[MAX_PATH];
-	sprintf_s(path, "%s\\waw_ui_mp\\%s", g_bspName);
+	sprintf_s(path, "raw/%s", g_bspName);
 
 	D3DBSP iBSP;
-	iBSP.Load(path);
-	iBSP.Convert(BSPVERSION_COD_BO);
-	iBSP.Write(*g_bspData);
+	if (iBSP.Load(path) != 0)
+		exit(-1);
 
-	Com_SaveLump(0x28, buf, size, 1);
+	Lump newPaths;
+	newPaths.AllocateMemory(size);
+	memcpy(newPaths.content, buf, size);
+	newPaths.size = size;
+	newPaths.isEmpty = false;
 
-	int* g_bspChecksum = (int*)0x024A3F80;
-	*g_bspChecksum = Com_GetBspChecksum();
+	if (!iBSP.lumps[LUMP_PATHCONNECTIONS].isEmpty)
+		iBSP.lumps[LUMP_PATHCONNECTIONS] = newPaths;
+	else
+		iBSP.AddLump(LUMP_PATHCONNECTIONS, newPaths);
+
+	iBSP.Write(path);
+
+	Com_UnloadBsp();
+	Com_LoadBsp(g_bspName);
 }
