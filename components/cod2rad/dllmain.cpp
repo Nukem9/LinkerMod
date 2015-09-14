@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+static char* techsetPath = "waw_pimp/techsets/%s%s.techset";
+static char* techiquePath = "waw_pimp/techniques/%s.tech";
+
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 {
 	printf("\n\nEXCEPTION DETECTED:\n");
@@ -37,6 +40,12 @@ BOOL cod2rad_Init()
 	PatchThreading();
 
 	//
+	// Enable Techset / Technique Path Redirection
+	//
+	PatchMemory(0x0042CA85, (PBYTE)&techiquePath, 4);
+	PatchMemory(0x0042CB4C, (PBYTE)&techsetPath, 4);
+
+	//
 	// Patch the requested IWI version to match BO1
 	//
 	PatchMemory(0x00417AA7, (PBYTE)"\xEB", 1);
@@ -49,7 +58,6 @@ BOOL cod2rad_Init()
 	PatchMemory(0x0042635A, (PBYTE)"\xEB", 1); // Xmodelsurfs version check
 	PatchMemory(0x004264AE, (PBYTE)"\xEB", 1); // Xmodelparts version check
 	PatchMemory(0x005351A2, (PBYTE)"\x08", 1); // 4 byte xmodelsurfs file adjustment (MagicNumber)
-
 
 	g_initted = true;
 	return TRUE;
