@@ -39,8 +39,17 @@ BOOL cod2rad_Init()
 	//
 	// Patch the requested IWI version to match BO1
 	//
-	BYTE iwiVersion = 0xEB;
-	PatchMemory(0x00417AA7, (PBYTE)&iwiVersion, 1);
+	PatchMemory(0x00417AA7, (PBYTE)"\xEB", 1);
+
+	//
+	// Patch Xmodel loading functions to support Black Ops
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00425220, (PBYTE)&hk_XModelLoadConfigFile);
+
+	PatchMemory(0x0042635A, (PBYTE)"\xEB", 1); // Xmodelsurfs version check
+	PatchMemory(0x004264AE, (PBYTE)"\xEB", 1); // Xmodelparts version check
+	PatchMemory(0x005351A2, (PBYTE)"\x08", 1); // 4 byte xmodelsurfs file adjustment (MagicNumber)
+
 
 	g_initted = true;
 	return TRUE;

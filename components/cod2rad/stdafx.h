@@ -15,3 +15,5 @@
 #include "PageGuard.h"
 #include "console.h"
 #include "threading.h"
+
+#include "r_xmodel_load_obj.h"
