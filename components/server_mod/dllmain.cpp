@@ -136,7 +136,7 @@ BOOL ServerMod_Init()
 	PatchMemory(0x008BD8EB, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 	PatchMemory(0x008BD7E5, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 
-	// !C !P .D 
+	//
 	// Com_Init_Try_Block_Function
 	//
 	{
@@ -150,7 +150,7 @@ BOOL ServerMod_Init()
 		PatchMemory_WithNOP(0x006D4D96, 2);
 	}
 
-	// !C .P !D 
+	// !C .P !D
 	// Com_Frame_Try_Block_Function
 	//
 	{
@@ -172,7 +172,8 @@ BOOL ServerMod_Init()
 		// Renderer
 		PatchMemory_WithNOP(0x006D424D, 2);
 
-		// todo: 006D42F1
+		// todo: check if this should be enabled or not
+		//PatchMemory(0x006D42F1, (PBYTE)"\xEB", 1);
 	}
 
 	// !C .P !D
@@ -486,4 +487,196 @@ Address        Function                                                         
 .text:00BE1F8A _HTNextPair                                                                                                                                                                                    mov     eax, 1
 .text:00BE21DC _HTNextElement                                                                                                                                                                                 mov     eax, 1
 
+Address        Function                                                                                                                            Instruction
+-------        --------                                                                                                                            -----------
+.text:00439A23 ?Phys_Vec3ToNitrousVec@@YA?BVphys_vec3@@QBM@Z                                                                                       mov     edx, 1
+.text:00440374 ?comp_aabb_loc@gjk_base_t@@UAEXXZ                                                                                                   mov     edx, 1
+.text:004B3EC6 ?CG_EntityEvent@@YAXHPAUcentity_s@@H@Z                                                                                              mov     edx, 1
+.text:004B7DC6 ?CG_PhysLaunch@@YAXHPAUcentity_s@@PBUentityState_s@@@Z                                                                              mov     edx, 1
+.text:00594220 DB_SyncExternalAssets                                                                                                               mov     edx, 1
+.text:005970DB ?DevGui_AddGraph@@YAXPBDPAUDevGraph@@@Z                                                                                             mov     edx, 1
+.text:005F4FAB Bullet_ImpactEffect                                                                                                                 mov     edx, 1
+.text:0061149D ?G_Say@@YAXPAUgentity_s@@0HPBD@Z                                                                                                    mov     edx, 1
+.text:0066F06D ?VEH_Teleport@@YAXPAUgentity_s@@QAM11@Z                                                                                             mov     edx, 1
+.text:0066F0A1 ?VEH_Teleport@@YAXPAUgentity_s@@QAM11@Z                                                                                             mov     edx, 1
+.text:0066F100 ?VEH_Teleport@@YAXPAUgentity_s@@QAM11@Z                                                                                             mov     edx, 1
+.text:0066F462 ?VEH_Teleport@@YAXPAUgentity_s@@QAM11@Z                                                                                             mov     edx, 1
+.text:006D194B ?Com_PrintMessage@@YAXHPBDH@Z                                                                                                       mov     edx, 1
+.text:006D24D7 ?Com_Error@@YAXW4errorParm_t@@PBDZZ                                                                                                 mov     edx, 1
+.text:006D6972 Com_Frame_Try_Block_Function                                                                                                        mov     edx, 1
+.text:006D6C66 Com_Frame_Try_Block_Function                                                                                                        mov     edx, 1
+.text:0070F654 SV_InitGameVM                                                                                                                       mov     edx, 1
+.text:007101B2 ?SV_Startup@@YAXH@Z                                                                                                                 mov     edx, 1
+.text:0071020B ?SV_Startup@@YAXH@Z                                                                                                                 mov     edx, 1
+.text:00712DED ?SV_SendServerCommand@@YAXPAUclient_t@@W4svscmd_type@@PBDZZ                                                                         mov     edx, 1
+.text:00716827 ?SV_MasterHeartbeat@@YAXHPBD@Z                                                                                                      mov     edx, 1
+.text:0071BDC0 ?SV_AddModifiedStats@@YAXH@Z                                                                                                        mov     edx, 1
+.text:0073E836 ?UI_Gametype_ReadFromMemFile@@YA_NAAUMemoryFile@@@Z                                                                                 mov     edx, 1
+.text:00740BFB ?UI_Gametype_FileShareDownloadComplete@@YAXPAUdwFileShareReadFileTask@@@Z                                                           mov     edx, 1
+.text:007841D9 ?AddPlayerToScene@UIViewer@@QAEXABUPlayerParams@1@ABUWeaponParams@1@_N@Z                                                            mov     edx, 1
+.text:007D3EE4 KeyValueToField                                                                                                                     mov     edx, 1          ; jumptable 007D3DB3 case 9
+.text:007D9EE1 Win_GetEvent                                                                                                                        mov     edx, 1
+.text:007DB72D _WinMain@16                                                                                                                         mov     edx, 1
+.text:00823F7E ?_update_prolog@NitrousVehicle@@QAEXM@Z                                                                                             mov     edx, 1
+.text:0082432B ?_update_prolog@NitrousVehicle@@QAEXM@Z                                                                                             mov     edx, 1
+.text:00824467 ?_update_prolog@NitrousVehicle@@QAEXM@Z                                                                                             mov     edx, 1
+.text:00828D7C ?make_rotate@@YAXAAVphys_mat44@@ABVphys_vec3@@MM@Z                                                                                  mov     edx, 1
+.text:0082A93F ?UpdateScriptVehicleControl@NitrousVehicleController@@AAEXAAVNitrousVehicle@@M@Z                                                    mov     edx, 1
+.text:00831145 ?create@gjk_aabb_t@@SAPAU1@ABVphys_vec3@@0HPAVgjk_collision_visitor@@@Z                                                             mov     edx, 1
+.text:008313B5 ?support@gjk_aabb_t@@UBEXABVphys_vec3@@PAV2@1@Z                                                                                     mov     edx, 1
+.text:008328B8 ?create@gjk_brush_t@@SAPAUgjk_base_t@@PBUcbrush_t@@HPAVgjk_collision_visitor@@@Z                                                    mov     edx, 1
+.text:00833FF6 ?create@gjk_double_sphere_t@@SAPAU1@ABVphys_vec3@@0MHPAVgjk_collision_visitor@@@Z                                                   mov     edx, 1
+.text:00839378 ?set_bpi_env@broad_phase_info@@QAEXPAVphys_auto_activate_callback@@@Z                                                               mov     edx, 1
+.text:0083BE60 ?debug_callback@@YAXPAX@Z                                                                                                           mov     edx, 1
+.text:0083C2A2 ?collide_vehicle_wheels@@YAXAAUPhysObjUserData@@@Z                                                                                  mov     edx, 1
+.text:0083F03E ?Phys_EffectsProcess@@YAXXZ                                                                                                         mov     edx, 1
+.text:008480C9 ?set@broad_phase_group@@QAEXXZ                                                                                                      mov     edx, 1
+.text:0084AE2C ?Phys_ObjSetPosition@@YAXHQBM@Z                                                                                                     mov     edx, 1
+.text:0084B14A ?Phys_ObjSetPosition@@YAXHQBM@Z                                                                                                     mov     edx, 1
+.text:0084B6BD ?Phys_ObjSetOrientation@@YAXHQBM0@Z                                                                                                 mov     edx, 1
+.text:0084BACF ?Phys_ObjSetOrientation@@YAXHQBM0@Z                                                                                                 mov     edx, 1
+.text:0085934B ?init_winding@@YAXABUplane_lt@@AAV?$phys_static_array@Vphys_vec3@@$0CAA@@@@Z                                                        mov     edx, 1
+.text:0086A489 Ragdoll_TunnelTest                                                                                                                  mov     edx, 1
+.text:0086A6C0 Ragdoll_TunnelTest                                                                                                                  mov     edx, 1
+.text:009372DE ?SND_Init@@YAXXZ                                                                                                                    mov     edx, 1
+.text:0094971C ?SND_LogMissingAliasId@@YAXI@Z                                                                                                      mov     edx, 1
+.text:0094ABC8 ?SND_PlayInternal@@YAXIHMTSndEntHandle@@QBM1_NPAUsnd_playback@@@Z                                                                   mov     edx, 1
+.text:0094BFA8 ?SND_PlayLoopAt@@YAXIQBM@Z                                                                                                          mov     edx, 1
+.text:0094C0E8 ?SND_StopLoopAt@@YAXIQBM@Z                                                                                                          mov     edx, 1
+.text:0094E327 ?SND_CommandPump@@YAIXZ                                                                                                             mov     edx, 1
+.text:0094F594 ?SND_NotifyPump@@YAXXZ                                                                                                              mov     edx, 1
+.text:0095119C ?Snd_StreamOpen@@YAXIPBD_NIPAD@Z                                                                                                    mov     edx, 1
+.text:009515AC ?Snd_StreamClose@@YAXI@Z                                                                                                            mov     edx, 1
+.text:00962FDD Live_FileShare_Read_f                                                                                                               mov     edx, 1
+.text:0096F93E ?PCache_GetEntry@@YAPAUPCacheEntry@@H_K@Z                                                                                           mov     edx, 1
+.text:0098CB1B ?SV_CACValidateReadCAC@@YAPAUTaskRecord@@_KPAEI@Z                                                                                   mov     edx, 1
+.text:0098CEFC ?SV_CACValidateReadGlobal@@YAPAUTaskRecord@@_KPAEI@Z                                                                                mov     edx, 1
+.text:00999FB4 ?ExplosionEvent@GlassRenderer@@AAEXQBMMMMH@Z                                                                                        mov     edx, 1
+.text:0099A0CB ?TracePoint@GlassRenderer@@AAEHQBM0@Z                                                                                               mov     edx, 1
+.text:0099A585 ?GetShardGroup@GlassRenderer@@QAEPAUShardGroup@@IPBUGlassDef@@@Z                                                                    mov     edx, 1
+.text:0099E157 ?front@?$list@PAUGlassShard@@V?$SmallAllocatorTemplate@PAUGlassShard@@@@@std@@QAEAAPAUGlassShard@@XZ                                mov     edx, 1
+.text:0099E374 ?end@?$list@PAUGlassShard@@V?$SmallAllocatorTemplate@PAPAUGlassShard@@@@@std@@QAE?AV?$_Iterator@$00@12@XZ                           mov     edx, 1
+.text:0099E42D ??D?$_Const_iterator@$00@?$list@PAUGlassShard@@V?$SmallAllocatorTemplate@PAUGlassShard@@@@@std@@QBEABQAUGlassShard@@XZ              mov     edx, 1
+.text:0099E72D ??E?$_Const_iterator@$00@?$list@PAUGlassShard@@V?$SmallAllocatorTemplate@PAPAUGlassShard@@@@@std@@QAEAAV012@XZ                      mov     edx, 1
+.text:0099EC6D ?Free@?$FixedSizeAllocator@PAUGlassShard@@@@QAEXPAUGlassShard@@@Z                                                                   mov     edx, 1
+.text:0099EFC7 ?push_front@?$list@PAUGlassPhysics@@V?$SmallAllocatorTemplate@PAPAUGlassPhysics@@@@@std@@QAEXABQAUGlassPhysics@@@Z                  mov     edx, 1
+.text:0099F229 ?erase@?$list@PAUGlassShard@@V?$SmallAllocatorTemplate@PAUGlassShard@@@@@std@@QAE?AV?$_Iterator@$00@12@V?$_Const_iterator@$00@12@@Z mov     edx, 1
+.text:0099F4CD ?IsValidUsedPtr@?$FixedSizeAllocator@PAUGlassPhysics@@@@QBE_NPAUGlassPhysics@@@Z                                                    mov     edx, 1
+.text:00A56C3D R_MarkModelCoreCallback_1_                                                                                                          mov     edx, 1
+.text:00A747B4 RB_StandardDrawCommands                                                                                                             mov     edx, 1
+.text:00B61BB1 _jinit_color_converter                                                                                                              mov     edx, 1
+.text:00BBA5FF sub_BBA5F0                                                                                                                          mov     edx, 1
+.text:00BBB06D sub_BBB040                                                                                                                          mov     edx, 1
+.text:00BC8CE3 _HTDoConnect                                                                                                                        mov     edx, 1
+.text:00BC94B3 _HTDoListen                                                                                                                         mov     edx, 1
+.text:00BD04D9 sub_BD0400                                                                                                                          mov     edx, 1
+
+Address        Function                                                                                                    Instruction
+-------        --------                                                                                                    -----------
+.text:0041A9B7 ?BG_EmblemsInit@@YAXXZ                                                                                      mov     ecx, 1
+.text:00539E4E ?phys_transpose@@YAXAAVphys_mat44@@ABV1@@Z                                                                  mov     ecx, 1
+.text:00539F3A ?phys_transpose@@YAXAAVphys_mat44@@ABV1@@Z                                                                  mov     ecx, 1
+.text:00539FC6 ?phys_transpose@@YAXAAVphys_mat44@@ABV1@@Z                                                                  mov     ecx, 1
+.text:00539FFA ?phys_transpose@@YAXAAVphys_mat44@@ABV1@@Z                                                                  mov     ecx, 1
+.text:0053A060 ?phys_transpose@@YAXAAVphys_mat44@@ABV1@@Z                                                                  mov     ecx, 1
+.text:0053A1BA ?phys_transpose@@YAXAAVphys_mat44@@ABV1@@Z                                                                  mov     ecx, 1
+.text:005D2549 FX_DrawElement_Setup_1_                                                                                     mov     ecx, 1
+.text:006114CA ?G_Say@@YAXPAUgentity_s@@0HPBD@Z                                                                            mov     ecx, 1
+.text:0066F411 ?VEH_Teleport@@YAXPAUgentity_s@@QAM11@Z                                                                     mov     ecx, 1
+.text:0068D437 ?ConsoleCommand@@YAHXZ                                                                                      mov     ecx, 1
+.text:006D1F4F ?Com_Shutdown@@YAXPBD@Z                                                                                     mov     ecx, 1
+.text:006D4D23 Com_Init_Try_Block_Function                                                                                 mov     ecx, 1
+.text:006D4D8F Com_Init_Try_Block_Function                                                                                 mov     ecx, 1
+.text:006D66B3 ?Com_LoadFrontEnd@@YAXXZ                                                                                    mov     ecx, 1
+.text:006D68C7 ?Com_Frame@@YAXXZ                                                                                           mov     ecx, 1
+.text:006D69EC Com_Frame_Try_Block_Function                                                                                mov     ecx, 1
+.text:00703CDC SV_Map_f                                                                                                    mov     ecx, 1
+.text:00703F82 ShowLoadErrorsSummary                                                                                       mov     ecx, 1
+.text:007077C4 ?SV_DirectConnect@@YAXUnetadr_t@@@Z                                                                         mov     ecx, 1
+.text:007083D2 ?SV_DropClient@@YAXPAUclient_t@@PBD_N2@Z                                                                    mov     ecx, 1
+.text:0071065F ?SV_SpawnServer@@YAXHPBDHH@Z                                                                                mov     ecx, 1
+.text:00711693 ?SV_Init@@YAXXZ                                                                                             mov     ecx, 1
+.text:00712186 ?SV_Shutdown@@YAXPBD@Z                                                                                      mov     ecx, 1
+.text:007121F2 ?SV_Shutdown@@YAXPBD@Z                                                                                      mov     ecx, 1
+.text:00713FA6 ?SVC_Info@@YAXUnetadr_t@@PAVbdSecurityID@@_N@Z                                                              mov     ecx, 1
+.text:00714410 ?SV_ConnectionlessPacket@@YAXUnetadr_t@@PAUmsg_t@@@Z                                                        mov     ecx, 1
+.text:00716815 ?SV_MasterHeartbeat@@YAXHPBD@Z                                                                              mov     ecx, 1
+.text:00716BBC ?SV_MasterHeartbeat@@YAXHPBD@Z                                                                              mov     ecx, 1
+.text:0076567F ?Item_ListBox_Viewmax@@YAHHHPAUitemDef_s@@@Z                                                                mov     ecx, 1
+.text:0078A546 ?Expression_Parse@@YA_NPAPBDPAUExpressionStatement@@PAXH@Z                                                  mov     ecx, 1
+.text:0078AAC7 Expression_ParseOperatorToken                                                                               mov     ecx, 1
+.text:0078AF0F ?Expression_Init@@YAXXZ                                                                                     mov     ecx, 1
+.text:007DB717 _WinMain@16                                                                                                 mov     ecx, 1
+.text:007DCA8A ?dwPlatformInit@@YAHAAVbdNetStartParams@@@Z                                                                 mov     ecx, 1
+.text:007DE9F1 ConWndProc                                                                                                  mov     ecx, 1          ; jumptable 007DE8F9 case 11
+.text:0081EB9C ??0NitrousVehicle@@QAE@XZ                                                                                   mov     ecx, 1
+.text:0082158A ?update_parms@NitrousVehicle@@QAEXPBVVehicleParameter@@_N@Z                                                 mov     ecx, 1
+.text:008243E7 ?_update_prolog@NitrousVehicle@@QAEXM@Z                                                                     mov     ecx, 1
+.text:0082D29C ?SetScriptTarget@NitrousVehicleController@@QAEXAAVNitrousVehicle@@AAVphys_vec3@@MM_N@Z                      mov     ecx, 1
+.text:0082D5A3 ?add_force@rigid_body@@QAEXABVphys_vec3@@@Z                                                                 mov     ecx, 1
+.text:0082D5D7 ?add_force@rigid_body@@QAEXABVphys_vec3@@@Z                                                                 mov     ecx, 1
+.text:0082D63C ?add_force@rigid_body@@QAEXABVphys_vec3@@@Z                                                                 mov     ecx, 1
+.text:00831CFB ?create@gjk_obb_t@@SAPAU1@ABVphys_mat44@@ABVphys_vec3@@HPAVgjk_collision_visitor@@@Z                        mov     ecx, 1
+.text:00831E9D ?support@gjk_obb_t@@UBEXABVphys_vec3@@PAV2@1@Z                                                              mov     ecx, 1
+.text:00832EBB ?create@gjk_partition_t@@SAPAU1@PBUCollisionAabbTree@@PAVgjk_collision_visitor@@@Z                          mov     ecx, 1
+.text:0083435E ?create@gjk_cylinder_t@@SAPAU1@HMMABVphys_mat44@@HPAVgjk_collision_visitor@@@Z                              mov     ecx, 1
+.text:00835C3E ?create@gjk_polygon_cylinder_t@@SAPAU1@AAY02$$CBM0MHPAVgjk_collision_visitor@@@Z                            mov     ecx, 1
+.text:00835DE2 ?destroy_gjk_geom@@YAXPAUgjk_base_t@@@Z                                                                     mov     ecx, 1          ; jumptable 00835D76 default case
+.text:00836F30 ?set_xform@gjk_base_t@@QAEXPBVphys_mat44@@@Z                                                                mov     ecx, 1
+.text:0083D1B2 ?collide_vehicle_wheels@@YAXAAUPhysObjUserData@@@Z                                                          mov     ecx, 1
+.text:00848161 ?add_bpi@broad_phase_group@@QAEXPAVbroad_phase_info@@@Z                                                     mov     ecx, 1
+.text:0084ABCC ?Phys_ObjSetPosition@@YAXHQBM@Z                                                                             mov     ecx, 1
+.text:0084AE9A ?Phys_ObjSetPosition@@YAXHQBM@Z                                                                             mov     ecx, 1
+.text:0084B18C ?Phys_ObjSetPosition@@YAXHQBM@Z                                                                             mov     ecx, 1
+.text:0084B4D6 ?Phys_ObjSetOrientation@@YAXHQBM0@Z                                                                         mov     ecx, 1
+.text:0084B6FC ?Phys_ObjSetOrientation@@YAXHQBM0@Z                                                                         mov     ecx, 1
+.text:0084BA1A ?Phys_ObjSetOrientation@@YAXHQBM0@Z                                                                         mov     ecx, 1
+.text:0084BE20 ?dangerous_set_a_vel@rigid_body@@QAEXABVphys_vec3@@@Z                                                       mov     ecx, 1
+.text:0084BE54 ?dangerous_set_a_vel@rigid_body@@QAEXABVphys_vec3@@@Z                                                       mov     ecx, 1
+.text:0084BEB9 ?dangerous_set_a_vel@rigid_body@@QAEXABVphys_vec3@@@Z                                                       mov     ecx, 1
+.text:0084C270 ?dangerous_set_t_vel@rigid_body@@QAEXABVphys_vec3@@@Z                                                       mov     ecx, 1
+.text:0084C2A4 ?dangerous_set_t_vel@rigid_body@@QAEXABVphys_vec3@@@Z                                                       mov     ecx, 1
+.text:0084C309 ?dangerous_set_t_vel@rigid_body@@QAEXABVphys_vec3@@@Z                                                       mov     ecx, 1
+.text:0084D493 ?add_torque@rigid_body@@QAEXABVphys_vec3@@@Z                                                                mov     ecx, 1
+.text:0084D4C7 ?add_torque@rigid_body@@QAEXABVphys_vec3@@@Z                                                                mov     ecx, 1
+.text:0084D52C ?add_torque@rigid_body@@QAEXABVphys_vec3@@@Z                                                                mov     ecx, 1
+.text:0085940E ?init_winding@@YAXABUplane_lt@@AAV?$phys_static_array@Vphys_vec3@@$0CAA@@@@Z                                mov     ecx, 1
+.text:00869346 Ragdoll_CreatePhysObj                                                                                       mov     ecx, 1
+.text:0086A4FA Ragdoll_TunnelTest                                                                                          mov     ecx, 1
+.text:008E3F5B yylex                                                                                                       mov     ecx, 1
+.text:00931104 ?SND_ShouldInit@@YA_NXZ                                                                                     mov     ecx, 1
+.text:0094B96A ?SND_SetPlaybackAttenuation@@YAXHM@Z                                                                        mov     ecx, 1
+.text:0094BA3A ?SND_SetPlaybackAttenuationRate@@YAXHM@Z                                                                    mov     ecx, 1
+.text:0094BB0A ?SND_SetPlaybackPitch@@YAXHM@Z                                                                              mov     ecx, 1
+.text:0094BBDA ?SND_SetPlaybackPitchRate@@YAXHM@Z                                                                          mov     ecx, 1
+.text:0094BD6D ?SND_SetSnapshot@@YAXW4snd_snapshot_type@@PBDMM@Z                                                           mov     ecx, 1
+.text:0094BE7F ?SND_SetEntState@@YAXTSndEntHandle@@@Z                                                                      mov     ecx, 1
+.text:0094C2B6 ?SND_PlayLineAt@@YAXIQBM0@Z                                                                                 mov     ecx, 1
+.text:0094C4A6 ?SND_StopLineAt@@YAXIQBM0@Z                                                                                 mov     ecx, 1
+.text:0096D683 ?LiveNews_PopulateFriendNews@@YAXH_KPAD@Z                                                                   mov     ecx, 1
+.text:0096E04F ?LiveNews_GetOwnNews@@YAXH@Z                                                                                mov     ecx, 1
+.text:00978364 LiveStats_GetPlayerStat                                                                                     mov     ecx, 1
+.text:0098D9DB ?SV_FetchWADDeferred@@YAXXZ                                                                                 mov     ecx, 1
+.text:0099119B ?PC_InitSigninState@@YAXXZ                                                                                  mov     ecx, 1
+.text:00994876 ?SocketRouter_EmergencyFrame@@YAXPBD@Z                                                                      mov     ecx, 1
+.text:009992AC ?Reset@GlassRenderer@@QAEXXZ                                                                                mov     ecx, 1
+.text:0099955C ?RemoveGlassShards@GlassRenderer@@QAEXI@Z                                                                   mov     ecx, 1
+.text:00999803 ?RemovePhysicsShards@GlassRenderer@@QAEXXZ                                                                  mov     ecx, 1
+.text:00999C90 ?Update@GlassRenderer@@QAEXH@Z                                                                              mov     ecx, 1
+.text:0099A8CF ?Insert@SortedShardsList@GlassRenderer@@QAEXPAUGlassShard@@@Z                                               mov     ecx, 1
+.text:0099ABAF ?InsertReverse@SortedShardsList@GlassRenderer@@QAEXPAUGlassShard@@@Z                                        mov     ecx, 1
+.text:0099E3CC ?begin@?$list@PAUGlassShard@@V?$SmallAllocatorTemplate@PAPAUGlassShard@@@@@std@@QAE?AV?$_Iterator@$00@12@XZ mov     ecx, 1
+.text:0099ECFA ?Free@?$FixedSizeAllocator@PAUGlassShard@@@@QAEXPAUGlassShard@@@Z                                           mov     ecx, 1
+.text:0099F3FB ?IsValidUsedPtr@?$FixedSizeAllocator@PAUGlassPhysics@@@@QBE_NPAUGlassPhysics@@@Z                            mov     ecx, 1
+.text:0099F487 ?IsValidUsedPtr@?$FixedSizeAllocator@PAUGlassPhysics@@@@QBE_NPAUGlassPhysics@@@Z                            mov     ecx, 1
+.text:009CA813 ?Demo_WriteToStream@@YAIPAXII@Z                                                                             mov     ecx, 1
+.text:00A57217 R_AddMarkFragment_1_                                                                                        mov     ecx, 1
+.text:00A74410 RB_StandardDrawCommands                                                                                     mov     ecx, 1
+.text:00A7A2D7 ?R_IssueRenderCommands@@YAXI@Z                                                                              mov     ecx, 1
+.text:00AA64F4 R_StreamUpdateAabbNode_r_0_                                                                                 mov     ecx, 1
+.text:00AB7687 RB_RenderCommandFrame                                                                                       mov     ecx, 1
+.text:00B6910C _jinit_color_deconverter                                                                                    mov     ecx, 1
+.text:00BB921C sub_BB90C0                                                                                                  mov     ecx, 1
+.text:00BDB226 sub_BDB1B0                                                                                                  mov     ecx, 1
+.text:00BDDA52 sub_BDD9A0                                                                                                  mov     ecx, 1
 */
