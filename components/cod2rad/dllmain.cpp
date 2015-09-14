@@ -36,6 +36,12 @@ BOOL cod2rad_Init()
 	//
 	PatchThreading();
 
+	//
+	// Patch the requested IWI version to match BO1
+	//
+	BYTE iwiVersion = 0xEB;
+	PatchMemory(0x00417AA7, (PBYTE)&iwiVersion, 1);
+
 	g_initted = true;
 	return TRUE;
 }
