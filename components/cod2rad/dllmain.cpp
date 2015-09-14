@@ -12,8 +12,13 @@ LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	//return PageGuard_Check(ExceptionInfo);
 }
 
+bool g_initted = false;
+
 BOOL cod2rad_Init()
 {
+	if (g_initted)
+		return TRUE;
+
 	//
 	// Disable STDOUT buffering
 	//
@@ -31,6 +36,7 @@ BOOL cod2rad_Init()
 	//
 	PatchThreading();
 
+	g_initted = true;
 	return TRUE;
 }
 
