@@ -81,7 +81,7 @@ void Init_MapMod()
 	//
 	PBYTE p_fmode = (PBYTE)&g_fmode;
 	PatchMemory(0x00407DE4, p_fmode, sizeof(p_fmode));
-	PatchMemory(0x00407E65, p_fmode, sizeof(p_fmode));
+	PatchMemory(0x00407E67, p_fmode, sizeof(p_fmode));
 	PatchMemory(0x00407EAF, p_fmode, sizeof(p_fmode));
 	PatchMemory(0x00407EE6, p_fmode, sizeof(p_fmode));
 
