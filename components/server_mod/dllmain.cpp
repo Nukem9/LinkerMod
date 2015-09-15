@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
-char* dwInitAddress = " http://cod7-steam-auth.live.demonware.net";
-char *dwLSGAddress = "";
+char* dwInitAddress = "cod7-steam-auth.live.demonware.net";
 
 typedef int(__cdecl * DB_GetXAssetSizeHandler_t)();
 DB_GetXAssetSizeHandler_t* DB_GetXAssetSizeHandlers = (DB_GetXAssetSizeHandler_t*)0x00E064A0;
@@ -16,34 +15,6 @@ void* ReallocateAssetPool(int type, unsigned int newSize)
 	DB_XAssetPool[type] = poolEntry;
 	g_poolSize[type] = newSize;
 	return poolEntry;
-}
-
-struct netadr_t
-{
-	int	type;		 // this+0x0
-	unsigned char	ip[4];		 // this+0x4
-	unsigned short	port;		 // this+0x8
-	int	addrHandleIndex;		 // this+0xC
-};
-
-bool (* dwCommonAddrToNetadr)(netadr_t *adr, const char *commonAddrBuf, void *secID);
-
-// 006490E0
-bool hk_dwCommonAddrToNetadr(netadr_t *adr, const char *commonAddrBuf, void *secID)
-{
-	bool ret = dwCommonAddrToNetadr(adr, commonAddrBuf, secID);
-
-	if ((DWORD)_ReturnAddress() == 0x00676D8A)
-	{
-		adr->type = 2;
-		adr->ip[0] = 192;
-		adr->ip[1] = 168;
-		adr->ip[2] = 1;
-		adr->ip[3] = 200;
-		adr->port = 3124;
-	}
-
-	return ret;
 }
 
 enum XAssetType
@@ -110,7 +81,7 @@ void(*SteamAPI_Init)();
 void(*LiveSteam_Init)();
 void hk_LiveSteam_Init()
 {
-	HMODULE hSteam = GetModuleHandleA("steam_api.dll");
+	HMODULE hSteam = LoadLibraryA("steam_api.dll");
 
 	*(FARPROC *)&SteamAPI_Init = GetProcAddress(hSteam, "SteamAPI_Init");
 
@@ -123,18 +94,16 @@ BOOL ServerMod_Init()
 	PatchMemory(0x0059E83E, (PBYTE)&dwInitAddress, 4);
 	PatchMemory(0x0059EE78, (PBYTE)&dwInitAddress, 4);
 
-	//PatchMemory(0x0059EE78, (PBYTE)&dwLSGAddress, 4);
-
 	ReallocateAssetPool(ASSET_TYPE_STRINGTABLE, 1024);
 	ReallocateAssetPool(ASSET_TYPE_LOCALIZE_ENTRY, 20400);
 	ReallocateAssetPool(ASSET_TYPE_SNDDRIVER_GLOBALS, 16);
 
-	PatchMemory(0x005A0274, (PBYTE)"\x90\x90\x90\x90\x90", 5);
-	PatchMemory(0x0071023F, (PBYTE)"\x90\x90\x90\x90\x90", 5);
+	//PatchMemory(0x005A0274, (PBYTE)"\x90\x90\x90\x90\x90", 5);
+	//PatchMemory(0x0071023F, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 	PatchMemory(0x0093CA00, (PBYTE)"\xC3", 1);
 
-	PatchMemory(0x008BD8EB, (PBYTE)"\x90\x90\x90\x90\x90", 5);
-	PatchMemory(0x008BD7E5, (PBYTE)"\x90\x90\x90\x90\x90", 5);
+	//PatchMemory(0x008BD8EB, (PBYTE)"\x90\x90\x90\x90\x90", 5);
+	//PatchMemory(0x008BD7E5, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 
 	//
 	// Com_Init_Try_Block_Function
@@ -157,26 +126,30 @@ BOOL ServerMod_Init()
 		// Renderer
 		PatchMemory_WithNOP(0x006D6C6D, 6);
 
-		// todo: 006D6979
-		// todo: 006D69F3
+		// Max FPS
+		PatchMemory_WithNOP(0x006D6979, 2);
 
-		// This needs to be rewritten to handle DW login
+		// Event loop?
+		PatchMemory_WithNOP(0x006D69F3, 6);
+
 		// DWDedicatedLobbyPump
-		//PatchMemory(0x006D6E27, (PBYTE)"\xEB", 1);
+		PatchMemory_WithNOP(0x006D6E27, 2);
+		PatchMemory_WithNOP(0x006D6E38, 5);
 	}
 
-	// !C .P !D
+	//
 	// Com_Init
 	//
 	{
 		// Renderer
 		PatchMemory_WithNOP(0x006D424D, 2);
 
-		// todo: check if this should be enabled or not
-		//PatchMemory(0x006D42F1, (PBYTE)"\xEB", 1);
+		// UI_LoadMap/Arena
+		PatchMemory_WithNOP(0x006D42F1, 2);
+
 	}
 
-	// !C .P !D
+	//
 	// Com_Frame
 	//
 	{
@@ -184,7 +157,7 @@ BOOL ServerMod_Init()
 		PatchMemory_WithNOP(0x006D68CE, 2);
 	}
 
-	// !C .P !D
+	//
 	// SV_SpawnServer
 	//
 	{
@@ -205,12 +178,79 @@ BOOL ServerMod_Init()
 		// !C .P !D Com_InitUIAndCommonXAssets
 		PatchMemory_WithNOP(0x006D410B, 9);
 
-		// !C .P !D DB_LoadFastFilesForPC
-		PatchMemory_WithNOP(0x00594EF4, 2);
+		PatchMemory_WithNOP(0x00594EF4, 2);	// DB_LoadFastFilesForPC
+		PatchMemory_WithNOP(0x00594F63, 2);	// DB_LoadFastFilesForPC
 	}
 
-	// todo: 006D4342 Com_ErrorCleanup
-	// todo: 006F587A Sys_WaitRenderer
+	PatchMemory_WithNOP(0x00987570, 9);	// LiveStorage_FetchOnlineWAD
+
+	PatchMemory_WithNOP(0x006D4342, 2);	// Com_ErrorCleanup
+
+	PatchMemory_WithNOP(0x007DB71E, 2);	// WinMain
+	PatchMemory_WithNOP(0x007DB6CC, 2);	// WinMain
+
+	PatchMemory_WithNOP(0x0099148B, 7);	// Live_Frame
+	PatchMemory_WithNOP(0x0097DA14, 7);	// LiveSteam_Init
+	PatchMemory_WithNOP(0x0097DDC4, 2);	// LiveSteam_Frame
+	PatchMemory_WithNOP(0x0097D57D, 4);	// LiveSteam_CheckAccess
+	PatchMemory_WithNOP(0x0097836B, 2);	// LiveStats_GetPlayerStat
+	PatchMemory_WithNOP(0x0097773C, 2);	// LiveStats_GetItemStat
+	PatchMemory_WithNOP(0x00974D50, 2);	// LiveStats_GetIntPlayerStatInternal
+	PatchMemory_WithNOP(0x00975297, 2);	// LiveStats_SetIntPlayerStatInternal
+	PatchMemory_WithNOP(0x0096D68A, 2);	// LiveNews_PopulateFriendNews
+	PatchMemory_WithNOP(0x00986BD8, 2);	// LiveStorage_Init
+	PatchMemory_WithNOP(0x00981431, 2);	// LiveStorage_ReadDWFileByUserID
+	PatchMemory_WithNOP(0x009818DD, 2);	// LiveStorage_GetServerTimeComplete
+	PatchMemory_WithNOP(0x00985183, 2);	// LiveStorage_FileShare_WriteSummarySuccess
+
+	PatchMemory(0x00710180, (PBYTE)"\xC3", 1);	// SV_Startup
+
+	PatchMemory(0x00962FE4, (PBYTE)"\xEB", 1);	// Live_FileShare_Read_f
+
+	PatchMemory_WithNOP(0x005A020A, 2);	// DWDedicatedLogon
+
+	PatchMemory_WithNOP(0x0059EE1B, 7);	// dwLogOnComplete
+
+	PatchMemory_WithNOP(0x00703CE3, 2);	// SV_Map_f
+
+	PatchMemory_WithNOP(0x00703CE3, 2);	// SV_Map_f
+	PatchMemory_WithNOP(0x00703CE3, 2);	// SV_Map_f
+
+
+	PatchMemory_WithNOP(0x0071681C, 2);	// SV_MasterHeartbeat
+	PatchMemory_WithNOP(0x0071682E, 2);	// SV_MasterHeartbeat
+
+	PatchMemory(0x007179E0, (PBYTE)"\xC3", 1);	// SV_SysLog_LogMessage (DANGEROUS - DISABLED)
+
+	PatchMemory_WithNOP(0x006F587A, 2);	// Sys_WaitRenderer
+
+	PatchMemory_WithNOP(0x0041A9BE, 2);	// BG_EmblemsInit
+
+	PatchMemory_WithNOP(0x007A79CD, 2);	// FS_Restart
+
+
+	PatchMemory_WithNOP(0x0093110B, 6);	// SND_ShouldInit
+
+	PatchMemory_WithNOP(0x006CD65B, 6);	// Com_ControllerIndexes_GetPrimary
+
+	PatchMemory_WithNOP(0x006D1952, 2);	// Com_PrintMessage
+
+	PatchMemory_WithNOP(0x00740C02, 2);	// UI_Gametype_FileShareDownloadComplete
+	PatchMemory_WithNOP(0x0050BE53, 2);	// UI_SetLocalVarStringByName
+
+	PatchMemory_WithNOP(0x0058F101, 2);	// DB_Sleep
+	PatchMemory_WithNOP(0x00594227, 2);	// DB_SyncExternalAssets
+
+	PatchMemory(0x00AB768E, (PBYTE)"\xEB", 1);	// RB_RenderCommandFrame
+
+	PatchMemory_WithNOP(0x0097287A, 6);	// Session_IsHost
+
+	PatchMemory(0x00972EED, (PBYTE)"\xEB", 1);	// Session_StartHost XBOXLIVE_SIGNEDOUTOFLIVE
+	PatchMemory(0x00972F0D, (PBYTE)"\xEB", 1);	// Session_StartHost assert #1
+	PatchMemory(0x00972FCB, (PBYTE)"\xEB", 1);	// Session_StartHost assert #2
+
+	// SocketRouter_EmergencyFrame
+	PatchMemory_WithNOP(0x0099487D, 6);
 
 	// !C .P !D UI_SetLoadingScreenMaterial
 	PatchMemory_WithNOP(0x0077697B, 7);
@@ -220,9 +260,6 @@ BOOL ServerMod_Init()
 
 	// !C .P !D Com_LoadMapLoadingScreenFastFile
 	PatchMemory_WithNOP(0x006D5F0B, 4);
-
-	// SND_ShouldInit short-circuit fix
-	PatchMemory(0x0093110B, (PBYTE)"\x90\x90\x90\x90\x90\x90", 6);
 
 	// Com_IntroPlayed
 	PatchMemory(0x006D500A, (PBYTE)"\x90\x90\x90\x90", 4);
@@ -238,14 +275,9 @@ BOOL ServerMod_Init()
 
 	// TODO: CHECK: 007077CB
 
-	PatchMemory(0x006D410B, (PBYTE)"\x90\x90", 2);
-
 	// script
 	PatchMemory(0x008DC190, (PBYTE)"\xEB", 1);
 	PatchMemory(0x00661FD0, (PBYTE)"\xC3", 1);// scr_playerconnect
-
-	// Live_GetXuid
-	PatchMemory(0x00990994, (PBYTE)"\xEB", 1);
 
 	// xuid != PCACHE_INVALID_XUID assert
 	PatchMemory(0x0096FD07, (PBYTE)"\xEB", 1);
@@ -257,6 +289,8 @@ BOOL ServerMod_Init()
 
 	// VAC: MOV EDX, 0
 	PatchMemory(0x0097F72B, (PBYTE)"\xBA\x00\x00\x00\x00", 5);
+
+	Patch_DDL();
 
 	Detours::X86::DetourFunction((PBYTE)0x009908C0, (PBYTE)&Live_IsSignedIn);
 	Detours::X86::DetourFunction((PBYTE)0x00596EB0, (PBYTE)&DevGui_AddCommand);
@@ -298,7 +332,6 @@ Address        Function                                                         
 .text:006CD654 ?Com_ControllerIndexes_GetPrimary@@YAHXZ                                                                                                                                                       mov     eax, 1
 .text:006D4104 ?Com_InitUIAndCommonXAssets@@YAXXZ                                                                                                                                                             mov     eax, 1
 .text:006D433B Com_ErrorCleanup                                                                                                                                                                               mov     eax, 1
-.text:006D49B8 Com_Init_Try_Block_Function                                                                                                                                                                    mov     eax, 1
 .text:006D5003 COM_PlayIntroMovies                                                                                                                                                                            mov     eax, 1
 .text:006D5240 Com_InitDvars                                                                                                                                                                                  mov     eax, 1
 .text:006D5A85 Com_WriteConfigToFile                                                                                                                                                                          mov     eax, 1
@@ -315,7 +348,6 @@ Address        Function                                                         
 .text:00707816 ?SV_DirectConnect@@YAXUnetadr_t@@@Z                                                                                                                                                            mov     eax, 1
 .text:0070F5F8 SV_InitGameVM                                                                                                                                                                                  mov     eax, 1
 .text:007101D3 ?SV_Startup@@YAXH@Z                                                                                                                                                                            mov     eax, 1
-.text:00710C43 ?SV_SpawnServer@@YAXHPBDHH@Z                                                                                                                                                                   mov     eax, 1
 .text:00711908 ?SV_Init@@YAXXZ                                                                                                                                                                                mov     eax, 1
 .text:00713D2B ?SVC_Info@@YAXUnetadr_t@@PAVbdSecurityID@@_N@Z                                                                                                                                                 mov     eax, 1
 .text:00716B81 ?SV_MasterHeartbeat@@YAXHPBD@Z                                                                                                                                                                 mov     eax, 1
@@ -437,9 +469,6 @@ Address        Function                                                         
 .text:00974D49 ?LiveStats_GetIntPlayerStatInternal@@YA_NPAHHQAPBDPAD@Z                                                                                                                                        mov     eax, 1
 .text:00975290 ?LiveStats_SetIntPlayerStatInternal@@YA_NHHQAPBDPADI@Z                                                                                                                                         mov     eax, 1
 .text:00977735 LiveStats_GetItemStat                                                                                                                                                                          mov     eax, 1
-.text:0097D576 ?LiveSteam_CheckAccess@@YAXXZ                                                                                                                                                                  mov     eax, 1
-.text:0097DA0D ?LiveSteam_Init@@YAXXZ                                                                                                                                                                         mov     eax, 1
-.text:0097DDBD ?LiveSteam_Frame@@YAXXZ                                                                                                                                                                        mov     eax, 1
 .text:0097FA7E ?Register@?$CCallback@VLiveSteamServer@@USteamServersConnected_t@@$00@@QAEXPAVLiveSteamServer@@P82@AEXPAUSteamServersConnected_t@@@Z@Z                                                         mov     eax, 1
 .text:0097FAEE ?Register@?$CCallback@VLiveSteamServer@@USteamServersDisconnected_t@@$00@@QAEXPAVLiveSteamServer@@P82@AEXPAUSteamServersDisconnected_t@@@Z@Z                                                   mov     eax, 1
 .text:0097FB5E ?Register@?$CCallback@VLiveSteamServer@@UGSPolicyResponse_t@@$00@@QAEXPAVLiveSteamServer@@P82@AEXPAUGSPolicyResponse_t@@@Z@Z                                                                   mov     eax, 1
@@ -456,7 +485,6 @@ Address        Function                                                         
 .text:0098B0B6 ?SV_DWWriteClientStats@@YAXPAUclient_t@@@Z                                                                                                                                                     mov     eax, 1
 .text:0098C6B6 ?SV_CACValidateWriteCAC@@YAX_KPAEI@Z                                                                                                                                                           mov     eax, 1
 .text:0098C896 ?SV_CACValidateWriteGlobal@@YAX_KPAEI@Z                                                                                                                                                        mov     eax, 1
-.text:00991484 ?Live_Frame@@YAXHH@Z                                                                                                                                                                           mov     eax, 1
 .text:00999E96 ?GenerateVerts@GlassRenderer@@QAEXHII@Z                                                                                                                                                        mov     eax, 1
 .text:0099B2B2 ?GetSmallestShards@GlassRenderer@@QAEXI_N0@Z                                                                                                                                                   mov     eax, 1
 .text:0099B402 ?GetLargestShards@GlassRenderer@@QAEXI_N0@Z                                                                                                                                                    mov     eax, 1
@@ -585,16 +613,12 @@ Address        Function                                                         
 .text:0066F411 ?VEH_Teleport@@YAXPAUgentity_s@@QAM11@Z                                                                     mov     ecx, 1
 .text:0068D437 ?ConsoleCommand@@YAHXZ                                                                                      mov     ecx, 1
 .text:006D1F4F ?Com_Shutdown@@YAXPBD@Z                                                                                     mov     ecx, 1
-.text:006D4D23 Com_Init_Try_Block_Function                                                                                 mov     ecx, 1
-.text:006D4D8F Com_Init_Try_Block_Function                                                                                 mov     ecx, 1
 .text:006D66B3 ?Com_LoadFrontEnd@@YAXXZ                                                                                    mov     ecx, 1
-.text:006D68C7 ?Com_Frame@@YAXXZ                                                                                           mov     ecx, 1
 .text:006D69EC Com_Frame_Try_Block_Function                                                                                mov     ecx, 1
 .text:00703CDC SV_Map_f                                                                                                    mov     ecx, 1
 .text:00703F82 ShowLoadErrorsSummary                                                                                       mov     ecx, 1
 .text:007077C4 ?SV_DirectConnect@@YAXUnetadr_t@@@Z                                                                         mov     ecx, 1
 .text:007083D2 ?SV_DropClient@@YAXPAUclient_t@@PBD_N2@Z                                                                    mov     ecx, 1
-.text:0071065F ?SV_SpawnServer@@YAXHPBDHH@Z                                                                                mov     ecx, 1
 .text:00711693 ?SV_Init@@YAXXZ                                                                                             mov     ecx, 1
 .text:00712186 ?SV_Shutdown@@YAXPBD@Z                                                                                      mov     ecx, 1
 .text:007121F2 ?SV_Shutdown@@YAXPBD@Z                                                                                      mov     ecx, 1
@@ -657,8 +681,6 @@ Address        Function                                                         
 .text:0096E04F ?LiveNews_GetOwnNews@@YAXH@Z                                                                                mov     ecx, 1
 .text:00978364 LiveStats_GetPlayerStat                                                                                     mov     ecx, 1
 .text:0098D9DB ?SV_FetchWADDeferred@@YAXXZ                                                                                 mov     ecx, 1
-.text:0099119B ?PC_InitSigninState@@YAXXZ                                                                                  mov     ecx, 1
-.text:00994876 ?SocketRouter_EmergencyFrame@@YAXPBD@Z                                                                      mov     ecx, 1
 .text:009992AC ?Reset@GlassRenderer@@QAEXXZ                                                                                mov     ecx, 1
 .text:0099955C ?RemoveGlassShards@GlassRenderer@@QAEXI@Z                                                                   mov     ecx, 1
 .text:00999803 ?RemovePhysicsShards@GlassRenderer@@QAEXXZ                                                                  mov     ecx, 1
