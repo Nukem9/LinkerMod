@@ -83,6 +83,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="com_bsp_load_obj.h" />
+    <ClInclude Include="com_files.h" />
+    <ClInclude Include="com_memory.h" />
     <ClInclude Include="console.h" />
     <ClInclude Include="PageGuard.h" />
     <ClInclude Include="r_xmodel_load_obj.h" />
@@ -91,6 +94,9 @@
     <ClInclude Include="threading.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="com_bsp_load_obj.cpp" />
+    <ClCompile Include="com_files.cpp" />
+    <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="console.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>

@@ -59,16 +59,35 @@ BOOL cod2rad_Init()
 	PatchMemory(0x004264AE, (PBYTE)"\xEB", 1); // Xmodelparts version check
 	Detours::X86::DetourFunction((PBYTE)0x004476B5, (PBYTE)&mfh_XModelReadSurface); // 4 byte xmodelsurfs file adjustment (MagicNumber)
 
+	//
+	// Change the file mode for saving d3dbsp files to "wb+"
+	//
+	PBYTE p_fmode = (PBYTE)&g_fmode;
+	PatchMemory(0x00441B5C, p_fmode, 4);
+	PatchMemory(0x00441BDB, p_fmode, 4);
+
+	//
+	// Enforce WAW D3DBSP Format on loaded D3DBSP
+	//	And BO1 D3DBSP Format on save
+	//
+	Detours::X86::DetourFunction((PBYTE)0x004413D0, (PBYTE)&hk_FS_FOpenFileRead);
+	Detours::X86::DetourFunction((PBYTE)0x00442E97, (PBYTE)&mfh_Com_SaveBsp);
+
 	g_initted = true;
 	return TRUE;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-	if(ul_reason_for_call == DLL_PROCESS_ATTACH)
+	switch (ul_reason_for_call)
 	{
-		DisableThreadLibraryCalls(hModule);
-		return cod2rad_Init();
+	case DLL_PROCESS_ATTACH:
+		Con_Init();
+		cod2rad_Init();
+		break;
+	case DLL_PROCESS_DETACH:
+		Con_Restore();
+		break;
 	}
 
 	return TRUE;
