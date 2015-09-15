@@ -57,7 +57,7 @@ BOOL cod2rad_Init()
 
 	PatchMemory(0x0042635A, (PBYTE)"\xEB", 1); // Xmodelsurfs version check
 	PatchMemory(0x004264AE, (PBYTE)"\xEB", 1); // Xmodelparts version check
-	PatchMemory(0x005351A2, (PBYTE)"\x08", 1); // 4 byte xmodelsurfs file adjustment (MagicNumber)
+	Detours::X86::DetourFunction((PBYTE)0x004476B5, (PBYTE)&mfh_XModelReadSurface); // 4 byte xmodelsurfs file adjustment (MagicNumber)
 
 	g_initted = true;
 	return TRUE;
