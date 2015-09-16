@@ -28,6 +28,12 @@ void Patch_DDL()
 	//PatchMemory(0x0098032C, (PBYTE)&newStatsSize, 4);
 	//PatchMemory(0x00980387, (PBYTE)&newStatsSize, 4);
 
+	PatchMemory(0x0098AA79, (PBYTE)&newStatsSize, 4);	// SV_IsStatsBlobOK
+	PatchMemory(0x0098AA96, (PBYTE)"\xCC", 1);			// SV_IsStatsBlobOK
+	PatchMemory(0x0098AAD9, (PBYTE)"\xCC", 1);			// SV_IsStatsBlobOK
+
+	PatchMemory(0x0098AD6B, (PBYTE)&newStatsSize, 4);	// SV_DWReadClientCAC
+
 	Detours::X86::DetourFunction((PBYTE)0x009801D0, (PBYTE)&LiveStorage_GetStatsBufferSize);
 	Detours::X86::DetourFunction((PBYTE)0x0097FF20, (PBYTE)&LiveStorage_GetPersStatsBuffer);
 	Detours::X86::DetourFunction((PBYTE)0x00986950, (PBYTE)&LiveStorage_ClearPlayerStats);
@@ -38,7 +44,7 @@ void Patch_DDL()
 	Detours::X86::DetourFunction((PBYTE)0x00982440, (PBYTE)&LiveStorage_ReadCommonStats);
 	Detours::X86::DetourFunction((PBYTE)0x0097FF00, (PBYTE)&LiveStorage_GetStatsBuffer);
 	Detours::X86::DetourFunction((PBYTE)0x009804A0, (PBYTE)&LiveStorage_DoWeHaveStats);
-
+	Detours::X86::DetourFunction((PBYTE)0x00980400, (PBYTE)&LiveStorage_AreStatsDDLValidated);
 	Detours::X86::DetourFunction((PBYTE)0x009804C0, (PBYTE)&LiveStorage_DoWeHaveCurrentStats);
 
 	PatchMemory(0x0098759A, (PBYTE)&newWAD, 4);
@@ -153,6 +159,11 @@ bool LiveStorage_GetStatsChecksumValid(const int controllerIndex, statsLocation 
 void LiveStorage_SetStatsDDLValidated(const int controllerIndex, statsLocation playerStatsLocation, bool statsValidatedWithDDL)
 {
 	LiveStorage_GetPersStatsBuffer(controllerIndex, playerStatsLocation, true)->statsValidatedWithDDL = statsValidatedWithDDL;
+}
+
+bool LiveStorage_AreStatsDDLValidated(const int controllerIndex, statsLocation playerStatsLocation)
+{
+	return LiveStorage_GetPersStatsBuffer(controllerIndex, playerStatsLocation, true)->statsValidatedWithDDL;
 }
 
 void LiveStorage_SetStatsFetched(const int localControllerIndex, statsLocation playerStatsLocation, bool isFetched)

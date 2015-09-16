@@ -88,8 +88,8 @@ void LiveStorage_ClearPlayerStats(const int controllerIndex);
 bool LiveStorage_DoWeHaveCurrentStats(const int controllerIndex);
 void LiveStorage_SetStatsChecksumValid(const int controllerIndex, statsLocation playerStatsLocation, bool isValid);
 bool LiveStorage_GetStatsChecksumValid(const int controllerIndex, statsLocation playerStatsLocation);
-
 void LiveStorage_SetStatsDDLValidated(const int controllerIndex, statsLocation playerStatsLocation, bool statsValidatedWithDDL);
+bool LiveStorage_AreStatsDDLValidated(const int controllerIndex, statsLocation playerStatsLocation);
 void LiveStorage_SetStatsFetched(const int localControllerIndex, statsLocation playerStatsLocation, bool isFetched);
 bool LiveStorage_DoWeHaveStats(const int controllerIndex, statsLocation playerStatsLocation);
 

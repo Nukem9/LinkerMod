@@ -89,18 +89,118 @@ void hk_LiveSteam_Init()
 	LiveSteam_Init();
 }
 
+typedef short scr_entref_t;
+
+struct BuiltinMethodDef
+{
+	const char *actionString;
+	void(__cdecl *actionFunc)(scr_entref_t);
+	int type;
+};
+
+struct BuiltinFunctionDef
+{
+	const char *actionString;
+	void(__cdecl *actionFunc)();
+	int type;
+};
+
+BuiltinMethodDef *methods_3 = (BuiltinMethodDef *)0x00E09708;
+BuiltinFunctionDef *functions = (BuiltinFunctionDef *)0x00E08510;
+
+void RandomFunc(scr_entref_t entref)
+{
+}
+
+void RandomFunc2()
+{
+}
+
+void(__cdecl *__cdecl BuiltIn_GetMethod(const char **pName, int *type))(scr_entref_t)
+{
+	for (int i = 0; i < 234; ++i)
+	{
+		if (!strcmp(*pName, methods_3[i].actionString))
+		{
+			*pName = methods_3[i].actionString;
+			*type = methods_3[i].type;
+			return methods_3[i].actionFunc;
+		}
+	}
+
+	if (!stricmp(*pName, "GetClientFlag"))
+	{
+		*pName = "getclientflag";
+		*type = 0;
+		return (void(__cdecl *)(scr_entref_t))0x00660BD0;
+	}
+
+	return RandomFunc;
+}
+
+void(__cdecl *__cdecl Scr_GetFunction(const char **pName, int *type))()
+{
+	for (int i = 0; i < 383; ++i)
+	{
+		if (!strcmp(*pName, functions[i].actionString))
+		{
+			*pName = functions[i].actionString;
+			*type = functions[i].type;
+			return functions[i].actionFunc;
+		}
+	}
+
+	*type = 0;
+	return RandomFunc2;
+}
+
+char *test = "maps/%s.d3dbsp";
+
 BOOL ServerMod_Init()
 {
 	PatchMemory(0x0059E83E, (PBYTE)&dwInitAddress, 4);
 	PatchMemory(0x0059EE78, (PBYTE)&dwInitAddress, 4);
 
+	//PatchMemory(0x007A7DC8, (PBYTE)&test, 4);
+
+	int proto = 2117;
+	PatchMemory(0x00973095, (PBYTE)&proto, 4);
+
+	PatchMemory(0x0071163B, (PBYTE)&proto, 4);
+	PatchMemory(0x00711640, (PBYTE)&proto, 4);
+	PatchMemory(0x00711645, (PBYTE)&proto, 4);
+	PatchMemory(0x00706EAF, (PBYTE)&proto, 4);
+	PatchMemory(0x00713A26, (PBYTE)&proto, 4);
+	PatchMemory(0x005612DB, (PBYTE)&proto, 4);
+
 	ReallocateAssetPool(ASSET_TYPE_STRINGTABLE, 1024);
+	ReallocateAssetPool(ASSET_TYPE_GAMEWORLD_SP, 1);
+	ReallocateAssetPool(ASSET_TYPE_FX, 1024);
 	ReallocateAssetPool(ASSET_TYPE_LOCALIZE_ENTRY, 20400);
 	ReallocateAssetPool(ASSET_TYPE_SNDDRIVER_GLOBALS, 16);
+
+	Detours::X86::DetourFunction((PBYTE)0x00661680, (PBYTE)&BuiltIn_GetMethod);
+	Detours::X86::DetourFunction((PBYTE)0x00660A50, (PBYTE)&Scr_GetFunction);
+
+	PatchMemory_WithNOP(0x008BDCF9, 2);
+	PatchMemory_WithNOP(0x008BDCFF, 2);
+	PatchMemory(0x008BDEB0, (PBYTE)"\xC3", 1);
+
+	PatchMemory_WithNOP(0x005644ED, 2);
+
+	PatchMemory_WithNOP(0x008B8396, 2);
 
 	//PatchMemory(0x005A0274, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 	//PatchMemory(0x0071023F, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 	PatchMemory(0x0093CA00, (PBYTE)"\xC3", 1);
+
+	//PatchMemory(0x00708A3C, (PBYTE)"\xEB", 1); stats bug
+
+	PatchMemory(0x00564720, (PBYTE)"\xC3", 1);	// CL_DevGuiDvar_f
+
+	PatchMemory_WithNOP(0x006D1C7B, 5);	// Com_DPrintf (logging)
+
+	PatchMemory(0x00661FD0, (PBYTE)"\xC3", 1);
 
 	//PatchMemory(0x008BD8EB, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 	//PatchMemory(0x008BD7E5, (PBYTE)"\x90\x90\x90\x90\x90", 5);
@@ -182,7 +282,6 @@ BOOL ServerMod_Init()
 		PatchMemory_WithNOP(0x00594F63, 2);	// DB_LoadFastFilesForPC
 	}
 
-	PatchMemory_WithNOP(0x00987570, 9);	// LiveStorage_FetchOnlineWAD
 
 	PatchMemory_WithNOP(0x006D4342, 2);	// Com_ErrorCleanup
 
@@ -190,6 +289,7 @@ BOOL ServerMod_Init()
 	PatchMemory_WithNOP(0x007DB6CC, 2);	// WinMain
 
 	PatchMemory_WithNOP(0x0099148B, 7);	// Live_Frame
+	PatchMemory(0x00962FE4, (PBYTE)"\xEB", 1);	// Live_FileShare_Read_f
 	PatchMemory_WithNOP(0x0097DA14, 7);	// LiveSteam_Init
 	PatchMemory_WithNOP(0x0097DDC4, 2);	// LiveSteam_Frame
 	PatchMemory_WithNOP(0x0097D57D, 4);	// LiveSteam_CheckAccess
@@ -199,27 +299,24 @@ BOOL ServerMod_Init()
 	PatchMemory_WithNOP(0x00975297, 2);	// LiveStats_SetIntPlayerStatInternal
 	PatchMemory_WithNOP(0x0096D68A, 2);	// LiveNews_PopulateFriendNews
 	PatchMemory_WithNOP(0x00986BD8, 2);	// LiveStorage_Init
+	PatchMemory_WithNOP(0x00987570, 9);	// LiveStorage_FetchOnlineWAD
 	PatchMemory_WithNOP(0x00981431, 2);	// LiveStorage_ReadDWFileByUserID
 	PatchMemory_WithNOP(0x009818DD, 2);	// LiveStorage_GetServerTimeComplete
 	PatchMemory_WithNOP(0x00985183, 2);	// LiveStorage_FileShare_WriteSummarySuccess
 
-	PatchMemory(0x00710180, (PBYTE)"\xC3", 1);	// SV_Startup
+	PatchMemory(0x007101B9, (PBYTE)"\xE9\x98\x00\x00\x00", 5);	// SV_Startup
 
-	PatchMemory(0x00962FE4, (PBYTE)"\xEB", 1);	// Live_FileShare_Read_f
 
 	PatchMemory_WithNOP(0x005A020A, 2);	// DWDedicatedLogon
-
 	PatchMemory_WithNOP(0x0059EE1B, 7);	// dwLogOnComplete
+	PatchMemory_WithNOP(0x005A100C, 2);	// dwUpdateSessionComplete
+
+
+	PatchMemory_WithNOP(0x00713FAD, 2);	// SVC_Info
 
 	PatchMemory_WithNOP(0x00703CE3, 2);	// SV_Map_f
-
-	PatchMemory_WithNOP(0x00703CE3, 2);	// SV_Map_f
-	PatchMemory_WithNOP(0x00703CE3, 2);	// SV_Map_f
-
-
 	PatchMemory_WithNOP(0x0071681C, 2);	// SV_MasterHeartbeat
 	PatchMemory_WithNOP(0x0071682E, 2);	// SV_MasterHeartbeat
-
 	PatchMemory(0x007179E0, (PBYTE)"\xC3", 1);	// SV_SysLog_LogMessage (DANGEROUS - DISABLED)
 
 	PatchMemory_WithNOP(0x006F587A, 2);	// Sys_WaitRenderer
@@ -227,7 +324,6 @@ BOOL ServerMod_Init()
 	PatchMemory_WithNOP(0x0041A9BE, 2);	// BG_EmblemsInit
 
 	PatchMemory_WithNOP(0x007A79CD, 2);	// FS_Restart
-
 
 	PatchMemory_WithNOP(0x0093110B, 6);	// SND_ShouldInit
 
@@ -237,6 +333,8 @@ BOOL ServerMod_Init()
 
 	PatchMemory_WithNOP(0x00740C02, 2);	// UI_Gametype_FileShareDownloadComplete
 	PatchMemory_WithNOP(0x0050BE53, 2);	// UI_SetLocalVarStringByName
+	PatchMemory_WithNOP(0x0077697B, 7);	// UI_SetLoadingScreenMaterial
+	PatchMemory(0x0073EB5B, (PBYTE)"\xEB", 1);	// UI_Gametype_IsUsingCustom
 
 	PatchMemory_WithNOP(0x0058F101, 2);	// DB_Sleep
 	PatchMemory_WithNOP(0x00594227, 2);	// DB_SyncExternalAssets
@@ -245,15 +343,14 @@ BOOL ServerMod_Init()
 
 	PatchMemory_WithNOP(0x0097287A, 6);	// Session_IsHost
 
-	PatchMemory(0x00972EED, (PBYTE)"\xEB", 1);	// Session_StartHost XBOXLIVE_SIGNEDOUTOFLIVE
-	PatchMemory(0x00972F0D, (PBYTE)"\xEB", 1);	// Session_StartHost assert #1
-	PatchMemory(0x00972FCB, (PBYTE)"\xEB", 1);	// Session_StartHost assert #2
+	PatchMemory(0x0060D582, (PBYTE)"\xEB", 1);	// PlayerCmd_IsLocalToHost
+
+	//PatchMemory(0x00972EED, (PBYTE)"\xEB", 1);	// Session_StartHost XBOXLIVE_SIGNEDOUTOFLIVE
+	//PatchMemory(0x00972F0D, (PBYTE)"\xEB", 1);	// Session_StartHost assert #1
+	//PatchMemory(0x00972FCB, (PBYTE)"\xEB", 1);	// Session_StartHost assert #2
 
 	// SocketRouter_EmergencyFrame
 	PatchMemory_WithNOP(0x0099487D, 6);
-
-	// !C .P !D UI_SetLoadingScreenMaterial
-	PatchMemory_WithNOP(0x0077697B, 7);
 
 	// !C .P !D PC_InitSigninState
 	PatchMemory(0x009911A2, (PBYTE)"\xEB", 1);
@@ -270,6 +367,8 @@ BOOL ServerMod_Init()
 	// Com_WriteKeyConfigToFile
 	PatchMemory(0x006D5BEF, (PBYTE)"\x90\x90", 2);
 
+	PatchMemory(0x007D3EEB, (PBYTE)"\x90\x90", 2);	// KeyValueToField
+
 	// !C !P !D Com_LoadFrontEnd
 	PatchMemory_WithNOP(0x006D66BA, 9);
 
@@ -277,7 +376,6 @@ BOOL ServerMod_Init()
 
 	// script
 	PatchMemory(0x008DC190, (PBYTE)"\xEB", 1);
-	PatchMemory(0x00661FD0, (PBYTE)"\xC3", 1);// scr_playerconnect
 
 	// xuid != PCACHE_INVALID_XUID assert
 	PatchMemory(0x0096FD07, (PBYTE)"\xEB", 1);
