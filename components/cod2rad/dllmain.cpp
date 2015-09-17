@@ -40,6 +40,11 @@ BOOL cod2rad_Init()
 	PatchThreading();
 
 	//
+	// Add Custom Cmd Line Arguments
+	//
+	PatchArguments();
+
+	//
 	// Enable Techset / Technique Path Redirection
 	//
 	PatchMemory(0x0042CA85, (PBYTE)&techiquePath, 4);
