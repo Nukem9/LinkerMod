@@ -40,7 +40,7 @@ BOOL cod2rad_Init()
 	PatchThreading();
 
 	//
-	// Add Custom Cmd Line Arguments
+	// Add Custom Cmd Line Arguments (-HDR Support)
 	//
 	PatchArguments();
 

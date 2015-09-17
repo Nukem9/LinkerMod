@@ -89,6 +89,7 @@
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="console.h" />
+    <ClInclude Include="hdr.h" />
     <ClInclude Include="PageGuard.h" />
     <ClInclude Include="r_xmodel_load_obj.h" />
     <ClInclude Include="r_xsurface_load_obj.h" />
@@ -109,6 +110,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="hdr.cpp" />
     <ClCompile Include="PageGuard.cpp" />
     <ClCompile Include="r_xmodel_load_obj.cpp" />
     <ClCompile Include="r_xsurface_load_obj.cpp" />

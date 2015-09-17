@@ -34,7 +34,12 @@ int Argument_HandleInteger(char** argv, int argv_len, int* dest, int min, int ma
 //
 int __cdecl argHDR_f(int argv_len, char **argv)
 {
-	return Argument_HandleInteger(argv, argv_len, &g_HDR, 0, 3);
+	int result = Argument_HandleInteger(argv, argv_len, &g_HDR, 0, 3);
+
+	if (g_HDR)
+		PatchHDR_Lightmaps();
+
+	return result;
 }
 
 void PatchArguments()
