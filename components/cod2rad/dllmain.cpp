@@ -54,6 +54,7 @@ BOOL cod2rad_Init()
 	// Patch the requested IWI version to match BO1
 	//
 	PatchMemory(0x00417AA7, (PBYTE)"\xEB", 1);
+	FS_FileOpen = (FS_FileOpen_t)Detours::X86::DetourFunction((PBYTE)0x004034E8, (PBYTE)&FS_ImageRedirect);
 
 	//
 	// Patch Xmodel loading functions to support Black Ops

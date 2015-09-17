@@ -5,7 +5,7 @@
 static char* g_fmode = "wb+";
 
 typedef FILE* (__cdecl* FS_FileOpen_t)(const char* filename, const char* mode);
-static FS_FileOpen_t FS_FileOpen = (FS_FileOpen_t)0x004034E8;
+extern FS_FileOpen_t FS_FileOpen;
 
 typedef int(__cdecl* FS_FileClose_t)(FILE* file);
 static FS_FileClose_t FS_FileClose = (FS_FileClose_t)0x00402883;
@@ -28,3 +28,5 @@ static FS_FileWrite_t FS_FileWrite = (FS_FileWrite_t)0x0040408A;
 size_t FS_FileGetFileSize(FILE* h);
 
 void hk_FS_FOpenFileRead();
+
+FILE* __cdecl FS_ImageRedirect(const char* filename, const char* mode);
