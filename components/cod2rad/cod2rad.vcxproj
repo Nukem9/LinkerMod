@@ -91,10 +91,12 @@
     <ClInclude Include="console.h" />
     <ClInclude Include="hdr.h" />
     <ClInclude Include="PageGuard.h" />
+    <ClInclude Include="r_lightmaps.h" />
     <ClInclude Include="r_xmodel_load_obj.h" />
     <ClInclude Include="r_xsurface_load_obj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="threading.h" />
+    <ClInclude Include="vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arguments.cpp" />
@@ -112,6 +114,7 @@
     </ClCompile>
     <ClCompile Include="hdr.cpp" />
     <ClCompile Include="PageGuard.cpp" />
+    <ClCompile Include="r_lightmaps.cpp" />
     <ClCompile Include="r_xmodel_load_obj.cpp" />
     <ClCompile Include="r_xsurface_load_obj.cpp" />
     <ClCompile Include="stdafx.cpp">
