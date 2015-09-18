@@ -49,6 +49,28 @@ void Com_SaveLightmaps_HDR(Lump* lump)
 	delete[] Lightmap2Bytes_HDR;
 }
 
+void Com_SaveLightgrid_HDR(Lump* lump)
+{
+	DWORD* lightgridColorCount = (DWORD*)0x112BAAB4;
+
+	Con_Warning("Saving %d LGC\n", *lightgridColorCount);
+
+	DiskGfxLightGridColors_BO* lightgridColors = (DiskGfxLightGridColors_BO*)lump->content;
+
+	for (DWORD i = 0; i < *lightgridColorCount; i++)
+	{
+		for (int y = 0; y < 56; y++)
+		{
+			for (int x = 0; x < 3; x++)
+			{
+				lightgridColors[i].rgb[y][x] = DiskLightGridSampleColors_HDR[i][y][x];
+			}
+		}
+	}
+
+	delete[] DiskLightGridSampleColors_HDR;
+}
+
 int __cdecl Com_SaveBsp_EnforceVersion(FILE* h)
 {
 	long len = FS_FTell(h);
@@ -65,17 +87,10 @@ int __cdecl Com_SaveBsp_EnforceVersion(FILE* h)
 
 	if (g_HDR)
 	{
-		Lump* lightmaps = NULL;
-		for (unsigned int i = 0; i < iBSP->diskLumpCount; i++)
-		{
-			if (iBSP->diskLumpOrder[i] == LUMP_LIGHTBYTES)
-			{
-				lightmaps = &iBSP->lumps[i];
-				break;
-			}
-		}
-		
-		Com_SaveLightmaps_HDR(lightmaps);
+		delete[] LightGridSampleColors_HDR;
+
+		Com_SaveLightmaps_HDR(&iBSP->lumps[LUMP_LIGHTBYTES]);
+		Com_SaveLightgrid_HDR(&iBSP->lumps[LUMP_LIGHTGRIDCOLORS]);
 	}
 
 	len = iBSP->PotentialFileSize();

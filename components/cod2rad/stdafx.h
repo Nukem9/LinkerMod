@@ -21,6 +21,7 @@
 #include "hdr.h"
 
 #include "r_lightmaps.h"
+#include "r_lightgrid.h"
 #include "r_xmodel_load_obj.h"
 #include "r_xsurface_load_obj.h"
 

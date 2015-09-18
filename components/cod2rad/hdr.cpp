@@ -3,16 +3,23 @@
 vec4* LightmapBytes_HDR = nullptr;
 vec4* Lightmap2Bytes_HDR = nullptr;
 
+SampleColorHDR* LightGridSampleColors_HDR = nullptr;
+DiskSampleColorHDR* DiskLightGridSampleColors_HDR = nullptr;
+
 void R_Init_LightmapsHDR()
 {
 	LightmapBytes_HDR = new vec4[512 * 512 * *g_LightmapCount];
 	Lightmap2Bytes_HDR = new vec4[512 * 512 * *g_LightmapCount];
 }
 
-void __cdecl R_StoreLightmapPixelHDR(vec4* pel1, vec4* pel2, int lightmap, int row, int pel)
+void R_Init_LightgridHDR()
 {
-	LightmapBytes_HDR[0x40000 * lightmap + 512 * row + pel] = *pel1;
-	Lightmap2Bytes_HDR[0x40000 * lightmap + 512 * row + pel] = *pel2;
+	LightGridSampleColors_HDR = new SampleColorHDR[*g_lightgridSampleCount + 1];
+}
+
+void R_Init_DiskLightgridHDR()
+{
+	DiskLightGridSampleColors_HDR = new DiskSampleColorHDR[*g_diskLightgridSampleCount];
 }
 
 void PatchHDR_Lightmaps()
@@ -47,4 +54,18 @@ void PatchHDR_Lightmaps()
 	o_R_BuildFinalLightmaps = (R_BuildFinalLightmaps_t)Detours::X86::DetourFunction((PBYTE)0x00432D70, (PBYTE)&hk_R_BuildFinalLightmaps);
 	Detours::X86::DetourFunction((PBYTE)0x00432830, (PBYTE)&hk_R_StoreLightmapPixel);
 	Detours::X86::DetourFunction((PBYTE)0x00432885, (PBYTE)&mfh_R_StoreLightmapPixel);
+}
+
+void PatchHDR_Lightgrid()
+{
+	//
+	// Remove HDR Clamping
+	//
+	PatchMemory(0x00434E87, (PBYTE)"\xEB", 1);
+	
+	Detours::X86::DetourFunction((PBYTE)0x00436847, (PBYTE)&mfh_R_Init_Lightgrid);
+	Detours::X86::DetourFunction((PBYTE)0x00434E7E, (PBYTE)&mfh_R_Store_LightgridSample);
+
+	Detours::X86::DetourFunction((PBYTE)0x00435C8E, (PBYTE)&mfh_R_Alloc_DiskLightGridColors);
+	o_R_Store_QuantizedLightGridSample = (R_Store_QuantizedLightGridSample_t)Detours::X86::DetourFunction((PBYTE)0x00433890, (PBYTE)&hk_R_Store_QuantizedLightGridSample);
 }

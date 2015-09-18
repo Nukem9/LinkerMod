@@ -37,7 +37,10 @@ int __cdecl argHDR_f(int argv_len, char **argv)
 	int result = Argument_HandleInteger(argv, argv_len, &g_HDR, 0, 3);
 
 	if (g_HDR)
+	{
 		PatchHDR_Lightmaps();
+		PatchHDR_Lightgrid();
+	}
 
 	return result;
 }

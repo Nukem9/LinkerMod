@@ -34,6 +34,12 @@ void __declspec(naked) hk_R_StoreLightmapPixel() //00432830
 	}
 }
 
+void __cdecl R_StoreLightmapPixelHDR(vec4* pel1, vec4* pel2, int lightmap, int row, int pel)
+{
+	LightmapBytes_HDR[0x40000 * lightmap + 512 * row + pel] = *pel1;
+	Lightmap2Bytes_HDR[0x40000 * lightmap + 512 * row + pel] = *pel2;
+}
+
 void* sub_4323E0 = (void*)0x4323E0;
 void* rtn_R_StoreLightmapPixel2 = (void*)0x0043288D;
 void __declspec(naked) mfh_R_StoreLightmapPixel()
