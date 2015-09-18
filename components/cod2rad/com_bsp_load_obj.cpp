@@ -44,6 +44,9 @@ void Com_SaveLightmaps_HDR(Lump* lump)
 			}
 		}
 	}
+
+	delete[] LightmapBytes_HDR;
+	delete[] Lightmap2Bytes_HDR;
 }
 
 int __cdecl Com_SaveBsp_EnforceVersion(FILE* h)
