@@ -29,45 +29,34 @@ void __declspec(naked) mfh_R_Init_Lightgrid()
 	}
 }
 
-void __cdecl R_Store_LightGridSample_HDR(int sampleIndex, int pelIndex, int channelIndex, float value)
+void __cdecl R_Store_LightGridSample_HDR(DWORD entryOffset, DWORD pixelIndex, float value)
 {
-	LightGridSampleColors_HDR[sampleIndex][pelIndex][channelIndex] = value;
+	float* LightGridEntry = (float*)LightGridSampleColors_HDR;
+	LightGridEntry += (entryOffset - *(DWORD*)0x153C91DC);
+
+	LightGridEntry[pixelIndex] = value;
 }
 
-void * ag = (void*)0x00434E8F;
-void* rtn_R_Store_LightgridSample = (void*)0x00434E87;
+void* rtn_R_Store_LightgridSample = (void*)0x00434EB3;
 void __declspec(naked) mfh_R_Store_LightgridSample()
 {
 	_asm
 	{
-		push eax
+		fadd [esp + 18h]
+		
 		push ebx
-		mov eax, [esp + 34h]
-		mov ebx, [esp + 18h]
+		mov ebx, [esp + 14h] 
 		pushad
 		push ebx //value
-		push ecx //channelIndex
-
-		sub edi, 1
-		push edi //pelIndex
-
-		//Calculate the index based on the offset and entry size
-		mov ebx, 153C91DCh
-		sub eax, [ebx]
-		mov edx, 0
-		mov ebx, 168
-		div ebx
-
-		push eax //sampleIndex
+		push ecx //pixelIndex
+		push esi //entryOffset
 		call R_Store_LightGridSample_HDR
-		add esp, 16
+		add esp, 12
 		popad
 		pop ebx
-		pop eax
 
-		movss xmm1, [esp + 10h]
-		comiss xmm1, xmm0
-	
+		fistp [esp + 14h]
+		mov	al, [esp + 14h]
 		jmp rtn_R_Store_LightgridSample
 	}
 }
@@ -89,14 +78,14 @@ void __declspec(naked) mfh_R_Alloc_DiskLightGridColors()
 
 void __cdecl R_QuantizeLightGridColorHDR(float* floats, GfxLightGridColor_Internal* LGCBuf)
 {
-	double sums[56][3];
+	double sums[168];
 	memset(sums, 0, sizeof(double) * 168);
 
 	DWORD LGCCount = LGCBuf->d1_lightgridcolorcount;
 
 	if (LGCCount)
 	{
-		SampleColorHDR* originalColors = LightGridSampleColors_HDR;
+		float* originalColors = (float*)LightGridSampleColors_HDR;
 		DWORD* dw_lightGridColorMapping = *(DWORD**)0x153C91E8;
 		DWORD* lightGridColorIndex = &dw_lightGridColorMapping[LGCBuf->d0_index];
 
@@ -105,38 +94,34 @@ void __cdecl R_QuantizeLightGridColorHDR(float* floats, GfxLightGridColor_Intern
 		//
 		for (DWORD colorIndex = 0; colorIndex < LGCCount; colorIndex++)
 		{
-			SampleColorHDR* originalEntry = &originalColors[*lightGridColorIndex];
+			float* originalEntry = &originalColors[168 * *lightGridColorIndex];
 
-			for (int y = 0; y < 56; y++)
+			for (int i = 0; i < 168; i++)
 			{
-				for (int x = 0; x < 3; x++)
-				{
-					float value = (*originalEntry)[y][x] < 0 ? 0.0f : (float)(*originalEntry)[y][x];
-					sums[y][x] += value;
-				}
+				sums[i] += originalEntry[i];;
 			}
 
 			lightGridColorIndex++;
 		}
 	}
 
-	double divisor = LGCCount;
-	SampleColorHDR* dest = (SampleColorHDR*)floats;
+	float divisor = (float)LGCCount;
 
-	for (int y = 0; y < 56; y++)
+	for (int i = 0; i < 168; i++)
 	{
-		for (int x = 0; x < 3; x++)
-		{
-			(*dest)[y][x] = (float)(sums[y][x] / divisor);
-		}
+		floats[i] = (float)sums[i];
+
+		if (sums[i] < 0)
+			floats[i] = 0;
+
+		floats[i] /= divisor;
 	}
 }
 
 void __cdecl R_Store_QuantizedLightGridSampleHDR(GfxLightGridColor_Internal* LGCBuf_Internal, BYTE* dest)
 {
 	SampleColorHDR floats;
-	BYTE result = 0;
-	R_QuantizeLightGridColorHDR((float*)&floats, LGCBuf_Internal);
+	R_QuantizeLightGridColorHDR(&floats[0][0], LGCBuf_Internal);
 
 	DWORD index = ((DWORD)dest - 0x096CAE08) / (168);
 
@@ -144,7 +129,7 @@ void __cdecl R_Store_QuantizedLightGridSampleHDR(GfxLightGridColor_Internal* LGC
 	{
 		for (int x = 0; x < 3; x++)
 		{
-			DiskLightGridSampleColors_HDR[index][y][x] = (WORD)(floats[y][x] * 255.0f * 8.0f + 0.5f);
+			DiskLightGridSampleColors_HDR[index][y][x] = (WORD)(floats[y][x]);
 		}
 	}
 }

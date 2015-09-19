@@ -15,6 +15,7 @@ void R_Init_LightmapsHDR()
 void R_Init_LightgridHDR()
 {
 	LightGridSampleColors_HDR = new SampleColorHDR[*g_lightgridSampleCount + 1];
+	memset(LightGridSampleColors_HDR, 0, sizeof(SampleColorHDR) * (*g_lightgridSampleCount + 1));
 }
 
 void R_Init_DiskLightgridHDR()
@@ -64,7 +65,7 @@ void PatchHDR_Lightgrid()
 	PatchMemory(0x00434E87, (PBYTE)"\xEB", 1);
 	
 	Detours::X86::DetourFunction((PBYTE)0x00436847, (PBYTE)&mfh_R_Init_Lightgrid);
-	Detours::X86::DetourFunction((PBYTE)0x00434E7E, (PBYTE)&mfh_R_Store_LightgridSample);
+	Detours::X86::DetourFunction((PBYTE)0x00434EA7, (PBYTE)&mfh_R_Store_LightgridSample);
 
 	Detours::X86::DetourFunction((PBYTE)0x00435C8E, (PBYTE)&mfh_R_Alloc_DiskLightGridColors);
 	o_R_Store_QuantizedLightGridSample = (R_Store_QuantizedLightGridSample_t)Detours::X86::DetourFunction((PBYTE)0x00433890, (PBYTE)&hk_R_Store_QuantizedLightGridSample);
