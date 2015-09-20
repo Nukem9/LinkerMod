@@ -83,12 +83,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="arguments.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="com_bsp_load_obj.h" />
+    <ClInclude Include="com_files.h" />
+    <ClInclude Include="com_memory.h" />
     <ClInclude Include="console.h" />
+    <ClInclude Include="hdr.h" />
     <ClInclude Include="PageGuard.h" />
+    <ClInclude Include="r_lightgrid.h" />
+    <ClInclude Include="r_lightmaps.h" />
+    <ClInclude Include="r_xmodel_load_obj.h" />
+    <ClInclude Include="r_xsurface_load_obj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="threading.h" />
+    <ClInclude Include="vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="arguments.cpp" />
+    <ClCompile Include="com_bsp_load_obj.cpp" />
+    <ClCompile Include="com_files.cpp" />
+    <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="console.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -98,7 +113,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="hdr.cpp" />
     <ClCompile Include="PageGuard.cpp" />
+    <ClCompile Include="r_lightgrid.cpp" />
+    <ClCompile Include="r_lightmaps.cpp" />
+    <ClCompile Include="r_xmodel_load_obj.cpp" />
+    <ClCompile Include="r_xsurface_load_obj.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
