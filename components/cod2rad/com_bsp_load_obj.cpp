@@ -53,8 +53,6 @@ void Com_SaveLightgrid_HDR(Lump* lump)
 {
 	DWORD* lightgridColorCount = (DWORD*)0x112BAAB4;
 
-	Con_Warning("Saving %d LGC\n", *lightgridColorCount);
-
 	DiskGfxLightGridColors_BO* lightgridColors = (DiskGfxLightGridColors_BO*)lump->content;
 
 	for (DWORD i = 0; i < *lightgridColorCount; i++)
