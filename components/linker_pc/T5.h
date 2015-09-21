@@ -18,6 +18,7 @@ static FS_FCloseFile_t FS_FCloseFile = (FS_FCloseFile_t)0x4C6720;
 typedef int (__cdecl * FS_Read_t)(void *buffer, int len, int fileHandle);
 static FS_Read_t FS_Read = (FS_Read_t)0x4C7480;
 
+#include "com_files.h"
 #include "com_memory.h"
 #include "cm_trace.h"
 #include "com_bsp_lump.h"

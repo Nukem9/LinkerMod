@@ -13,7 +13,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "radiant_mod", "components\r
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cod2rad", "components\cod2rad\cod2rad.vcxproj", "{B19C7605-5258-457E-883A-1A7896E7BD6C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "map_mod", "components\cod2map\cod2map.vcxproj", "{37CF9A1C-7E15-44FA-BA81-A389E617F2D9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cod2map", "components\cod2map\cod2map.vcxproj", "{37CF9A1C-7E15-44FA-BA81-A389E617F2D9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "path_mod", "components\path_mod\path_mod.vcxproj", "{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{37CF9A1C-7E15-44FA-BA81-A389E617F2D9}.Debug|Win32.Build.0 = Debug|Win32
 		{37CF9A1C-7E15-44FA-BA81-A389E617F2D9}.Release|Win32.ActiveCfg = Release|Win32
 		{37CF9A1C-7E15-44FA-BA81-A389E617F2D9}.Release|Win32.Build.0 = Release|Win32
+		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Debug|Win32.Build.0 = Debug|Win32
+		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Release|Win32.ActiveCfg = Release|Win32
+		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -62,6 +62,12 @@ BOOL LinkerMod_Init()
 	//VirtualProtect((LPVOID)0x475B60, 1, PAGE_EXECUTE_READWRITE, &d);
 	//*(BYTE *)0x475B60 = 0xC3;
 
+	//
+	// Fix for early fclose of dependency file
+	//
+	PatchMemory_WithNOP(0x0041E5B1, 5);
+	Detours::X86::DetourFunction((PBYTE)0x0041E689, (PBYTE)&mfh_fcloseDeps);
+
 	g_initted = TRUE;
 	return TRUE;
 }

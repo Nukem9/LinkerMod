@@ -15,3 +15,22 @@
 #include "PageGuard.h"
 #include "console.h"
 #include "threading.h"
+
+#include "arguments.h"
+#include "vector.h"
+#include "hdr.h"
+
+#include "r_lightmaps.h"
+#include "r_lightgrid.h"
+#include "r_xmodel_load_obj.h"
+#include "r_xsurface_load_obj.h"
+
+#include "common.h"
+#include "com_memory.h"
+#include "com_files.h"
+
+#include "com_bsp_load_obj.h"
+#include "r_xmodel_load_obj.h"
+#include "r_xsurface_load_obj.h"
+
+

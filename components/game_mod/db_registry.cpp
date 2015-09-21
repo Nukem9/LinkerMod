@@ -25,6 +25,12 @@ void DB_LoadGraphicsAssetsForPC()
 	zoneInfo[0].allocFlags = 8;
 	zoneInfo[0].freeFlags = 0;
 
+	//Add frontend_patch to the zone list (enable mods button)
+	zoneInfo[zoneCount].name = "frontend_patch";
+	zoneInfo[zoneCount].allocFlags = 32;
+	zoneInfo[zoneCount].freeFlags = 0;
+	zoneCount++;
+
 	if(DB_ModFileExists())
 	{
 		zoneInfo[zoneCount].name = "mod";
@@ -32,12 +38,6 @@ void DB_LoadGraphicsAssetsForPC()
 		zoneInfo[zoneCount].freeFlags = 0;
 		zoneCount++;
 	}
-
-	//Add frontend_patch to the zone list
-	zoneInfo[zoneCount].name = "frontend_patch";
-	zoneInfo[zoneCount].allocFlags = 32;
-	zoneInfo[zoneCount].freeFlags = 0;
-	zoneCount++;
 
 	DB_LoadXAssets(zoneInfo, zoneCount, 0);
 }
