@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+void** DB_XAssetPool = (void**)0x00B741B8;
+DWORD* g_poolSize = (DWORD*)0x00B73EF8;
+
 void DB_SyncXAssets()
 {
 	R_BeginRemoveScreenUpdate();
@@ -98,3 +101,12 @@ void DB_ModXFileHandle(HANDLE *zoneFile, char* zoneName, FF_DIR *zoneDir)
 	}
 }
 
+void* DB_ReallocXAssetPool(XAssetType type, unsigned int size)
+{
+	int assetSize = DB_GetXAssetTypeSize(type);
+	void* assetPool = malloc(size * assetSize + sizeof(void*));
+	DB_XAssetPool[type] = assetPool;
+	g_poolSize[type] = size;
+	
+	return assetPool;
+}

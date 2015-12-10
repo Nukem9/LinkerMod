@@ -173,6 +173,10 @@ BOOL GameMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007D9590, (PBYTE)&nullsub);
 	
+	//
+	// Increase Asset Limits
+	//
+	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
 
 	if(IsReflectionMode())
 		ReflectionMod_Init();
