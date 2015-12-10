@@ -11,3 +11,4 @@ void __fastcall sub_661450(void *thisptr, PVOID _EDX, DWORD address, size_t scan
 void __fastcall sub_4E9880(void *thisptr, PVOID _EDX, DWORD address, size_t scanSize);
 void __fastcall sub_640020(void *thisptr, PVOID _EDX, DWORD address, size_t scanSize);
 void __fastcall sub_51A140(void *thisptr, PVOID _EDX, DWORD address, size_t scanSize);
+void __fastcall sub_54A430(void *thisptr, PVOID _EDX, DWORD address, size_t scanSize);
