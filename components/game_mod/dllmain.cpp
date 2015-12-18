@@ -164,6 +164,11 @@ BOOL GameMod_Init()
 	PatchMemory(0x00868414, (PBYTE)"\xEB", 1);
 
 	//
+	// Force new mod specific configs to inherit from the vanilla config
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0082A269, (PBYTE)&mfh_Cmd_Exec_f);
+
+	//
 	// Enable Custom Render Dvars
 	//
 	Detours::X86::DetourFunction((PBYTE)0x006CA27B, (PBYTE)&mfh_R_RegisterDvars);

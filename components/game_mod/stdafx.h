@@ -18,6 +18,7 @@
 
 #include "common.h"
 #include "com_files.h"
+#include "cmd.h"
 #include "dvar.h"
 #include "sv_ccmds_mp.h"
 #include "cl_main_mp.h"
