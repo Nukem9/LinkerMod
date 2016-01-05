@@ -4,10 +4,14 @@
 *.ipch
 *.log
 *.opensdf
+*.vcxproj.filters
 
 /build
 /ipch
 
+components/sdk
+components/setup/Debug
+components/setup/Release
 components/cod2map/Debug
 components/cod2map/Release
 components/cod2rad/Debug
