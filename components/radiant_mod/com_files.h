@@ -16,3 +16,5 @@ typedef void (__cdecl * FS_FreeFile_t)(void *buffer);
 static FS_FreeFile_t FS_FreeFile = (FS_FreeFile_t)0x004BC910;
 
 int __cdecl FS_ReadFile(const char *qpath, void **buffer);
+
+void FS_Init_TechsetOverride(void);

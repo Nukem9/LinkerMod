@@ -79,6 +79,11 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x005675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
 
 	//
+	// Load techset override data
+	//
+	FS_Init_TechsetOverride();
+
+	//
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
 	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
