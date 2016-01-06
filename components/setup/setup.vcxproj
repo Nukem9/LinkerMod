@@ -79,10 +79,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="arg.cpp" />
+    <ClCompile Include="files.cpp" />
+    <ClCompile Include="iwd.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="miniz.c" />
+    <ClCompile Include="steam.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arg.h" />
+    <ClInclude Include="files.h" />
+    <ClInclude Include="iwd.h" />
+    <ClInclude Include="miniz.h" />
+    <ClInclude Include="steam.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
