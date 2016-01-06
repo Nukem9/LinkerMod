@@ -3,13 +3,18 @@
 #include "../sdk/public/steam/steam_api.h"
 #pragma comment(lib, "../sdk/redistributable_bin/steam_api.lib")
 
+#include "arg.h"
+
 #define APPID_BO1_SP	42700
 #define APPID_BO1_TOOLS	42740
 
-char appDir_BO1_TOOLS[MAX_PATH] = "";
-
 int main(int argc, char** argv)
 {
+	if (Arg_HandleArguments(argc, argv) != NULL)
+	{
+		return 1;
+	}
+
 	if (!SteamAPI_Init())
 	{
 		SteamAPI_Shutdown();
@@ -35,9 +40,15 @@ int main(int argc, char** argv)
 		printf("Failed!\n");
 		return 2;
 	}
-
+	char appDir_BO1_TOOLS[MAX_PATH] = "";
 	SteamApps()->GetAppInstallDir(APPID_BO1_TOOLS, appDir_BO1_TOOLS, MAX_PATH);
 	printf("Found!\n	%s\n", appDir_BO1_TOOLS);
+
+	if (strcmp(appDir_BO1_SP, appDir_BO1_TOOLS) != 0)
+	{
+		printf("ERROR: Directory Mismatch\n");
+		return 3;
+	}
 
 	char buf[MAX_PATH];
 	sprintf_s(buf, "%s/main", appDir_BO1_TOOLS);
