@@ -79,6 +79,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="arg.cpp" />
+    <ClCompile Include="ff.cpp" />
     <ClCompile Include="files.cpp" />
     <ClCompile Include="iwd.cpp" />
     <ClCompile Include="main.cpp" />
@@ -87,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arg.h" />
+    <ClInclude Include="ff.h" />
     <ClInclude Include="files.h" />
     <ClInclude Include="iwd.h" />
     <ClInclude Include="miniz.h" />

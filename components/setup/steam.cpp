@@ -51,6 +51,17 @@ const char* AppInfo_AppDir(void)
 	return appDir_BO1;
 }
 
+const char* AppInfo_FFDir(void)
+{
+	static char ffCommonDir[MAX_PATH] = "\0";
+	if (ffCommonDir[0] == '\0')
+	{
+		sprintf_s(ffCommonDir, "%s/zone/common", AppInfo_AppDir());
+	}
+
+	return ffCommonDir;
+}
+
 const char* AppInfo_IWDDir(void)
 {
 	static char iwdDir[MAX_PATH] = "\0";
@@ -70,5 +81,9 @@ const char* AppInfo_RawDir(void)
 		sprintf_s(rawDir, "%s/raw", AppInfo_AppDir());
 	}
 
+#if _DEBUG
+	return "out/";
+#else
 	return rawDir;
+#endif
 }

@@ -4,6 +4,7 @@
 #include "steam.h"
 #include "files.h"
 #include "iwd.h"
+#include "ff.h"
 
 int main(int argc, char** argv)
 {
@@ -16,8 +17,7 @@ int main(int argc, char** argv)
 	{
 		return 2;
 	}
-
-
+	
 	if (ARG_FLAG_SETUP)
 	{
 		printf("setup\n");
@@ -28,5 +28,10 @@ int main(int argc, char** argv)
 		FS_FileIterator(AppInfo_IWDDir(), FS_SEARCHPATTERN_IWD, IWD_IWDHandler);
 	}
 	
+	if (ARG_FLAG_FF)
+	{
+		FS_FileIterator(AppInfo_FFDir(), FS_SEARCHPATTERN_FF, FF_FFExtract);
+	}
+
 	return 0;
 }

@@ -1,6 +1,7 @@
 #include "files.h"
 #include <windows.h>
 #include <string>
+#include "steam.h"
 
 int FS_FileCount(const char* path, const char* pattern)
 {
@@ -62,4 +63,27 @@ int FS_FileIterator(const char* path, const char* pattern, int(__cdecl* FS_FileH
 
 	FindClose(dir);
 	return count;
+}
+
+int FS_CreatePath(const char* targetPath)
+{
+	int len = strlen(targetPath);
+	for (int i = 0; i < len; i++)
+	{
+		if (targetPath[i] == '/' || targetPath[i] == '\\')
+		{
+			char buf[1024] = "";
+			strncpy(buf + strlen(buf), targetPath, i);
+
+			char qpath[1024] = "";
+			sprintf_s(qpath, "%s%s/", AppInfo_RawDir(), buf);
+
+			if (!CreateDirectoryA(qpath, 0) && GetLastError() != ERROR_ALREADY_EXISTS)
+			{
+				return GetLastError();
+			}
+		}
+	}
+
+	return 0;
 }

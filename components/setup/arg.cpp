@@ -1,11 +1,12 @@
 #include "arg.h"
 #include <string>
 
-bool ARG_FLAG_AUDIO = false; // -a
-bool ARG_FLAG_EVERY = false;  // -e
-bool ARG_FLAG_IMAGE = false; // -i
+bool ARG_FLAG_AUDIO = false;	// -a
+bool ARG_FLAG_EVERY = false;	// -e
+bool ARG_FLAG_IMAGE = false;	// -i
+bool ARG_FLAG_FF = false;		// -r
 bool ARG_FLAG_OVERWRITE = false; // -o
-bool ARG_FLAG_SETUP = false; // -s
+bool ARG_FLAG_SETUP = false;	// -s
 
 void Arg_PrintUsage()
 {
@@ -14,6 +15,7 @@ void Arg_PrintUsage()
 				"  -e	Extract All Files from IWDs" \
 				"  -a	Extract Audio Files from IWDs\n" \
 				"  -i	Extract Image Files from IWDs\n" \
+				"  -r	Extract Rawfiles from FastFiles\n" \
 				"  -o	Force overwriting any existing file when extracting\n" \
 			);
 }
@@ -41,6 +43,9 @@ int Arg_HandleArguments(int argc, char** argv)
 				break;
 			case 'I':
 				ARG_FLAG_IMAGE = true;
+				break;
+			case 'R':
+				ARG_FLAG_FF = true;
 				break;
 			case 'O':
 				ARG_FLAG_OVERWRITE = true;
