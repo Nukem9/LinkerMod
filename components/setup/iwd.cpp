@@ -54,8 +54,22 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 	}
 	else
 	{
-		printf("Extracting file: \"%s\"\n", filepath);
-		mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0);
+		printf("Extracting file: \"%s\"...	", filepath);
+		char buf[MAX_PATH];
+		sprintf(buf, "/%s", filepath);
+		if (FS_CreatePath(buf) != 0)
+		{
+			printf("DIR ERROR\n");
+			return 1;
+		}
+		
+		if (!mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0))
+		{
+			printf("ERROR\n");
+			return 1;
+		}
+
+		printf("SUCCESS\n");
 		return 0;
 	}
 	
