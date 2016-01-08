@@ -12,7 +12,7 @@ void Arg_PrintUsage()
 {
 	printf	(	"Usage: setup [OPTION]...\n" \
 				"  -s	Run setup\n" \
-				"  -e	Extract All Files from IWDs" \
+				"  -e	Extract All Files from IWDs\n" \
 				"  -a	Extract Audio Files from IWDs\n" \
 				"  -i	Extract Image Files from IWDs\n" \
 				"  -r	Extract Rawfiles from FastFiles\n" \
