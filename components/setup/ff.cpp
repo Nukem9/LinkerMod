@@ -46,10 +46,10 @@ char* FindRawfileStringReverseLookup(BYTE* start)
 
 int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfilePath)
 {
-	printf("Extracting file: \"%s\" 0%X...	", rawfilePath, rawfileHeader);
+	printf("Extracting file: \"%s\"...	", rawfilePath, rawfileHeader);
 
 	char qpath[1024] = "";
-	sprintf_s(qpath, "%s%s", AppInfo_RawDir(), rawfilePath);
+	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
 
 	//
 	// If not in overwrite mode AND the file exists
