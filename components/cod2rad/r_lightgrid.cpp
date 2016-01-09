@@ -129,7 +129,7 @@ void __cdecl R_Store_QuantizedLightGridSampleHDR(GfxLightGridColor_Internal* LGC
 	{
 		for (int x = 0; x < 3; x++)
 		{
-			DiskLightGridSampleColors_HDR[index][y][x] = (WORD)(floats[y][x]);
+			DiskLightGridSampleColors_HDR[index][y][x] = (WORD)(floats[y][x] * g_LGI);
 		}
 	}
 }

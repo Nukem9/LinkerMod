@@ -11,5 +11,6 @@ struct arg_t
 
 extern arg_t* g_Args;
 extern int g_HDR;
+extern float g_LGI;
 
 void PatchArguments();
