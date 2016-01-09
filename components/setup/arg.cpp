@@ -7,6 +7,7 @@ bool ARG_FLAG_IMAGE = false;	// -i
 bool ARG_FLAG_FF = false;		// -r
 bool ARG_FLAG_OVERWRITE = false; // -o
 bool ARG_FLAG_SETUP = false;	// -s
+bool ARG_FLAG_VERBOSE = false; // -v
 
 void Arg_PrintUsage()
 {
@@ -17,6 +18,7 @@ void Arg_PrintUsage()
 				"  -i	Extract Image Files from IWDs\n" \
 				"  -r	Extract Rawfiles from FastFiles\n" \
 				"  -o	Force overwriting any existing file when extracting\n" \
+				"  -v	Verbose print mode\n" \
 			);
 }
 
@@ -52,6 +54,9 @@ int Arg_HandleArguments(int argc, char** argv)
 				break;
 			case 'S':
 				ARG_FLAG_SETUP = true;
+				break;
+			case 'V':
+				ARG_FLAG_VERBOSE = true;
 				break;
 			default:
 				break;

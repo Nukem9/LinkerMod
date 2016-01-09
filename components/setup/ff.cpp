@@ -2,7 +2,7 @@
 #include "steam.h"
 #include "arg.h"
 #include "files.h"
-#include <iostream>
+#include "io.h"
 #include <Windows.h>
 
 typedef int __cdecl zlib_func(BYTE *dest, unsigned int* destLen, const BYTE* source, unsigned int sourceLen);
@@ -46,7 +46,7 @@ char* FindRawfileStringReverseLookup(BYTE* start)
 
 int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfilePath)
 {
-	printf("Extracting file: \"%s\"...	", rawfilePath, rawfileHeader);
+	printf_v("Extracting file: \"%s\"...	", rawfilePath, rawfileHeader);
 
 	char qpath[1024] = "";
 	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
@@ -59,7 +59,7 @@ int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfileP
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
-			printf("SKIPPED\n");
+			printf_v("SKIPPED\n");
 
 			fclose(h);
 			return 0;
@@ -68,7 +68,7 @@ int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfileP
 
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
-		printf("ERROR\n");
+		printf_v("ERROR\n");
 		return 0;
 	}
 
@@ -77,7 +77,7 @@ int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfileP
 	//
 	if (rawfileHeader->uncompressedSize > 1024 * 1024 * 16)
 	{
-		printf("IGNORED\n");
+		printf_v("IGNORED\n");
 		return 0;
 	}
 
@@ -85,7 +85,7 @@ int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfileP
 	unsigned int dSize = rawfileHeader->uncompressedSize;
 	if (uncompress(dBuf, &dSize, &rawfileHeader->fileData, rawfileHeader->compressedSize) != 0)
 	{
-		printf("ERROR\n");
+		printf_v("ERROR\n");
 		return 0;
 	}
 
@@ -94,7 +94,7 @@ int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfileP
 		fwrite(dBuf, 1, rawfileHeader->uncompressedSize, h);
 		fclose(h);
 
-		printf("SUCCESS\n");
+		printf_v("SUCCESS\n");
 
 		delete[] dBuf;
 		return 1;
@@ -102,7 +102,7 @@ int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfileP
 
 	delete[] dBuf;
 
-	printf("ERROR\n");
+	printf_v("ERROR\n");
 	return 0;
 }
 

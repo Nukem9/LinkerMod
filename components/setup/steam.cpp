@@ -1,5 +1,6 @@
 #include "steam.h"
 #include <Windows.h>
+#include "io.h"
 
 static char appDir_BO1[MAX_PATH] = "";
 
@@ -21,7 +22,8 @@ int AppInfo_Init(void)
 	}
 	char appDir_BO1_SP[MAX_PATH] = "";
 	SteamApps()->GetAppInstallDir(APPID_BO1_SP, appDir_BO1_SP, MAX_PATH);
-	printf("Found!\n	%s\n", appDir_BO1_SP);
+	printf("Found!\n");
+	printf_v("	%s\n", appDir_BO1_SP);
 
 	printf("Searching for \"Call of Duty: Black Ops Mod Tools (BETA)\"...	");
 	bool appInstalled_BO1_TOOLS = SteamApps()->BIsAppInstalled(APPID_BO1_TOOLS);
@@ -32,7 +34,8 @@ int AppInfo_Init(void)
 	}
 	char appDir_BO1_TOOLS[MAX_PATH] = "";
 	SteamApps()->GetAppInstallDir(APPID_BO1_TOOLS, appDir_BO1_TOOLS, MAX_PATH);
-	printf("Found!\n	%s\n\n", appDir_BO1_TOOLS);
+	printf("Found!\n");
+	printf_v("	%s\n\n", appDir_BO1_TOOLS);
 
 	if (strcmp(appDir_BO1_SP, appDir_BO1_TOOLS) != 0)
 	{
@@ -41,6 +44,8 @@ int AppInfo_Init(void)
 	}
 
 	strcpy_s(appDir_BO1, appDir_BO1_TOOLS);
+
+	printf_nv("\n");
 
 	SteamAPI_Shutdown();
 	return 0;

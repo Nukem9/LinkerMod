@@ -1,7 +1,7 @@
 #include "iwd.h"
 #include "arg.h"
 #include <Windows.h>
-#include <iostream>
+#include "io.h"
 #include "miniz.h"
 #include "steam.h"
 
@@ -41,29 +41,29 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 
 	if (ARG_FLAG_OVERWRITE)
 	{
-		printf("Extracting file: \"%s\"\n", filepath);
+		printf_v("Extracting file: \"%s\"\n", filepath);
 		mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0);
 		return 0;
 	}
 
 	if (FILE* h = fopen(outPath, "r"))
 	{
-		printf("Skipping file: \"%s\"\n", filepath);
+		printf_v("Skipping file: \"%s\"\n", filepath);
 		fclose(h);
 		return 1;
 	}
 	else
 	{
-		printf("Extracting file: \"%s\"...	", filepath);
+		printf_v("Extracting file: \"%s\"...	", filepath);
 		if (FS_CreatePath(filepath) != 0)
 		{
-			printf("DIR ERROR\n");
+			printf_v("DIR ERROR\n");
 			return 1;
 		}
 		
 		if (!mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0))
 		{
-			printf("ERROR\n");
+			printf_v("ERROR\n");
 			return 1;
 		}
 
@@ -81,7 +81,7 @@ int __cdecl IWD_IWDExtract(const char* iwdPath, const char* iwdName)
 
 	if (!mz_zip_reader_init_file(&iwd, iwdPath, 0))
 	{
-		printf("ERROR: Could not open %s\n", iwdPath);
+		printf_v("ERROR: Could not open %s\n", iwdPath);
 		return 2;
 	}
 
@@ -91,7 +91,7 @@ int __cdecl IWD_IWDExtract(const char* iwdPath, const char* iwdName)
 		mz_zip_archive_file_stat file_stat;
 		if (!mz_zip_reader_file_stat(&iwd, f, &file_stat))
 		{
-			printf("ERROR: Could Get Info for Compressed File\n");
+			printf_v("ERROR: Could Get Info for Compressed File\n");
 			mz_zip_reader_end(&iwd);
 			return -1;
 		}

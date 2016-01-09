@@ -81,6 +81,7 @@
     <ClCompile Include="arg.cpp" />
     <ClCompile Include="ff.cpp" />
     <ClCompile Include="files.cpp" />
+    <ClCompile Include="io.cpp" />
     <ClCompile Include="iwd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="miniz.c" />
@@ -90,6 +91,7 @@
     <ClInclude Include="arg.h" />
     <ClInclude Include="ff.h" />
     <ClInclude Include="files.h" />
+    <ClInclude Include="io.h" />
     <ClInclude Include="iwd.h" />
     <ClInclude Include="miniz.h" />
     <ClInclude Include="steam.h" />
