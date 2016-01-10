@@ -30,6 +30,7 @@ int main(int argc, char** argv)
 	
 	if (ARG_FLAG_FF)
 	{
+		FS_FileIterator(AppInfo_FFDir_Localized(), FS_SEARCHPATTERN_FF, FF_FFExtract);
 		FS_FileIterator(AppInfo_FFDir(), FS_SEARCHPATTERN_FF, FF_FFExtract);
 	}
 
