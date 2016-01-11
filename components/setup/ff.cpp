@@ -9,13 +9,19 @@ typedef int __cdecl zlib_func(BYTE *dest, unsigned int* destLen, const BYTE* sou
 static zlib_func* compress = nullptr;
 static zlib_func* uncompress = nullptr;
 
+bool Str_EndsWith(const char* str, const char* substr)
+{
+	return (strstr(str, substr) == str + strlen(str) - strlen(substr));
+}
+
 char* FindRawfileString(BYTE* start, BYTE* end)
 {
 	while (start < end - 5)
 	{
 		if (strncmp(".atr", (char*)start, 4) == 0 ||
 			strncmp(".gsc", (char*)start, 4) == 0 ||
-			strncmp(".csc", (char*)start, 4) == 0)
+			strncmp(".csc", (char*)start, 4) == 0 ||
+			strncmp(".vision", (char*)start, 4) == 0)
 		{
 			return (char*)start;
 		}
@@ -44,9 +50,9 @@ char* FindRawfileStringReverseLookup(BYTE* start)
 	return nullptr;
 }
 
-int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfilePath)
+int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfilePath)
 {
-	printf_v("Extracting file: \"%s\"...	", rawfilePath, rawfileHeader);
+	printf_v("Extracting file: \"%s\"...	", rawfilePath);
 
 	char qpath[1024] = "";
 	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
@@ -106,6 +112,56 @@ int FF_FFExtractRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfileP
 	return 0;
 }
 
+int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
+{
+	printf_v("Extracting file: \"%s\"...	", rawfilePath);
+
+	char qpath[1024] = "";
+	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
+
+	//
+	// If not in overwrite mode AND the file exists
+	// skip it before performing decompression
+	//
+	if (!ARG_FLAG_OVERWRITE)
+	{
+		if (FILE* h = fopen(qpath, "r"))
+		{
+			printf_v("SKIPPED\n");
+
+			fclose(h);
+			return 0;
+		}
+	}
+
+	if (FS_CreatePath(rawfilePath) != 0)
+	{
+		printf_v("ERROR\n");
+		return 0;
+	}
+
+	//
+	// Catch incorrect rawfile data to prevent massive allocations
+	//
+	if (strlen(rawfileData) > 1024 * 1024 * 16)
+	{
+		printf_v("IGNORED\n");
+		return 0;
+	}
+
+	if (FILE* h = fopen(qpath, "wb"))
+	{
+		fwrite(rawfileData, 1, strlen(rawfileData), h);
+		fclose(h);
+
+		printf_v("SUCCESS\n");
+		return strlen(rawfileData);
+	}
+
+	printf_v("ERROR\n");
+	return 0;
+}
+
 int FF_FFExtractRawfiles(BYTE* searchData, DWORD searchSize)
 {
 	int extractedFileCount = 0;
@@ -137,15 +193,33 @@ int FF_FFExtractRawfiles(BYTE* searchData, DWORD searchSize)
 
 		rawfileString = tmpString;
 
-		XAssetRawfileHeader* rawfileHeader = (XAssetRawfileHeader*)(rawfileString + strlen(rawfileString) + 1);
-		if (!FF_FFExtractRawfile(rawfileHeader, rawfileString))
+		if (Str_EndsWith(rawfileString, ".vision"))
 		{
-			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
-			continue;
+			char* rawfileData = rawfileString + strlen(rawfileString) + 1;
+			int fileLen = FF_FFExtractUncompressedRawfile(rawfileData, rawfileString);
+
+			if (!fileLen)
+			{
+				searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
+				continue;
+			}
+			
+			searchData = (BYTE*)rawfileData + fileLen + 1;
+		}
+		else
+		{
+			XAssetRawfileHeader* rawfileHeader = (XAssetRawfileHeader*)(rawfileString + strlen(rawfileString) + 1);
+			if (!FF_FFExtractCompressedRawfile(rawfileHeader, rawfileString))
+			{
+				searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
+				continue;
+			}
+
+			
+			searchData = (BYTE*)rawfileHeader + rawfileHeader->compressedSize;
 		}
 
 		extractedFileCount++;
-		searchData = (BYTE*)rawfileHeader + rawfileHeader->compressedSize;
 	}
 
 	return extractedFileCount;
