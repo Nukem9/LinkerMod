@@ -96,6 +96,15 @@ void Init_MapMod()
 	Detours::X86::DetourFunction((PBYTE)0x00409509, (PBYTE)&hk_ConvertBSP_Post); 
 	Detours::X86::DetourFunction((PBYTE)0x0040947A, (PBYTE)&hk_ConvertBSP_Update_Post);
 
+	//
+	// Leak pointfile compatibility fix
+	//
+	void* stringPatch = ".pts";
+	PatchMemory(0x0042626F, (PBYTE)&stringPatch, 4);
+	PatchMemory(0x00426514, (PBYTE)&stringPatch, 4);
+	stringPatch = "%s.pts";
+	PatchMemory(0x00406F4E, (PBYTE)&stringPatch, 4);
+
 	g_modInitialized = true;
 }
 
