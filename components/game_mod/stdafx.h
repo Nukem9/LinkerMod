@@ -29,6 +29,7 @@
 
 #include "r_rendercmds.h"
 #include "sys_cmds.h"
+#include "r_cinematic.h"
 #include "r_screenshot.h"
 #include "r_scene.h"
 #include "r_reflection_probe.h"
