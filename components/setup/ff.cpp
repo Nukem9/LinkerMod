@@ -91,7 +91,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	unsigned int dSize = rawfileHeader->uncompressedSize;
 	if (uncompress(dBuf, &dSize, &rawfileHeader->fileData, rawfileHeader->compressedSize) != 0)
 	{
-		printf_v("ERROR\n");
+		printf_v("READ ERROR\n");
 		delete[] dBuf;
 		return 0;
 	}
@@ -109,7 +109,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 
 	delete[] dBuf;
 
-	printf_v("ERROR\n");
+	printf_v("WRITE ERROR\n");
 	return 0;
 }
 
@@ -271,8 +271,16 @@ int FF_FFExtract(const char* filepath, const char* filename)
 	size_t dSize = sizeof(XFile);
 	uncompress((BYTE*)&ffInfo, &dSize, cBuf, 0x8000);
 
-	BYTE* dBuf = new BYTE[ffInfo.size + 36];
 	dSize = ffInfo.size + 36;
+	if (dSize >= 1073741824)
+	{
+		//Any fastfiles that claim they decompress to a file >= 1GB
+		//are either corrupt or do not belong to the vanilla game
+		printf("ERROR: Skipping %s\n", filename);
+		return 1;
+	}
+
+	BYTE* dBuf = new BYTE[dSize];
 	uncompress(dBuf, &dSize, cBuf, cSize);
 	delete[] cBuf;
 

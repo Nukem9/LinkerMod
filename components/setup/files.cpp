@@ -78,7 +78,11 @@ int FS_CreatePath(const char* targetPath)
 			char qpath[1024] = "";
 			sprintf_s(qpath, "%s/%s/", AppInfo_RawDir(), buf);
 
+#if _DEBUG
+			if (!CreateDirectoryA(buf, 0) && GetLastError() != ERROR_ALREADY_EXISTS)
+#else
 			if (!CreateDirectoryA(qpath, 0) && GetLastError() != ERROR_ALREADY_EXISTS)
+#endif
 			{
 				return GetLastError();
 			}
