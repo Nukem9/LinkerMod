@@ -85,6 +85,8 @@
     <ClCompile Include="iwd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="miniz.c" />
+    <ClCompile Include="process.cpp" />
+    <ClCompile Include="setup.cpp" />
     <ClCompile Include="steam.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +96,8 @@
     <ClInclude Include="io.h" />
     <ClInclude Include="iwd.h" />
     <ClInclude Include="miniz.h" />
+    <ClInclude Include="process.h" />
+    <ClInclude Include="setup.h" />
     <ClInclude Include="steam.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
