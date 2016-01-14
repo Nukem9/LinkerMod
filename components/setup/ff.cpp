@@ -92,6 +92,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	if (uncompress(dBuf, &dSize, &rawfileHeader->fileData, rawfileHeader->compressedSize) != 0)
 	{
 		printf_v("ERROR\n");
+		delete[] dBuf;
 		return 0;
 	}
 
