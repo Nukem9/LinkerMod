@@ -3,6 +3,17 @@
 #include <string>
 #include "steam.h"
 
+const char* FS_Cwd(void)
+{
+	static char cwd[MAX_PATH] = "\0";
+	if (!cwd[0])
+	{
+		GetCurrentDirectoryA(MAX_PATH, cwd);
+	}
+
+	return cwd;
+}
+
 int FS_FileCount(const char* path, const char* pattern)
 {
 	HANDLE dir;
@@ -89,5 +100,51 @@ int FS_CreatePath(const char* targetPath)
 		}
 	}
 
+	return 0;
+}
+
+int FS_CopyDirectory(char* srcPath, char* destPath, bool overwriteFiles)
+{
+	WIN32_FIND_DATAA file_data;
+	HANDLE h;
+	char tmp[1025] = "\0";
+	strcpy(tmp, srcPath);
+
+	char tmp_srcPath[1025] = { 0 };
+	char tmp_destPath[1025] = { 0 };
+
+	strcat(tmp, "*");
+
+	if (!(h = FindFirstFileA(tmp, &file_data)))
+	{
+		return 1;
+	}
+
+	do
+	{
+		if (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			if (strcmp(file_data.cFileName, ".") && strcmp(file_data.cFileName, ".."))
+			{
+				sprintf(tmp_destPath, "%s%s\\", destPath, file_data.cFileName);
+				sprintf(tmp_srcPath, "%s%s\\", srcPath, file_data.cFileName);
+
+				CreateDirectoryA(tmp_destPath, NULL);
+				FS_CopyDirectory(tmp_srcPath, tmp_destPath, overwriteFiles);
+			}
+		}
+		else
+		{
+			char srcFile[1025] = "\0";
+			char destFile[1025] = "\0";
+
+			sprintf(destFile, "%s%s", destPath, file_data.cFileName);
+			sprintf(srcFile, "%s%s", srcPath, file_data.cFileName);
+
+			CopyFileA(srcFile, destFile, !overwriteFiles);
+		}
+	} while (FindNextFileA(h, &file_data));
+
+	FindClose(h);
 	return 0;
 }
