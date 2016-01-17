@@ -76,6 +76,41 @@ int FS_FileIterator(const char* path, const char* pattern, int(__cdecl* FS_FileH
 	return count;
 }
 
+int FS_DirectoryIterator(const char* path, int(__cdecl* FS_DirectoryHandlerCallback)(const char* path))
+{
+	HANDLE dir;
+	WIN32_FIND_DATAA file_data;
+
+	char qpath[MAX_PATH];
+	sprintf(qpath, "%s/*", path);
+
+	if ((dir = FindFirstFileA(qpath, &file_data)) == INVALID_HANDLE_VALUE)
+	{
+		return 0;
+	}
+
+	int count = 0;
+	do
+	{
+		if (file_data.cFileName[0] == '.')
+		{
+			continue;
+		}
+
+		if (file_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			char tpath[MAX_PATH];
+			sprintf(tpath, "%s/%s", path, file_data.cFileName);
+
+			FS_DirectoryHandlerCallback(tpath);
+			count++;
+		}
+	} while (FindNextFileA(dir, &file_data));
+
+	FindClose(dir);
+	return count;
+}
+
 int FS_CreatePath(const char* targetPath)
 {
 	int len = strlen(targetPath);

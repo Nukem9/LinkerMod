@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 	{
 		return 2;
 	}
-	
+
 	if (ARG_FLAG_SETUP)
 	{
 		Setup_Init();
@@ -35,8 +35,15 @@ int main(int argc, char** argv)
 	
 	if (ARG_FLAG_FF)
 	{
-		FS_FileIterator(AppInfo_FFDir_Localized(), FS_SEARCHPATTERN_FF, FF_FFExtract);
-		FS_FileIterator(AppInfo_FFDir(), FS_SEARCHPATTERN_FF, FF_FFExtract);
+		if (ARG_FLAG_LOCALIZED)
+		{
+			FS_FileIterator(AppInfo_ZoneDir(), FS_SEARCHPATTERN_FF, FF_FFExtract);
+		}
+		else
+		{
+			FS_FileIterator(AppInfo_FFDir(), FS_SEARCHPATTERN_FF, FF_FFExtract);
+		}
+
 		execPostConvertStep = true;
 	}
 

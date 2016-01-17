@@ -67,12 +67,12 @@ const char* AppInfo_FFDir(void)
 	return ffCommonDir;
 }
 
-const char* AppInfo_FFDir_Localized(void)
+const char* AppInfo_ZoneDir(void)
 {
 	static char ffLocalizedDir[MAX_PATH] = "\0";
 	if (ffLocalizedDir[0] == '\0')
 	{
-		sprintf_s(ffLocalizedDir, "%s/zone/english", AppInfo_AppDir());
+		sprintf_s(ffLocalizedDir, "%s/zone", AppInfo_AppDir());
 	}
 
 	return ffLocalizedDir;

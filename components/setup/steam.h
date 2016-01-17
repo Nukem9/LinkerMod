@@ -10,6 +10,6 @@
 int AppInfo_Init(void);
 const char* AppInfo_AppDir(void);
 const char* AppInfo_FFDir(void);
-const char* AppInfo_FFDir_Localized(void);
+const char* AppInfo_ZoneDir(void);
 const char* AppInfo_IWDDir(void);
 const char* AppInfo_RawDir(void);

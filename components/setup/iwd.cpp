@@ -4,12 +4,19 @@
 #include "io.h"
 #include "miniz.h"
 #include "steam.h"
+#include "str.h"
 
 #define IWD_DIR_SOUND "sound/"
 #define IWD_DIR_IMAGE "images/"
 
 int __cdecl IWD_IWDHandler(const char* iwdPath, const char* iwdName)
 {
+	if (!ARG_FLAG_LOCALIZED && stristr(iwdName, "localized"))
+	{
+		return 0;
+	}
+
+
 	char sub[MAX_PATH];
 	if (ARG_FLAG_EVERY)
 	{

@@ -34,4 +34,3 @@ struct XAsset
 	int header;
 };
 
-int FF_FFExtract(const char* filepath, const char* filename);

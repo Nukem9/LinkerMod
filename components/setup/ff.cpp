@@ -328,4 +328,9 @@ int FF_FFExtract(const char* filepath, const char* filename)
 
 	delete[] dBuf;
 	return 0;
+}}
+
+int __cdecl FF_DirectoryHandler(const char* path)
+{
+	return FS_FileIterator(path, FS_SEARCHPATTERN_FF, FF_FFExtract);
 }
