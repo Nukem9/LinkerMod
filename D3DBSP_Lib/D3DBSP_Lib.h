@@ -1,4 +1,5 @@
 #pragma once
+#include <windows.h>
 
 enum LOGFILE_MODE
 {
