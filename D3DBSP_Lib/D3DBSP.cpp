@@ -282,6 +282,30 @@ Lump* D3DBSP::AddLump(LUMP_TYPE type, Lump& lump)
 	return &this->lumps[type];
 }
 
+int D3DBSP::PreserveLump(LUMP_TYPE type, Lump* dest)
+{
+	if (this->lumps[type].isEmpty)
+	{
+		return -1;
+	}
+
+	*dest = this->lumps[type];
+
+	return 0;
+}
+
+int D3DBSP::RestoreLump(LUMP_TYPE type, Lump* src)
+{
+	if (this->lumps[type].isEmpty)
+	{
+		this->AddLump(type, *src);
+		return 0;
+	}
+
+	this->lumps[type] = *src;
+	return 0;
+}
+
 D3DBSP::D3DBSP(void)
 {
 	this->diskLumpOrderSize = 0;

@@ -148,6 +148,9 @@ public:
 
 	Lump* AddLump(LUMP_TYPE, Lump&);
 
+	int PreserveLump(LUMP_TYPE, Lump* dest);
+	int RestoreLump(LUMP_TYPE, Lump* src);
+
 	int Load(const char* filepath);
 	int Load(BYTE* pBuf);
 	int Write(const char* filepath);
