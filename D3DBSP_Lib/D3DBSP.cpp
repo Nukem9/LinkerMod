@@ -195,9 +195,6 @@ int D3DBSP::Write(BYTE* pBuf)
 			LumpIndexEntry indexEntry;
 			indexEntry.length = pLump->size;
 			indexEntry.type = this->diskLumpOrder[i];
-			
-			Con_Printf("Doing %s\n", LUMP_NAMES[this->diskLumpOrder[i]]);
-
 			iBuf.write((char*)&indexEntry, sizeof(LumpIndexEntry));
 		}
 	}

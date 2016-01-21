@@ -12,19 +12,14 @@ int ConvertLump_WAWtoBO(Lump* wawLump, Lump* boLump, LUMP_TYPE type)
 	switch(type)
 	{
 	case LUMP_MODELS:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_WAWtoBO_BrushModels(wawLump,boLump);
 	case LUMP_PRIMARY_LIGHTS:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_WAWtoBO_PrimaryLights(wawLump,boLump);
 	case LUMP_LIGHTBYTES:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_WAWtoBO_Lightmaps(wawLump,boLump);
 	case LUMP_REFLECTION_PROBES:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_WAWtoBO_ReflectionProbes(wawLump,boLump);
 	case LUMP_LIGHTGRIDCOLORS:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_WAWtoBO_LightGridColors(wawLump,boLump);
 
 	case LUMP_MATERIALS:
@@ -82,13 +77,11 @@ int ConvertLump_WAWtoBO(Lump* wawLump, Lump* boLump, LUMP_TYPE type)
 	case LUMP_LIGHTGRID2D_CELLS:
 	case LUMP_LIGHT_CORONAS:
 	{
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		*boLump = *wawLump;
 		return 0;
 	}
 
 	default:
-		Con_Warning("Extraneous Lump: %s\n",LUMP_NAMES[type]);
 		boLump->FreeMemory();
 		return 1;
 	}
@@ -118,19 +111,14 @@ int ConvertLump_BOtoWAW(Lump* boLump, Lump* wawLump, LUMP_TYPE type)
 	switch(type)
 	{
 	case LUMP_MODELS:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_BOtoWAW_BrushModels(boLump,wawLump);
 	case LUMP_PRIMARY_LIGHTS:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_BOtoWAW_PrimaryLights(boLump,wawLump);
 	case LUMP_LIGHTBYTES:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_BOtoWAW_Lightmaps(boLump,wawLump);
 	case LUMP_REFLECTION_PROBES:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_BOtoWAW_ReflectionProbes(boLump,wawLump);
 	case LUMP_LIGHTGRIDCOLORS:
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		return ConvertLump_BOtoWAW_LightGridColors(boLump,wawLump);
 
 	case LUMP_MATERIALS:
@@ -188,13 +176,11 @@ int ConvertLump_BOtoWAW(Lump* boLump, Lump* wawLump, LUMP_TYPE type)
 	case LUMP_LIGHTGRID2D_CELLS:
 	case LUMP_LIGHT_CORONAS:
 	{
-		Con_Printf("Converting Lump: %s\n",LUMP_NAMES[type]);
 		*wawLump = *boLump;
 		return 0;
 	}
 
 	default:
-		Con_Warning("Extraneous Lump: %s\n",LUMP_NAMES[type]);
 		wawLump->FreeMemory();
 		return 1;
 	}
