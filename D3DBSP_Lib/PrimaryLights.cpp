@@ -33,10 +33,10 @@ int ConvertLump_WAWtoBO_PrimaryLights(Lump* wawLump, Lump* boLump)
 		
 		if(lightIndex > 1)
 		{
-			boLights[lightIndex].cutOn = 0;
+			boLights[lightIndex].cutOn = 0.0f;
 	
-			boLights[lightIndex].nearEdge = 0;
-			boLights[lightIndex].farEdge = 0;
+			boLights[lightIndex].nearEdge = 0.0f;
+			boLights[lightIndex].farEdge = 0.0f;
 
 			boLights[lightIndex].specularcolor[0] = boLights[lightIndex].color[0];
 			boLights[lightIndex].specularcolor[1] = boLights[lightIndex].color[1];
@@ -50,9 +50,10 @@ int ConvertLump_WAWtoBO_PrimaryLights(Lump* wawLump, Lump* boLump)
 			boLights[lightIndex].attenuation[0] = 1.0f;		//matches attenuation in radiant
 			boLights[lightIndex].attenuation[1] = 0.0f;
 			boLights[lightIndex].attenuation[2] = 0.0f;
-			boLights[lightIndex].aAbB[0] = 0.75f;			//matches superellipse in radiant
+			boLights[lightIndex].roundness = 1.0f;			//1 is circular superellipse, 0 is square
+			boLights[lightIndex].aAbB[0] = 0.0f;			//matches superellipse / superellipsis in radiant
 			boLights[lightIndex].aAbB[1] = 1.0f;
-			boLights[lightIndex].aAbB[2] = 0.75f;
+			boLights[lightIndex].aAbB[2] = 0.0f;
 			boLights[lightIndex].aAbB[3] = 1.0f;
 			boLights[lightIndex].cookieControl0[0] = 0.0f;
 			boLights[lightIndex].cookieControl0[1] = 0.0f;
