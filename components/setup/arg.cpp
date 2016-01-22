@@ -5,6 +5,7 @@ bool ARG_FLAG_AUDIO = false;		// -a
 bool ARG_FLAG_CONVERT = false;		// -c
 bool ARG_FLAG_EVERY = false;		// -e
 bool ARG_FLAG_IMAGE = false;		// -i
+bool ARG_FLAG_SND = false;			// -n
 bool ARG_FLAG_FF = false;			// -r
 bool ARG_FLAG_LOCALIZED = false;	// -l
 bool ARG_FLAG_OVERWRITE = false;	// -o
@@ -20,6 +21,7 @@ void Arg_PrintUsage()
 				"  -a	Extract Audio Files from IWDs\n" \
 				"  -i	Extract Image Files from IWDs\n" \
 				"  -r	Extract Rawfiles from FastFiles\n" \
+				"  -s	Extract Sounds from FastFiles\n" \
 				"  -l	Include Localized Files When Extracting\n" \
 				"  -o	Force overwriting any existing file when extracting\n" \
 				"  -v	Verbose print mode\n" \
@@ -52,6 +54,9 @@ int Arg_HandleArguments(int argc, char** argv)
 				break;
 			case 'R':
 				ARG_FLAG_FF = true;
+				break;
+			case 'N':
+				ARG_FLAG_SND = true;
 				break;
 			case 'L':
 				ARG_FLAG_LOCALIZED = true;

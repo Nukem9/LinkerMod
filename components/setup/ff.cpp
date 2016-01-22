@@ -21,7 +21,8 @@ char* FindRawfileString(BYTE* start, BYTE* end)
 		if (strncmp(".atr", (char*)start, 4) == 0 ||
 			strncmp(".gsc", (char*)start, 4) == 0 ||
 			strncmp(".csc", (char*)start, 4) == 0 ||
-			strncmp(".vision", (char*)start, 4) == 0)
+			strncmp(".vision", (char*)start, 4) == 0 ||
+			strncmp(".wav", (char*)start, 4) == 0)
 		{
 			return (char*)start;
 		}
@@ -163,7 +164,94 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 	return 0;
 }
 
-int FF_FFExtractRawfiles(BYTE* searchData, DWORD searchSize)
+int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
+{
+	printf_v("Extracting file: \"%s\"...	\n", sndfilePath);
+
+	/*printf_v("Format: %d\n", snd_header->format);
+	printf_v("Size: %d (0x%X)\n", snd_header->data_size, snd_header->data_size);
+	printf_v("Seek Table Size: %d\n", snd_header->seek_table_count);*/
+
+	char qpath[1024] = "";
+#if _DEBUG
+	sprintf_s(qpath, "%s", sndfilePath);
+#else
+	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), sndfilePath);
+#endif
+	
+	
+
+	//
+	// If not in overwrite mode AND the file exists
+	// skip it before performing decompression
+	//
+	if (!ARG_FLAG_OVERWRITE)
+	{
+		if (FILE* h = fopen(qpath, "r"))
+		{
+			printf_v("SKIPPED\n");
+
+			fclose(h);
+			return 0;
+		}
+	}
+
+	if (FS_CreatePath(sndfilePath) != 0)
+	{
+		printf_v("PATH ERROR\n");
+		return 0;
+	}
+
+	//
+	// Catch incorrect sndfile data and bypass it
+	//
+	if (snd_header->format != 6 && snd_header->format != 7)
+	{
+		printf_v("IGNORED\n");
+		return 0;
+	}
+	
+	//
+	// Ignore non-Loaded Sounds Assets
+	//
+	if (snd_header->data_size == 0)
+	{
+		printf_v("IGNORED\n");
+		return 0;
+	}
+
+	if (FILE* h = fopen(qpath, "wb"))
+	{
+		fwrite(snd_header, 1, sizeof(Snd_Header), h);
+
+		int* seek_table = (int*)(sndfilePath + strlen(sndfilePath) + 1);
+
+		if (snd_header->seek_table_count != 0)
+		{
+			fwrite(seek_table, 4, snd_header->seek_table_count, h);
+		}
+
+		//
+		// Pad the seek table to 2040 bytes
+		//
+		BYTE pad[2040];
+		memset(pad, 0, 2040);
+		fwrite(pad, 1, 2040 - 4 * snd_header->seek_table_count, h);
+		
+		BYTE* snd_data = (BYTE*)&seek_table[snd_header->seek_table_count];
+		fwrite(snd_data, 1, snd_header->data_size, h);
+
+		fclose(h);
+
+		printf_v("SUCCESS\n");
+		return snd_header->data_size;
+	}
+
+	printf_v("ERROR\n");
+	return 0;
+}
+
+int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 {
 	int extractedFileCount = 0;
 
@@ -193,6 +281,19 @@ int FF_FFExtractRawfiles(BYTE* searchData, DWORD searchSize)
 		}
 
 		rawfileString = tmpString;
+
+		if (ARG_FLAG_SND && Str_EndsWith(rawfileString, ".wav"))
+		{
+			Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
+			FF_FFExtractSoundFile(snd_info, rawfileString);
+			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
+		}
+
+		if (!ARG_FLAG_FF)
+		{
+			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
+			continue;
+		}
 
 		if (Str_EndsWith(rawfileString, ".vision"))
 		{
@@ -324,11 +425,11 @@ int FF_FFExtract(const char* filepath, const char* filename)
 		assetList++;
 	}*/
 
-	FF_FFExtractRawfiles((BYTE*)dBuf, ffInfo.size + 36);
+	FF_FFExtractFiles((BYTE*)dBuf, ffInfo.size + 36);
 
 	delete[] dBuf;
 	return 0;
-}}
+}
 
 int __cdecl FF_DirectoryHandler(const char* path)
 {

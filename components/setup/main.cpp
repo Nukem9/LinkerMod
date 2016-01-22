@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 		execPostConvertStep = true;
 	}
 	
-	if (ARG_FLAG_FF)
+	if (ARG_FLAG_FF || ARG_FLAG_SND)
 	{
 		if (ARG_FLAG_LOCALIZED)
 		{
