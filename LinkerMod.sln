@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "launcher_ldr", "components\launcher_ldr\launcher_ldr.vcxproj", "{E543772A-4051-499E-8DC6-B5501043DA7B}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cod2map", "components\cod2map\cod2map.vcxproj", "{37CF9A1C-7E15-44FA-BA81-A389E617F2D9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "path_mod", "components\path_mod\path_mod.vcxproj", "{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setup", "components\setup\setup.vcxproj", "{9146CB30-88C2-40F6-A424-98432160C9A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Debug|Win32.Build.0 = Debug|Win32
 		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Release|Win32.ActiveCfg = Release|Win32
 		{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}.Release|Win32.Build.0 = Release|Win32
+		{9146CB30-88C2-40F6-A424-98432160C9A9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9146CB30-88C2-40F6-A424-98432160C9A9}.Debug|Win32.Build.0 = Debug|Win32
+		{9146CB30-88C2-40F6-A424-98432160C9A9}.Release|Win32.ActiveCfg = Release|Win32
+		{9146CB30-88C2-40F6-A424-98432160C9A9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
