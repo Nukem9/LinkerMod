@@ -1,0 +1,22 @@
+//
+// This file contains a list of techsets and their appropriate replacements
+// which is used by Radiant to override techsets for materials that do not display correctly
+//
+// This file should only be manually modified if a particular techset has graphical issues
+// any modifications should be reported so that they can be committed
+//
+
+// Techset Key						//  Techset Replacement
+l_sm_r0c0n0s0x0,					l_sm_r0c0n0s0, 
+l_sm_r0c0n0s0_wpn_clrdtl_hero,		l_sm_r0c0n0s0, 
+l_sm_r0c0n0s0sc0x0_clrdtl,			l_sm_r0c0n0s0, 
+l_sm_r0c0n0s0_wpn_clrdtl,			l_sm_r0c0n0s0,
+l_sm_r0c0n0s0sc0x0_clrdtl,			l_sm_r0c0n0s0, 
+l_sm_r0c0d0n0s0_wpn_clrdtl_hero,	l_sm_r0c0n0s0, 
+l_sm_r0c0n0s0sc0x0,					l_sm_r0c0n0s0, 
+l_sm_r0c0s0sc0x0,					l_sm_r0c0n0s0, 
+l_sm_r0c0n0s0_hero,					l_sm_r0c0n0s0, 
+l_sm_b0c0n0_hero,					l_sm_b0c0,		 //Fix for Zombie_Wolf Fur
+l_sm_r0c0n0s0sc0x0_clrdtl_hero,		l_sm_r0c0n0s0, 
+l_sm_r0c0d0n0s0sc0x0_clrdtl_hero,	l_sm_r0c0n0s0, 
+sm_treecanopy_sway,					l_sm_b0c0,		 //Fix for Foliage (Currently has a blue tint)

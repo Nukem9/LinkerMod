@@ -3246,29 +3246,7 @@ DWORD MapPointerToOffset(void* origin, void* offset)
 	return (DWORD)((char*)offset - (char*)origin);
 }
 
-struct blacklistEntry
-{
-	const char* key;
-	const char* replacement;
-};
-
-blacklistEntry blacklist[] =
-{
-	// Techset Key						//  Techset Replacement
-	{ "l_sm_r0c0n0s0x0",					"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0_wpn_clrdtl_hero",		"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0sc0x0_clrdtl",			"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0_wpn_clrdtl",			"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0sc0x0_clrdtl",			"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0d0n0s0_wpn_clrdtl_hero",	"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0sc0x0",					"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0s0sc0x0",					"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0_hero",					"l_sm_r0c0n0s0" },
-	{ "l_sm_b0c0n0_hero",					"l_sm_b0c0"		}, //Fix for Zombie_Wolf Fur
-	{ "l_sm_r0c0n0s0sc0x0_clrdtl_hero",		"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0d0n0s0sc0x0_clrdtl_hero",	"l_sm_r0c0n0s0" },
-	{ "sm_treecanopy_sway",					"l_sm_b0c0"		}, //Fix for Foliage (Currently has a blue tint)
-};
+std::vector<techsetOverride> techsetOverrideList;
 
 Material_LoadRaw_t* o_Material_LoadRaw = (Material_LoadRaw_t *)0x005325F0;
 int Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType, int imageTrack)
@@ -3277,11 +3255,12 @@ int Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType, int imageTr
 		return o_Material_LoadRaw(mtlRaw, materialType, imageTrack);
 
 	const char* techsetOverride = nullptr;
-	for (int i = 0; i < ARRAYSIZE(blacklist); i++)
+	for (unsigned int i = 0; i < techsetOverrideList.size(); i++)
 	{
-		if (strcmp((char*)MapOffsetToPointer(mtlRaw, mtlRaw->techSetNameOffset), blacklist[i].key) == 0)
+		if (strcmp((char*)MapOffsetToPointer(mtlRaw, mtlRaw->techSetNameOffset), techsetOverrideList[i].key.c_str()) == 0)
 		{
-			techsetOverride = blacklist[i].replacement;
+			printf("overriding technique %s\a\n", techsetOverrideList[i].replacement.c_str());
+			techsetOverride = techsetOverrideList[i].replacement.c_str();
 			break;
 		}
 	}

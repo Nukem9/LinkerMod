@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 #define BO1_BUILD
 
@@ -373,7 +374,13 @@ struct MaterialRaw
 	unsigned int constantTableOffset;
 };
 
+struct techsetOverride
+{
+	std::string key;
+	std::string replacement;
+};
 
+extern std::vector<techsetOverride> techsetOverrideList;
 
 LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *routingData, int streamCount, stream_source_info_t *sourceTable);
 void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl);

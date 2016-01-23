@@ -20,6 +20,7 @@ BOOL GameMod_Init()
 {
 	if(g_initted)
 		return TRUE;
+
 	//
 	// Disable STDOUT buffering
 	//
@@ -164,6 +165,16 @@ BOOL GameMod_Init()
 	PatchMemory(0x00868414, (PBYTE)"\xEB", 1);
 
 	//
+	// Force new mod specific configs to inherit from the vanilla config
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0082A269, (PBYTE)&mfh_Cmd_Exec_f);
+
+	//
+	// Add Support for Mod Specific Bink Cinematics
+	//
+	Detours::X86::DetourFunction((PBYTE)0x006D98F0, (PBYTE)&hk_R_Cinematic_BinkOpen);
+
+	//
 	// Enable Custom Render Dvars
 	//
 	Detours::X86::DetourFunction((PBYTE)0x006CA27B, (PBYTE)&mfh_R_RegisterDvars);
@@ -173,6 +184,10 @@ BOOL GameMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007D9590, (PBYTE)&nullsub);
 	
+	//
+	// Increase Asset Limits
+	//
+	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
 
 	if(IsReflectionMode())
 		ReflectionMod_Init();

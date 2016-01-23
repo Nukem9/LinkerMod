@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+Lump preservedPrimaryLights;
+
 size_t __cdecl Com_LoadBsp_EnforceVersion(BYTE** data)
 {
 	if (!data)
@@ -7,6 +9,7 @@ size_t __cdecl Com_LoadBsp_EnforceVersion(BYTE** data)
 
 	D3DBSP iBSP;
 	iBSP.Load(*data);
+	iBSP.PreserveLump(LUMP_PRIMARY_LIGHTS, &preservedPrimaryLights);
 	iBSP.Convert(BSPVERSION_COD_WAW);
 
 	size_t len = iBSP.PotentialFileSize();
@@ -82,6 +85,12 @@ int __cdecl Com_SaveBsp_EnforceVersion(FILE* h)
 	delete[] buf;
 
 	iBSP->Convert(BSPVERSION_COD_BO);
+
+	if (!preservedPrimaryLights.isEmpty)
+	{
+		printf("restoring primary ligmmpts\n");
+		iBSP->RestoreLump(LUMP_PRIMARY_LIGHTS, &preservedPrimaryLights);
+	}
 
 	if (g_HDR)
 	{

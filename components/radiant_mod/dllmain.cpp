@@ -79,6 +79,11 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x005675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
 
 	//
+	// Load techset override data
+	//
+	FS_Init_TechsetOverride();
+
+	//
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
 	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
@@ -153,6 +158,11 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004D7066, (PBYTE)&mfh1_Sys_ListFiles);
 	Detours::X86::DetourFunction((PBYTE)0x004D7093, (PBYTE)&mfh2_Sys_ListFiles);
 	Detours::X86::DetourFunction((PBYTE)0x004D70DB, (PBYTE)&mfh3_Sys_ListFiles);
+
+	//
+	// Leak pointfile compatibility fix
+	//
+	PatchMemory(0x006F7378, (PBYTE)".pts", 4);
 
 	g_Initted = true;
 

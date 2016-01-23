@@ -3,6 +3,7 @@
 #include "../shared/detours/Detours.h"
 
 #include "com_files.h"
+#include "lights.h"
 
 int __cdecl hk_FS_ReadFile(const char* path, BYTE** fileData)
 {
@@ -33,6 +34,9 @@ int __cdecl ConvertBSP_Post(FILE* h)
 	delete[] buf;
 
 	iBSP->Convert(BSPVERSION_COD_BO);
+
+	Light_FixPrimaryLightInfo(&iBSP->lumps[LUMP_PRIMARY_LIGHTS]);
+
 	len = iBSP->PotentialFileSize();
 	buf = new BYTE[len];
 	iBSP->Write(buf);
@@ -95,6 +99,17 @@ void Init_MapMod()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x00409509, (PBYTE)&hk_ConvertBSP_Post); 
 	Detours::X86::DetourFunction((PBYTE)0x0040947A, (PBYTE)&hk_ConvertBSP_Update_Post);
+
+	//
+	// Add Support for Custom KVs
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0043D649, (PBYTE)&mfh_PrimaryLightHandler);
+
+	void* stringPatch = ".pts";
+	PatchMemory(0x0042626F, (PBYTE)&stringPatch, 4);
+	PatchMemory(0x00426514, (PBYTE)&stringPatch, 4);
+	stringPatch = "%s.pts";
+	PatchMemory(0x00406F4E, (PBYTE)&stringPatch, 4);
 
 	g_modInitialized = true;
 }

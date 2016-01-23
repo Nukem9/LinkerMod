@@ -2,6 +2,7 @@
 
 arg_t* g_Args = (arg_t*)0x004613E8;
 int g_HDR = 0;
+float g_LGI = 1.0;
 
 int Argument_HandleInteger(char** argv, int argv_len, int* dest, int min, int max)
 {
@@ -9,6 +10,30 @@ int Argument_HandleInteger(char** argv, int argv_len, int* dest, int min, int ma
 		Com_FatalError("ERROR: %s: missing argument\n", argv[1]);
 
 	int val = atol(argv[1]);
+	*dest = val;
+
+	if (val >= min)
+	{
+		if (val > max)
+		{
+			Con_Printf("%s: clamping to %i\n", *argv, max);
+			*dest = max;
+		}
+	}
+	else
+	{
+		Con_Printf("%s: clamping to %i\n", *argv, min);
+		*dest = min;
+	}
+	return 2;
+}
+
+int Argument_HandleFloat(char** argv, int argv_len, float* dest, float min, float max)
+{
+	if (argv_len < 2)
+		Com_FatalError("ERROR: %s: missing argument\n", argv[1]);
+
+	float val = (float)atof(argv[1]);
 	*dest = val;
 
 	if (val >= min)
@@ -45,11 +70,18 @@ int __cdecl argHDR_f(int argv_len, char **argv)
 	return result;
 }
 
+int __cdecl argLGI_f(int argv_len, char **argv)
+{
+	int result = Argument_HandleFloat(argv, argv_len, &g_LGI, 0, 16);
+	return result;
+}
+
 void PatchArguments()
 {
 	arg_t c_Args[] =
 	{
 		{ "-HDR", "Enables HDR lightmaps and lightgrid", (arg_f)&argHDR_f },
+		{ "-LightGridIntensity", "Multiplier for  HDR lightgrid intensity", (arg_f)&argLGI_f },
 	};
 
 	arg_t* o_Args = g_Args;

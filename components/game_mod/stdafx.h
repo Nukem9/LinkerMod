@@ -18,6 +18,7 @@
 
 #include "common.h"
 #include "com_files.h"
+#include "cmd.h"
 #include "dvar.h"
 #include "sv_ccmds_mp.h"
 #include "cl_main_mp.h"
@@ -28,8 +29,11 @@
 
 #include "r_rendercmds.h"
 #include "sys_cmds.h"
+#include "r_cinematic.h"
 #include "r_screenshot.h"
 #include "r_scene.h"
 #include "r_reflection_probe.h"
 
 #include "reflection_fix.h"
+
+#define GM_NET_VERSION 0x01
