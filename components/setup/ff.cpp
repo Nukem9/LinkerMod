@@ -82,7 +82,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	//
 	// Catch incorrect rawfile data to prevent massive allocations
 	//
-	if (rawfileHeader->uncompressedSize > 1024 * 1024 * 16)
+	if (rawfileHeader->uncompressedSize > 1024 * 1024 * 16 || rawfileHeader->uncompressedSize < 0)
 	{
 		printf_v("IGNORED\n");
 		return 0;
@@ -317,7 +317,6 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 				continue;
 			}
 
-			
 			searchData = (BYTE*)rawfileHeader + rawfileHeader->compressedSize;
 		}
 
