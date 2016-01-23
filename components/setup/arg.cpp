@@ -21,7 +21,7 @@ void Arg_PrintUsage()
 				"  -a	Extract Audio Files from IWDs\n" \
 				"  -i	Extract Image Files from IWDs\n" \
 				"  -r	Extract Rawfiles from FastFiles\n" \
-				"  -s	Extract Sounds from FastFiles\n" \
+				"  -n	Extract Sounds from FastFiles\n" \
 				"  -l	Include Localized Files When Extracting\n" \
 				"  -o	Force overwriting any existing file when extracting\n" \
 				"  -v	Verbose print mode\n" \
