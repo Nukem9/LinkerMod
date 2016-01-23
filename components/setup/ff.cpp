@@ -166,7 +166,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 
 int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 {
-	printf_v("Extracting file: \"%s\"...	\n", sndfilePath);
+	printf_v("Extracting file: \"%s\"...	", sndfilePath);
 
 	/*printf_v("Format: %d\n", snd_header->format);
 	printf_v("Size: %d (0x%X)\n", snd_header->data_size, snd_header->data_size);
