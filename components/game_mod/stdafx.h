@@ -35,3 +35,5 @@
 #include "r_reflection_probe.h"
 
 #include "reflection_fix.h"
+
+#define GM_NET_VERSION 0x01

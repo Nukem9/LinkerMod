@@ -20,6 +20,7 @@ BOOL GameMod_Init()
 {
 	if(g_initted)
 		return TRUE;
+
 	//
 	// Disable STDOUT buffering
 	//
