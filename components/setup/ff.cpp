@@ -35,7 +35,7 @@ char* FindRawfileString(BYTE* start, BYTE* end)
 
 char* FindRawfileStringReverseLookup(BYTE* start)
 {
-	for (char* strStart = (char*)start; strStart > strStart - MAX_PATH; strStart--)
+	for (char* strStart = (char*)start; strStart > (char*)start - MAX_PATH; strStart--)
 	{
 		if (*(DWORD*)strStart == 0xFFFFFFFF)
 		{
@@ -207,7 +207,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	//
 	if (snd_header->format != 6 && snd_header->format != 7)
 	{
-		printf_v("IGNORED\n");
+		printf_v("IGNORED (FMT: %d)\n", snd_header->format);
 		return 0;
 	}
 	
@@ -269,9 +269,13 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 		char* tmpString = FindRawfileStringReverseLookup((BYTE*)rawfileString);
 
+		//
+		// Keep searching past any invalid assets
+		//
 		if (!tmpString)
 		{
-			return extractedFileCount;
+			searchData = (BYTE*)(rawfileString + strlen(rawfileString) + 1);
+			continue;
 		}
 
 		if ((BYTE*)tmpString < searchData || !IsCharAlphaNumericA(*tmpString))
