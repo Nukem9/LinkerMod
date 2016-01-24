@@ -12,21 +12,33 @@ Session_Modify_t* Session_Modify = (Session_Modify_t*)0x00611930;
 void __cdecl Session_Modify_Fix(const int localControllerIndex, void *session, const int flags, const int publicSlots, const int privateSlots)
 {
 	MatchMakingInfo* g_matchmakingInfo = *(MatchMakingInfo**)0x03879A24;
-	sprintf_s(g_matchmakingInfo->m_membermod, "%.*s", 32, Dvar_GetString("fs_game"));
-	//printf("Settings membermod to %s\n",Dvar_GetString("fs_game"));
+	
+	g_matchmakingInfo->m_membermod[0] = GM_NET_VERSION;
+	sprintf_s(g_matchmakingInfo->m_membermod + 1, 32, "%.*s", 30, Dvar_GetString("fs_game"));
+	//printf("Settings membermod to %s using net version %d\n",Dvar_GetString("fs_game"), LM_NET_VERSION);
+
 	return Session_Modify(localControllerIndex, session, flags, publicSlots, privateSlots);
 }
 
 int Live_ClientModMatchesServerMod()
 {
-	if(strcmp(mminfo->m_membermod, Dvar_GetString("fs_game")) != 0)
+	char c_membermod[32] = "\0";
+	c_membermod[0] = GM_NET_VERSION;
+	sprintf_s(c_membermod + 1, 32, "%.*s", 30, Dvar_GetString("fs_game"));
+
+	if (strcmp(mminfo->m_membermod, c_membermod) != 0)
 	{
 		Dvar_SetStringByName("notice_popmenuTitle", UI_SafeTranslateString("@MENU_NOTICE_CAPS"));
 		char* msg;
-		if(mminfo->m_membermod[0] != NULL)
-			msg = va("^7This server is running the mod ^3%s^7.\nYou need to unload the current mod before you can join the server.", mminfo->m_membermod);
+		if (mminfo->m_membermod[0] != c_membermod[0])
+			msg = va("^7This server is running an incompatible version of game_mod.dll.\n" \
+						"Host is running game_mod with net version: ^3%d^7\n" \
+						"You are running game_mod with net version: ^3%d^7", mminfo->m_membermod[0], c_membermod[0]);
+		else if (mminfo->m_membermod[1] == 0)
+			msg = va("^7This server is not running a mod.\nYou need to unload the current mod before you can join the server.");
 		else
-			msg = va("^7This server is running the mod ^3%s^7.\nYou need to load the mod before you can join the server.", mminfo->m_membermod);
+			msg = va("^7This server is running the mod ^3%s^7.\nYou need to load the mod before you can join the server.", mminfo->m_membermod + 1);
+
 		Dvar_SetStringByName("notice_popmenuMessage", msg);
 		Dvar_SetStringByName("notice_onEscArg", (const char*)0x009DD354);
 		Live_UpdateUiPopup(0, "code_notice_popmenu");

@@ -20,6 +20,7 @@ BOOL GameMod_Init()
 {
 	if(g_initted)
 		return TRUE;
+
 	//
 	// Disable STDOUT buffering
 	//
@@ -167,6 +168,11 @@ BOOL GameMod_Init()
 	// Force new mod specific configs to inherit from the vanilla config
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0082A269, (PBYTE)&mfh_Cmd_Exec_f);
+
+	//
+	// Add Support for Mod Specific Bink Cinematics
+	//
+	Detours::X86::DetourFunction((PBYTE)0x006D98F0, (PBYTE)&hk_R_Cinematic_BinkOpen);
 
 	//
 	// Enable Custom Render Dvars

@@ -159,6 +159,11 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004D7093, (PBYTE)&mfh2_Sys_ListFiles);
 	Detours::X86::DetourFunction((PBYTE)0x004D70DB, (PBYTE)&mfh3_Sys_ListFiles);
 
+	//
+	// Leak pointfile compatibility fix
+	//
+	PatchMemory(0x006F7378, (PBYTE)".pts", 4);
+
 	g_Initted = true;
 
 	return TRUE;
