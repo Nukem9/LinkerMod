@@ -55,6 +55,15 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 {
 	printf_v("Extracting file: \"%s\"...	", rawfilePath);
 
+	//
+	// Catch incorrect rawfile data to prevent massive allocations
+	//
+	if (rawfileHeader->uncompressedSize > 1024 * 1024 * 16 || rawfileHeader->uncompressedSize < 0)
+	{
+		printf_v("IGNORED\n");
+		return 0;
+	}
+
 	char qpath[1024] = "";
 	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
 
@@ -76,15 +85,6 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
 		printf_v("ERROR\n");
-		return 0;
-	}
-
-	//
-	// Catch incorrect rawfile data to prevent massive allocations
-	//
-	if (rawfileHeader->uncompressedSize > 1024 * 1024 * 16 || rawfileHeader->uncompressedSize < 0)
-	{
-		printf_v("IGNORED\n");
 		return 0;
 	}
 
@@ -118,6 +118,15 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 {
 	printf_v("Extracting file: \"%s\"...	", rawfilePath);
 
+	//
+	// Catch incorrect rawfile data to prevent massive allocations
+	//
+	if (strlen(rawfileData) > 1024 * 1024 * 16)
+	{
+		printf_v("IGNORED\n");
+		return 0;
+	}
+
 	char qpath[1024] = "";
 	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
 
@@ -142,15 +151,6 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 		return 0;
 	}
 
-	//
-	// Catch incorrect rawfile data to prevent massive allocations
-	//
-	if (strlen(rawfileData) > 1024 * 1024 * 16)
-	{
-		printf_v("IGNORED\n");
-		return 0;
-	}
-
 	if (FILE* h = fopen(qpath, "wb"))
 	{
 		fwrite(rawfileData, 1, strlen(rawfileData), h);
@@ -172,6 +172,24 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	printf_v("Size: %d (0x%X)\n", snd_header->data_size, snd_header->data_size);
 	printf_v("Seek Table Size: %d\n", snd_header->seek_table_count);*/
 
+	//
+	// Catch incorrect sndfile data and bypass it
+	//
+	if (snd_header->format != 6 && snd_header->format != 7)
+	{
+		printf_v("IGNORED (FMT: %d)\n", snd_header->format);
+		return 0;
+	}
+
+	//
+	// Ignore non-Loaded Sounds Assets
+	//
+	if (snd_header->data_size == 0)
+	{
+		printf_v("IGNORED\n");
+		return 0;
+	}
+
 	char qpath[1024] = "";
 #if _DEBUG
 	sprintf_s(qpath, "%s", sndfilePath);
@@ -179,8 +197,6 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), sndfilePath);
 #endif
 	
-	
-
 	//
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
@@ -199,24 +215,6 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	if (FS_CreatePath(sndfilePath) != 0)
 	{
 		printf_v("PATH ERROR\n");
-		return 0;
-	}
-
-	//
-	// Catch incorrect sndfile data and bypass it
-	//
-	if (snd_header->format != 6 && snd_header->format != 7)
-	{
-		printf_v("IGNORED (FMT: %d)\n", snd_header->format);
-		return 0;
-	}
-	
-	//
-	// Ignore non-Loaded Sounds Assets
-	//
-	if (snd_header->data_size == 0)
-	{
-		printf_v("IGNORED\n");
 		return 0;
 	}
 
