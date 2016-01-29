@@ -1,0 +1,37 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+}
+// entity 1
+{
+"classname" "trigger_use"
+"origin" "-488 1246 34"
+"targetname" "use_elec_switch"
+// brush 0
+{
+ ( -32 -38 2 ) ( 40 -38 2 ) ( 40 26 2 ) trigger 64 -64 -456 -1272 0 0 lightmap_gray 16384 16383.938 456 1271.9988 180 0
+ ( 40 26 66 ) ( 40 -38 66 ) ( -32 -38 66 ) trigger 64 -64 -456 -1272.0031 0 0 lightmap_gray 16384 16384.063 456 1272.0052 180 0
+ ( 40 24 10 ) ( -32 24 10 ) ( -32 24 2 ) trigger 64 64 -456 32 0 0 lightmap_gray 16384 -16384 456 -32 -180 0
+ ( -24 26 10 ) ( -24 -38 10 ) ( -24 -38 2 ) trigger 64 64 1272.0033 32 0 0 lightmap_gray 16383.969 -16384 -1271.998 -32 -180 0
+ ( -32 -28 10 ) ( 40 -28 10 ) ( 40 -28 2 ) trigger 64 64 -456 32 0 0 lightmap_gray 16384 -16384 456 -32 -180 0
+ ( 24 -38 10 ) ( 24 26 10 ) ( 24 26 2 ) trigger 64 64 1272 32 0 0 lightmap_gray 16384 -16384 -1272.0029 -32 -180 0
+}
+}
+// entity 2
+{
+"classname" "script_model"
+"model" "zombie_power_lever_handle"
+"origin" "0.0 0.0 30.0"
+"angles" "0 2.50448e-006 90"
+"targetname" "elec_switch"
+}
+// entity 3
+{
+"classname" "script_struct"
+"origin" "0.0 0.0 43.0"
+"angles" "0 90 0"
+"targetname" "elec_switch_fx"
+}
