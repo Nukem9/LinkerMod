@@ -1,0 +1,62 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( -10 14 0 ) ( -16 14 0 ) ( -16 8 0 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -16 8 100 ) ( -16 14 100 ) ( -10 14 100 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -14 -16 84 ) ( -8 -16 84 ) ( -8 -16 20 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 15 -15 84 ) ( 15 -9 84 ) ( 15 -9 20 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -10 14 84 ) ( -16 14 84 ) ( -16 14 20 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -15 14 84 ) ( -15 8 84 ) ( -15 8 20 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+}
+// entity 1
+{
+"classname" "trigger_use"
+"origin" "-328 -490 53"
+"target" "vending_jugg"
+"targetname" "zombie_vending"
+"script_noteworthy" "specialty_armorvest"
+"script_sound" "mus_perks_jugganog_jingle"
+"script_label" "mus_perks_jugganog_sting"
+"script_string" "jugg_perk"
+// brush 0
+{
+ ( -32 -34 21 ) ( 40 -34 21 ) ( 40 30 21 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16384 296 -460 180 0
+ ( 40 30 85 ) ( 40 -34 85 ) ( -32 -34 85 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16383.977 296 -460 180 0
+ ( 39 0 29 ) ( -33 0 29 ) ( -33 0 21 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 -16383.975 296 -32 -180 0
+ ( -15 30 29 ) ( -15 -34 29 ) ( -15 -34 21 ) trigger 64 64 0 0 0 0 lightmap_gray 16383.975 -16384 460 -32 180 0
+ ( -32 -18 29 ) ( 40 -18 29 ) ( 40 -18 21 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 -16383.973 296 -32 -180 0
+ ( 15 -34 29 ) ( 15 30 29 ) ( 15 30 21 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 -16383.986 460 -32 -180 0
+}
+}
+// entity 2
+{
+"classname" "script_model"
+"model" "zombie_vending_jugg"
+"origin" "0.0 0.0 0.0"
+"angles" "0 2.50448e-006 0"
+"targetname" "vending_jugg"
+"script_string" "jugg_perk"
+}
+// entity 3
+{
+"classname" "trigger_multiple"
+"origin" "-328 -491 47"
+"targetname" "audio_bump_trigger"
+"script_sound" "fly_bump_bottle"
+"script_string" "jugg_perk"
+// brush 0
+{
+ ( -32 -33 15 ) ( 40 -33 15 ) ( 40 31 15 ) sound_trigger 64 -64 -296 460 0 0 lightmap_gray 16384 16384 296 -460 180 0
+ ( 40 31 79 ) ( 40 -33 79 ) ( -32 -33 79 ) sound_trigger 64 -64 -296 460 0 0 lightmap_gray 16383.986 16384 296 -460 180 0
+ ( 40 13 23 ) ( -32 13 23 ) ( -32 13 15 ) sound_trigger 64 64 -296 32 0 0 lightmap_gray 16384 -16384 296 -32 180 0
+ ( -18 31 23 ) ( -18 -33 23 ) ( -18 -33 15 ) sound_trigger 64 64 -460 32 0 0 lightmap_gray 16384 -16384 460 -32 -180 0
+ ( -30 -19 23 ) ( 42 -19 23 ) ( 42 -19 15 ) sound_trigger 64 64 -296 32 0 0 lightmap_gray 16384 -16384 296 -32 -180 0
+ ( 18 -33 23 ) ( 18 31 23 ) ( 18 31 15 ) sound_trigger 64 64 -460 32 0 0 lightmap_gray 16384 -16384 460 -32 180 0
+}
+}

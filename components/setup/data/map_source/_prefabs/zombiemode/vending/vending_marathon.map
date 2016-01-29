@@ -1,0 +1,104 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( 23 -17 0 ) ( 23 7 0 ) ( -2 7 0 ) clip_player 64 64 0 0 -90 0 lightmap_gray 16384 16384 0 0 -90 0
+ ( -2 5 88 ) ( 23 5 88 ) ( 23 -19 88 ) clip_player 64 64 0 0 -90 0 lightmap_gray 16384 16384 0 0 -90 0
+ ( -23 6 16 ) ( -23 -18 16 ) ( -23 -18 0 ) clip_player 64 -64 0 8 180 0 lightmap_gray 16384 -16384 0 8 180 0
+ ( -2 -16 16 ) ( 23 -16 16 ) ( 23 -16 0 ) clip_player 64 64 0 -8 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 23 -17 16 ) ( 23 7 16 ) ( 23 7 0 ) clip_player 64 -64 0 8 180 0 lightmap_gray 16384 -16384 0 8 180 0
+ ( 23 7 16 ) ( -2 7 16 ) ( -2 7 0 ) clip_player 64 64 0 -8 0 0 lightmap_gray 16384 16384 0 -8 0 0
+}
+}
+// entity 1
+{
+"classname" "trigger_use"
+"origin" "674 2236 -329"
+"target" "vending_marathon"
+"targetname" "zombie_vending"
+"script_noteworthy" "specialty_longersprint"
+"script_sound" "mus_perks_stamin_jingle"
+"script_label" "mus_perks_stamin_sting"
+"script_string" "marathon_perk"
+// brush 0
+{
+ ( 35 -58 21 ) ( 35 14 21 ) ( -29 14 21 ) trigger 64 64 16 -7 -90 0 lightmap_gray 16383.969 16384.014 -687.99457 2265.0022 -90 0
+ ( -29 9 59 ) ( 35 9 59 ) ( 35 -63 59 ) trigger 64 64 16 -7 -90 0 lightmap_gray 16384.016 16384.025 -688 2265.0034 -90 0
+ ( -18 22 9 ) ( -18 -50 9 ) ( -18 -50 1 ) trigger 64 -64 16 -8 -180 0 lightmap_gray 16384 -16383.703 -687.98718 327.99612 -180 0
+ ( -29 -16 7 ) ( 35 -16 7 ) ( 35 -16 -1 ) trigger 64 64 7 8 0 0 lightmap_gray 16384 16383.842 -2264.9956 -327.99768 0 -3.1607186e-005
+ ( 18 -50 8 ) ( 18 22 8 ) ( 18 22 0 ) trigger 64 -64 16 -8 180 0 lightmap_gray 16384 -16384.055 -688.00513 328 180 0
+ ( 35 0 9 ) ( -29 0 9 ) ( -29 0 1 ) trigger 64 64 7 8 0 0 lightmap_gray 16384 16383.93 -2265.0117 -328 0 0
+}
+}
+// entity 2
+{
+"script_string" "tap_perk"
+"targetname" "vending_marathon"
+"target" "pf1337_auto1"
+"angles" "0 2.50448e-006 0"
+"origin" "0.0 0.0 0.0"
+"model" "zombie_vending_marathon"
+"classname" "script_model"
+}
+// entity 3
+{
+"script_int" "3"
+"script_noteworthy" "cosmo_monkey_marathon"
+"targetname" "auto3"
+"angles" "0 90 0"
+"origin" "24.0 -32.0 0.0"
+"classname" "script_struct"
+"target" "vending_marathon"
+}
+// entity 4
+{
+"script_int" "2"
+"script_noteworthy" "cosmo_monkey_marathon"
+"targetname" "pf1337_auto1"
+"angles" "0 90 0"
+"origin" "0.0 -40.0 0.0"
+"classname" "script_struct"
+}
+// entity 5
+{
+"script_int" "1"
+"script_noteworthy" "cosmo_monkey_marathon"
+"targetname" "auto2"
+"angles" "0 90 0"
+"origin" "-24.0 -32.0 0.0"
+"classname" "script_struct"
+"target" "vending_marathon"
+}
+// entity 6
+{
+"script_int" "3"
+"script_noteworthy" "cosmo_monkey_marathon"
+"targetname" "auto7"
+"angles" "0 90 0"
+"origin" "24.0 -32.0 0.0"
+"classname" "script_struct"
+"target" "vending_marathon"
+}
+// entity 7
+{
+"script_int" "1"
+"script_noteworthy" "cosmo_monkey_marathon"
+"targetname" "auto6"
+"angles" "0 90 0"
+"origin" "-24.0 -32.0 0.0"
+"classname" "script_struct"
+"target" "vending_marathon"
+}
+// entity 8
+{
+"script_int" "2"
+"script_noteworthy" "cosmo_monkey_marathon"
+"targetname" "auto4"
+"angles" "0 90 0"
+"origin" "0.0 -40.0 0.0"
+"classname" "script_struct"
+}
