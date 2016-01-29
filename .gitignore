@@ -10,21 +10,7 @@
 /ipch
 
 components/sdk
-components/setup/Debug
-components/setup/Release
-components/cod2map/Debug
-components/cod2map/Release
-components/cod2rad/Debug
-components/cod2rad/Release
-components/path_mod/Debug
-components/path_mod/Release
-components/game_mod/Debug
-components/game_mod/Release
-components/launcher_ldr/Debug
-components/launcher_ldr/Release
-components/linker_pc/Debug
-components/linker_pc/Release
-components/radiant_mod/Debug
-components/radiant_mod/Release
+components/*/Debug
+components/*/Release
 
 !*.lib
