@@ -3839,7 +3839,7 @@ fx,weapon/muzzleflashes/fx_raygun_view
 fx,weapon/muzzleflashes/fx_smg_flash_base
 fx,impacts/fx_flesh_hit_body_fatal_exit
 fx,weapon/shellejects/fx_shotgun_resting
-impactfx,
+character,c_usa_marine_michael_carter_player_zm
 rawfile,animscripts/traverse/zombie_jump_down_40.gsc
 rawfile,maps/_zombiemode_weap_tesla.gsc
 rawfile,animtrees/zombie_dog.atr
