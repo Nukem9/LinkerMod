@@ -330,7 +330,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 int FF_FFExtract(const char* filepath, const char* filename)
 {
-	printf("Extracting rawfiles from \"%s\"...\n", filename);
+	printf("Extracting files from \"%s\"...\n", filename);
 
 	FILE* h = nullptr;
 	if (fopen_s(&h, filepath, "r+b") != 0)

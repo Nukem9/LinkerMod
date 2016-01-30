@@ -74,7 +74,7 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 			return 1;
 		}
 
-		printf("SUCCESS\n");
+		printf_v("SUCCESS\n");
 		return 0;
 	}
 	
