@@ -11,7 +11,7 @@ static zlib_func* uncompress = nullptr;
 
 bool Str_EndsWith(const char* str, const char* substr)
 {
-	return (strstr(str, substr) == str + strlen(str) - strlen(substr));
+	return !strcmp(str + strlen(str) - strlen(substr), substr);
 }
 
 char* FindRawfileString(BYTE* start, BYTE* end)
