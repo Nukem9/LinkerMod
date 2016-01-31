@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <string>
 #include "steam.h"
+#include "io.h"
 
 const char* FS_Cwd(void)
 {
@@ -175,6 +176,10 @@ int FS_CopyDirectory(char* srcPath, char* destPath, bool overwriteFiles)
 
 			sprintf(destFile, "%s%s", destPath, file_data.cFileName);
 			sprintf(srcFile, "%s%s", srcPath, file_data.cFileName);
+
+			printf_v("Copying File: '%s'...\n", file_data.cFileName);
+			//printf_v("Src '%s'\n", srcPath);
+			//printf_v("Dest '%s'\n\n", destPath);
 
 			CopyFileA(srcFile, destFile, !overwriteFiles);
 		}
