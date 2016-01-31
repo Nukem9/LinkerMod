@@ -59,7 +59,7 @@ void Light_FixPrimaryLightInfo(Lump* lump)
 {
 	if (!g_tmpPrimaryLightData)
 	{
-		Con_Warning("Custom primary light data not generated (using default values)...\n");
+		Con_Printf("Custom primary light data was not generated (using default values) ...\n");
 		return;
 	}
 

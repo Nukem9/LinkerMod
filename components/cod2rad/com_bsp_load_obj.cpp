@@ -88,7 +88,6 @@ int __cdecl Com_SaveBsp_EnforceVersion(FILE* h)
 
 	if (!preservedPrimaryLights.isEmpty)
 	{
-		printf("restoring primary ligmmpts\n");
 		iBSP->RestoreLump(LUMP_PRIMARY_LIGHTS, &preservedPrimaryLights);
 	}
 
