@@ -1,0 +1,65 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( 48 16 0 ) ( -48 16 0 ) ( -48 -16 0 ) clip 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -48 -8 64 ) ( -48 24 64 ) ( 48 24 64 ) clip 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -48 -12 56 ) ( 48 -12 56 ) ( 48 -12 0 ) clip 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 46 -16 56 ) ( 46 16 56 ) ( 46 16 0 ) clip 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 48 13 56 ) ( -48 13 56 ) ( -48 13 0 ) clip 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -46 16 56 ) ( -46 -16 56 ) ( -46 -16 0 ) clip 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+}
+// entity 1
+{
+"targetname" "auto1"
+"origin" "0.0 0.0 0.0"
+"model" "zombie_treasure_box"
+"classname" "script_model"
+}
+// entity 2
+{
+"target" "auto2"
+"classname" "trigger_use"
+"origin" "-1 -775 285"
+"targetname" "treasure_chest_use"
+"script_noteworthy" "treasure_box_0"
+"zombie_cost" "950"
+// brush 0
+{
+ ( 31 69 13 ) ( -41 69 13 ) ( -41 5 13 ) trigger 64 -64 32 780 180 0 lightmap_gray 16384 16383.986 -32 -780 0 0
+ ( -41 5 61 ) ( -41 69 61 ) ( 31 69 61 ) trigger 64 -64 32 780 180 0 lightmap_gray 16384 16384.059 -32 -780 0 0
+ ( -38 -12 5 ) ( 34 -12 5 ) ( 34 -12 -3 ) trigger 64 -64 32 -288 180 0 lightmap_gray 16384 16383.982 -32 288 0 0
+ ( 46 5 5 ) ( 46 69 5 ) ( 46 69 -3 ) trigger 64 -64 -779.99347 -288 -180 0 lightmap_gray 16383.965 16384 779.99213 288 0 0
+ ( 31 13 5 ) ( -41 13 5 ) ( -41 13 -3 ) trigger 64 -64 32 -288 180 0 lightmap_gray 16384 16383.92 -32 288 0 0
+ ( -46 69 5 ) ( -46 5 5 ) ( -46 5 -3 ) trigger 64 -64 -780 -288 180 0 lightmap_gray 16384 16384.012 779.98975 288.00101 0 0
+}
+}
+// entity 3
+{
+"origin" "20.0 -8.0 5.5"
+"script_noteworthy" "treasure_box_0_rubble"
+"classname" "script_model"
+"model" "zombie_coast_bearpile"
+"angles" "0 135 0"
+}
+// entity 4
+{
+"angles" "0 90 0"
+"origin" "0.0 0.0 0.0"
+"classname" "script_origin"
+"target" "auto1"
+"targetname" "auto3"
+}
+// entity 5
+{
+"origin" "0.0 -12.0 18.0"
+"model" "zombie_treasure_box_lid"
+"classname" "script_model"
+"targetname" "auto2"
+"target" "auto3"
+}
