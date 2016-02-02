@@ -27,7 +27,7 @@ iwmap 4
 "classname" "trigger_use"
 "origin" "-1 -775 285"
 "targetname" "treasure_chest_use"
-"script_noteworthy" "treasure_box_0"
+"script_noteworthy" "start_chest"
 "zombie_cost" "950"
 // brush 0
 {
@@ -42,7 +42,7 @@ iwmap 4
 // entity 3
 {
 "origin" "20.0 -8.0 5.5"
-"script_noteworthy" "treasure_box_0_rubble"
+"script_noteworthy" "start_chest_rubble"
 "classname" "script_model"
 "model" "zombie_coast_bearpile"
 "angles" "0 135 0"
