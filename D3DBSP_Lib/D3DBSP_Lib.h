@@ -1,4 +1,5 @@
 #pragma once
+#include <windows.h>
 
 enum LOGFILE_MODE
 {
@@ -38,7 +39,7 @@ public:
 	~Lump(void);
 };
 
-enum LUMP_TYPE : DWORD
+enum LUMP_TYPE
 {
   LUMP_MATERIALS = 0x0,
   LUMP_LIGHTBYTES = 0x1,
@@ -146,6 +147,11 @@ public:
 	DWORD bspVersion;
 	Lump lumps[INFO_LUMP_TYPE_COUNT];
 
+	Lump* AddLump(LUMP_TYPE, Lump&);
+
+	int PreserveLump(LUMP_TYPE, Lump* dest);
+	int RestoreLump(LUMP_TYPE, Lump* src);
+
 	int Load(const char* filepath);
 	int Load(BYTE* pBuf);
 	int Write(const char* filepath);
@@ -153,6 +159,7 @@ public:
 
 	size_t PotentialFileSize();
 
+	int Convert(BSPVERSION_TYPE);
 	int ConvertFrom(D3DBSP*, BSPVERSION_TYPE);
 
 	D3DBSP(void);
