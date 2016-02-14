@@ -33,7 +33,7 @@ iwmap 4
 }
 // entity 2
 {
-"target" "pf40_auto2108"
+"target" "auto2"
 "spawnflags" "-32766"
 "animscript" "zombie_mantle_over_40"
 "classname" "node_negotiation_begin"
@@ -42,7 +42,7 @@ iwmap 4
 }
 // entity 3
 {
-"targetname" "pf40_auto2108"
+"targetname" "auto2"
 "spawnflags" "-32766"
 "classname" "node_negotiation_end"
 "angles" "0 270 0"
