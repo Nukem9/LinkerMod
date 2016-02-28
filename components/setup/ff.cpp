@@ -99,7 +99,14 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 
 	if (FILE* h = fopen(qpath, "wb"))
 	{
-		fwrite(dBuf, 1, rawfileHeader->uncompressedSize, h);
+		unsigned int size = rawfileHeader->uncompressedSize;
+
+		if (dBuf[rawfileHeader->uncompressedSize - 1] == '\0')
+		{
+			size--;
+		}
+
+		fwrite(dBuf, 1, size, h);
 		fclose(h);
 
 		printf_v("SUCCESS\n");
