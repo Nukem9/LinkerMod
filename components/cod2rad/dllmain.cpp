@@ -80,6 +80,11 @@ BOOL cod2rad_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004413D0, (PBYTE)&hk_FS_FOpenFileRead);
 	Detours::X86::DetourFunction((PBYTE)0x00442E97, (PBYTE)&mfh_Com_SaveBsp);
 
+	//
+	// Temporary fix for non height 1 attenuation images
+	//
+	PatchMemory(0x0042B533, (PBYTE)"\xEB", 1);
+
 	g_initted = true;
 	return TRUE;
 }
