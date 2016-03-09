@@ -112,6 +112,27 @@ int FS_DirectoryIterator(const char* path, int(__cdecl* FS_DirectoryHandlerCallb
 	return count;
 }
 
+//
+// Tests a path to a file or directory
+// return 0 - invalid file
+// return 1 - file
+// return 2 - directory
+//
+int FS_TestPath(const char* path)
+{
+	DWORD attributes = GetFileAttributesA(path);
+	return (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY));
+
+	if (attributes == INVALID_FILE_ATTRIBUTES)
+		return 0;
+	else if (attributes & FILE_ATTRIBUTE_NORMAL)
+		return 1;
+	else if (attributes & FILE_ATTRIBUTE_DIRECTORY)
+		return 2;
+
+	return 0;
+}
+
 int FS_CreatePath(const char* targetPath)
 {
 	int len = strlen(targetPath);
