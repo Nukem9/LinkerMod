@@ -1,0 +1,148 @@
+ignore,code_post_gfx
+ignore,common_zombie
+include,configStrings
+
+//localize,template
+
+col_map_sp,maps/template.d3dbsp
+
+include,zombiemode_ai_quad
+include,template_fx
+
+include, zombiemode_perk_deadshot
+include, zombiemode_perk_divetonuke
+include, zombiemode_perk_marathon
+include, zombiemode_perk_additionalprimaryweapon
+
+sound, zmb_theater
+
+rawfile,maps/_zombiemode_timer.gsc
+rawfile,maps/template.gsc
+rawfile,maps/template_fx.gsc
+rawfile,maps/template_amb.gsc
+//rawfile,maps/createfx/template_fx.gsc
+
+rawfile,maps/zombie_theater_quad.gsc
+
+rawfile,clientscripts/template.csc
+rawfile,clientscripts/template_fx.csc
+rawfile,clientscripts/template_amb.csc
+rawfile,clientscripts/createfx/template_fx.csc
+rawfile,clientscripts/_zombiemode.csc
+
+material,flamethrowerfx_color_distort_overlay_bloom
+material,zombie_electric_shock_overlay
+material,zombie_transporter_overlay
+mptype,player_t5_zm
+xmodel,viewhands_usmc
+xmodel,viewmodel_knife
+xmodel,viewmodel_knife_bowie
+
+// Turrets
+//xmodel,weapon_zombie_auto_turret
+
+// Weapons - Special
+include,zombiemode_weap_thundergun
+include,zombiemode_weap_crossbow
+include,zombiemode_weap_ballistic_knife
+
+//rawfile,animscripts/traverse/mantle_over_40.gsc
+rawfile,animscripts/traverse/zombie_mantle_over_40.gsc
+rawfile,animscripts/traverse/zombie_jump_down_40.gsc
+rawfile,animscripts/traverse/zombie_jump_down_72.gsc
+rawfile,animscripts/traverse/zombie_jump_down_120.gsc
+rawfile,animscripts/traverse/zombie_jump_down_127.gsc
+rawfile,animscripts/traverse/zombie_jump_down_190.gsc
+rawfile,animscripts/traverse/zombie_jump_down_240.gsc
+rawfile,animscripts/traverse/zombie_jump_down_286.gsc
+rawfile,animscripts/traverse/zombie_wall_crawl_drop.gsc
+rawfile,animscripts/traverse/zombie_wall_crawl_drop_quick.gsc
+xanim,ai_zombie_jump_down_40
+xanim,ai_zombie_jump_down_72
+xanim,ai_zombie_jump_down_120
+xanim,ai_zombie_jump_down_127
+xanim,ai_zombie_jump_down_190
+xanim,ai_zombie_jump_down_240
+xanim,ai_zombie_jump_down_286
+xanim,ai_zombie_quad_crawl_sprint_wall_intro_quick
+
+// electrical trap
+fx,misc/fx_zombie_electric_trap_loc
+fx,misc/fx_zombie_electric_trap
+fx,misc/fx_zombie_elec_trail
+fx,misc/fx_zombie_zapper_powerbox_on
+fx,misc/fx_zombie_zapper_wall_control_on
+fx,env/electrical/fx_elec_wire_spark_dl_oneshot
+fx,misc/fx_zombie_elec_gen_on
+fx,misc/fx_zombie_elec_gen_idle
+
+xmodel,zombie_zapper_cagelight_red
+xmodel,zombie_zapper_cagelight_green
+fx,misc/fx_zombie_zapper_light_green
+fx,misc/fx_zombie_zapper_light_red
+
+// dogs
+//fx,maps/zombie/fx_zombie_dog_eyes
+//fx,maps/zombie/fx_zombie_dog_explosion
+//fx,maps/zombie/fx_zombie_dog_fire_trail
+//fx,maps/zombie/fx_zombie_dog_ash_trail
+//fx,maps/zombie/fx_zombie_dog_breath
+//fx,maps/zombie/fx_zombie_dog_gate_start
+//fx,maps/zombie/fx_zombie_dog_gate_looping
+//fx,maps/zombie/fx_zombie_dog_gate_end
+
+fx,maps/zombie/fx_zombie_dog_lightning_spawn
+fx,maps/zombie/fx_zombie_dog_lightning_buildup
+
+// electric switch
+fx,env/electrical/fx_elec_wire_spark_burst
+
+// Fog, Sky, and vision
+rawfile,vision/template.vision
+rawfile,vision/zombie_sumpf_dogs.vision
+
+// Teleporter FX
+fx,maps/zombie/fx_transporter_beam
+fx,maps/zombie/fx_transporter_pad_start
+fx,maps/zombie/fx_transporter_start
+fx,maps/zombie/fx_transporter_ambient
+fx,maps/zombie/fx_zombie_wire_spark
+fx,maps/zombie/fx_zombie_mainframe_beam
+fx,maps/zombie/fx_zombie_mainframe_flat
+fx,maps/zombie/fx_zombie_mainframe_flat_start
+fx,maps/zombie/fx_zombie_mainframe_beam_start
+fx,maps/zombie/fx_zombie_flashback_theater
+fx,maps/zombie/fx_zombie_heat_sink
+
+// packapunch machine
+fx,maps/zombie/fx_zombie_packapunch
+
+// auto turret light
+fx,maps/zombie/fx_zombie_auto_turret_light
+
+// electric trap fx
+fx,maps/zombie/fx_elec_player_md
+fx,maps/zombie/fx_elec_player_sm
+fx,maps/zombie/fx_elec_player_torso
+
+// stopwatch
+material,zombie_stopwatch
+material,zombie_stopwatchneedle
+material,zombie_stopwatch_glass
+
+// film grain overlay
+material,ac130_overlay_grain
+
+//viewmodel arms
+xmodel,viewmodel_rus_prisoner_arms
+xmodel,viewmodel_usa_pow_arms
+xmodel,viewmodel_vtn_nva_standard_arms
+xmodel,viewmodel_usa_hazmat_arms
+
+// character 3rd person
+mptype,player_t5_zm_theater,
+xmodel,lights_hang_single
+xmodel,lights_hang_single_on_nonflkr
+
+fx,trail/fx_trail_blood_streak	// Used for gibs
+physpreset, gib
