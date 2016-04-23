@@ -27,4 +27,7 @@ components/linker_pc/Release
 components/radiant_mod/Debug
 components/radiant_mod/Release
 
+components/D3DBSP_Lib/*/Release
+components/D3DBSP_Lib/*/Debug
+
 !*.lib

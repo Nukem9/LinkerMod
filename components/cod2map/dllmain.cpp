@@ -5,6 +5,13 @@
 #include "com_files.h"
 #include "lights.h"
 
+#include "../D3DBSP_Lib/D3DBSP_Lib/D3DBSP_Lib.h"
+#if _DEBUG
+#pragma comment(lib, "../build/Debug/D3DBSP_Lib.lib")
+#else
+#pragma comment(lib, "../build/Release/D3DBSP_Lib.lib")
+#endif
+
 int __cdecl hk_FS_ReadFile(const char* path, BYTE** fileData)
 {
 	int result = FS_ReadFile(path,fileData);
