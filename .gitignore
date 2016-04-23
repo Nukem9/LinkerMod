@@ -13,4 +13,7 @@ components/sdk
 components/*/Debug
 components/*/Release
 
+components/D3DBSP_Lib/*/Release
+components/D3DBSP_Lib/*/Debug
+
 !*.lib

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../D3DBSP_Lib/D3DBSP_Lib/D3DBSP_Lib.h"
 #include <wtypes.h>
 
 extern Lump preservedPrimaryLights;
