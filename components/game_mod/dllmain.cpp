@@ -189,6 +189,15 @@ BOOL GameMod_Init()
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
 
+	//
+	// Enable cg_fov in coop
+	//
+	DWORD flags = 0x01; // 0x80 is the default
+	PatchMemory(0x004A3921, (PBYTE)&flags, 4);
+
+	PatchMemory(0x004A3A30, (PBYTE)&flags, 4); //cg_fovMin
+	PatchMemory(0x004A39C1, (PBYTE)&flags, 4); //cg_fovScale
+
 	if(IsReflectionMode())
 		ReflectionMod_Init();
 
