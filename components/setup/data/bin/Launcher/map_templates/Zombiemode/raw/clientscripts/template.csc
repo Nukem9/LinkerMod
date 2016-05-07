@@ -26,6 +26,11 @@ register_zombie_types()
 {
 	character\clientscripts\c_ger_honorguard_zt::register_gibs();	
 	character\clientscripts\c_zom_quad::register_gibs();
+
+	// Register gibs for zombie_pentagon zombies (Enable if used)
+	//character\clientscripts\c_usa_pent_zombie_scientist::register_gibs();
+	//character\clientscripts\c_usa_pent_zombie_officeworker::register_gibs();
+	//character\clientscripts\c_usa_pent_zombie_militarypolice::register_gibs();
 }	
 /*****************************************************************************
 // WEAPON FUNCTIONS
