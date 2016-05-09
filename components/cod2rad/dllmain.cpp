@@ -53,8 +53,10 @@ BOOL cod2rad_Init()
 	//
 	// Patch the requested IWI version to match BO1
 	//
-	PatchMemory(0x00417AA7, (PBYTE)"\xEB", 1);
-	PatchMemory(0x00417B41, (PBYTE)"\x30", 1);
+	BYTE iwiVersion = 13;
+	PatchMemory(0x00417AA6, &iwiVersion, 1); // version check
+	PatchMemory(0x00417AAD, &iwiVersion, 1); // print version
+	Detours::X86::DetourFunction((PBYTE)0x00417A91, (PBYTE)&mfh_Image_LoadFromFileWithReader); // Enforce cod2rad compatible file header
 	FS_FileOpen = (FS_FileOpen_t)Detours::X86::DetourFunction((PBYTE)0x004034E8, (PBYTE)&FS_ImageRedirect);
 
 	//

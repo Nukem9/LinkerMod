@@ -4,6 +4,8 @@
 #include <windows.h>
 #include <stdio.h>
 
+#define CHECK_SIZE(Type, Size) static_assert(sizeof(Type) == Size, "Invalid type size!");
+
 //
 // Shared files
 //
@@ -29,6 +31,7 @@
 #include "com_bsp_load_obj.h"
 #include "r_xmodel_load_obj.h"
 #include "r_xsurface_load_obj.h"
+#include "r_image_load_obj.h"
 
 #include "../D3DBSP_Lib/D3DBSP_Lib/D3DBSP_Lib.h"
 #include "../D3DBSP_Lib/D3DBSP_Lib/Lightmaps.h"
