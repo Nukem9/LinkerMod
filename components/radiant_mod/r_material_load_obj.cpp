@@ -1725,6 +1725,8 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 			return nullptr;
 		}
 	}
+
+#if WAW_PIMP
 	else
 	{
 		//
@@ -1741,6 +1743,7 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 			return nullptr;
 		}
 	}
+#endif
 
 	void *shaderMemory	= Z_Malloc(shaderDataSize);
 	LPD3DXBUFFER shader	= nullptr;
