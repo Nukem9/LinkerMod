@@ -68,6 +68,12 @@ BOOL LinkerMod_Init()
 	PatchMemory_WithNOP(0x0041E5B1, 5);
 	Detours::X86::DetourFunction((PBYTE)0x0041E689, (PBYTE)&mfh_fcloseDeps);
 
+	//
+	// Fix for misleading (incorrect) assertion message
+	//
+	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
+	PatchMemory(0x00480D10, (PBYTE)&msg_assertion, 4);
+
 	g_initted = TRUE;
 	return TRUE;
 }

@@ -164,6 +164,12 @@ BOOL RadiantMod_Init()
 	//
 	PatchMemory(0x006F7378, (PBYTE)".pts", 4);
 
+	//
+	// Fix for misleading (incorrect) assertion message
+	//
+	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
+	PatchMemory(0x0052E7F0, (PBYTE)&msg_assertion, 4);
+
 	g_Initted = true;
 
 	return TRUE;

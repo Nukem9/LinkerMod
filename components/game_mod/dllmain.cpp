@@ -185,6 +185,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x007D9590, (PBYTE)&nullsub);
 	
 	//
+	// Fix for misleading (incorrect) assertion message
+	//
+	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
+	PatchMemory(0x00700492, (PBYTE)&msg_assertion, 4);
+
+	//
 	// Increase Asset Limits
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
