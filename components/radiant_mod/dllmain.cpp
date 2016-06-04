@@ -128,6 +128,7 @@ BOOL RadiantMod_Init()
 	//
 	// Debug INT3 to make sure specific functions are not called
 	//
+#if !WAW_PIMP
 #define DO_NOT_USE(x) PatchMemory((x), (PBYTE)"\xCC", 1)
 	DO_NOT_USE(0x0052EA20);// Material_ParseArgumentSource
 	DO_NOT_USE(0x0052E2C0);// Material_ParseSamplerSource
@@ -148,6 +149,7 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
 	DO_NOT_USE(0x0052FE70);// Material_SetPassShaderArguments_DX
 #undef DO_NOT_USE
+#endif
 
 	//
 	// Increase the maximum number of files used by FS_ListFilteredFiles
