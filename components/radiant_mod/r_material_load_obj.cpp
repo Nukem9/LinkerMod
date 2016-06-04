@@ -3207,6 +3207,9 @@ CodeSamplerSource s_codeSamplers[] =
 	{ "floatZ", 19, 0, 0, 0 },
 	{ "processedFloatZ", 20, 0, 0, 0 },
 	{ "rawFloatZ", 21, 0, 0, 0 },
+
+	{ "caseTexture", 22, 0, 0, 0 }, // from linker_pc
+
 	{ "codeTexture0", 34, 0, 0, 0 },
 	{ "codeTexture1", 35, 0, 0, 0 },
 	{ "codeTexture2", 36, 0, 0, 0 },
