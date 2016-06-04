@@ -26,32 +26,35 @@ void FS_Init_TechsetOverride(void)
 {
 	FILE* h = fopen("techset_override.csv", "r");
 
-	for (int eof = false; !eof && !feof(h);)
+	if (h)
 	{
-		char buf[1024] = "";
-		if (!fgets(buf, 1024, h))
+		for (int eof = false; !eof && !feof(h);)
 		{
-			fclose(h);
-			return;
+			char buf[1024] = "";
+			if (!fgets(buf, 1024, h))
+			{
+				fclose(h);
+				return;
+			}
+
+			techsetOverride tsOverride;
+			char* p = strtok(buf, " \t\n,");
+			if (!p || (p[0] == '/' && p[1] == '/'))
+			{
+				continue;
+			}
+			tsOverride.key = p;
+
+			p = strtok(NULL, " \t\n,");
+			if (!p)
+			{
+				continue;
+			}
+			tsOverride.replacement = p;
+
+			techsetOverrideList.push_back(tsOverride);
 		}
 
-		techsetOverride tsOverride;
-		char* p = strtok(buf, " \t\n,");
-		if (!p || (p[0] == '/' && p[1] == '/'))
-		{
-			continue;
-		}
-		tsOverride.key = p;
-
-		p = strtok(NULL, " \t\n,");
-		if (!p)
-		{
-			continue;
-		}
-		tsOverride.replacement = p;
-
-		techsetOverrideList.push_back(tsOverride);
+		fclose(h);
 	}
-
-	fclose(h);
 }
