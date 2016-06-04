@@ -64,7 +64,7 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 
 		if (!SUCCEEDED(hr))
 		{
-			//++g_disableRendering;
+			// g_disableRendering++;
 			(*(DWORD *)0xEE4F80)++;
 
 			Com_Error(ERR_FATAL, "dx.device->CreateVertexDeclaration( elemTable, &decl ) failed: %s\n", R_ErrorDescription(hr));
@@ -85,6 +85,7 @@ void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl)
 
 	for (int vertDeclType = 0; vertDeclType < 18; vertDeclType++)
 	{
+		// r_loadForRenderer->current.enabled
 		if (*(BYTE *)(*(DWORD *)0x0191D574 + 12))
 		{
 			(*mtlVertDecl)->routing.decl[vertDeclType] = Material_BuildVertexDecl(
@@ -426,7 +427,7 @@ bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable
 	//
 	// Material pass vertex stream routing
 	//
-	MaterialStreamRouting routing[16 + 1];
+	MaterialStreamRouting routing[16];
 	memset(routing, 0, sizeof(routing));
 
 	int routingIndex = 0;
@@ -651,12 +652,12 @@ bool Material_ParseSamplerSource(const char **text, ShaderArgumentSource *argSou
 			return false;
 		
 		argSource->type						= MTL_ARG_MATERIAL_PIXEL_SAMPLER;
-		argSource->u.literalConst			= (const float *)Material_RegisterString(Com_Parse(text));
+		argSource->u.name					= Material_RegisterString(Com_Parse(text));
 		argSource->indexRange.first			= 0;
 		argSource->indexRange.count			= 1;
 		argSource->indexRange.isImplicit	= true;
 
-		return argSource->u.literalConst != nullptr;
+		return argSource->u.name != nullptr;
 	}
 
 	Com_ScriptError("expected 'sampler' or 'material', found '%s' instead\n", token);
@@ -689,9 +690,9 @@ bool Material_DefaultSamplerSourceFromTable(const char *constantName, ShaderInde
 SRCLINE(3606)
 bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
-	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource) != false;
+	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource);
 	// FIX
-	//return Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource) != false;
+	//return Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource);
 }
 
 SRCLINE(3613)
@@ -851,12 +852,12 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 
 		token = Com_Parse(text);
 		argSource->type						= (shaderType == MTL_VERTEX_SHADER) ? MTL_ARG_MATERIAL_VERTEX_CONST : MTL_ARG_MATERIAL_PIXEL_CONST;
-		argSource->u.literalConst			= (const float *)Material_RegisterString(token);
+		argSource->u.name					= Material_RegisterString(token);
 		argSource->indexRange.first			= 0;
 		argSource->indexRange.count			= 1;
 		argSource->indexRange.isImplicit	= true;
 
-		return argSource->u.literalConst != nullptr;
+		return argSource->u.name != nullptr;
 	}
 
 	Com_ScriptError("expected 'sampler' or 'material', found '%s' instead\n", token);
@@ -912,9 +913,9 @@ bool Material_DefaultConstantSource(MaterialShaderType shaderType, const char *c
 	//if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064BCD0, argSource))
 		return true;
 
-	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_defaultCodeConsts, argSource) != 0;
+	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_defaultCodeConsts, argSource);
 	// FIX
-	//return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource) != false;
+	//return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource);
 }
 
 SRCLINE(3800)
@@ -1094,9 +1095,7 @@ bool Material_AttemptCombineShaderArguments(MaterialShaderArgument *arg0, Materi
 	if (arg0->u.codeConst.rowCount + arg0->dest != arg1->dest)
 		return false;
 
-	ASSERT((signed int)LOWORD(arg0->u.literalConst) == arg0->u.codeConst.index);
-
-	if ((signed int)LOWORD(arg0->u.literalConst) < R_MAX_CODE_INDEX)
+	if (arg0->u.codeConst.index < R_MAX_CODE_INDEX)
 		return false;
 
 	if (arg0->u.codeConst.index != arg1->u.codeConst.index)
@@ -1447,10 +1446,6 @@ bool CodeConstIsOneOf(unsigned __int16 constCodeIndex, const unsigned __int16 *c
 SRCLINE(4285)
 bool Material_ParseShaderArguments(const char **text, const char *shaderName, MaterialShaderType shaderType, ShaderUniformDef *paramTable, unsigned int paramCount, unsigned __int16 *techFlags, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args)
 {
-	unsigned __int16 v10 = 0; // cx@54
-	__int16 v14 = 0; // [sp+18h] [bp-5134h]@24
-	unsigned __int16 v15 = 0; // [sp+1Ch] [bp-5130h]@25
-
 	ASSERT(techFlags != nullptr);
 	ASSERT(paramTable  != nullptr);
 
@@ -1460,7 +1455,7 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 	//
 	// Values for shader registers stored as 64-byte strings
 	//
-	char registerUsage[16384];
+	char registerUsage[R_MAX_PIXEL_SHADER_CONSTS][64];
 	memset(registerUsage, 0, sizeof(registerUsage));
 
 	//
@@ -1515,12 +1510,12 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 				paramCount,
 				&usedCount,
 				localArgs,
-				(char(*)[64])registerUsage))
+				registerUsage))
 				return false;
 
-			if (v14 == 4)
+			if (argSource.type == MTL_ARG_CODE_PIXEL_SAMPLER)
 			{
-				switch (v15)
+				switch (argSource.u.codeIndex)
 				{
 				case 9:
 					*techFlags |= 1;
@@ -1570,36 +1565,46 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 		{
 			printf("success\n");
 
-			if (v14 == 5)
+			if (argSource.type == MTL_ARG_CODE_PIXEL_CONST)
 			{
-				if (v15 == 4)
+				if (argSource.u.codeIndex == 4)
 					*techFlags |= 0x10u;
 			}
-			else if (v14 == 4 && (v15 == 19 || v15 == 20 || v15 == 21))
+			else if (argSource.type == MTL_ARG_CODE_PIXEL_SAMPLER)
 			{
-				*techFlags |= 0x40u;
+				if (argSource.u.codeIndex == 19 || argSource.u.codeIndex == 20 || argSource.u.codeIndex == 21)
+					*techFlags |= 0x40u;
 			}
 
-			if (v14 == 3 && v15 == 120)
+			if (argSource.type == MTL_ARG_CODE_VERTEX_CONST && argSource.u.codeIndex == 120)
 				*techFlags |= 0x100u;
 			
-			if (v14 == 3)
+			if (argSource.type == MTL_ARG_CODE_VERTEX_CONST)
 			{
-				v10 = *techFlags;
-				if (!(v10 & 0x20))
+				if (!(*techFlags & 0x20))
 				{
-					static unsigned short foliageConsts[4] = { 81, 82, 83, 84 };
+					static unsigned short foliageConsts[4] =
+					{
+						81,
+						82,
+						83,
+						84
+					};
 
-					if (CodeConstIsOneOf(v15, foliageConsts, 4))
+					if (CodeConstIsOneOf(argSource.u.codeIndex, foliageConsts, 4))
 						*techFlags |= 0x20u;
 				}
 			}
 
-			if (v14 == 3 && !(*techFlags & 0x200))
+			if (argSource.type == MTL_ARG_CODE_PRIM_BEGIN && !(*techFlags & 0x200))
 			{
-				static unsigned short scorchConsts[2] = { 114, 118 };
+				static unsigned short scorchConsts[2] =
+				{
+					114,
+					118
+				};
 
-				if (CodeConstIsOneOf(v15, scorchConsts, 2))
+				if (CodeConstIsOneOf(argSource.u.codeIndex, scorchConsts, 2))
 					*techFlags |= 0x200u;
 			}
 
@@ -1611,7 +1616,7 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 				paramCount,
 				&usedCount,
 				localArgs,
-				(char(*)[64])registerUsage))
+				registerUsage))
 				return false;
 		}
 	}
@@ -1821,18 +1826,17 @@ char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 
 		return 19;
 
-	case D3DDECLUSAGE_TEXCOORD:
-		printf("TEXCOORD! %d %d\n", semantic->Usage, semantic->UsageIndex);
-		if (semantic->UsageIndex < 0 || semantic->UsageIndex >= 14)
-			break;
-
-		return semantic->UsageIndex + 5;
-
 	case D3DDECLUSAGE_NORMAL:
 		if (semantic->UsageIndex)
 			break;
 
 		return 1;
+
+	case D3DDECLUSAGE_TEXCOORD:
+		if (semantic->UsageIndex < 0 || semantic->UsageIndex >= 14)
+			break;
+
+		return semantic->UsageIndex + 5;
 
 	case D3DDECLUSAGE_COLOR:
 		if (semantic->UsageIndex < 0 || semantic->UsageIndex >= 2)
@@ -2140,7 +2144,7 @@ char Material_CountArgsWithUpdateFrequency(MaterialUpdateFrequency updateFreq, M
 }
 
 SRCLINE(8375)
-bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap)
+bool Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap, int rendererInUse)
 {
 	memset(pass, 0, sizeof(MaterialPass));
 
@@ -2846,6 +2850,26 @@ void __declspec(naked) hk_Material_LoadShader()
 		push [ebp + 0x8]
 		call Material_LoadShader
 		add esp, 0x8
+
+		pop ebp
+		retn
+	}
+}
+
+void __declspec(naked) hk_Material_LoadPass()
+{
+	__asm
+	{
+		push ebp
+		mov ebp, esp
+
+		push [ebp + 0xC]	// a5: rendererInUse
+		push [ebp + 0x14]	// a4: stateMap
+		push [ebp + 0x10]	// a3: pass
+		push ecx			// a2: techFlags
+		push [ebp + 0x8]	// a1: text
+		call Material_LoadPass
+		add esp, 0x14
 
 		pop ebp
 		retn

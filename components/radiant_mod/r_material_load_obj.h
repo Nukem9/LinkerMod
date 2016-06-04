@@ -449,13 +449,14 @@ bool Material_ValidateShaderLinkage(ShaderVaryingDef *vertexOutputs, unsigned in
 MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *arg);
 int Material_CompareShaderArgumentsForRuntime(const void *e0, const void *e1);
 char Material_CountArgsWithUpdateFrequency(MaterialUpdateFrequency updateFreq, MaterialShaderArgument *args, unsigned int argCount, unsigned int *firstArg);
-bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap);
+bool Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap, int rendererInUse);
 void *Material_RegisterTechnique(const char *name, int renderer);
 bool Material_IgnoreTechnique(const char *name);
 int Material_TechniqueTypeForName(const char *name);
 void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer);
 
 void hk_Material_LoadShader();
+void hk_Material_LoadPass();
 
 extern stream_source_info_t s_streamSourceInfo[18][10];
 extern stream_dest_info_t s_streamDestInfo[20];

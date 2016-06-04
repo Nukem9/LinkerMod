@@ -89,8 +89,7 @@ BOOL RadiantMod_Init()
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
 #if !WAW_PIMP
-	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
-	Detours::X86::DetourFunction((PBYTE)0x00530550, (PBYTE)&Material_LoadPass);
+	Detours::X86::DetourFunction((PBYTE)0x00530550, (PBYTE)&hk_Material_LoadPass);
 	Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
 #endif
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
@@ -130,7 +129,6 @@ BOOL RadiantMod_Init()
 	// Debug INT3 to make sure specific functions are not called
 	//
 #define DO_NOT_USE(x) PatchMemory((x), (PBYTE)"\xCC", 1)
-	/*
 	DO_NOT_USE(0x0052EA20);// Material_ParseArgumentSource
 	DO_NOT_USE(0x0052E2C0);// Material_ParseSamplerSource
 	DO_NOT_USE(0x0052E6E0);// Material_ParseConstantSource
@@ -148,7 +146,7 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052E990);// Material_ElemCountForParamName
 	DO_NOT_USE(0x0052D140);// Material_UsingTechnique
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
-	*/
+	DO_NOT_USE(0x0052FE70);// Material_SetPassShaderArguments_DX
 #undef DO_NOT_USE
 
 	//
@@ -175,7 +173,6 @@ BOOL RadiantMod_Init()
 	PatchMemory(0x0052E7F0, (PBYTE)&msg_assertion, 4);
 
 	g_Initted = true;
-
 	return TRUE;
 }
 
