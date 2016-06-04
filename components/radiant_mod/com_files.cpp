@@ -11,7 +11,7 @@ int __cdecl FS_ReadFile(const char *qpath, void **buffer)
 		if (strncmp(qpath, "techniques", strlen("techniques")) == 0 || strncmp(qpath, "techsets", strlen("techsets")) == 0)
 		{
 			char npath[MAX_PATH];
-			sprintf_s(npath, "waw_pimp/%s", qpath);
+			sprintf_s(npath, PATH_PIMP_FALLBACK"/%s", qpath);
 			printf("%s\n", npath);
 			result = o_FS_ReadFile(npath, buffer);
 		}

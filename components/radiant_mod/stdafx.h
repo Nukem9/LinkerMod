@@ -18,6 +18,14 @@
 // 
 //
 
+#if WAW_PIMP
+#define PATH_PIMP_FALLBACK "waw_pimp"
+#define TECH_TYPE_COUNT 59
+#else
+#define PATH_PIMP_FALLBACK "pimp"
+#define TECH_TYPE_COUNT 59 //130 causes radiant to crash at the moment
+#endif
+
 #define SRCLINE(x)
 #define CHECK_SIZE(Type, Size) static_assert(sizeof(Type) == Size, "Invalid type size!");
 
