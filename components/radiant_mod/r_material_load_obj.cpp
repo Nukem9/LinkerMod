@@ -1033,7 +1033,7 @@ unsigned int R_SetParameterDefArray(LPD3DXSHADER_CONSTANTTABLE constantTable, un
 	case D3DXPT_SAMPLERCUBE:type = SHADER_PARAM_SAMPLER_CUBE;	break;
 
 	default:
-		Com_ScriptError("Unknown constant type '%i' (%s)", typeInfo->Type, name);
+		Com_ScriptError("Unknown constant type '%i' (%s)\n", typeInfo->Type, name);
 		return 0;
 	}
 
