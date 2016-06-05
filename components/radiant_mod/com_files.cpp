@@ -12,7 +12,7 @@ int __cdecl FS_ReadFile(const char *qpath, void **buffer)
 		{
 			char npath[MAX_PATH];
 			sprintf_s(npath, PATH_PIMP_FALLBACK"/%s", qpath);
-			printf("%s\n", npath);
+			_VERBOSE( printf("%s\n", npath) );
 			result = o_FS_ReadFile(npath, buffer);
 		}
 	}

@@ -20,7 +20,7 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 
 	int elemIndex = 0;
 
-	printf("new -- 0x%X\n", elemTable);
+	_VERBOSE(printf("new -- 0x%X\n", elemTable));
 	while (streamCount > 0)
 	{
 		ASSERT_MSG((unsigned)(routingData->source) < (unsigned)(STREAM_SRC_COUNT), "routingData->source doesn't index STREAM_SRC_COUNT\n\t%i not in [0, 10)");
@@ -36,7 +36,7 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 		for (; elemIndexInsert > 0 && elemTable[elemIndexInsert].Stream > sourceInfo->Stream; elemIndexInsert--)
 			memcpy(&elemTable[elemIndexInsert], &endDecl, sizeof(D3DVERTEXELEMENT9));
 
-		printf("Type: %d %d\n", sourceInfo->Type, destInfo->Usage);
+		_VERBOSE(printf("Type: %d %d\n", sourceInfo->Type, destInfo->Usage));
 
 		elemTable[elemIndexInsert].Stream		= sourceInfo->Stream;
 		elemTable[elemIndexInsert].Offset		= sourceInfo->Offset;
@@ -889,7 +889,8 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 SRCLINE(3758)
 bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, const char *constantName, ShaderIndexRange *indexRange, CodeConstantSource *sourceTable, ShaderArgumentSource *argSource)
 {
-	printf("CONST: %s\n", constantName);
+	_VERBOSE( printf("CONST: %s\n", constantName) );
+
 
 	int sourceIndex = 0;
 	for (;; sourceIndex++)
@@ -901,7 +902,7 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 		{
 			unsigned int arrayCount;
 
-			printf("MATCH: %s\n", constantName);
+			_VERBOSE( printf("MATCH: %s\n", constantName) );
 
 			if (sourceTable[sourceIndex].source < R_MAX_CODE_INDEX)
 			{
@@ -1052,7 +1053,7 @@ bool Material_DefaultArgumentSource(MaterialShaderType shaderType, const char *c
 	ASSERT(constantName != nullptr);
 	ASSERT(argSource != nullptr);
 
-	printf("type: %d name: %s param: %d\n", shaderType, constantName, paramType);
+	_VERBOSE( printf("type: %d name: %s param: %d\n", shaderType, constantName, paramType) );
 
 	if (paramType)
 	{
@@ -1116,12 +1117,12 @@ int Material_PrepareToParseShaderArguments(D3DXSHADER_CONSTANTTABLE *constantTab
 {
 	int usedCount = 0;
 
-	printf("const count: %d\n", constantTable->Constants);
+	_VERBOSE(printf("const count: %d\n", constantTable->Constants));
 
 	for (unsigned int constantIndex = 0; constantIndex < constantTable->Constants; constantIndex++)
 		usedCount += R_SetParameterDefArray(constantTable, constantIndex, &paramTable[usedCount]);
 
-	printf("used count: %d\n", usedCount);
+	_VERBOSE(printf("used count: %d\n", usedCount));
 
 	return usedCount;
 }
@@ -1621,7 +1622,7 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 			&argDest.indexRange,
 			&argSource))
 		{
-			printf("success\n");
+			_VERBOSE(printf("success\n"));
 
 			if (argSource.type == MTL_ARG_CODE_PIXEL_CONST)
 			{
@@ -3426,7 +3427,7 @@ int Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType, int imageTr
 	{
 		if (strcmp((char*)MapOffsetToPointer(mtlRaw, mtlRaw->techSetNameOffset), techsetOverrideList[i].key.c_str()) == 0)
 		{
-			printf("overriding technique %s\a\n", techsetOverrideList[i].replacement.c_str());
+			_VERBOSE(printf("overriding technique %s\a\n", techsetOverrideList[i].replacement.c_str()));
 			techsetOverride = techsetOverrideList[i].replacement.c_str();
 			break;
 		}

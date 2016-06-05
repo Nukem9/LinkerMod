@@ -19,6 +19,13 @@
 #define RADIANT_DISABLE_SPAM_MSG_IMAGE 1
 #define RADIANT_DISABLE_SPAM_MSG_MATERIAL 1
 
+#define RADIANT_MOD_VERBOSE 0
+#if RADIANT_MODE_VERBOSE
+#define _VERBOSE(X) X;
+#else
+#define _VERBOSE(X)
+#endif
+
 //
 // Shared files
 //
