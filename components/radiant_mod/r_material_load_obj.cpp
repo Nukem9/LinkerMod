@@ -714,6 +714,8 @@ bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *i
 	if (!Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource))
 		return Material_DefaultSamplerSourceFromTable("modelLightingSampler", indexRange, (CodeSamplerSource *)0x0064B9A8, argSource);
 #endif
+
+	return true;
 }
 
 SRCLINE(3613)
@@ -974,6 +976,8 @@ bool Material_DefaultConstantSource(MaterialShaderType shaderType, const char *c
 	if (!Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource))
 		return Material_DefaultConstantSource(shaderType, "fogConsts", indexRange, argSource);
 #endif
+
+	return true;
 }
 
 SRCLINE(3800)
