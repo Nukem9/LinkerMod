@@ -56,3 +56,5 @@
 #include "r_material_load_obj.h"
 #include "r_material_load_obj_waw.h"
 #include "r_material.h"
+
+#include "r_draw_shadowablelight.h"

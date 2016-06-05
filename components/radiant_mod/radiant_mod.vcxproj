@@ -94,6 +94,7 @@
     <ClCompile Include="CWinApp.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="q_parse.cpp" />
+    <ClCompile Include="r_draw_shadowablelight.cpp" />
     <ClCompile Include="r_image.cpp" />
     <ClCompile Include="r_image_load_common.cpp" />
     <ClCompile Include="r_image_load_obj.cpp" />
@@ -111,6 +112,7 @@
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="CWinApp.h" />
     <ClInclude Include="q_parse.h" />
+    <ClInclude Include="r_draw_shadowablelight.h" />
     <ClInclude Include="r_image.h" />
     <ClInclude Include="r_image_load_common.h" />
     <ClInclude Include="r_image_load_obj.h" />

@@ -174,6 +174,11 @@ BOOL RadiantMod_Init()
 	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
 	PatchMemory(0x0052E7F0, (PBYTE)&msg_assertion, 4);
 
+	//
+	// Fix for omni light previews being cut off at sqrt(radius)
+	//
+	R_SetLightProperties_o = (R_SetLightProperties_t)Detours::X86::DetourFunction((PBYTE)0x0056E4A0, (PBYTE)&R_SetLightProperties);
+
 	g_Initted = true;
 	return TRUE;
 }
