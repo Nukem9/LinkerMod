@@ -1,12 +1,13 @@
 #pragma once
 #include <vector>
 
-#define BO1_BUILD
+//#define BO1_BUILD
 
 #ifdef BO1_BUILD
 #define R_MAX_PIXEL_SHADER_CONSTS	256
 #define R_MAX_CODE_INDEX			197
 #else
+#define R_MAX_PIXEL_SHADER_CONSTS	256
 #define R_MAX_CODE_INDEX			105
 #endif // BO1_BUILD
 
@@ -322,8 +323,6 @@ struct stream_dest_info_t
 	char Usage;
 	char UsageIndex;
 };
-
-
 
 struct MaterialConstantDefRaw
 {

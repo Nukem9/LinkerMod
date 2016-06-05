@@ -18,5 +18,8 @@ static void assert(const char *File, int Line, const char *Format, ...)
 
 	MessageBoxA(nullptr, message, "ASSERTION", MB_ICONERROR);
 
+	if (IsDebuggerPresent())
+		__debugbreak();
+
 	ExitProcess(1);
 }

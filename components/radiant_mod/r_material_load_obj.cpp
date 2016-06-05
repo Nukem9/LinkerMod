@@ -67,7 +67,7 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 			// g_disableRendering++;
 			(*(DWORD *)0xEE4F80)++;
 
-			Com_Error(ERR_FATAL, "dx.device->CreateVertexDeclaration( elemTable, &decl ) failed: %s\n", R_ErrorDescription(hr));
+			Com_Error(ERR_FATAL, "dx.device->CreateVertexDeclaration(elemTable, &decl) failed: %s\n", R_ErrorDescription(hr));
 		}
 
 		ASSERT(decl != nullptr);
@@ -205,10 +205,13 @@ const char *Material_RegisterString(const char *string)
 SRCLINE(2819)
 bool Material_UsingTechnique(int techType)
 {
+#ifndef BO1_BUILD
+	return Material_UsingTechnique_WAW(techType);
+#else
 	ASSERT(techType < ARRAYSIZE(g_useTechnique));
 
-	return ((bool *)0x0064B67C)[techType];
-	//return g_useTechnique[techType];
+	return g_useTechnique[techType];
+#endif
 }
 
 SRCLINE(2825)
@@ -268,6 +271,9 @@ bool Material_ParseIndex(const char **text, int indexCount, int *index)
 SRCLINE(3168)
 const char *Material_NameForStreamDest(char dest)
 {
+#ifndef BO1_BUILD
+	return Material_NameForStreamDest_WAW(dest);
+#else
 	switch (dest)
 	{
 	case 0:	return "position";
@@ -297,11 +303,15 @@ const char *Material_NameForStreamDest(char dest)
 	}
 
 	return "";
+#endif
 }
 
 SRCLINE(3221)
 bool Material_StreamDestForName(const char **text, const char *destName, char *dest)
 {
+#ifndef BO1_BUILD
+	return Material_StreamDestForName_WAW(text, destName, dest);
+#else
 	int index;
 
 	if (!strcmp(destName, "position"))
@@ -328,16 +338,20 @@ bool Material_StreamDestForName(const char **text, const char *destName, char *d
 		*dest = 19;
 	else
 	{
-		Com_ScriptError("unknown stream destination '%s'\n", destName);
+		Com_ScriptError("Unknown stream destination '%s'\n", destName);
 		return false;
 	}
 
 	return true;
+#endif
 }
 
 SRCLINE(3263)
 bool Material_StreamSourceForName(const char **text, const char *sourceName, char *source)
 {
+#ifndef BO1_BUILD
+	return Material_StreamSourceForName_WAW(text, sourceName, source);
+#else
 	int index = 0;
 
 	if (!strcmp(sourceName, "position"))
@@ -374,6 +388,7 @@ bool Material_StreamSourceForName(const char **text, const char *sourceName, cha
 	}
 
 	return true;
+#endif
 }
 
 SRCLINE(3314)
@@ -641,10 +656,13 @@ bool Material_ParseSamplerSource(const char **text, ShaderArgumentSource *argSou
 {
 	const char *token = Com_Parse(text);
 
+#ifdef BO1_BUILD
 	if (!strcmp(token, "sampler"))
 		return Material_CodeSamplerSource_r(text, 0, s_codeSamplers, argSource);
-		// FIX
-		//return Material_CodeSamplerSource_r(text, 0, (CodeSamplerSource *)0x0064B7B0, argSource);
+#else
+	if (!strcmp(token, "sampler"))
+		return Material_CodeSamplerSource_r(text, 0, (CodeSamplerSource *)0x0064B7B0, argSource);
+#endif
 
 	if (!strcmp(token, "material"))
 	{
@@ -690,9 +708,11 @@ bool Material_DefaultSamplerSourceFromTable(const char *constantName, ShaderInde
 SRCLINE(3606)
 bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
+#ifdef BO1_BUILD
 	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource);
-	// FIX
-	//return Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource);
+#else
+	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource);
+#endif
 }
 
 SRCLINE(3613)
@@ -840,10 +860,13 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 		return argSource->u.literalConst != nullptr;
 	}
 
+#ifdef BO1_BUILD
 	if (!strcmp(token, "constant"))
 		return Material_ParseCodeConstantSource_r(shaderType, text, 0, s_codeConsts, argSource);
-		// FIX
-		//return Material_ParseCodeConstantSource_r(shaderType, text, 0, (CodeConstantSource *)0x0064BCD0, argSource);
+#else
+	if (!strcmp(token, "constant"))
+		return Material_ParseCodeConstantSource_r(shaderType, text, 0, (CodeConstantSource *)0x0064BCD0, argSource);
+#endif
 
 	if (!strcmp(token, "material"))
 	{
@@ -908,14 +931,17 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 SRCLINE(3791)
 bool Material_DefaultConstantSource(MaterialShaderType shaderType, const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
+#ifdef BO1_BUILD
 	if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_codeConsts, argSource))
-	// FIX
-	//if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064BCD0, argSource))
 		return true;
 
 	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_defaultCodeConsts, argSource);
-	// FIX
-	//return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource);
+#else
+	if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064BCD0, argSource))
+		return true;
+
+	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource);
+#endif
 }
 
 SRCLINE(3800)
@@ -1715,25 +1741,20 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 	
 	if (shaderFile)
 	{
-		//
 		// Skip the first 4 bytes (zeros)
-		//
 		fpos_t pos = 4;
 		fsetpos(shaderFile, &pos);
 
-		//
 		// Read the real data size
-		//
 		if (fread(&shaderDataSize, 4, 1, shaderFile) < 1)
 		{
 			fclose(shaderFile);
 			return nullptr;
 		}
 	}
-
-#if WAW_PIMP
 	else
 	{
+#if WAW_PIMP
 		//
 		// Load the WAW version if it wasn't found
 		//
@@ -1747,13 +1768,17 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 			fclose(shaderFile);
 			return nullptr;
 		}
-	}
+#else
+		// WAW PIMP disabled and the shader wasn't found. Function has failed.
+		return nullptr;
 #endif
+	}
 
 	void *shaderMemory	= Z_Malloc(shaderDataSize);
 	LPD3DXBUFFER shader	= nullptr;
 
-	fread(shaderMemory, 1, shaderDataSize, shaderFile);
+	if (fread(shaderMemory, 1, shaderDataSize, shaderFile) != shaderDataSize)
+		ASSERT_MSG(false, "Unable to read shader file data");
 
 	if (!Material_CopyTextToDXBuffer(shaderMemory, shaderDataSize, &shader))
 		ASSERT_MSG(false, "SHADER UPLOAD FAILED\n");
@@ -1812,6 +1837,9 @@ char Material_ParseShaderVersion(const char **text)
 SRCLINE(7866)
 char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 {
+#ifndef BO1_BUILD
+	return Material_GetStreamDestForSemantic_WAW(semantic);
+#else
 	switch (semantic->Usage)
 	{
 	case D3DDECLUSAGE_POSITION:
@@ -1853,6 +1881,7 @@ char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 
 	Com_Error(ERR_DROP, "Unknown shader input/output usage %i:%i\n", semantic->Usage, semantic->UsageIndex);
 	return 0;
+#endif
 }
 
 SRCLINE(7929)
@@ -2092,7 +2121,7 @@ MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *a
 	case MTL_ARG_CODE_PIXEL_CONST:
 		updateFreq = s_codeConstUpdateFreq[arg->u.codeConst.index];
 
-		ASSERT(updateFreq == MTL_UPDATE_RARELY);
+		//ASSERT(updateFreq == MTL_UPDATE_RARELY); TODO
 		break;
 
 	default:
@@ -2215,7 +2244,7 @@ bool Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialP
 				if (customArg->u.codeSampler == g_customSamplerSrc[customSamplerIndex])
 				{
 					ASSERT(!(pass->customSamplerFlags & (1 << customSamplerIndex)));
-					ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
+					//ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]); TODO
 
 					pass->customSamplerFlags |= 1 << customSamplerIndex;
 					break;
@@ -2324,233 +2353,14 @@ bool Material_IgnoreTechnique(const char *name)
 	return false;
 }
 
-#if WAW_PIMP
 SRCLINE(8763)
 int Material_TechniqueTypeForName(const char *name)
 {
-	const char *techniqueNames[59];
-	techniqueNames[0] = "\"depth prepass\"";
-	techniqueNames[1] = "\"build floatz\"";
-	techniqueNames[2] = "\"build shadowmap depth\"";
-	techniqueNames[3] = "\"build shadowmap color\"";
-	techniqueNames[4] = "\"unlit\"";
-	techniqueNames[5] = "\"emissive\"";
-	techniqueNames[6] = "\"emissive shadow\"";
-	techniqueNames[7] = "\"emissive reflected\"";
-	techniqueNames[8] = "\"lit\"";
-	techniqueNames[9] = "\"lit fade\"";
-	techniqueNames[10] = "\"lit sun\"";
-	techniqueNames[11] = "\"lit sun fade\"";
-	techniqueNames[12] = "\"lit sun shadow\"";
-	techniqueNames[13] = "\"lit sun shadow fade\"";
-	techniqueNames[14] = "\"lit spot\"";
-	techniqueNames[15] = "\"lit spot fade\"";
-	techniqueNames[16] = "\"lit spot shadow\"";
-	techniqueNames[17] = "\"lit spot shadow fade\"";
-	techniqueNames[18] = "\"lit omni\"";
-	techniqueNames[19] = "\"lit omni fade\"";
-	techniqueNames[20] = "\"lit omni shadow\"";
-	techniqueNames[21] = "\"lit omni shadow fade\"";
-	techniqueNames[22] = "\"lit charred\"";
-	techniqueNames[23] = "\"lit fade charred\"";
-	techniqueNames[24] = "\"lit sun charred\"";
-	techniqueNames[25] = "\"lit sun fade charred\"";
-	techniqueNames[26] = "\"lit sun shadow charred\"";
-	techniqueNames[27] = "\"lit sun shadow fade charred\"";
-	techniqueNames[28] = "\"lit spot charred\"";
-	techniqueNames[29] = "\"lit spot fade charred\"";
-	techniqueNames[30] = "\"lit spot shadow charred\"";
-	techniqueNames[31] = "\"lit spot shadow fade charred\"";
-	techniqueNames[32] = "\"lit omni charred\"";
-	techniqueNames[33] = "\"lit omni fade charred\"";
-	techniqueNames[34] = "\"lit omni shadow charred\"";
-	techniqueNames[35] = "\"lit omni shadow fade charred\"";
-	techniqueNames[36] = "\"lit instanced\"";
-	techniqueNames[37] = "\"lit instanced sun\"";
-	techniqueNames[38] = "\"lit instanced sun shadow\"";
-	techniqueNames[39] = "\"lit instanced spot\"";
-	techniqueNames[40] = "\"lit instanced spot shadow\"";
-	techniqueNames[41] = "\"lit instanced omni\"";
-	techniqueNames[42] = "\"lit instanced omni shadow\"";
-	techniqueNames[43] = "\"light spot\"";
-	techniqueNames[44] = "\"light omni\"";
-	techniqueNames[45] = "\"light spot shadow\"";
-	techniqueNames[46] = "\"light spot charred\"";
-	techniqueNames[47] = "\"light omni charred\"";
-	techniqueNames[48] = "\"light spot shadow charred\"";
-	techniqueNames[49] = "\"fakelight normal\"";
-	techniqueNames[50] = "\"fakelight view\"";
-	techniqueNames[51] = "\"sunlight preview\"";
-	techniqueNames[52] = "\"case texture\"";
-	techniqueNames[53] = "\"solid wireframe\"";
-	techniqueNames[54] = "\"shaded wireframe\"";
-	techniqueNames[55] = "\"shadowcookie caster\"";
-	techniqueNames[56] = "\"shadowcookie receiver\"";
-	techniqueNames[57] = "\"debug bumpmap\"";
-	techniqueNames[58] = "\"debug bumpmap instanced\"";
-
-	for (int techniqueIndex = 0; techniqueIndex < 59; techniqueIndex++)
-	{
-		if (!strcmp(name, techniqueNames[techniqueIndex]))
-			return techniqueIndex;
-	}
-
-	return 59;
-}
-
-SRCLINE(9023)
-void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
-{
-	char techType[130];
-
-	//
-	// Create a file path using normal techsets and read data
-	//
-	char filename[MAX_PATH];
-#if WAW_PIMP
-	Com_sprintf(filename, MAX_PATH, "waw_pimp/techsets/%s.techset", name);
-#else
-	Com_sprintf(filename, MAX_PATH, "techsets/%s.techset", name);
-#endif
-
-	void *fileData;
-	int fileSize = FS_ReadFile(filename, (void **)&fileData);
-
-	if (fileSize < 0)
-	{
-		//
-		// Try loading with PIMP enabled
-		//
-		//Com_sprintf(filename, MAX_PATH, "pimp/techsets/%s.techset", name);
-		//fileSize = FS_ReadFile(filename, (void **)&fileData);
-
-		if (fileSize < 0)
-		{
-			if (strcmp(name, "default") != 0)
-			{
-				void* result = Material_LoadTechniqueSet("default", renderer);
-				if (!result)
-					Com_PrintError(8, "^1ERROR: Couldn't override techniqueSet '%s' (\'default\' techniqueSet is missing)\n", filename);
-				return result;
-			}
-			else
-			{
-				Com_PrintError(8, "^1ERROR: Couldn't open techniqueSet '%s'\n", filename);
-				return nullptr;
-			}
-		}
-	}
-
-	//
-	// Allocate the techset structure
-	//
-	const char *textData	= (const char *)fileData;
-	size_t nameSize			= strlen(name) + 1;
-	char *techniqueSet		= (char *)Z_Malloc(nameSize + 248);
-
-	*(char **)(techniqueSet + 0)	= techniqueSet + 248;
-	*(BYTE *)(techniqueSet + 4)		= 0;
-	*(char **)(techniqueSet + 8)	= techniqueSet;
-
-	memcpy(techniqueSet + 248, name, nameSize);
-
-	//
-	// TODO: What does this function actually do?
-	//
-	((void(__cdecl *)())0x005525D0)();
-
-	//
-	// Begin the text parsing session
-	//
-	Com_BeginParseSession(filename);
-	Com_SetScriptWarningPrefix("^1ERROR: ");
-	Com_SetSpaceDelimited(0);
-	Com_SetKeepStringQuotes(1);
-
-	int techTypeCount	= 0;
-	bool usingTechnique = false;
-	while (1)
-	{
-		const char *token = Com_Parse(&textData);
-
-		if (*token == '\0')
-			break;
-
-		if (*token == '"')
-		{
-			if (techTypeCount == 59)
-			{
-				Com_ScriptError("Too many labels in technique set\n");
-				techniqueSet = 0;
-				break;
-			}
-
-			if (!Material_IgnoreTechnique(token))
-			{
-				techType[techTypeCount] = Material_TechniqueTypeForName(token);
-
-				if (techType[techTypeCount] == 59)
-				{
-					Com_ScriptError("Unknown technique type '%s'\n", token);
-					techniqueSet = 0;
-					break;
-				}
-
-				if (Material_UsingTechnique(techType[techTypeCount]))
-					usingTechnique = true;
-
-				techTypeCount++;
-			}
-
-			if (!Material_MatchToken(&textData, ":"))
-			{
-				techniqueSet = 0;
-				break;
-			}
-		}
-		else
-		{
-			if (usingTechnique)
-			{
-				if (!techTypeCount)
-				{
-					Com_ScriptError("Unknown technique type '%s'\n", token);
-					techniqueSet = 0;
-					break;
-				}
-
-				void *technique = Material_RegisterTechnique(token, renderer);
-				if (!technique)
-				{
-					Com_ScriptError("Couldn't register technique '%s'\n", token);
-					techniqueSet = 0;
-					break;
-				}
-
-				for (int techTypeIndex = 0; techTypeIndex < techTypeCount; techTypeIndex++)
-					*(DWORD *)&techniqueSet[4 * techType[techTypeIndex] + 12] = (DWORD)technique;
-			}
-
-			techTypeCount	= 0;
-			usingTechnique	= false;
-			if (!Material_MatchToken(&textData, ";"))
-			{
-				techniqueSet = 0;
-				break;
-			}
-		}
-	}
-
-	Com_EndParseSession();
-	FS_FreeFile(fileData);
-	return techniqueSet;
-}
-#else
-int __cdecl Material_TechniqueTypeForName(const char *name)
-{
-	void *techniqueNames[130]; // [sp+14h] [bp-210h]@1
-	unsigned int techniqueIndex; // [sp+220h] [bp-4h]@1
-
+//#ifndef BO1_BUILD
+	return Material_TechniqueTypeForName_WAW(name);
+//#else
+#if 0
+	const char *techniqueNames[130];
 	techniqueNames[0] = "\"depth prepass\"";
 	techniqueNames[1] = "\"build floatz\"";
 	techniqueNames[2] = "\"build shadowmap depth\"";
@@ -2681,19 +2491,20 @@ int __cdecl Material_TechniqueTypeForName(const char *name)
 	techniqueNames[127] = "\"debug bumpmap\"";
 	techniqueNames[128] = "\"debug bumpmap instanced\"";
 	techniqueNames[129] = "\"impact mask\"";
-	for (techniqueIndex = 0; techniqueIndex < 130; ++techniqueIndex)
+
+	for (unsigned int techniqueIndex = 0; techniqueIndex < 130; ++techniqueIndex)
 	{
-		if (!strcmp(name, (const char *)techniqueNames[techniqueIndex]))
+		if (!strcmp(name, techniqueNames[techniqueIndex]))
 			return techniqueIndex;
 	}
+
 	return 130;
+#endif
 }
 
 SRCLINE(9023)
 void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 {
-	char techType[130];
-
 	//
 	// Create a file path using normal techsets and read data
 	//
@@ -2737,7 +2548,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	//
 	const char *textData = (const char *)fileData;
 	size_t nameSize = strlen(name) + 1;
-	char *techniqueSet = (char *)Z_Malloc(nameSize + 248);
+	char *techniqueSet = (char *)Z_Malloc(nameSize + 249);
 
 	*(char **)(techniqueSet + 0) = techniqueSet + 248;
 	*(BYTE *)(techniqueSet + 4) = 0;
@@ -2746,21 +2557,19 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	memcpy(techniqueSet + 248, name, nameSize);
 
 	//
-	// TODO: What does this function actually do?
-	//
-	((void(__cdecl *)())0x005525D0)();
-
-	//
 	// Begin the text parsing session
 	//
+	// TODO: What does this function actually do?
+	((void(__cdecl *)())0x005525D0)();
 	Com_BeginParseSession(filename);
 	Com_SetScriptWarningPrefix("^1ERROR: ");
 	Com_SetSpaceDelimited(0);
 	Com_SetKeepStringQuotes(1);
 
-	int techTypeCount = 0;
+	char techType[TECH_TYPE_COUNT];
+	int techTypeCount	= 0;
 	bool usingTechnique = false;
-	while (1)
+	while (true)
 	{
 		const char *token = Com_Parse(&textData);
 
@@ -2836,8 +2645,6 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	FS_FreeFile(fileData);
 	return techniqueSet;
 }
-#endif
-
 
 void __declspec(naked) hk_Material_LoadShader()
 {
