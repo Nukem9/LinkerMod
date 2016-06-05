@@ -55,18 +55,14 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 	//
 	memcpy(&elemTable[elemIndex], &endDecl, sizeof(D3DVERTEXELEMENT9));
 
-	IDirect3DDevice9 *d3d_device = *(IDirect3DDevice9 **)0x13A15A0;
-
-	if (d3d_device)
+	if (*dx_device)
 	{
 		LPDIRECT3DVERTEXDECLARATION9 decl	= nullptr;
-		HRESULT hr							= d3d_device->CreateVertexDeclaration(elemTable, &decl);
+		HRESULT hr							= (*dx_device)->CreateVertexDeclaration(elemTable, &decl);
 
 		if (!SUCCEEDED(hr))
 		{
-			// g_disableRendering++;
-			(*(DWORD *)0xEE4F80)++;
-
+			(*g_disableRendering)++;
 			Com_Error(ERR_FATAL, "dx.device->CreateVertexDeclaration(elemTable, &decl) failed: %s\n", R_ErrorDescription(hr));
 		}
 

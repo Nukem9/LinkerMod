@@ -148,6 +148,7 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052D140);// Material_UsingTechnique
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
 	DO_NOT_USE(0x0052FE70);// Material_SetPassShaderArguments_DX
+	DO_NOT_USE(0x00567450);// Image_LoadFromData
 #undef DO_NOT_USE
 #endif
 

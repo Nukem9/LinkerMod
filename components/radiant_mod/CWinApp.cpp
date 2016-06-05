@@ -1,14 +1,5 @@
 #include "stdafx.h"
 
-/*
-int __getmainargs(
-	int * _Argc,
-	char *** _Argv,
-	char *** _Env,
-	int _DoWildCard,
-	void * _StartInfo);
-*/
-
 typedef void (WINAPI * AfxPostQuitMessage_t)(int nExitCode);
 static AfxPostQuitMessage_t AfxPostQuitMessage = (AfxPostQuitMessage_t)0x005BEE73;
 
