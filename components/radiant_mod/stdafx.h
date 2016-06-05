@@ -11,6 +11,10 @@
 #define RADIANT_MOD 1
 #endif
 
+#ifndef BO1_SEMI_NATIVE_BUILD
+#define BO1_SEMI_NATIVE_BUILD 1
+#endif
+
 //
 // Shared files
 //

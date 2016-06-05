@@ -309,7 +309,7 @@ const char *Material_NameForStreamDest(char dest)
 SRCLINE(3221)
 bool Material_StreamDestForName(const char **text, const char *destName, char *dest)
 {
-#ifndef BO1_BUILD
+#ifndef BO1_SEMI_NATIVE_BUILD
 	return Material_StreamDestForName_WAW(text, destName, dest);
 #else
 	int index;
@@ -349,7 +349,7 @@ bool Material_StreamDestForName(const char **text, const char *destName, char *d
 SRCLINE(3263)
 bool Material_StreamSourceForName(const char **text, const char *sourceName, char *source)
 {
-#ifndef BO1_BUILD
+#ifndef BO1_SEMI_NATIVE_BUILD
 	return Material_StreamSourceForName_WAW(text, sourceName, source);
 #else
 	int index = 0;
@@ -711,7 +711,8 @@ bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *i
 #ifdef BO1_BUILD
 	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource);
 #else
-	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource);
+	if (!Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource))
+		return Material_DefaultSamplerSourceFromTable("modelLightingSampler", indexRange, (CodeSamplerSource *)0x0064B9A8, argSource);
 #endif
 }
 
@@ -928,9 +929,39 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 	return true;
 }
 
+const char *remap[] =
+{
+	"fogConsts2",
+	"sunFog",
+	"sunFogColor",
+	"sunFogDir",
+	"hdrControl0",
+	"lightAttenuation",
+	"lightConeControl1",
+	"lightConeControl2",
+	"lightFallOffA",
+	"lightFallOffB",
+	"lightSpotAABB",
+	"lightSpotCookieSlideControl",
+	"lightSpotMatrix0",
+	"lightSpotMatrix1",
+	"lightSpotMatrix2",
+	"lightSpotMatrix3",
+};
+
 SRCLINE(3791)
 bool Material_DefaultConstantSource(MaterialShaderType shaderType, const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
+
+	for (int i = 0; i < ARRAYSIZE(remap); i++)
+	{
+		if (strstr(constantName, remap[i]))
+		{
+			constantName = "fogConsts";
+			break;
+		}
+	}
+
 #ifdef BO1_BUILD
 	if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_codeConsts, argSource))
 		return true;
@@ -940,7 +971,8 @@ bool Material_DefaultConstantSource(MaterialShaderType shaderType, const char *c
 	if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064BCD0, argSource))
 		return true;
 
-	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource);
+	if (!Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource))
+		return Material_DefaultConstantSource(shaderType, "fogConsts", indexRange, argSource);
 #endif
 }
 
@@ -1837,7 +1869,7 @@ char Material_ParseShaderVersion(const char **text)
 SRCLINE(7866)
 char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 {
-#ifndef BO1_BUILD
+#ifndef BO1_SEMI_NATIVE_BUILD
 	return Material_GetStreamDestForSemantic_WAW(semantic);
 #else
 	switch (semantic->Usage)
