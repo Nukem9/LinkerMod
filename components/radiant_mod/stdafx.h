@@ -7,6 +7,10 @@
 #include <intrin.h>
 #include <shellapi.h>
 
+#ifndef RADIANT_MOD
+#define RADIANT_MOD 1
+#endif
+
 //
 // Shared files
 //
