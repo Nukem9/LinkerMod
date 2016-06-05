@@ -299,7 +299,9 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 
 	if (fileSize == -1)
 	{
+#if !RADIANT_DISABLE_SPAM_MSG_IMAGE
 		Com_PrintError(8, "ERROR: image '%s' is missing\n", filepath);
+#endif
 		return false;
 	}
 

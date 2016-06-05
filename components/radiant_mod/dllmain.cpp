@@ -180,6 +180,30 @@ BOOL RadiantMod_Init()
 	//
 	R_SetLightProperties_o = (R_SetLightProperties_t)Detours::X86::DetourFunction((PBYTE)0x0056E4A0, (PBYTE)&R_SetLightProperties);
 
+	//
+	// Disable Spam
+	//
+#if RADIANT_DISABLE_SPAM_MSG_SCAN
+	PatchMemory_WithNOP(0x004A7418, 5); //ScanDestructibleDef
+	PatchMemory_WithNOP(0x004A74CD, 5); //StrCpy
+	PatchMemory_WithNOP(0x004A71C2, 5); //ScanWeapon
+	PatchMemory_WithNOP(0x0049B5F2, 5); //ScanFile
+#endif
+#if RADIANT_DISABLE_SPAM_MSG_IMAGE
+
+	// ERROR: image '%s' is missing\n
+	PatchMemory_WithNOP(0x0056762C, 5); // Com_Printf
+	PatchMemory_WithNOP(0x00576C50, 5); // Com_Error
+	
+	// ERROR: failed to load image '%s'\n
+	PatchMemory_WithNOP(0x0052B4D4, 5);
+	PatchMemory_WithNOP(0x0052B61D, 5);
+#endif
+#if RADIANT_DISABLE_SPAM_MSG_MATERIAL
+	PatchMemory_WithNOP(0x00472C28, 5); // WARNING: Could not find material '%s'
+	PatchMemory_WithNOP(0x00519A5A, 5);
+#endif
+
 	g_Initted = true;
 	return TRUE;
 }
