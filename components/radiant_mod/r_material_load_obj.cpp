@@ -264,6 +264,37 @@ bool Material_ParseIndex(const char **text, int indexCount, int *index)
 	return Material_MatchToken(text, "]");
 }
 
+void __cdecl hk_MaterialValueForState(const char* token)
+{
+	if ( strcmp(token, "GE255") == 0 )
+	{
+		strcpy((char*)token, "GE128");
+	}
+}
+
+//
+// Override GE255 DepthTest to use GE128
+//
+void* rtn_Material_ParseValueForState = (void*)0x0052D1BE;
+void __declspec(naked) mfh_Material_ParseValueForState() //0052D1B8
+{
+	_asm
+	{
+		pushad
+		push eax //token
+		call hk_MaterialValueForState
+		add esp, 4
+		popad
+
+		mov		edx, [edi]
+		xor		esi, esi
+		test	edx, edx
+
+		jmp rtn_Material_ParseValueForState
+	}
+}
+
+
 SRCLINE(3168)
 const char *Material_NameForStreamDest(char dest)
 {
@@ -3558,6 +3589,13 @@ CodeConstantSource s_codeConsts[] =
 	{ "postFxControl1", 102, 0, 0, 0 },
 	{ "cinematicBlurBox", 103, 0, 0, 0 },
 	{ "cinematicBlurBox2", 104, 0, 0, 0 },
+
+	//
+	// Remapped from BO1
+	//
+	{ "u_customWindCenter", 60, 0, 0, 0 },
+	{ "u_customWindSpring", 78, 0, 0, 0 },
+
 	{ nullptr, 0, 0, 0, 0 },
 };
 

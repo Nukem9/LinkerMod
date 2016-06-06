@@ -204,6 +204,11 @@ BOOL RadiantMod_Init()
 	PatchMemory_WithNOP(0x00519A5A, 5);
 #endif
 
+	//
+	// Remap Statemap GE255 DepthTest -> GE128
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0052D1B8, (PBYTE)&mfh_Material_ParseValueForState);
+
 	g_Initted = true;
 	return TRUE;
 }
