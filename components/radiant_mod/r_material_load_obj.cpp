@@ -652,13 +652,8 @@ bool Material_ParseSamplerSource(const char **text, ShaderArgumentSource *argSou
 {
 	const char *token = Com_Parse(text);
 
-#ifdef BO1_BUILD
 	if (!strcmp(token, "sampler"))
 		return Material_CodeSamplerSource_r(text, 0, s_codeSamplers, argSource);
-#else
-	if (!strcmp(token, "sampler"))
-		return Material_CodeSamplerSource_r(text, 0, (CodeSamplerSource *)0x0064B7B0, argSource);
-#endif
 
 	if (!strcmp(token, "material"))
 	{
@@ -704,13 +699,7 @@ bool Material_DefaultSamplerSourceFromTable(const char *constantName, ShaderInde
 SRCLINE(3606)
 bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
-#ifdef BO1_BUILD
 	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource);
-#else
-	if (!Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource))
-		return Material_DefaultSamplerSourceFromTable("modelLightingSampler", indexRange, (CodeSamplerSource *)0x0064B9A8, argSource);
-#endif
-
 	return true;
 }
 
@@ -859,13 +848,8 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 		return argSource->u.literalConst != nullptr;
 	}
 
-#ifdef BO1_BUILD
 	if (!strcmp(token, "constant"))
 		return Material_ParseCodeConstantSource_r(shaderType, text, 0, s_codeConsts, argSource);
-#else
-	if (!strcmp(token, "constant"))
-		return Material_ParseCodeConstantSource_r(shaderType, text, 0, (CodeConstantSource *)0x0064BCD0, argSource);
-#endif
 
 	if (!strcmp(token, "material"))
 	{
@@ -928,51 +912,13 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 	return true;
 }
 
-const char *remap[] =
-{
-	"fogConsts2",
-	"sunFog",
-	"sunFogColor",
-	"sunFogDir",
-	"hdrControl0",
-	"lightAttenuation",
-	"lightConeControl1",
-	"lightConeControl2",
-	"lightFallOffA",
-	"lightFallOffB",
-	"lightSpotAABB",
-	"lightSpotCookieSlideControl",
-	"lightSpotMatrix0",
-	"lightSpotMatrix1",
-	"lightSpotMatrix2",
-	"lightSpotMatrix3",
-};
-
 SRCLINE(3791)
 bool Material_DefaultConstantSource(MaterialShaderType shaderType, const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
-
-	for (int i = 0; i < ARRAYSIZE(remap); i++)
-	{
-		if (strstr(constantName, remap[i]))
-		{
-			constantName = "fogConsts";
-			break;
-		}
-	}
-
-#ifdef BO1_BUILD
 	if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_codeConsts, argSource))
 		return true;
 
 	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_defaultCodeConsts, argSource);
-#else
-	if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064BCD0, argSource))
-		return true;
-
-	if (!Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource))
-		return Material_DefaultConstantSource(shaderType, "fogConsts", indexRange, argSource);
-#endif
 
 	return true;
 }
@@ -3037,6 +2983,7 @@ const bool g_useTechnique[130] =
 	1, 0, 0, 0, 0, 1, 0, 1, 1, 1,
 };
 
+#if USE_BO1_CODE_SAMPLERS
 CodeSamplerSource s_lightmapSamplers[] =
 {
 	{ "primary", 4, 0, 0, 0 },
@@ -3120,7 +3067,97 @@ CodeSamplerSource s_defaultCodeSamplers[] =
 
 	{ nullptr, 0, 0, 0, 0 },
 };
+#else
+CodeSamplerSource s_lightmapSamplers[] =
+{
+	{ "primary", 4, 0, 0, 0 },
+	{ "secondary", 5, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
 
+CodeSamplerSource s_lightSamplers[] =
+{
+	{ "attenuation", 17, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeSamplerSource s_codeSamplers[] =
+{
+	{ "white", 1, 0, 0, 0 },
+	{ "black", 0, 0, 0, 0 },
+	{ "identityNormalMap", 2, 0, 0, 0 },
+	{ "lightmap", 4, s_lightmapSamplers, 0, 0 },
+	{ "outdoor", 19, 0, 0, 0 },
+	{ "shadowmapSun", 7, 0, 0, 0 },
+	{ "shadowmapSpot", 8, 0, 0, 0 },
+	{ "shadowCookie", 6, 0, 0, 0 },
+	{ "dynamicShadow", 18, 0, 0, 0 },
+	{ "feedback", 9, 0, 0, 0 },
+	{ "resolvedPostSun", 10, 0, 0, 0 },
+	{ "resolvedScene", 11, 0, 0, 0 },
+	{ "postEffectSrc", 12, 0, 0, 0 },
+	{ "postEffectGodRays", 13, 0, 0, 0 },
+	{ "postEffect0", 14, 0, 0, 0 },
+	{ "postEffect1", 15, 0, 0, 0 },
+	{ "sky", 16, 0, 0, 0 },
+	{ "light", 17, s_lightSamplers, 0, 0 },
+	{ "floatZ", 20, 0, 0, 0 },
+	{ "processedFloatZ", 21, 0, 0, 0 },
+	{ "rawFloatZ", 22, 0, 0, 0 },
+	{ "halfParticleColorSampler", 23, 0, 0, 0 },
+	{ "halfParticleDepthSampler", 24, 0, 0, 0 },
+	{ "caseTexture", 25, 0, 0, 0 },
+
+	//
+	// Remapped from BO1
+	//
+	{ "ui3d", 25, 0, 0, 0 },
+	{ "missileCam", 25, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeSamplerSource s_defaultCodeSamplers[] =
+{
+	{ "shadowmapSamplerSun", 7, 0, 0, 0 },
+	{ "shadowmapSamplerSpot", 8, 0, 0, 0 },
+	{ "shadowCookieSampler", 6, 0, 0, 0 },
+	{ "feedbackSampler", 9, 0, 0, 0 },
+	{ "dynamicShadowSampler", 18, 0, 0, 0 },
+	{ "floatZSampler", 20, 0, 0, 0 },
+	{ "processedFloatZSampler", 21, 0, 0, 0 },
+	{ "rawFloatZSampler", 22, 0, 0, 0 },
+	{ "halfParticleColorSampler", 23, 0, 0, 0 },
+	{ "halfParticleDepthSampler", 24, 0, 0, 0 },
+	{ "attenuationSampler", 17, 0, 0, 0 },
+	{ "lightmapSamplerPrimary", 4, 0, 0, 0 },
+	{ "lightmapSamplerSecondary", 5, 0, 0, 0 },
+	{ "modelLightingSampler", 3, 0, 0, 0 },
+	{ "cinematicYSampler", 26, 0, 0, 0 },
+	{ "cinematicCrSampler", 27, 0, 0, 0 },
+	{ "cinematicCbSampler", 28, 0, 0, 0 },
+	{ "cinematicASampler", 29, 0, 0, 0 },
+	{ "reflectionProbeSampler", 30, 0, 0, 0 },
+	{ "terrainScorchTextureSampler0", 31, 0, 0, 0 },
+	{ "terrainScorchTextureSampler1", 32, 0, 0, 0 },
+	{ "terrainScorchTextureSampler2", 33, 0, 0, 0 },
+	{ "terrainScorchTextureSampler3", 34, 0, 0, 0 },
+	{ "terrainScorchTextureSampler4", 35, 0, 0, 0 },
+
+	//
+	// Remapped from BO1
+	// 
+	{ "lightmapSamplerSecondaryB", 5, 0, 0, 0 },
+	{ "dlightAttenuationSampler", 17, 0, 0, 0 },
+
+	{ "ui3dSampler", 26, 0, 0, 0 },
+	{ "missileCamSampler", 27, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
+};
+#endif
+
+#if USE_BO1_CODE_CONSTS
 CodeConstantSource s_nearPlaneConsts[] =
 {
 	{ "org", 16, 0, 0, 0 },
@@ -3383,6 +3420,245 @@ CodeConstantSource s_defaultCodeConsts[] =
 
 	{ nullptr, 0, 0, 0, 0 },
 };
+#else
+CodeConstantSource s_nearPlaneConsts[] =
+{
+	{ "org", 5, 0, 0, 0 },
+	{ "dx", 6, 0, 0, 0 },
+	{ "dy", 7, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeConstantSource s_sunConsts[] =
+{
+	{ "position", 36, 0, 0, 0 },
+	{ "diffuse", 37, 0, 0, 0 },
+	{ "specular", 38, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeConstantSource s_lightConsts[] =
+{
+	{ "position", 0, 0, 0, 0 },
+	{ "diffuse", 1, 0, 0, 0 },
+	{ "specular", 2, 0, 0, 0 },
+	{ "spotDir", 3, 0, 0, 0 },
+	{ "spotFactors", 4, 0, 0, 0 },
+	{ "falloffPlacement", 11, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeConstantSource s_codeConsts[] =
+{
+	{ "nearPlane", 142, s_nearPlaneConsts, 0, 0 },
+	{ "sun", 142, s_sunConsts, 0, 0 },
+	{ "light", 142, s_lightConsts, 0, 0 },
+	{ "baseLightingCoords", 59, 0, 0, 0 },
+	{ "lightingLookupScale", 39, 0, 0, 0 },
+	{ "debugBumpmap", 40, 0, 0, 0 },
+	{ "pixelCostFracs", 20, 0, 0, 0 },
+	{ "pixelCostDecode", 21, 0, 0, 0 },
+	{ "materialColor", 41, 0, 0, 0 },
+	{ "fogConsts", 42, 0, 0, 0 },
+	{ "fogColor", 43, 0, 0, 0 },
+	{ "glowSetup", 44, 0, 0, 0 },
+	{ "glowApply", 45, 0, 0, 0 },
+	{ "filterTap", 22, 0, 8, 1 },
+	{ "codeMeshArg", 57, 0, 2, 1 },
+	{ "renderTargetSize", 10, 0, 0, 0 },
+	{ "shadowmapSwitchPartition", 33, 0, 0, 0 },
+	{ "shadowmapScale", 34, 0, 0, 0 },
+	{ "shadowmapPolygonOffset", 9, 0, 0, 0 },
+	{ "shadowParms", 8, 0, 0, 0 },
+	{ "zNear", 35, 0, 0, 0 },
+	{ "clipSpaceLookupScale", 53, 0, 0, 0 },
+	{ "clipSpaceLookupOffset", 54, 0, 0, 0 },
+	{ "dofEquationViewModelAndFarBlur", 12, 0, 0, 0 },
+	{ "dofEquationScene", 13, 0, 0, 0 },
+	{ "dofLerpScale", 14, 0, 0, 0 },
+	{ "dofLerpBias", 15, 0, 0, 0 },
+	{ "dofRowDelta", 16, 0, 0, 0 },
+	{ "depthFromClip", 56, 0, 0, 0 },
+	{ "outdoorFeatherParms", 49, 0, 0, 0 },
+	{ "skyTransition", 50, 0, 0, 0 },
+	{ "envMapParms", 51, 0, 0, 0 },
+	{ "waterParms", 61, 0, 0, 0 },
+	{ "colorMatrixR", 30, 0, 0, 0 },
+	{ "colorMatrixG", 31, 0, 0, 0 },
+	{ "colorMatrixB", 32, 0, 0, 0 },
+	{ "colorBias", 46, 0, 0, 0 },
+	{ "colorTintBase", 47, 0, 0, 0 },
+	{ "colorTintDelta", 48, 0, 0, 0 },
+	{ "gameTime", 18, 0, 0, 0 },
+	{ "alphaFade", 19, 0, 0, 0 },
+	{ "destructibleParms", 94, 0, 0, 0 },
+	{ "particleCloudColor", 17, 0, 0, 0 },
+	{ "particleCloudMatrix", 55, 0, 0, 0 },
+	{ "worldMatrix", 105, 0, 0, 0 },
+	{ "inverseWorldMatrix", 106, 0, 0, 0 },
+	{ "transposeWorldMatrix", 107, 0, 0, 0 },
+	{ "inverseTransposeWorldMatrix", 108, 0, 0, 0 },
+	{ "viewMatrix", 109, 0, 0, 0 },
+	{ "inverseViewMatrix", 110, 0, 0, 0 },
+	{ "transposeViewMatrix", 111, 0, 0, 0 },
+	{ "inverseTransposeViewMatrix", 112, 0, 0, 0 },
+	{ "projectionMatrix", 113, 0, 0, 0 },
+	{ "inverseProjectionMatrix", 114, 0, 0, 0 },
+	{ "transposeProjectionMatrix", 115, 0, 0, 0 },
+	{ "inverseTransposeProjectionMatrix", 116, 0, 0, 0 },
+	{ "worldViewMatrix", 117, 0, 0, 0 },
+	{ "inverseWorldViewMatrix", 118, 0, 0, 0 },
+	{ "transposeWorldViewMatrix", 119, 0, 0, 0 },
+	{ "inverseTransposeWorldViewMatrix", 120, 0, 0, 0 },
+	{ "viewProjectionMatrix", 121, 0, 0, 0 },
+	{ "inverseViewProjectionMatrix", 122, 0, 0, 0 },
+	{ "transposeViewProjectionMatrix", 123, 0, 0, 0 },
+	{ "inverseTransposeViewProjectionMatrix", 124, 0, 0, 0 },
+	{ "worldViewProjectionMatrix", 125, 0, 0, 0 },
+	{ "inverseWorldViewProjectionMatrix", 126, 0, 0, 0 },
+	{ "transposeWorldViewProjectionMatrix", 127, 0, 0, 0 },
+	{ "inverseTransposeWorldViewProjectionMatrix", 128, 0, 0, 0 },
+	{ "shadowLookupMatrix", 129, 0, 0, 0 },
+	{ "inverseShadowLookupMatrix", 130, 0, 0, 0 },
+	{ "transposeShadowLookupMatrix", 131, 0, 0, 0 },
+	{ "inverseTransposeShadowLookupMatrix", 132, 0, 0, 0 },
+	{ "worldOutdoorLookupMatrix", 133, 0, 0, 0 },
+	{ "inverseWorldOutdoorLookupMatrix", 134, 0, 0, 0 },
+	{ "transposeWorldOutdoorLookupMatrix", 135, 0, 0, 0 },
+	{ "inverseTransposeWorldOutdoorLookupMatrix", 136, 0, 0, 0 },
+	{ "modelWorldToObjectMatrix", 137, 0, 0, 0 },
+	{ "inverseModelWorldToObjectMatrix", 138, 0, 0, 0 },
+	{ "transposeModelWorldToObjectMatrix", 139, 0, 0, 0 },
+	{ "inverseTransposeModelWorldToObjectMatrix", 140, 0, 0, 0 },
+	{ "windDirection", 60, 0, 0, 0 },
+	{ "variantWindSpring", 78, 0, 16, 1 },
+	{ "grassParms", 62, 0, 0, 0 },
+	{ "grassForce0", 63, 0, 0, 0 },
+	{ "grassForce1", 64, 0, 0, 0 },
+	{ "grassForce0Ex", 65, 0, 0, 0 },
+	{ "grassForce1Ex", 66, 0, 0, 0 },
+	{ "grassWindForce0", 67, 0, 0, 0 },
+	{ "cloudWorldArea", 95, 0, 0, 0 },
+	{ "waterScroll", 96, 0, 0, 0 },
+	{ "motionblurDirectionAndMagnitude", 68, 0, 0, 0 },
+	{ "flameDistortion", 69, 0, 0, 0 },
+	{ "bloomScale", 70, 0, 0, 0 },
+	{ "overlayTexCoord", 71, 0, 0, 0 },
+	{ "colorBias1", 72, 0, 0, 0 },
+	{ "colorTintBase1", 73, 0, 0, 0 },
+	{ "colorTintDelta1", 74, 0, 0, 0 },
+	{ "fadeEffect", 75, 0, 0, 0 },
+	{ "viewportDimensions", 76, 0, 0, 0 },
+	{ "framebufferRead", 77, 0, 0, 0 },
+	{ "crossFadeAlpha", 97, 0, 0, 0 },
+	{ "__characterCharredAmount", 98, 0, 0, 0 },
+	{ "treeCanopyParms", 99, 0, 0, 0 },
+	{ "marksHitNormal", 100, 0, 0, 0 },
+	{ "postFxControl0", 101, 0, 0, 0 },
+	{ "postFxControl1", 102, 0, 0, 0 },
+	{ "cinematicBlurBox", 103, 0, 0, 0 },
+	{ "cinematicBlurBox2", 104, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeConstantSource s_defaultCodeConsts[] =
+{
+	{ "nearPlaneOrg", 5, 0, 0, 0 },
+	{ "nearPlaneDx", 6, 0, 0, 0 },
+	{ "nearPlaneDy", 7, 0, 0, 0 },
+	{ "sunPosition", 36, 0, 0, 0 },
+	{ "sunDiffuse", 37, 0, 0, 0 },
+	{ "sunSpecular", 38, 0, 0, 0 },
+	{ "lightPosition", 0, 0, 0, 0 },
+	{ "lightDiffuse", 1, 0, 0, 0 },
+	{ "lightSpecular", 2, 0, 0, 0 },
+	{ "lightSpotDir", 3, 0, 0, 0 },
+	{ "lightSpotFactors", 4, 0, 0, 0 },
+	{ "lightFalloffPlacement", 11, 0, 0, 0 },
+	{ "spotShadowmapPixelAdjust", 52, 0, 0, 0 },
+
+	//
+	// Remapped from BO1
+	//
+	{ "fogConsts2", 42, 0, 0, 0 },
+	{ "sunFog", 42, 0, 0, 0 },
+	{ "sunFogColor", 42, 0, 0, 0 },
+	{ "sunFogDir", 42, 0, 0, 0 },
+	{ "hdrControl0", 42, 0, 0, 0 },
+	{ "lightAttenuation", 42, 0, 0, 0 },
+	{ "lightConeControl1", 42, 0, 0, 0 },
+	{ "lightConeControl2", 42, 0, 0, 0 },
+	{ "lightFallOffA", 42, 0, 0, 0 },
+	{ "lightFallOffB", 42, 0, 0, 0 },
+	{ "lightSpotAABB", 42, 0, 0, 0 },
+	{ "lightSpotCookieSlideControl", 42, 0, 0, 0 },
+	{ "lightSpotMatrix0", 42, 0, 0, 0 },
+	{ "lightSpotMatrix1", 42, 0, 0, 0 },
+	{ "lightSpotMatrix2", 42, 0, 0, 0 },
+	{ "lightSpotMatrix3", 42, 0, 0, 0 },
+
+	{ "dlightAttenuation", 42, 0, 0, 0 },
+	{ "dlightAttenuationSampler", 42, 0, 0, 0 },
+	{ "dlightDiffuse", 42, 0, 0, 0 },
+	{ "dlightFallOff", 42, 0, 0, 0 },
+	{ "dlightPosition", 42, 0, 0, 0 },
+	{ "dlightShadowLookupMatrix0", 42, 0, 0, 0 },
+	{ "dlightShadowLookupMatrix1", 42, 0, 0, 0 },
+	{ "dlightShadowLookupMatrix2", 42, 0, 0, 0 },
+	{ "dlightShadowLookupMatrix3", 42, 0, 0, 0 },
+	{ "dlightSpecular", 42, 0, 0, 0 },
+	{ "dlightSpotDir", 42, 0, 0, 0 },
+	{ "dlightSpotFactors", 42, 0, 0, 0 },
+	{ "dlightSpotMatrix0", 42, 0, 0, 0 },
+	{ "dlightSpotMatrix1", 42, 0, 0, 0 },
+	{ "dlightSpotMatrix2", 42, 0, 0, 0 },
+	{ "dlightSpotMatrix3", 42, 0, 0, 0 },
+	{ "dlightSpotShadowmapPixelAdjust", 42, 0, 0, 0 },
+
+	{ "glightReds", 42, 0, 0, 0 },
+	{ "glightBlues", 42, 0, 0, 0 },
+	{ "glightFallOffs", 42, 0, 0, 0 },
+	{ "glightGreens", 42, 0, 0, 0 },
+	{ "glightPosXs", 42, 0, 0, 0 },
+	{ "glightPosYs", 42, 0, 0, 0 },
+	{ "glightPosZs", 42, 0, 0, 0 },
+
+	{ "heroLightingR", 42, 0, 0, 0 },
+	{ "heroLightingG", 42, 0, 0, 0 },
+	{ "heroLightingB", 42, 0, 0, 0 },
+	{ "lightHeroScale", 42, 0, 0, 0 },
+
+	{ "postFxControl2", 42, 0, 0, 0 },
+	{ "postFxControl3", 42, 0, 0, 0 },
+	{ "postFxControl4", 42, 0, 0, 0 },
+	{ "postFxControl5", 42, 0, 0, 0 },
+	{ "postFxControl6", 42, 0, 0, 0 },
+	{ "postFxControl7", 42, 0, 0, 0 },
+	{ "postFxControl8", 42, 0, 0, 0 },
+	{ "postFxControl9", 42, 0, 0, 0 },
+	{ "postFxControlA", 42, 0, 0, 0 },
+
+	{ "scriptVector0", 42, 0, 0, 0 },
+	{ "scriptVector1", 42, 0, 0, 0 },
+	{ "scriptVector2", 42, 0, 0, 0 },
+	{ "scriptVector3", 42, 0, 0, 0 },
+	{ "scriptVector4", 42, 0, 0, 0 },
+	{ "scriptVector5", 42, 0, 0, 0 },
+	{ "scriptVector6", 42, 0, 0, 0 },
+	{ "scriptVector7", 42, 0, 0, 0 },
+	{ "skyColorMultiplier", 42, 0, 0, 0 },
+
+	{ "ui3dUVSetup0", 42, 0, 0, 0 },
+	{ "ui3dUVSetup1", 42, 0, 0, 0 },
+	{ "ui3dUVSetup2", 42, 0, 0, 0 },
+	{ "ui3dUVSetup3", 42, 0, 0, 0 },
+	{ "ui3dUVSetup4", 42, 0, 0, 0 },
+	{ "ui3dUVSetup5", 42, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+#endif
 
 size_t g_MaterialFileSize = 0;
 void* rtn_MaterialLoad = (void*)0x00532AAE;
