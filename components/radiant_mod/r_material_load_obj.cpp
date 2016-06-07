@@ -897,7 +897,7 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 		return argSource->u.name != nullptr;
 	}
 
-	Com_ScriptError("expected 'sampler' or 'material', found '%s' instead\n", token);
+	Com_ScriptError("expected 'constant' or 'material', found '%s' instead\n", token);
 	return false;
 }
 
