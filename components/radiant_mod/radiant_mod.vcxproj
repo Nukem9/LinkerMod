@@ -102,6 +102,7 @@
     <ClCompile Include="r_material.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_material_load_obj_waw.cpp" />
+    <ClCompile Include="r_shade.cpp" />
     <ClCompile Include="r_utils.cpp" />
     <ClCompile Include="r_xsurface_load_obj.cpp" />
     <ClCompile Include="win_main.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="r_material.h" />
     <ClInclude Include="r_material_load_obj.h" />
     <ClInclude Include="r_material_load_obj_waw.h" />
+    <ClInclude Include="r_shade.h" />
     <ClInclude Include="r_utils.h" />
     <ClInclude Include="r_xsurface_load_obj.h" />
     <ClInclude Include="stdafx.h" />

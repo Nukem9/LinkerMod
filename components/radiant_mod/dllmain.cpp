@@ -209,6 +209,11 @@ BOOL RadiantMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0052D1B8, (PBYTE)&mfh_Material_ParseValueForState);
 
+	//
+	// Override BO1 codeConsts before pushing data to the shader
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0053F625, (PBYTE)&mfh_R_SetPassPixelShaderStableArguments);
+
 	g_Initted = true;
 	return TRUE;
 }
