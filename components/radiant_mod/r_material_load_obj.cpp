@@ -3514,9 +3514,14 @@ CodeConstantSource s_codeConsts[] =
 	{ "skyTransition", 50, 0, 0, 0 },
 	{ "envMapParms", 51, 0, 0, 0 },
 	{ "waterParms", 61, 0, 0, 0 },
+
+	//
+	// The actual const values for colorMatrix are overridden to identity values in r_shade.cpp for now
+	//
 	{ "colorMatrixR", 30, 0, 0, 0 },
 	{ "colorMatrixG", 31, 0, 0, 0 },
 	{ "colorMatrixB", 32, 0, 0, 0 },
+
 	{ "colorBias", 46, 0, 0, 0 },
 	{ "colorTintBase", 47, 0, 0, 0 },
 	{ "colorTintDelta", 48, 0, 0, 0 },
@@ -3622,7 +3627,7 @@ CodeConstantSource s_defaultCodeConsts[] =
 	{ "sunFog", 42, 0, 0, 0 },
 	{ "sunFogColor", 42, 0, 0, 0 },
 	{ "sunFogDir", 42, 0, 0, 0 },
-	{ "hdrControl0", 42, 0, 0, 0 },
+	{ "hdrControl0", 170, 0, 0, 0 },
 	{ "lightAttenuation", 150, 0, 0, 0 },
 	{ "lightConeControl1", 151, 0, 0, 0 },
 	{ "lightConeControl2", 152, 0, 0, 0 },
@@ -3684,7 +3689,7 @@ CodeConstantSource s_defaultCodeConsts[] =
 	{ "scriptVector5", 42, 0, 0, 0 },
 	{ "scriptVector6", 42, 0, 0, 0 },
 	{ "scriptVector7", 42, 0, 0, 0 },
-	{ "skyColorMultiplier", 42, 0, 0, 0 },
+	{ "skyColorMultiplier", 171, 0, 0, 0 },
 
 	{ "ui3dUVSetup0", 42, 0, 0, 0 },
 	{ "ui3dUVSetup1", 42, 0, 0, 0 },
