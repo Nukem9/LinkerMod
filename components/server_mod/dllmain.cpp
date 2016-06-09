@@ -8,10 +8,89 @@ DB_GetXAssetSizeHandler_t* DB_GetXAssetSizeHandlers = (DB_GetXAssetSizeHandler_t
 void** DB_XAssetPool = (void**)0x00E06888;
 unsigned int* g_poolSize = (unsigned int*)0x00E065C8;
 
+#include <stdio.h>
+#include "../shared/minidx9/Include/d3dx9.h"
+#pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
+
+bool Material_CopyTextToDXBuffer(void *cachedShader, unsigned int shaderLen, LPD3DXBUFFER *shader)
+{
+	HRESULT hr = D3DXCreateBuffer(shaderLen, shader);
+
+	if (!SUCCEEDED(hr))
+	{
+		// Com_PrintError(8, "ERROR: Material_CopyTextToDXBuffer: D3DXCreateBuffer(%d) failed: %s (0x%08x)\n", shaderLen, R_ErrorDescription(hr), hr);
+
+		free(cachedShader);
+		return false;
+	}
+
+	memcpy((*shader)->GetBufferPointer(), cachedShader, shaderLen);
+	return true;
+}
+
+FILE *Material_OpenShader_BlackOps(const char *shaderTarget, const char *shaderName)
+{
+	//
+	// Determine if this was a vertex shader or pixel shader
+	//
+	const char *shaderMain;
+
+	if (shaderTarget[0] == 'v' && shaderTarget[1] == 's')
+		shaderMain = "vs_main";
+	else
+		shaderMain = "ps_main";
+
+	//
+	// Load the shader directly from the name
+	//
+	char shaderPath[MAX_PATH];
+	sprintf_s(shaderPath, "%s\\raw\\shadercache_mods\\%s_%s_%s",
+		*(DWORD *)(*(DWORD *)0x099D3C64 + 0x18),
+		shaderMain,
+		shaderTarget,
+		shaderName);
+
+	return fopen(shaderPath, "rb");
+}
+
+bool Material_FindCachedShaderDX(const char *shaderText, const unsigned int shaderTextLen, const char *entryPoint, const char *target, ID3DXBuffer **shader, const char *shaderName, int useUPDB)
+{
+	int shaderDataSize = 0;
+	FILE *shaderFile = Material_OpenShader_BlackOps(target, shaderName);
+
+	if (shaderFile)
+	{
+		// Skip the first 4 bytes (zeros)
+		fpos_t pos = 4;
+		fsetpos(shaderFile, &pos);
+
+		// Read the real data size
+		if (fread(&shaderDataSize, 4, 1, shaderFile) < 1)
+		{
+			fclose(shaderFile);
+			return false;
+		}
+	}
+
+	void *shaderMemory = malloc(shaderDataSize);
+	fread(shaderMemory, 1, shaderDataSize, shaderFile);
+
+	if (!Material_CopyTextToDXBuffer(shaderMemory, shaderDataSize, shader))
+		ASSERT_MSG(false, "SHADER UPLOAD FAILED\n");
+
+	fclose(shaderFile);
+	free(shaderMemory);
+	return true;
+}
+
 void* ReallocateAssetPool(int type, unsigned int newSize)
 {
 	int elSize = DB_GetXAssetSizeHandlers[type]();
 	void* poolEntry = malloc(newSize * elSize);
+
+	if (!poolEntry)
+		__debugbreak();
+
 	DB_XAssetPool[type] = poolEntry;
 	g_poolSize[type] = newSize;
 	return poolEntry;
@@ -66,6 +145,29 @@ enum XAssetType
 	ASSET_TYPE_STRING = 0x2B,
 	ASSET_TYPE_ASSETLIST = 0x2C,
 };
+
+unsigned int __cdecl DB_GetImageIndex(char *image)
+{
+	return ((char *)image - (char *)DB_XAssetPool[ASSET_TYPE_IMAGE]) / 52;
+}
+
+void *__cdecl DB_GetImageAtIndex(unsigned int index)
+{
+	/*if (index >= 0x1080
+		&& !Assert_MyHandler(
+		"C:\\projects_pc\\cod\\codsrc\\src\\database\\db_registry.cpp",
+		5951,
+		0,
+		"index doesn't index ARRAY_COUNT( g_GfxImagePool.entries )\n\t%i not in [0, %i)",
+		index,
+		4224))
+		__debugbreak();*/
+	char *ptr = (char *)DB_XAssetPool[ASSET_TYPE_IMAGE];
+
+	return ptr + (index * 52);
+	//return &g_GfxImagePool.entries[index].entry;
+
+}
 
 bool Live_IsSignedIn(int controllerIndex)
 {
@@ -154,14 +256,140 @@ void(__cdecl *__cdecl Scr_GetFunction(const char **pName, int *type))()
 	return RandomFunc2;
 }
 
-char *test = "maps/%s.d3dbsp";
+//char *test = "maps/%s.d3dbsp";
+char *test = "maps/asset_viewer.d3dbsp";
+
+char *defModel = "viewmodel_default";
+
+void Patch_DisabledFastFiles()
+{
+	// Patches to get the game running when 'useFastFile' is 0
+
+	// Live_Init hacks
+	PatchMemory_WithNOP(0x0098F9C3, 2);// Live_InitPlatform => 'live_service' set to 0
+	PatchMemory_WithNOP(0x0098F9D6, 5);
+
+	PatchMemory_WithNOP(0x0098FAE6, 5);
+	PatchMemory_WithNOP(0x0098FB07, 5);
+	PatchMemory_WithNOP(0x0098FB11, 5);
+	PatchMemory_WithNOP(0x0098FB16, 5);
+	PatchMemory_WithNOP(0x0098FB2A, 5);
+	PatchMemory_WithNOP(0x0098FB41, 5);
+	PatchMemory_WithNOP(0x0098FB6F, 5);
+	PatchMemory_WithNOP(0x0098FB86, 5);
+	PatchMemory_WithNOP(0x0098FB9D, 5);
+	PatchMemory_WithNOP(0x0098FBB4, 5);
+	PatchMemory_WithNOP(0x0098FBCB, 5);
+	PatchMemory_WithNOP(0x0098FBE2, 5);
+	PatchMemory_WithNOP(0x0098FBF9, 5);
+	PatchMemory_WithNOP(0x0098FC01, 5);
+	PatchMemory_WithNOP(0x0098FC0D, 5);
+	PatchMemory_WithNOP(0x0098FC12, 5);
+	PatchMemory_WithNOP(0x0098FC17, 5);
+	PatchMemory_WithNOP(0x0098FC1C, 5);
+	PatchMemory_WithNOP(0x0098FC21, 5);
+	// end
+
+	PatchMemory(0x00626C88, (PBYTE)"\xEB", 1);// G_InitGame hang on DB_SyncXAssets
+	PatchMemory(0x009910D0, (PBYTE)"\xC3", 1);// PC_InitSigninState hang from steam not loaded
+	PatchMemory_WithNOP(0x0041A9B0, 2);// BG_EmblemsInit hang on DB_FindXAssetHeader
+	PatchMemory_WithNOP(0x0098807D, 2);// LiveStorage_ReadStatsIfDirChanged
+	PatchMemory_WithNOP(0x009880BD, 2);// LiveStorage_UploadStats
+	PatchMemory_WithNOP(0x007DC64A, 2);// Sys_GetPacket
+	PatchMemory_WithNOP(0x006D6C03, 5);// LiveSteam_Frame
+	PatchMemory(0x0097D570, (PBYTE)"\xC3", 1);// LiveSteam_CheckAccess
+	PatchMemory(0x00ABA1E0, (PBYTE)"\xC3", 1);// R_StreamAlloc_InitTempImages crash/horribly undefined behavior
+	//PatchMemory_WithNOP(0x006CDC4E, 2);// ValidateGameModes
+
+	//PatchMemory_WithNOP(0x006D66AB, 5);// Com_LoadFrontEnd => Dvar_SetBool(xblive_matchEndingSoon = null)
+
+	//PatchMemory_WithNOP(0x006D4867, 2);// Forcefully run LiveSteam_Init
+	//PatchMemory_WithNOP(0x006D4875, 5);// Forcefully run LiveSteam_Init
+
+	PatchMemory(0x00570EBE, (PBYTE)"\xE9\x93\x00\x00\x00", 5);// CL_ParseGamestate LiveStat dvars
+
+
+	PatchMemory_WithNOP(0x006D4114, 5);// Com_InitUIAndCommonXAssets hang on Com_UnloadLevelFastFiles
+	PatchMemory_WithNOP(0x006D4177, 5);// Com_InitUIAndCommonXAssets hang on DB_LoadFastFilesForPC
+
+	PatchMemory(0x00613310, (PBYTE)"\xC3", 1);// G_ParseHitLocDmgTable
+	PatchMemory(0x0044F0A0, (PBYTE)"\xC3", 1);// BG_LoadPenetrationDepthTable
+
+
+	//PatchMemory_WithNOP(0x00800D39, 5);// XmodelLoad hack
+	//PatchMemory(0x00800D4D, (PBYTE)"\xEB", 1);// XmodelLoad hack
+	//PatchMemory_WithNOP(0x0080336F, 5);// XModelGenerateHighMipVolume
+
+	// XModelAllowLoadMesh
+	PatchMemory_WithNOP(0x00805A98, 7);
+
+	// GC_InitWeaponOptions
+	PatchMemory_WithNOP(0x004C61BC, 5);
+
+	// cg_drawBudgets/DB_GetAssetTypeUsageInfo
+	PatchMemory(0x00497481, (PBYTE)"\xE9\xB7\x01\x00\x00", 5);
+
+	// R_StreamUpdateDynamicModels (db code)
+	PatchMemory(0x00AA4700, (PBYTE)"\xC3", 1);
+
+	// R_StreamUpdateStatic (db code)
+	PatchMemory(0x00AA63E0, (PBYTE)"\xC3", 1);
+
+	// TODO Expression_Free crash/memory leak
+	PatchMemory(0x00789E50, (PBYTE)"\xC3", 1);
+}
 
 BOOL ServerMod_Init()
 {
+	// Always disable system keyboard hooking (Sys_SetBlockSystemHotkeys)
+	PatchMemory(0x007E08E0, (PBYTE)"\xC3", 1);
+
+	//Patch_DisabledFastFiles();
+
 	PatchMemory(0x0059E83E, (PBYTE)&dwInitAddress, 4);
 	PatchMemory(0x0059EE78, (PBYTE)&dwInitAddress, 4);
 
-	//PatchMemory(0x007A7DC8, (PBYTE)&test, 4);
+	PatchMemory(0x007A7DC8, (PBYTE)&test, 4);
+
+	// hack for stats bypass
+	PatchMemory(0x00708A3C, (PBYTE)"\xEB", 1);
+	// hack to disable asserts
+	//PatchMemory(0x00788720, (PBYTE)"\xB8\x01\x00\x00\x00\xC3", 6);
+
+	// begin rawmap hacks ---
+
+	// map bsp loading hacks
+	PatchMemory_WithNOP(0x00541E99, 2);			// CL_CM_LoadMap	useFF Com_LoadBsp
+	PatchMemory_WithNOP(0x00710B7A, 2);			// SV_SpawnServer	useFF Com_UnloadBsp
+	PatchMemory_WithNOP(0x00542A9F, 2);			// LoadWorld		useFF Com_UnloadBsp
+	PatchMemory_WithNOP(0x00710AF3, 2);			// SV_SpawnServer	useFF Com_LoadBsp
+	PatchMemory(0x006A93A7, (PBYTE)"\xEB", 1);	// CM_LoadMapData	loadObj
+	PatchMemory(0x00AB98C4, (PBYTE)"\xEB", 1);	// R_LoadWorld		loadObj
+	PatchMemory(0x006CC0B7, (PBYTE)"\xEB", 1);	// Com_LoadWorld	loadObj
+	PatchMemory(0x00800CD7, (PBYTE)"\xEB", 1);	// XModelPrecache	loadObj
+	//PatchMemory(0x00A4C947, (PBYTE)"\xEB", 1);	// Material_Register loadObj
+	//PatchMemory(0x00A4BC07, (PBYTE)"\xEB", 1);	// Material_RegisterTechniqueSet loadObj
+
+	// XModelAllowLoadMesh
+	PatchMemory_WithNOP(0x00805A98, 7);
+
+	PatchMemory(0x00998264, (PBYTE)"\xEB", 1);	// GetGlasses		loadObj
+
+	// hunk allocation hack for raw d3dbsp maps
+	PatchMemory_WithNOP(0x007B2993, 2);
+	PatchMemory(0x007B29B1, (PBYTE)"\xEB", 1);
+
+	// disable session creation crash (offline)
+	PatchMemory(0x00972E10, (PBYTE)"\xC3", 1);
+
+	// R_CheckValidStaticModel bypass
+	PatchMemory(0x00A9AFA0, (PBYTE)"\xB8\x01\x00\x00\x00\xC3", 6);
+	PatchMemory(0x00A9B0E3, (PBYTE)&defModel, 4);
+	PatchMemory_WithNOP(0x00A9B046, 5);
+
+
+	// end rawmap hacks ---
+
 
 	int proto = 2117;
 	PatchMemory(0x00973095, (PBYTE)&proto, 4);
@@ -178,6 +406,13 @@ BOOL ServerMod_Init()
 	ReallocateAssetPool(ASSET_TYPE_FX, 1024);
 	ReallocateAssetPool(ASSET_TYPE_LOCALIZE_ENTRY, 20400);
 	ReallocateAssetPool(ASSET_TYPE_SNDDRIVER_GLOBALS, 16);
+	//ReallocateAssetPool(ASSET_TYPE_IMAGE, 8192);
+
+	//Detours::X86::DetourFunction((PBYTE)0x005947E0, (PBYTE)&DB_GetImageAtIndex);
+	//Detours::X86::DetourFunction((PBYTE)0x00594750, (PBYTE)&DB_GetImageIndex);
+
+	Detours::X86::DetourFunction((PBYTE)0x00AD0660, (PBYTE)&Material_FindCachedShaderDX);
+	PatchMemory(0x00ACF7BF, (PBYTE)"\xEB", 1);
 
 	Detours::X86::DetourFunction((PBYTE)0x00661680, (PBYTE)&BuiltIn_GetMethod);
 	Detours::X86::DetourFunction((PBYTE)0x00660A50, (PBYTE)&Scr_GetFunction);
@@ -186,7 +421,7 @@ BOOL ServerMod_Init()
 	PatchMemory_WithNOP(0x008BDCFF, 2);
 	PatchMemory(0x008BDEB0, (PBYTE)"\xC3", 1);
 
-	PatchMemory_WithNOP(0x005644ED, 2);
+	// PatchMemory_WithNOP(0x005644ED, 2); patch to force using default materials
 
 	PatchMemory_WithNOP(0x008B8396, 2);
 
@@ -206,108 +441,75 @@ BOOL ServerMod_Init()
 	//PatchMemory(0x008BD7E5, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 
 	//
+	// BEGIN SERVER CHECK PATCHES
+	//
+
 	// Com_Init_Try_Block_Function
-	//
-	{
-		// CL_InitDedicated
-		PatchMemory_WithNOP(0x006D49BF, 7);
+	PatchMemory_WithNOP(0x006D49BF, 7);// CL_InitDedicated disable
+	PatchMemory_WithNOP(0x006D4D2A, 2);// Client initializations (CL_Init*)
+	PatchMemory_WithNOP(0x006D4D96, 2);// Renderer and sound
 
-		// Client initializations
-		PatchMemory_WithNOP(0x006D4D2A, 2);
-
-		// Renderer
-		PatchMemory_WithNOP(0x006D4D96, 2);
-	}
-
-	// !C .P !D
 	// Com_Frame_Try_Block_Function
-	//
-	{
-		// Renderer
-		PatchMemory_WithNOP(0x006D6C6D, 6);
+	PatchMemory_WithNOP(0x006D6C6D, 6);// Renderer
+	PatchMemory_WithNOP(0x006D6979, 2);// Max FPS
+	PatchMemory_WithNOP(0x006D69F3, 6);// Event loop
+	PatchMemory_WithNOP(0x006D6E27, 2);// Phys_RunToTime
+	PatchMemory_WithNOP(0x006D6E38, 5);// DWDedicatedLobbyPump disable
 
-		// Max FPS
-		PatchMemory_WithNOP(0x006D6979, 2);
-
-		// Event loop?
-		PatchMemory_WithNOP(0x006D69F3, 6);
-
-		// DWDedicatedLobbyPump
-		PatchMemory_WithNOP(0x006D6E27, 2);
-		PatchMemory_WithNOP(0x006D6E38, 5);
-	}
-
-	//
 	// Com_Init
-	//
-	{
-		// Renderer
-		PatchMemory_WithNOP(0x006D424D, 2);
+	PatchMemory_WithNOP(0x006D424D, 2);// Renderer init
+	PatchMemory_WithNOP(0x006D42F1, 2);// UI_LoadMap/Arena
 
-		// UI_LoadMap/Arena
-		PatchMemory_WithNOP(0x006D42F1, 2);
-
-	}
-
-	//
 	// Com_Frame
-	//
-	{
-		// Renderer
-		PatchMemory_WithNOP(0x006D68CE, 2);
-	}
+	PatchMemory_WithNOP(0x006D68CE, 2);// CL_InitRenderer/Com_StartHunkUsers
 
-	//
 	// SV_SpawnServer
-	//
-	{
-		// Client setup
-		PatchMemory_WithNOP(0x00710666, 2);
+	PatchMemory_WithNOP(0x00710666, 2);// Client setup
+	PatchMemory_WithNOP(0x00710C4A, 6);// Session update/exit after tool completion
 
-		// Exit after tool completion
-		PatchMemory_WithNOP(0x00710C4A, 6);
-	}
+	// Live* functions
+	PatchMemory_WithNOP(0x0099148B, 7);// Live_Frame
+	PatchMemory_WithNOP(0x0097DA14, 7);// LiveSteam_Init
+	PatchMemory_WithNOP(0x0097DDC4, 2);// LiveSteam_Frame
+	PatchMemory_WithNOP(0x0097D57D, 4);// LiveSteam_CheckAccess
+	PatchMemory_WithNOP(0x0097836B, 2);// LiveStats_GetPlayerStat
+	PatchMemory_WithNOP(0x0097773C, 2);// LiveStats_GetItemStat
+	PatchMemory_WithNOP(0x00974D50, 2);// LiveStats_GetIntPlayerStatInternal
+	PatchMemory_WithNOP(0x00975297, 2);// LiveStats_SetIntPlayerStatInternal
+	PatchMemory_WithNOP(0x0096D68A, 2);// LiveNews_PopulateFriendNews
+	PatchMemory_WithNOP(0x00986BD8, 2);// LiveStorage_Init ("listcustomgametypes" command)
+	PatchMemory_WithNOP(0x00987570, 9);// LiveStorage_FetchOnlineWAD (SV_IsConnectedToDW bypass)
+	PatchMemory_WithNOP(0x00981431, 2);// LiveStorage_ReadDWFileByUserID
+	PatchMemory_WithNOP(0x009818DD, 2);// LiveStorage_GetServerTimeComplete
+	PatchMemory_WithNOP(0x00985183, 2);// LiveStorage_FileShare_WriteSummarySuccess
+	PatchMemory(0x00962FE4, (PBYTE)"\xEB", 1);// Live_FileShare_Read_f (Dedicated server custom gametype auth)
 
-	//
-	// RELATED FF LOADING
-	//
-	{
-		// !C .P !D Com_LoadUiFastFile
-		PatchMemory_WithNOP(0x006D5DCD, 7);
+	// UI
+	PatchMemory_WithNOP(0x00740C02, 2);// UI_Gametype_FileShareDownloadComplete
+	PatchMemory_WithNOP(0x0050BE53, 2);// UI_SetLocalVarStringByName
+	PatchMemory_WithNOP(0x0077697B, 7);// UI_SetLoadingScreenMaterial
+	PatchMemory(0x0073EB5B, (PBYTE)"\xEB", 1);// UI_Gametype_IsUsingCustom (SV_GetLicenseType bypass)
 
-		// !C .P !D Com_InitUIAndCommonXAssets
-		PatchMemory_WithNOP(0x006D410B, 9);
+	// FastFile loading
+	PatchMemory_WithNOP(0x0058F101, 2);// DB_Sleep
+	PatchMemory_WithNOP(0x00594227, 2);// DB_SyncExternalAssets
+	PatchMemory_WithNOP(0x00594EF4, 2);// DB_LoadFastFilesForPC ("ui_mp")
+	PatchMemory_WithNOP(0x00594F63, 2);// DB_LoadFastFilesForPC ("ui_viewer_mp")
+	PatchMemory_WithNOP(0x006D5DCD, 7);// Com_LoadUiFastFile
+	PatchMemory_WithNOP(0x006D410B, 9);// Com_InitUIAndCommonXAssets
+	PatchMemory_WithNOP(0x006D5F0B, 4);// Com_LoadMapLoadingScreenFastFile
 
-		PatchMemory_WithNOP(0x00594EF4, 2);	// DB_LoadFastFilesForPC
-		PatchMemory_WithNOP(0x00594F63, 2);	// DB_LoadFastFilesForPC
-	}
 
 
+	// todo
 	PatchMemory_WithNOP(0x006D4342, 2);	// Com_ErrorCleanup
 
 	PatchMemory_WithNOP(0x007DB71E, 2);	// WinMain
 	PatchMemory_WithNOP(0x007DB6CC, 2);	// WinMain
 
-	PatchMemory_WithNOP(0x0099148B, 7);	// Live_Frame
-	PatchMemory(0x00962FE4, (PBYTE)"\xEB", 1);	// Live_FileShare_Read_f
-	PatchMemory_WithNOP(0x0097DA14, 7);	// LiveSteam_Init
-	PatchMemory_WithNOP(0x0097DDC4, 2);	// LiveSteam_Frame
-	PatchMemory_WithNOP(0x0097D57D, 4);	// LiveSteam_CheckAccess
-	PatchMemory_WithNOP(0x0097836B, 2);	// LiveStats_GetPlayerStat
-	PatchMemory_WithNOP(0x0097773C, 2);	// LiveStats_GetItemStat
-	PatchMemory_WithNOP(0x00974D50, 2);	// LiveStats_GetIntPlayerStatInternal
-	PatchMemory_WithNOP(0x00975297, 2);	// LiveStats_SetIntPlayerStatInternal
-	PatchMemory_WithNOP(0x0096D68A, 2);	// LiveNews_PopulateFriendNews
-	PatchMemory_WithNOP(0x00986BD8, 2);	// LiveStorage_Init
-	PatchMemory_WithNOP(0x00987570, 9);	// LiveStorage_FetchOnlineWAD
-	PatchMemory_WithNOP(0x00981431, 2);	// LiveStorage_ReadDWFileByUserID
-	PatchMemory_WithNOP(0x009818DD, 2);	// LiveStorage_GetServerTimeComplete
-	PatchMemory_WithNOP(0x00985183, 2);	// LiveStorage_FileShare_WriteSummarySuccess
+	PatchMemory(0x007101B9, (PBYTE)"\xE9\x98\x00\x00\x00", 5);	// SV_Startup (Dedicated DW startup) ????????????????
 
-	PatchMemory(0x007101B9, (PBYTE)"\xE9\x98\x00\x00\x00", 5);	// SV_Startup
-
-
-	PatchMemory_WithNOP(0x005A020A, 2);	// DWDedicatedLogon
+	PatchMemory_WithNOP(0x005A020A, 2);	// DWDedicatedLogon (Never called; skipped by PC_InitSigninState patch)
 	PatchMemory_WithNOP(0x0059EE1B, 7);	// dwLogOnComplete
 	PatchMemory_WithNOP(0x005A100C, 2);	// dwUpdateSessionComplete
 
@@ -331,14 +533,7 @@ BOOL ServerMod_Init()
 
 	PatchMemory_WithNOP(0x006D1952, 2);	// Com_PrintMessage
 
-	PatchMemory_WithNOP(0x00740C02, 2);	// UI_Gametype_FileShareDownloadComplete
-	PatchMemory_WithNOP(0x0050BE53, 2);	// UI_SetLocalVarStringByName
-	PatchMemory_WithNOP(0x0077697B, 7);	// UI_SetLoadingScreenMaterial
-	PatchMemory(0x0073EB5B, (PBYTE)"\xEB", 1);	// UI_Gametype_IsUsingCustom
-
-	PatchMemory_WithNOP(0x0058F101, 2);	// DB_Sleep
-	PatchMemory_WithNOP(0x00594227, 2);	// DB_SyncExternalAssets
-
+	PatchMemory_WithNOP(0x00AB750F, 6);	// RB_RenderCommandFrame
 	PatchMemory(0x00AB768E, (PBYTE)"\xEB", 1);	// RB_RenderCommandFrame
 
 	PatchMemory_WithNOP(0x0097287A, 6);	// Session_IsHost
@@ -355,24 +550,27 @@ BOOL ServerMod_Init()
 	// !C .P !D PC_InitSigninState
 	PatchMemory(0x009911A2, (PBYTE)"\xEB", 1);
 
-	// !C .P !D Com_LoadMapLoadingScreenFastFile
-	PatchMemory_WithNOP(0x006D5F0B, 4);
+	// Do not execute SV_DWWriteClientStats
+	PatchMemory(0x0098B0BD, (PBYTE)"\xE9\x54\x02\x00\x00", 5);
+
+	// Con_Restricted_InitLists (Execute on dedicated server for RCON only)
+	PatchMemory(0x0054D870, (PBYTE)"\xC3", 1);
 
 	// Com_IntroPlayed
-	PatchMemory(0x006D500A, (PBYTE)"\x90\x90\x90\x90", 4);
+	PatchMemory_WithNOP(0x006D500A, 4);
 
 	// Com_WriteConfigToFile
-	PatchMemory(0x006D5A8C, (PBYTE)"\x90\x90", 2);
+	PatchMemory_WithNOP(0x006D5A8C, 2);
 
 	// Com_WriteKeyConfigToFile
-	PatchMemory(0x006D5BEF, (PBYTE)"\x90\x90", 2);
+	PatchMemory_WithNOP(0x006D5BEF, 2);
 
-	PatchMemory(0x007D3EEB, (PBYTE)"\x90\x90", 2);	// KeyValueToField
+	PatchMemory_WithNOP(0x007D3EEB, 2);// KeyValueToField
 
 	// !C !P !D Com_LoadFrontEnd
-	PatchMemory_WithNOP(0x006D66BA, 9);
+	// PatchMemory_WithNOP(0x006D66BA, 9); ?????????
 
-	// TODO: CHECK: 007077CB
+	PatchMemory_WithNOP(0x007077CB, 2);// SV_DirectConnect (Already enabled by default, does nothing)
 
 	// script
 	PatchMemory(0x008DC190, (PBYTE)"\xEB", 1);
@@ -384,6 +582,9 @@ BOOL ServerMod_Init()
 
 	// Duplicate QPORT on server
 	PatchMemory(0x007075E0, (PBYTE)"\xEB", 1);
+
+	// Patch XBOXLIVE_SIGNEDOUTOFLIVE error when skipping the main menu
+	PatchMemory(0x00972EED, (PBYTE)"\xEB", 1);
 
 	// VAC: MOV EDX, 0
 	PatchMemory(0x0097F72B, (PBYTE)"\xBA\x00\x00\x00\x00", 5);
