@@ -37,6 +37,11 @@
 // 
 //
 
+//
+// Nvidia Nsight patches
+//
+#include "nvidia.h"
+
 #if WAW_PIMP
 #define PATH_PIMP_FALLBACK "waw_pimp"
 #define TECH_TYPE_COUNT 59

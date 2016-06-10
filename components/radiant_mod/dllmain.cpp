@@ -57,6 +57,8 @@ BOOL RadiantMod_Init()
 		freopen("CONIN$", "r", stdin);
 	}
 
+	PatchNvidiaTools();
+
 	//
 	// Hook any needed functions
 	//
