@@ -46,12 +46,17 @@ DWORD WINAPI NvidiaPatchThread(LPVOID lpArg)
 	return 0;
 }
 
-void PatchNvidiaTools()
+bool PatchNvidiaTools()
 {
 	HANDLE threadHandle = CreateThread(nullptr, 0, NvidiaPatchThread, nullptr, 0, nullptr);
 
 	ASSERT(threadHandle != nullptr);
 
 	if (threadHandle)
+	{
 		CloseHandle(threadHandle);
+		return true;
+	}
+
+	return false;
 }

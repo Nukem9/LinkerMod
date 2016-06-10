@@ -1,3 +1,3 @@
 #pragma once
 
-void PatchNvidiaTools();
+bool PatchNvidiaTools();
