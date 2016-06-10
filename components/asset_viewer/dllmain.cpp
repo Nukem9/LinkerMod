@@ -35,6 +35,13 @@ BOOL AssetViewerMod_Init()
 		freopen("CONIN$", "r", stdin);
 	}
 
+	//
+	// Fix writing model pics to wrong directory
+	//
+	const char* model_pics_path = "..\\docs\\model_pics\\";
+	ASSERT(strlen(model_pics_path) < 24);
+	PatchMemory(0x009471EC, (PBYTE)model_pics_path, strlen(model_pics_path) + 1);
+
 	g_Initted = true;
 
 	return TRUE;
