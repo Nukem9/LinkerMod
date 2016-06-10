@@ -86,12 +86,14 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="kvs.cpp" />
+    <ClCompile Include="libqhull_geom.cpp" />
     <ClCompile Include="lights.cpp" />
     <ClCompile Include="vec.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="com_files.h" />
     <ClInclude Include="kvs.h" />
+    <ClInclude Include="libqhull_geom.h" />
     <ClInclude Include="lights.h" />
     <ClInclude Include="vec.h" />
   </ItemGroup>
