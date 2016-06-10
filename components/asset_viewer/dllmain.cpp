@@ -42,6 +42,14 @@ BOOL AssetViewerMod_Init()
 	ASSERT(strlen(model_pics_path) < 24);
 	PatchMemory(0x009471EC, (PBYTE)model_pics_path, strlen(model_pics_path) + 1);
 
+	//
+	// Disable the "fileSize > 0" assertion for materials
+	//
+#if ASSET_VIEWER_DISABLE_MATERIAL_ASSERT
+	PatchMemory_WithNOP(0x0080480C, 5);
+	PatchMemory_WithNOP(0x0080481B, 1);
+#endif
+
 	g_Initted = true;
 
 	return TRUE;

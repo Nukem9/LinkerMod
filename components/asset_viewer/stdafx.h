@@ -16,9 +16,13 @@
 
 #include "../shared/minidx9/Include/d3dx9.h"
 #pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
-//
-// 
-//
 
 #define SRCLINE(x)
 #define CHECK_SIZE(Type, Size) static_assert(sizeof(Type) == Size, "Invalid type size!");
+
+//
+// Asset Viewer Mod Options
+// Can be used to easily toggle certain tweaks
+//
+#define ASSET_VIEWER_DISABLE_MATERIAL_ASSERT 1
+
