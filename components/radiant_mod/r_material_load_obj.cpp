@@ -20,7 +20,6 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 
 	int elemIndex = 0;
 
-	_VERBOSE(printf("new -- 0x%X\n", elemTable));
 	while (streamCount > 0)
 	{
 		ASSERT_MSG((unsigned)(routingData->source) < (unsigned)(STREAM_SRC_COUNT), "routingData->source doesn't index STREAM_SRC_COUNT\n\t%i not in [0, 10)");
@@ -60,7 +59,7 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 		LPDIRECT3DVERTEXDECLARATION9 decl	= nullptr;
 		HRESULT hr							= (*dx_device)->CreateVertexDeclaration(elemTable, &decl);
 
-		if (!SUCCEEDED(hr))
+		if (FAILED(hr))
 		{
 			(*g_disableRendering)++;
 			Com_Error(ERR_FATAL, "dx.device->CreateVertexDeclaration(elemTable, &decl) failed: %s\n", R_ErrorDescription(hr));
@@ -145,7 +144,7 @@ MaterialVertexDeclaration *Material_AllocVertexDecl(MaterialStreamRouting *routi
 	// Maximum index check
 	//
 	if (materialVertexDeclCount == 63)
-		Com_Error(ERR_DROP, "More than %i vertex declarations in use", 63);
+		Com_Error(ERR_DROP, "More than %i vertex declarations in use", materialVertexDeclCount);
 
 	materialVertexDeclCount++;
 
@@ -731,7 +730,6 @@ SRCLINE(3606)
 bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
 	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource);
-	return true;
 }
 
 SRCLINE(3613)
@@ -950,8 +948,6 @@ bool Material_DefaultConstantSource(MaterialShaderType shaderType, const char *c
 		return true;
 
 	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_defaultCodeConsts, argSource);
-
-	return true;
 }
 
 SRCLINE(3800)
@@ -1683,7 +1679,7 @@ bool Material_CopyTextToDXBuffer(void *cachedShader, unsigned int shaderLen, LPD
 {
 	HRESULT hr = D3DXCreateBuffer(shaderLen, shader);
 
-	if (!SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
 		Com_PrintError(8, "ERROR: Material_CopyTextToDXBuffer: D3DXCreateBuffer(%d) failed: %s (0x%08x)\n", shaderLen, R_ErrorDescription(hr), hr);
 
@@ -1913,7 +1909,7 @@ bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderNam
 	//
 	LPD3DXCONSTANTTABLE constants;
 
-	if (!SUCCEEDED(hr = D3DXGetShaderConstantTable(program, &constants)))
+	if (FAILED(hr = D3DXGetShaderConstantTable(program, &constants)))
 		goto __d3dfail;
 
 	ASSERT(constants != nullptr);
@@ -1949,11 +1945,11 @@ bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderNam
 		D3DXSEMANTIC outputSemantics[MAXD3DDECLLENGTH];
 
 		UINT inputCount;
-		if (!SUCCEEDED(hr = D3DXGetShaderInputSemantics(program, inputSemantics, &inputCount)))
+		if (FAILED(hr = D3DXGetShaderInputSemantics(program, inputSemantics, &inputCount)))
 			goto __d3dfail;
 
 		UINT outputCount;
-		if (!SUCCEEDED(hr = D3DXGetShaderOutputSemantics(program, outputSemantics, &outputCount)))
+		if (FAILED(hr = D3DXGetShaderOutputSemantics(program, outputSemantics, &outputCount)))
 			goto __d3dfail;
 
 		//
@@ -2269,14 +2265,11 @@ bool Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialP
 	}
 
 	//
-	// Allocate space for the local arguments
+	// Allocate space for the local arguments and copy
 	//
 	argCount		= pass->stableArgCount + pass->perObjArgCount + pass->perPrimArgCount;
 	pass->localArgs = (MaterialShaderArgument *)Material_Alloc(sizeof(MaterialShaderArgument) * argCount);
 
-	//
-	// Copy the data over to the pointer
-	//
 	memcpy(pass->localArgs, args, sizeof(MaterialShaderArgument) * argCount);
 
 	//

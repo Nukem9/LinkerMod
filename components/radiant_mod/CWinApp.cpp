@@ -19,15 +19,11 @@ void CWinApp::Run()
 	if (!*(DWORD *)(this + 32) && AfxOleGetUserCtrl())
 		AfxPostQuitMessage(0);
 
-	//
 	// Convert the unicode command line to a multi-byte string
-	//
 	int argc		= 0;
 	LPWSTR *argv	= CommandLineToArgvW(GetCommandLineW(), &argc);
 
-	//
 	// Open the map specified
-	//
 	if (argc > 0)
 	{
 		char path[MAX_PATH];
@@ -36,9 +32,7 @@ void CWinApp::Run()
 		Map_LoadFile(path);
 	}
 
-	//
-	// Free memory
-	//
+	// Free allocated command array
 	if (argv)
 		LocalFree(argv);
 
