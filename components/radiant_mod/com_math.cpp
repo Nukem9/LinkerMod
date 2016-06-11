@@ -7,11 +7,18 @@ void Vec3Cross(const float *v0, const float *v1, float *cross)
 	cross[2] = v0[0] * v1[1] - v0[1] * v1[0];
 }
 
-void *Vec3Scale(const float *vec, float scale, float *dest)
+void Vec3Scale(const float *vec, float scale, float *dest)
 {
 	dest[0] = scale * vec[0];
 	dest[1] = scale * vec[1];
 	dest[2] = scale * vec[2];
+}
+
+void Vec3Subtract(const float *v0, const float* v1, float *dest)
+{
+	dest[0] = v0[0] - v1[0];
+	dest[1] = v0[1] - v1[1];
+	dest[2] = v0[2] - v1[2];
 }
 
 float Vec3Normalize(float *v)

@@ -10,19 +10,6 @@ float red[4] = { 1.0, 0.0, 0.0, 1.0 };
 float green[4] = { 0.0, 1.0, 0.0, 1.0 };
 float blue[4] = { 0.0, 0.0, 1.0, 1.0 };
 
-float aAbB[4] = { 0.0, 1.0, 0.0, 1.0 };
-float attenuation[4] = { 1.0, 0.0, 0.0, 0.0 };
-
-float lightSpotMatrix0[4] = { 1.0, 0.0, 0.0, 0.0 };
-float lightSpotMatrix1[4] = { 0.0, 1.0, 0.0, 0.0 };
-float lightSpotMatrix2[4] = { 0.0, 0.0, 1.0, 0.0 };
-float lightSpotMatrix3[4] = { 0.0, 0.0, 0.0, 1.0 };
-
-vec4 lightConeControl1 = { 0.0, 0.0, 0.0, 0.0 };
-vec4 lightConeControl2 = { 0.0, 0.0, 0.0, 0.0 };
-vec4 lightFallOffA = { 0.0, 0.0, 0.0, 0.0 };
-vec4 lightFallOffB = { 0.0, 0.0, 0.0, 0.0 };
-
 R_HW_SetPixelShaderConstant_t R_HW_SetPixelShaderConstant = (R_HW_SetPixelShaderConstant_t)0x0053EE00;
 
 int __cdecl R_HW_RemapPixelShaderConstant(void* device, MaterialShaderArgument* arg)
@@ -48,47 +35,6 @@ int __cdecl R_HW_RemapPixelShaderConstant(void* device, MaterialShaderArgument* 
 	if (arg->u.codeConst.index < 150)
 		return 0;
 
-	if (R_GetCurrentLight() && R_GetCurrentLight()->type == 2)
-	{
-		GfxLight* light = R_GetCurrentLight();
-		float roundness = 1.0;
-
-		float cutOn = 0.0f;
-		float nearEdge = 0.0f;
-		float farEdge = 0.0f;
-
-		vec4 fallOff;
-		fallOff.x = 0.0f;	//cutOn;
-		fallOff.y = 200.0f;	//light->radius;
-		fallOff.z = 0.0f;	//((light->radius - cutOn) * nearEdge) + cutOn;
-		fallOff.w = 0.0f;	//((light->radius - cutOn) * farEdge) + cutOn;
-
-		R_CalculateCodeConst_LightConeControl1(roundness, &lightConeControl1);
-		R_CalculateCodeConst_LightConeControl2((vec4*)aAbB, &lightConeControl2);
-		R_CalculateCodeConst_LightFallOffA((vec4*)aAbB, &fallOff, &lightFallOffA);
-		R_CalculateCodeConst_LightFallOffB((vec4*)aAbB, &fallOff, &lightFallOffB);
-
-		vec4 angles = { 0.0f, 0.0f, 0.0f, 0.0f };
-		memcpy(&angles, light->angles, sizeof(float) * 3);
-		
-		float viewMatrix[16];
-		SpotLightViewMatrix((float*)&angles, 0.0f, viewMatrix);
-
-		float projMatrix[16];
-		SpotLightProjectionMatrix(light->cosHalfFovOuter, fallOff.x, light->radius, projMatrix);
-
-		float spotMatrixTransposed[16];
-		MatrixMultiply44(viewMatrix, projMatrix, spotMatrixTransposed);
-		
-		float spotMatrix[16];
-		MatrixTranspose44(spotMatrixTransposed, spotMatrix);
-		
-		memcpy(lightSpotMatrix0, &spotMatrix[0], sizeof(float) * 4);
-		memcpy(lightSpotMatrix1, &spotMatrix[4], sizeof(float) * 4);
-		memcpy(lightSpotMatrix2, &spotMatrix[8], sizeof(float) * 4);
-		memcpy(lightSpotMatrix3, &spotMatrix[12], sizeof(float) * 4);
-	}
-
 	switch (arg->u.codeConst.index)
 	{
 		case 170: // hdrControl0
@@ -99,37 +45,37 @@ int __cdecl R_HW_RemapPixelShaderConstant(void* device, MaterialShaderArgument* 
 			return 1;
 
 		case 150: // lightAttenuation
-			R_HW_SetPixelShaderConstant(device, arg->dest, attenuation, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.attenuation, 1);
 			return 1;
 		case 151: // lightConeControl1
-			R_HW_SetPixelShaderConstant(device, arg->dest, &lightConeControl1, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.coneControl1, 1);
 			return 1;
 		case 152: // lightConeControl2
-			R_HW_SetPixelShaderConstant(device, arg->dest, &lightConeControl2, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.coneControl2, 1);
 			return 1;
 		case 153: // lightFallOffA
-			R_HW_SetPixelShaderConstant(device, arg->dest, &lightFallOffA, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.fallOffA, 1);
 			return 1;
 		case 154: // lightFallOffB
-			R_HW_SetPixelShaderConstant(device, arg->dest, &lightFallOffB, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.fallOffB, 1);
 			return 1;
 		case 156: // lightSpotCookieSlideControl
-			R_HW_SetPixelShaderConstant(device, arg->dest, not_null, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.spotCookieControl, 1);
 			return 1;
 		case 155: // lightSpotAABB
-			R_HW_SetPixelShaderConstant(device, arg->dest, aAbB, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.aAbB, 1);
 			return 1;
 		case 157: // lightSpotMatrix0
-			R_HW_SetPixelShaderConstant(device, arg->dest, lightSpotMatrix0, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.spotMatrix[0], 1);
 			return 1;
 		case 158: // lightSpotMatrix1
-			R_HW_SetPixelShaderConstant(device, arg->dest, lightSpotMatrix1, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.spotMatrix[4], 1);
 			return 1;
 		case 159: // lightSpotMatrix2
-			R_HW_SetPixelShaderConstant(device, arg->dest, lightSpotMatrix2, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.spotMatrix[8], 1);
 			return 1;
 		case 160: // lightSpotMatrix3
-			R_HW_SetPixelShaderConstant(device, arg->dest, lightSpotMatrix3, 1);
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.spotMatrix[12], 1);
 			return 1;
 	}
 
@@ -142,25 +88,24 @@ void __declspec(naked) mfh_R_SetPassPixelShaderStableArguments() //0x0053F625
 	_asm
 	{
 		mov[esp + 14h], eax
-			mov eax, [edi + 4] // context->state
+		mov eax, [edi + 4] // context->state
 
-			pushad
-			push esi // arg
-			mov ecx, [eax + 90h]
-			push ecx // device
+		pushad
+		push esi // arg
+		mov ecx, [eax + 90h]
+		push ecx // device
 
-			call R_HW_RemapPixelShaderConstant
-			add esp, 8
-			cmp eax, 0
-			jne SKIP
+		call R_HW_RemapPixelShaderConstant
+		add esp, 8
+		cmp eax, 0
+		jne SKIP
 
-			popad
-
-			jmp rtn_R_SetPassPixelShaderStableArguments
-
-		SKIP :
 		popad
-			jmp rtn2_R_SetPassPixelShaderStableArguments
+		jmp rtn_R_SetPassPixelShaderStableArguments
+
+	SKIP:
+		popad
+		jmp rtn2_R_SetPassPixelShaderStableArguments
 	}
 }
 

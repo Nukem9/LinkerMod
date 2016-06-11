@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 GfxLight* g_lightStack[GFX_LIGHT_TYPE_COUNT_WITH_SHADOWMAP_VERSIONS + 1];
+GfxLightInfo g_lightInfo;
 
 R_SetLightProperties_t R_SetLightProperties_o = (R_SetLightProperties_t)0x0056E4A0;
 
@@ -19,6 +20,11 @@ int __cdecl R_SetLightProperties(float* source, void *light, int def, int hasSha
 	// forces 1.0 / (radius * radius)
 	//
 	source[579] *= source[579];
+
+	if (_light->type == GFX_LIGHT_TYPE_SPOT)
+	{
+		R_BuildSpotLightInfo(source, _light);
+	}
 
 	return result;
 }
@@ -85,4 +91,45 @@ void SpotLightViewMatrix(const float *direction, float rotation, float* mtx)
 		0.0f,			0.0f,			0.0f,	1.0f	};
 
 	MatrixMultiply44(rotationMatrix, lookAtMatrix, mtx);
+}
+
+void R_BuildSpotLightInfo(float* source, GfxLight* light)
+{
+	ASSERT(light->type == GFX_LIGHT_TYPE_SPOT);
+
+	const float roundness = 1.0f;
+
+	const float cutOn = 0.0f;
+	const float nearEdge = 0.0f;
+	const float farEdge = 0.0f;
+
+	vec4 aAbB = { 0.0f, 1.0f, 0.0f, 1.0f };
+	vec4 attenuation = { 1.0f, 0.0f, 0.0f, 0.0f };
+
+	vec4 fallOff;
+	fallOff.x = cutOn;
+	fallOff.y = light->radius;
+	fallOff.z = ((light->radius - cutOn) * nearEdge) + cutOn;
+	fallOff.w = ((light->radius - cutOn) * farEdge) + cutOn;
+
+	memcpy(&g_lightInfo.aAbB, &aAbB, sizeof(vec4));
+	memcpy(&g_lightInfo.attenuation, &attenuation, sizeof(vec4));
+
+	vec4 angles = { 0.0f, 0.0f, 0.0f, 0.0f };
+	memcpy(&angles, light->angles, sizeof(float) * 3);
+
+	R_CalculateCodeConst_LightConeControl1(roundness, &g_lightInfo.coneControl1);
+	R_CalculateCodeConst_LightConeControl2(&aAbB, &g_lightInfo.coneControl2);
+	R_CalculateCodeConst_LightFallOffA(&aAbB, &fallOff, &g_lightInfo.fallOffA);
+	R_CalculateCodeConst_LightFallOffB(&aAbB, &fallOff, &g_lightInfo.fallOffB);
+
+	float viewMatrix[16];
+	SpotLightViewMatrix((float*)&angles, 0.0f, viewMatrix);
+
+	float projMatrix[16];
+	SpotLightProjectionMatrix(light->cosHalfFovOuter, fallOff.x, light->radius, projMatrix);
+
+	float spotMatrixTransposed[16];
+	MatrixMultiply44(viewMatrix, projMatrix, spotMatrixTransposed);
+	MatrixTranspose44(spotMatrixTransposed, g_lightInfo.spotMatrix);
 }

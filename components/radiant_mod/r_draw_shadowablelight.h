@@ -26,6 +26,25 @@ struct GfxLight
 	int exponent;
 };
 
+struct GfxLightInfo
+{
+	GfxLightType type;
+
+	vec4 aAbB;
+	vec4 attenuation;
+
+	vec4 coneControl1;
+	vec4 coneControl2;
+
+	vec4 fallOffA;
+	vec4 fallOffB;
+
+	float spotCookieControl[4];
+	float spotFactors[4];
+
+	float spotMatrix[16];
+};
+
 typedef int(__cdecl* R_SetLightProperties_t)(float* source, void *light, int def, int hasShadowMap, float spotShadowFade);
 extern R_SetLightProperties_t R_SetLightProperties_o;
 
@@ -38,3 +57,6 @@ GfxLight* R_GetLastOmniLight(void);
 
 void SpotLightProjectionMatrix(float cosFov, float zNear, float zFar, float* mtx);
 void SpotLightViewMatrix(const float *direction, float rotation, float* mtx);
+
+extern GfxLightInfo g_lightInfo;
+void R_BuildSpotLightInfo(float* source, GfxLight* light);
