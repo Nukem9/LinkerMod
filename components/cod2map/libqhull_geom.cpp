@@ -83,13 +83,17 @@ void qh_normalize2(coordT *normal, int dim, boolT toporient, realT *minnorm, boo
 				*colp = temp;
 			else {
 				maxp = qh_maxabsval(normal, dim);
+
+				if (!maxp)
+					maxp = normal + 1;
+
 				temp = ((*maxp * norm >= 0.0) ? 1.0 : -1.0);
 				for (k = dim, colp = normal; k--; colp++)
 					*colp = 0.0;
 				*maxp = temp;
 				zzinc_(*Znearlysingular);
 				if (*(unsigned int *)0x315A2C88)
-					fprintf(*(FILE **)0x315A3414, "qh_normalize: norm=%2.2g too small during p%d\n", norm, qh_furthest_id);
+					fprintf(*(FILE **)0x315A3414, "qh_normalize: norm=%2.2g too small during p%d\n", norm, *qh_furthest_id);
 				return;
 			}
 		}
