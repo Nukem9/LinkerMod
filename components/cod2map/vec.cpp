@@ -1,4 +1,4 @@
-#include "vec.h"
+#include "stdafx.h"
 
 vec3::vec3(void)
 {

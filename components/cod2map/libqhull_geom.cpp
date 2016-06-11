@@ -1,7 +1,4 @@
-#include <limits>
-#include <math.h>
-#include <stdio.h>
-#include "libqhull_geom.h"
+#include "stdafx.h"
 
 #define True 1
 #define False 0

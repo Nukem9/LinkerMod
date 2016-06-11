@@ -1,5 +1,4 @@
-#include "kvs.h"
-#include <iostream>
+#include "stdafx.h"
 
 int Ent_GetKV_Vec4(void* ent, const char* key, vec4* dest)
 {

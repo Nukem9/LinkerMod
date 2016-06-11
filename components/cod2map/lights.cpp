@@ -1,6 +1,4 @@
-#include "lights.h"
-#include <Windows.h>
-#include "kvs.h"
+#include "stdafx.h"
 
 PrimaryLightData* g_tmpPrimaryLightData = nullptr;
 int g_primaryLightCount = 0;
