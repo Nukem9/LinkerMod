@@ -260,9 +260,7 @@ int Material_TechniqueTypeForName_WAW(const char *name)
 			return techniqueIndex;
 	}
 
-	return 43;
-
-	return 59;
+	return 58;
 }
 
 /*
