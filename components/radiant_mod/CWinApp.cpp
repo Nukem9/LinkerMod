@@ -28,8 +28,21 @@ void CWinApp::Run()
 	{
 		char path[MAX_PATH];
 		wcstombs(path, argv[0], ARRAYSIZE(path));
-
-		Map_LoadFile(path);
+		
+		//
+		// Ensure that the map radiant is trying to open exists
+		// if the map does not exist, radiant will open in its default state
+		//
+		FILE* h = NULL;
+		if (fopen_s(&h, path, "rb") == 0)
+		{
+			fclose(h);
+			Map_LoadFile(path);
+		}
+		else
+		{
+			printf("ERROR: Could not open file '%s'\n", path);
+		}
 	}
 
 	// Free allocated command array
