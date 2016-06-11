@@ -129,6 +129,17 @@ void R_BuildSpotLightInfo(float* source, GfxLight* light)
 	float projMatrix[16];
 	SpotLightProjectionMatrix(light->cosHalfFovOuter, fallOff.x, light->radius, projMatrix);
 
+	//
+	// Calculate the offset used in the light transformation
+	//
+	float offset[3];
+	Vec3Subtract(light->origin, &source[0x4BF], offset);
+
+	float inverseOffset[3] = { offset[2], offset[1], offset[0] };
+	viewMatrix[12] = -(offset[0] * viewMatrix[0] + offset[1] * viewMatrix[4] + offset[2] * viewMatrix[8]);
+	viewMatrix[13] = -(inverseOffset[2] * viewMatrix[1] + inverseOffset[1] * viewMatrix[5] + inverseOffset[0] * viewMatrix[9]);
+	viewMatrix[14] = -(inverseOffset[2] * viewMatrix[2] + inverseOffset[1] * viewMatrix[6] + inverseOffset[0] * viewMatrix[10]);
+
 	float spotMatrixTransposed[16];
 	MatrixMultiply44(viewMatrix, projMatrix, spotMatrixTransposed);
 	MatrixTranspose44(spotMatrixTransposed, g_lightInfo.spotMatrix);
