@@ -23,7 +23,7 @@ int __cdecl R_SetLightProperties(float* source, void *light, int def, int hasSha
 
 	if (_light->type == GFX_LIGHT_TYPE_SPOT)
 	{
-		R_BuildSpotLightInfo(source, _light);
+		R_BuildSpotLightInfo(source, _light, spotShadowFade);
 	}
 
 	return result;
@@ -93,7 +93,7 @@ void SpotLightViewMatrix(const float *direction, float rotation, float* mtx)
 	MatrixMultiply44(rotationMatrix, lookAtMatrix, mtx);
 }
 
-void R_BuildSpotLightInfo(float* source, GfxLight* light)
+void R_BuildSpotLightInfo(float* source, GfxLight* light, float spotShadowFade)
 {
 	ASSERT(light->type == GFX_LIGHT_TYPE_SPOT);
 
@@ -122,6 +122,14 @@ void R_BuildSpotLightInfo(float* source, GfxLight* light)
 	R_CalculateCodeConst_LightConeControl2(&aAbB, &g_lightInfo.coneControl2);
 	R_CalculateCodeConst_LightFallOffA(&aAbB, &fallOff, &g_lightInfo.fallOffA);
 	R_CalculateCodeConst_LightFallOffB(&aAbB, &fallOff, &g_lightInfo.fallOffB);
+
+	//
+	// Build spotFactors
+	//
+	g_lightInfo.spotFactors[0] = 0.5f;
+	g_lightInfo.spotFactors[1] = 0.0f;
+	g_lightInfo.spotFactors[2] = 0.5f;
+	g_lightInfo.spotFactors[3] = spotShadowFade;
 
 	float viewMatrix[16];
 	SpotLightViewMatrix((float*)&angles, 0.0f, viewMatrix);

@@ -3609,7 +3609,7 @@ CodeConstantSource s_defaultCodeConsts[] =
 	{ "lightDiffuse", 1, 0, 0, 0 },
 	{ "lightSpecular", 2, 0, 0, 0 },
 	{ "lightSpotDir", 3, 0, 0, 0 },
-	{ "lightSpotFactors", 4, 0, 0, 0 },
+	{ "lightSpotFactors", 161, 0, 0, 0 },
 	{ "lightFalloffPlacement", 11, 0, 0, 0 },
 	{ "spotShadowmapPixelAdjust", 52, 0, 0, 0 },
 

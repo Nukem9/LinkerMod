@@ -77,6 +77,9 @@ int __cdecl R_HW_RemapPixelShaderConstant(void* device, MaterialShaderArgument* 
 		case 160: // lightSpotMatrix3
 			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.spotMatrix[12], 1);
 			return 1;
+		case 161: // lightSpotFactors
+			R_HW_SetPixelShaderConstant(device, arg->dest, &g_lightInfo.spotFactors, 1);
+			return 1;
 	}
 
 	return 0;

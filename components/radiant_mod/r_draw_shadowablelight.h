@@ -59,4 +59,4 @@ void SpotLightProjectionMatrix(float cosFov, float zNear, float zFar, float* mtx
 void SpotLightViewMatrix(const float *direction, float rotation, float* mtx);
 
 extern GfxLightInfo g_lightInfo;
-void R_BuildSpotLightInfo(float* source, GfxLight* light);
+void R_BuildSpotLightInfo(float* source, GfxLight* light, float spotShadowFade);
