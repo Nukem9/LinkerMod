@@ -57,12 +57,14 @@ BOOL RadiantMod_Init()
 		freopen("CONIN$", "r", stdin);
 	}
 
+#if USE_NSIGHT_FIX
 	if (PatchNvidiaTools())
 	{
 		// Force windows to always be redrawn
 		PatchMemory_WithNOP(0x0042EDC4, 10);
 		*(DWORD *)0x027C32F4 = 0xFFFFFFFF;
 	}
+#endif
 
 	//
 	// Hook any needed functions
