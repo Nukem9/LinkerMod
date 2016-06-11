@@ -35,3 +35,6 @@ GfxLight* R_GetCurrentLight(void);
 GfxLight* R_GetLastDirLight(void);
 GfxLight* R_GetLastSpotLight(void);
 GfxLight* R_GetLastOmniLight(void);
+
+void SpotLightProjectionMatrix(float cosFov, float zNear, float zFar, float* mtx);
+void SpotLightViewMatrix(const float *direction, float rotation, float* mtx);

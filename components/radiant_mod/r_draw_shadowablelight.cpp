@@ -42,3 +42,47 @@ GfxLight* R_GetLastOmniLight(void)
 {
 	return g_lightStack[GFX_LIGHT_TYPE_OMNI];
 }
+
+void SpotLightProjectionMatrix(float cosFov, float zNear, float zFar, float* mtx)
+{
+	memset(mtx, 0, 0x40u);
+
+	if (zNear < 0.001)
+		zNear = 0.001f;
+
+	mtx[0] = 1.0f / (sqrt(1.0f - (cosFov * cosFov)) / cosFov);
+	mtx[5] = mtx[0];
+	mtx[10] = zFar / (zFar - zNear);
+	mtx[11] = 1.0f;
+	mtx[14] = -mtx[10] * zNear;
+}
+
+void SpotLightViewMatrix(const float *direction, float rotation, float* mtx)
+{
+	rotation = 0.785398f;
+
+	float vec[3];
+	vec[0] = -direction[0];
+	vec[1] = -direction[1];
+	vec[2] = -direction[2];
+
+	float vec3[3];
+	PerpendicularVector(vec, vec3);
+
+	float vec2[3];
+	Vec3Cross(vec3, vec, vec2);
+
+	float rotationMatrix[16] =
+	{	-vec2[0],	vec3[0],	vec[0],		0.0f,
+		-vec2[1],	vec3[1],	vec[1],		0.0f,
+		-vec2[2],	vec3[2],	vec[2],		0.0f,
+		0.0f,		0.0f,		0.0f,		1.0f	};
+
+	float lookAtMatrix[16] =
+	{	cos(rotation),	-sin(rotation), 0.0f,	0.0f,
+		sin(rotation),	cos(rotation),	0.0f,	0.0f,
+		0.0f,			0.0f,			1.0f,	0.0f,
+		0.0f,			0.0f,			0.0f,	1.0f	};
+
+	MatrixMultiply44(rotationMatrix, lookAtMatrix, mtx);
+}
