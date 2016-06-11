@@ -4,6 +4,7 @@
 
 #include "com_files.h"
 #include "lights.h"
+#include "libqhull_geom.h"
 
 #include "../D3DBSP_Lib/D3DBSP_Lib/D3DBSP_Lib.h"
 #if _DEBUG
@@ -118,10 +119,18 @@ void Init_MapMod()
 	stringPatch = "%s.pts";
 	PatchMemory(0x00406F4E, (PBYTE)&stringPatch, 4);
 
+	//
+	// Increase (double) the max amount of curvenn/terrain collision verts
+	//
+	int maxCollisionVerts = 131072;
+	PatchMemory(0x004197F9, (PBYTE)&maxCollisionVerts, 4);
+
+	Detours::X86::DetourFunction((PBYTE)0x004B3550, (PBYTE)qh_normalize2);
+
 	g_modInitialized = true;
 }
 
-BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call,LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call,LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
 	{

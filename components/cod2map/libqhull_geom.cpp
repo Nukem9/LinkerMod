@@ -1,16 +1,21 @@
 #include <limits>
 #include <math.h>
+#include <stdio.h>
 #include "libqhull_geom.h"
 
 #define True 1
 #define False 0
 
+#define zzinc_(x) (x)++
 #define wmin_(x, y) if ((y) < (x)) (x) = (y);
 #define REALmax (DBL_MAX)
 
 double *Wmindenom = (double *)0x315A2128;
 double *qh_MINdenom = (double *)0x315A32E8;
 double *qh_MINdenom_1 = (double *)0x315A32E0;
+
+int *Znearlysingular = (int *)0x315A2148;
+int *qh_furthest_id = (int *)0x315A3488;
 
 void qh_normalize2(coordT *normal, int dim, boolT toporient, realT *minnorm, boolT *ismin)
 {
@@ -82,9 +87,9 @@ void qh_normalize2(coordT *normal, int dim, boolT toporient, realT *minnorm, boo
 				for (k = dim, colp = normal; k--; colp++)
 					*colp = 0.0;
 				*maxp = temp;
-				zzinc_(Znearlysingular);
-				trace0((qh ferr, 1, "qh_normalize: norm=%2.2g too small during p%d\n",
-					norm, qh furthest_id));
+				zzinc_(*Znearlysingular);
+				if (*(unsigned int *)0x315A2C88)
+					fprintf(*(FILE **)0x315A3414, "qh_normalize: norm=%2.2g too small during p%d\n", norm, qh_furthest_id);
 				return;
 			}
 		}
