@@ -97,14 +97,17 @@ void R_BuildSpotLightInfo(float* source, GfxLight* light, float spotShadowFade)
 {
 	ASSERT(light->type == GFX_LIGHT_TYPE_SPOT);
 
-	const float roundness = g_lightInfo.roundness;
+	const float roundness = g_lightInfo.kvs.roundness;
 
-	const float cutOn = 0.0f;
-	const float nearEdge = 0.0f;
-	const float farEdge = 0.0f;
+	const float cutOn = g_lightInfo.kvs.cut_on; //0.0f;
+	const float nearEdge = g_lightInfo.kvs.near_edge; //0.0f;
+	const float farEdge = g_lightInfo.kvs.far_edge; //0.0f;
 
-	vec4 aAbB = { 0.0f, 1.0f, 0.0f, 1.0f };
-	vec4 attenuation = { 1.0f, 0.0f, 0.0f, 0.0f };
+	vec4 aAbB; // = { 0.0f, 1.0f, 0.0f, 1.0f };
+	memcpy(&aAbB, &g_lightInfo.kvs.superellipse, sizeof(vec4));
+
+	vec4 attenuation; // = { 1.0f, 0.0f, 0.0f, 0.0f };
+	memcpy(&attenuation, &g_lightInfo.kvs.attenuation, sizeof(vec3));
 
 	vec4 fallOff;
 	fallOff.x = cutOn;

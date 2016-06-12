@@ -226,7 +226,8 @@ BOOL RadiantMod_Init()
 	//
 	// Add support for BO1 KVs in the lighting preview
 	// 
-	Detours::X86::DetourFunction((PBYTE)0x00408367, (PBYTE)&mfh_R_BuildLightFromEntity); // Currently defaults to square spot lights
+	Detours::X86::DetourFunction((PBYTE)0x00408367, (PBYTE)&mfh_Ent_BuildLightInfo);
+	Detours::X86::DetourFunction((PBYTE)0x004A814E, (PBYTE)&mfh_Ent_Connect); // Generate the new default spotLight KVs when creating a spotLight
 
 	g_Initted = true;
 	return TRUE;

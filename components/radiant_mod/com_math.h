@@ -1,5 +1,19 @@
 #pragma once
 
+struct vec3
+{
+	union
+	{
+		float data[3];
+		struct
+		{
+			float x;
+			float y;
+			float z;
+		};
+	};
+};
+
 struct vec4
 {
 	union

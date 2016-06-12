@@ -39,12 +39,26 @@ struct GfxLightInfo
 	vec4 fallOffA;
 	vec4 fallOffB;
 
-	float roundness;
-
 	float spotCookieControl[4];
 	float spotFactors[4];
 
 	float spotMatrix[16];
+
+	struct
+	{
+		float roundness;
+
+		float near_edge;
+		float far_edge;
+
+		float cut_on;
+		float falloffdistance;
+
+		vec3 angle;
+		vec3 attenuation;
+
+		vec4 superellipse;
+	} kvs;
 };
 
 typedef int(__cdecl* R_SetLightProperties_t)(float* source, void *light, int def, int hasShadowMap, float spotShadowFade);
