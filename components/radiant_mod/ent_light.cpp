@@ -44,9 +44,12 @@ void Ent_GenerateDefaultSpotLightKVs(void* ent)
 
 	Ent_KV_SetString_IfMissing(ent, "roundness", "1");
 
-	Ent_KV_SetString_IfMissing(ent, "cut_on", "0");
-	Ent_KV_SetString_IfMissing(ent, "near_edge", "0");
-	Ent_KV_SetString_IfMissing(ent, "far_edge", "0");
+	//
+	// Prevent Spamming the Ent Extra KVs
+	//
+	//Ent_KV_SetString_IfMissing(ent, "cut_on", "0");
+	//Ent_KV_SetString_IfMissing(ent, "near_edge", "0");
+	//Ent_KV_SetString_IfMissing(ent, "far_edge", "0");
 
 	Ent_KV_SetString_IfMissing(ent, "falloffdistance", "100");
 
