@@ -7,6 +7,9 @@
 
 static void assert(const char *File, int Line, const char *Format, ...)
 {
+#if RADIANT_MOD
+	return;
+#endif
 	char buffer[4096];
 	char message[4096];
 
@@ -17,6 +20,9 @@ static void assert(const char *File, int Line, const char *Format, ...)
 	sprintf_s(message, "%s(%d):\n\n%s", File, Line, buffer);
 
 	MessageBoxA(nullptr, message, "ASSERTION", MB_ICONERROR);
+
+	if (IsDebuggerPresent())
+		__debugbreak();
 
 	ExitProcess(1);
 }

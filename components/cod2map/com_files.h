@@ -1,5 +1,4 @@
 #pragma once
-#include <fstream>
 
 typedef int (__cdecl FS_ReadFile_t)(const char* qpath, BYTE** buffer);
 static FS_ReadFile_t* FS_ReadFile = (FS_ReadFile_t*)0x00418950;
