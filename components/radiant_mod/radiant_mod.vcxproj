@@ -94,6 +94,7 @@
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="CWinApp.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="ent_light.cpp" />
     <ClCompile Include="nvidia.cpp" />
     <ClCompile Include="q_parse.cpp" />
     <ClCompile Include="r_draw_shadowablelight.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="CWinApp.h" />
+    <ClInclude Include="ent_light.h" />
     <ClInclude Include="nvidia.h" />
     <ClInclude Include="q_parse.h" />
     <ClInclude Include="r_draw_shadowablelight.h" />

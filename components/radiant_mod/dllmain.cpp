@@ -223,6 +223,11 @@ BOOL RadiantMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0053F625, (PBYTE)&mfh_R_SetPassPixelShaderStableArguments);
 
+	//
+	// Add support for BO1 KVs in the lighting preview
+	// 
+	Detours::X86::DetourFunction((PBYTE)0x00408367, (PBYTE)&mfh_R_BuildLightFromEntity); // Currently defaults to square spot lights
+
 	g_Initted = true;
 	return TRUE;
 }

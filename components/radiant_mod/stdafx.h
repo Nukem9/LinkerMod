@@ -76,3 +76,5 @@
 
 #include "r_shade.h"
 #include "r_draw_shadowablelight.h"
+
+#include "ent_light.h"

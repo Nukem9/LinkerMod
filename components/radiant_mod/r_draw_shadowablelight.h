@@ -39,6 +39,8 @@ struct GfxLightInfo
 	vec4 fallOffA;
 	vec4 fallOffB;
 
+	float roundness;
+
 	float spotCookieControl[4];
 	float spotFactors[4];
 

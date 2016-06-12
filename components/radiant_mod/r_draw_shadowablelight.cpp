@@ -97,7 +97,7 @@ void R_BuildSpotLightInfo(float* source, GfxLight* light, float spotShadowFade)
 {
 	ASSERT(light->type == GFX_LIGHT_TYPE_SPOT);
 
-	const float roundness = 1.0f;
+	const float roundness = g_lightInfo.roundness;
 
 	const float cutOn = 0.0f;
 	const float nearEdge = 0.0f;
