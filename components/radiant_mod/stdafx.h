@@ -7,13 +7,10 @@
 #include <intrin.h>
 #include <shellapi.h>
 
-#ifndef RADIANT_MOD
 #define RADIANT_MOD 1
-#endif
-
-#ifndef BO1_SEMI_NATIVE_BUILD
 #define BO1_SEMI_NATIVE_BUILD 1
-#endif
+
+#define RADIANT_USE_AFX_OVERRIDES 0
 
 #define RADIANT_DISABLE_SPAM_MSG_SCAN 1
 #define RADIANT_DISABLE_SPAM_MSG_IMAGE 1
@@ -79,3 +76,6 @@
 
 #include "kvs.h"
 #include "ent_light.h"
+
+#include "afx.h"
+#include "afx_colors.h"

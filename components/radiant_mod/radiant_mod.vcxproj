@@ -89,6 +89,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="afx.cpp" />
     <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
@@ -113,6 +114,8 @@
     <ClCompile Include="xmodel_load_obj.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="afx.h" />
+    <ClInclude Include="afx_colors.h" />
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />

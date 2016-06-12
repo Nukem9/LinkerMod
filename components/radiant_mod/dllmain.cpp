@@ -229,6 +229,10 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00408367, (PBYTE)&mfh_Ent_BuildLightInfo);
 	Detours::X86::DetourFunction((PBYTE)0x004A814E, (PBYTE)&mfh_Ent_Connect); // Generate the new default spotLight KVs when creating a spotLight
 
+#if RADIANT_USE_AFX_OVERRIDES
+	CWnd::OnCtlColor_o = (OnCtlColor_t)Detours::X86::DetourClassFunction((PBYTE)0x0059B96E, &CWnd::OnCtlColor);
+#endif
+
 	g_Initted = true;
 	return TRUE;
 }
