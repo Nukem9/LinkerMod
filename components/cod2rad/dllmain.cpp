@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-static char* techsetPath = "waw_pimp/techsets/%s%s.techset";
-static char* techiquePath = "waw_pimp/techniques/%s.tech";
+static char* techsetPath = "pimp/techsets/%s%s.techset";
+static char* techiquePath = "pimp/techniques/%s.tech";
 
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 {
