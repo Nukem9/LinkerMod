@@ -4,9 +4,9 @@
 #include "../D3DBSP_Lib/D3DBSP_Lib/D3DBSP_Lib.h"
 #include "../D3DBSP_Lib/D3DBSP_Lib/PrimaryLights.h"
 #if _DEBUG
-#pragma comment(lib, "../build/Debug/D3DBSP_Lib.lib")
+#pragma comment(lib, "../../build/Debug/D3DBSP_Lib.lib")
 #else
-#pragma comment(lib, "../build/Release/D3DBSP_Lib.lib")
+#pragma comment(lib, "../../build/Release/D3DBSP_Lib.lib")
 #endif
 
 
