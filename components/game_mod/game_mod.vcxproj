@@ -95,6 +95,7 @@
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="reflection_fix.cpp" />
     <ClCompile Include="r_cinematic.cpp" />
+    <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="ui_main_pc.cpp" />
@@ -111,6 +112,7 @@
     <ClInclude Include="live_win.h" />
     <ClInclude Include="reflection_fix.h" />
     <ClInclude Include="r_cinematic.h" />
+    <ClInclude Include="r_material_load_obj.h" />
     <ClInclude Include="r_reflection_probe.h" />
     <ClInclude Include="r_rendercmds.h" />
     <ClInclude Include="r_scene.h" />

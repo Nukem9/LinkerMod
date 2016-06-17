@@ -42,8 +42,6 @@ void PatchUseFF()
 	PatchMemory(0x0057362A, data, 5);	// nullptr fix
 	PatchMemory(0x00866C92, data, 5);	// ^
 
-
-
 	//
 	// Shaders
 	//
