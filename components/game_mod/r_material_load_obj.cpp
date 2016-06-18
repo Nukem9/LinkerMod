@@ -42,7 +42,13 @@ FILE *Material_OpenShader_BlackOps(const char *shaderTarget, const char *shaderN
 		shaderMain,
 		shaderName);
 
-	return fopen(shaderPath, "rb");
+	FILE* h = NULL;
+	if (fopen_s(&h, shaderPath, "rb") != 0)
+	{
+		return NULL;
+	}
+	
+	return h;
 }
 
 ID3DXBuffer *Material_CompileShader(const char *shaderName, int shaderType, const char *entryPoint, const char *target)
