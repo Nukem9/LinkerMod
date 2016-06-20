@@ -22,6 +22,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cod2map", "components\cod2m
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "path_mod", "components\path_mod\path_mod.vcxproj", "{B6D3B040-AC50-4BA9-BC91-CE5F5DAAF877}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9BA1B1B-9BF9-4365-8A18-531F80C8847F} = {F9BA1B1B-9BF9-4365-8A18-531F80C8847F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setup", "components\setup\setup.vcxproj", "{9146CB30-88C2-40F6-A424-98432160C9A9}"
 EndProject
