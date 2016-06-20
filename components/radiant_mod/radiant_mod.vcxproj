@@ -83,6 +83,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <IgnoreSpecificDefaultLibraries />
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(ProjectDir)/techset_override.csv" "$(TargetDir)/techset_override.csv"</Command>
