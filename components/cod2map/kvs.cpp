@@ -25,7 +25,7 @@ float Ent_KV_Float(void* ent, const char* key, float defaultValue)
 		return defaultValue;
 	}
 
-	return Ent_GetKV_Float(ent, key);
+	return (float)Ent_GetKV_Float(ent, key);
 }
 
 vec3 Ent_KV_Vec3(void* ent, const char* key, vec3 defaultValue)
