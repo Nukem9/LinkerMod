@@ -11,8 +11,10 @@ void PatchUseFF()
 	//
 	// Only apply patch if 'useFastFile 0' was present at launch
 	//
-	if (LaunchArg_NoFF())
+	if (!LaunchArg_NoFF())
+	{
 		return;
+	}
 
 	//
 	// Live_Init
@@ -67,9 +69,9 @@ bool LaunchArg_NoFF(void)
 	{
 		if (_wcsicmp(argv[i], L"useFastFile") == 0 && wcscmp(argv[i + 1], L"0") != 0)
 		{
-			return false;
+			return true;
 		}
 	}
 
-	return true;
+	return false;
 }
