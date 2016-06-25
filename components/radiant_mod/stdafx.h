@@ -11,6 +11,7 @@
 #define BO1_SEMI_NATIVE_BUILD 1
 
 #define RADIANT_USE_AFX_OVERRIDES 0
+#define RADIANT_USE_SPLASH 1
 
 #define RADIANT_DISABLE_SPAM_MSG_SCAN 1
 #define RADIANT_DISABLE_SPAM_MSG_IMAGE 1
@@ -22,6 +23,9 @@
 #else
 #define _VERBOSE(X)
 #endif
+
+#define APP_SPLASH_PATH TEXT("../cod.bmp")
+#define APP_SPLASH_TITLE TEXT("CoDBORadiant")
 
 //
 // Shared files
@@ -52,6 +56,7 @@
 
 #include "CWinApp.h"
 #include "win_main.h"
+#include "win_splash.h"
 
 #include "T5.h"
 #include "com_files.h"
@@ -59,6 +64,7 @@
 #include "com_math.h"
 
 #include "q_parse.h"
+#include "q_project.h"
 #include "xmodel_load_obj.h"
 #include "r_xsurface_load_obj.h"
 

@@ -100,6 +100,7 @@
     <ClCompile Include="kvs.cpp" />
     <ClCompile Include="nvidia.cpp" />
     <ClCompile Include="q_parse.cpp" />
+    <ClCompile Include="q_project.cpp" />
     <ClCompile Include="r_draw_shadowablelight.cpp" />
     <ClCompile Include="r_image.cpp" />
     <ClCompile Include="r_image_load_common.cpp" />
@@ -112,6 +113,7 @@
     <ClCompile Include="r_utils.cpp" />
     <ClCompile Include="r_xsurface_load_obj.cpp" />
     <ClCompile Include="win_main.cpp" />
+    <ClCompile Include="win_splash.cpp" />
     <ClCompile Include="xmodel_load_obj.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +127,7 @@
     <ClInclude Include="kvs.h" />
     <ClInclude Include="nvidia.h" />
     <ClInclude Include="q_parse.h" />
+    <ClInclude Include="q_project.h" />
     <ClInclude Include="r_draw_shadowablelight.h" />
     <ClInclude Include="r_image.h" />
     <ClInclude Include="r_image_load_common.h" />
@@ -139,6 +142,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />
     <ClInclude Include="win_main.h" />
+    <ClInclude Include="win_splash.h" />
     <ClInclude Include="xmodel_load_obj.h" />
   </ItemGroup>
   <ItemGroup>

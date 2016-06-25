@@ -233,6 +233,18 @@ BOOL RadiantMod_Init()
 	CWnd::OnCtlColor_o = (OnCtlColor_t)Detours::X86::DetourClassFunction((PBYTE)0x0059B96E, &CWnd::OnCtlColor);
 #endif
 
+#if RADIANT_USE_SPLASH
+	//
+	// Generate Splash Screen on Launch (WinMain)
+	//
+	rtn_WinMain = Detours::X86::DetourFunction((PBYTE)0x00635355, (PBYTE)&mfh_WinMain, Detours::X86Option::USE_JUMP);
+
+	//
+	// Destroy Splash Screen Upon Entering MessageLoop
+	//
+	Com_LoadProject_o = (Com_LoadProject_t)Detours::X86::DetourFunction((PBYTE)0x0042E9C0, (PBYTE)&Com_LoadProject);
+#endif
+
 	g_Initted = true;
 	return TRUE;
 }
