@@ -243,6 +243,24 @@ BOOL RadiantMod_Init()
 	// Destroy Splash Screen Upon Entering MessageLoop
 	//
 	Com_LoadProject_o = (Com_LoadProject_t)Detours::X86::DetourFunction((PBYTE)0x0042E9C0, (PBYTE)&Com_LoadProject);
+
+	//
+	// Disable the initial SetWindowPlacement call for the corresponding windows
+	// (Used to prevent the windows from showing upon placement, but prevents the placement from being restored from the registry keys)
+	//
+	//PatchMemory_WithNOP(0x0042F87E, 8); // Main Window (Resets the saved placement settings at every launch)
+	PatchMemory_WithNOP(0x004B36DB, 8); // Entity Window
+	PatchMemory_WithNOP(0x004018AC, 8); // Advanced Curve Dialog
+
+	//
+	// Override the initial SetWindowPlacement call for the corresponding windows
+	// (Forces SW_HIDE for SetWindowPlacement, but doesn't always prevent certain windows from displaying)
+	//
+	void* ppfn = &pfn_SetWindowPlacement_Hidden;
+	PatchMemory(0x0042F882, (PBYTE)&ppfn, 4); // Main Window
+	//PatchMemory(0x004B36DF, (PBYTE)&ppfn, 4); // Entity Window (Doesn't work)
+	//PatchMemory(0x004018B0, (PBYTE)&ppfn, 4); // Advanced Curve Dialog (Doesn''t work)
+
 #endif
 
 	g_Initted = true;

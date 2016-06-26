@@ -60,3 +60,9 @@ void __declspec(naked) mfh_WinMain()
 		jmp rtn_WinMain;
 	}
 }
+
+BOOL __stdcall SetWindowPlacement_Hidden(HWND hWnd, WINDOWPLACEMENT *lpwndpl)
+{
+	lpwndpl->showCmd = SW_HIDE;
+	return SetWindowPlacement(hWnd, lpwndpl);
+}
