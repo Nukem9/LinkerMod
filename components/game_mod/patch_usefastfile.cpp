@@ -1,4 +1,6 @@
+#include "patch_common.h"
 #include "patch_usefastfile.h"
+
 #include <shellapi.h>
 
 unsigned __int64 LiveSteam_GetUid()
@@ -15,6 +17,11 @@ void PatchUseFF()
 	{
 		return;
 	}
+
+	//
+	// Prevent overwriting the config file with launch args
+	//
+	Patch_Disable_WriteToConfig();
 
 	//
 	// Live_Init

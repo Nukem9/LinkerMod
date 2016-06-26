@@ -5,6 +5,8 @@
 #include <shellapi.h>
 #include <time.h>
 
+#include "patch_common.h"
+
 char	g_mapName[256];
 bool	g_reflectionsUpdated = false;
 char	g_ffDir[MAX_PATH] = "\0";
@@ -78,6 +80,11 @@ BOOL ReflectionMod_Init()
 {
 	if(!IsReflectionMode())
 		return FALSE;
+
+	//
+	// Prevent overwriting the config file
+	//
+	Patch_Disable_WriteToConfig();
 
 	//
 	// Always force the cursor to be shown
