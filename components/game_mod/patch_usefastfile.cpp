@@ -67,7 +67,7 @@ bool LaunchArg_NoFF(void)
 
 	for (int i = 0; i < argc - 1; i++)
 	{
-		if (_wcsicmp(argv[i], L"useFastFile") == 0 && wcscmp(argv[i + 1], L"0") != 0)
+		if (_wcsicmp(argv[i], L"useFastFile") == 0 && wcscmp(argv[i + 1], L"0") == 0)
 		{
 			return true;
 		}
