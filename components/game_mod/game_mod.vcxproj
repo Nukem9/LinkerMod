@@ -95,7 +95,7 @@
     <ClCompile Include="dvar.cpp" />
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
-    <ClCompile Include="reflection_fix.cpp" />
+    <ClCompile Include="patch_reflections.cpp" />
     <ClCompile Include="r_cinematic.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
@@ -113,7 +113,7 @@
     <ClInclude Include="dvar.h" />
     <ClInclude Include="live_win.h" />
     <ClInclude Include="patch_usefastfile.h" />
-    <ClInclude Include="reflection_fix.h" />
+    <ClInclude Include="patch_reflections.h" />
     <ClInclude Include="r_cinematic.h" />
     <ClInclude Include="r_material_load_obj.h" />
     <ClInclude Include="r_reflection_probe.h" />

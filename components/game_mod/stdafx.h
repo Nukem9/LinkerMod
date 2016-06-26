@@ -35,6 +35,6 @@
 #include "r_reflection_probe.h"
 #include "r_material_load_obj.h"
 
-#include "reflection_fix.h"
+#include "patch_reflections.h"
 
 #define GM_NET_VERSION 0x01
