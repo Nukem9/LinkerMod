@@ -183,7 +183,6 @@ BOOL GameMod_Init()
 	// Increase Asset Limits
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
-	DB_ReallocXAssetPool(ASSET_TYPE_IMAGE, 6000);
 
 	if(IsReflectionMode())
 		ReflectionMod_Init();
