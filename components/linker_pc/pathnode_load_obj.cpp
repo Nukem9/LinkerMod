@@ -1,7 +1,30 @@
 #include "stdafx.h"
 
+const char* g_pathsError = NULL;
+
+void Path_ErasePaths(const char* pathsError)
+{
+	if (!g_pathsError)
+	{
+		g_pathsError = pathsError;
+		for (unsigned int i = 0; i < GameWorldCurrent->path.nodeCount; ++i)
+		{
+			pathnode_t* node = &GameWorldCurrent->path.nodes[i];
+			node->constant.totalLinkCount = 0;
+			node->dynamic.wLinkCount = 0;
+			node->constant.wOverlapNode[0] = -1;
+			node->constant.wOverlapNode[1] = -1;
+			node->constant.wChainParent = -1;
+			node->constant.wChainId = 0;
+			node->constant.wChainDepth = 0;
+		}
+	}
+}
+
 bool Path_LoadPathsInternal()
 {
+	g_pathsError = NULL;
+
 	if (!GameWorldCurrent->path.nodeCount)
 		return true;
 
