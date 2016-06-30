@@ -86,6 +86,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CEG.cpp" />
+    <ClCompile Include="cg_scoreboard.cpp" />
     <ClCompile Include="cl_main_mp.cpp" />
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="common.cpp" />
@@ -105,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CEG.h" />
+    <ClInclude Include="cg_scoreboard.h" />
     <ClInclude Include="cl_main_mp.h" />
     <ClInclude Include="cmd.h" />
     <ClInclude Include="common.h" />

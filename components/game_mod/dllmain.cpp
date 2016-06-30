@@ -184,6 +184,13 @@ BOOL GameMod_Init()
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
 
+	//
+	// Add cg_showServerInfo dvar to show/hide server ip and name in coop scoreboards
+	//
+	CG_RegisterScoreboardDvars_o = (CG_RegisterScoreboardDvars_t)Detours::X86::DetourFunction((PBYTE)0x005C74D0, (PBYTE)&CG_RegisterScoreboardDvars);
+	CL_GetServerIPAddress_o = (CL_GetServerIPAddress_t)Detours::X86::DetourFunction((PBYTE)0x0053BE60, (PBYTE)&CL_GetServerIPAddress);
+	Detours::X86::DetourFunction((PBYTE)0x00890E23, (PBYTE)&mfh_CG_DrawBackdropServerInfo);
+
 	if(IsReflectionMode())
 		ReflectionMod_Init();
 
