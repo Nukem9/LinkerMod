@@ -32,4 +32,10 @@ void GScr_OpenFile();
 //void CGScr_CloseFile();
 void GScr_CloseFile();
 
+//void CScr_FPrintln();
+void GScr_FPrintln();
+
+//void CScr_FPrintFields();
+void GScr_FPrintFields();
+
 void Scr_PatchFunctions();

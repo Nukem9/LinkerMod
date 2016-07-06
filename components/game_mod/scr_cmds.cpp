@@ -13,6 +13,12 @@ void Scr_PatchFunctions()
 
 	ptr = GScr_CloseFile;
 	PatchMemory((ULONG_PTR)&functions[370].actionFunc, (PBYTE)&ptr, 4);
+
+	ptr = GScr_FPrintln;
+	PatchMemory((ULONG_PTR)&functions[371].actionFunc, (PBYTE)&ptr, 4);
+
+	ptr = GScr_FPrintFields;
+	PatchMemory((ULONG_PTR)&functions[372].actionFunc, (PBYTE)&ptr, 4);
 }
 
 void GScr_OpenFile()
@@ -127,4 +133,56 @@ void GScr_CloseFile()
 		}
 		Scr_AddInt(1, SCRIPTINSTANCE_SERVER);
 	}
+}
+
+void __cdecl Scr_FPrint_internal(bool commaBetweenFields)
+{
+	if (Scr_GetNumParam(SCRIPTINSTANCE_SERVER) > 1)
+	{
+		int filenum = Scr_GetInt(0, SCRIPTINSTANCE_SERVER);
+		if (filenum >= 0 && filenum <= 1)
+		{
+			if (level_openScriptIOFileHandles[filenum])
+			{
+				for (int arg = 1; arg < Scr_GetNumParam(SCRIPTINSTANCE_SERVER); ++arg)
+				{
+					const char* s = Scr_GetString(arg, SCRIPTINSTANCE_SERVER);
+					FS_Write(s, strlen(s), level_openScriptIOFileHandles[filenum]);
+					
+					if (commaBetweenFields)
+						FS_Write(",", 1, level_openScriptIOFileHandles[filenum]);
+				}
+				
+				FS_Write("\n", 1, level_openScriptIOFileHandles[filenum]);
+				
+				int val = Scr_GetNumParam(SCRIPTINSTANCE_SERVER);
+				Scr_AddInt(val - 1, SCRIPTINSTANCE_SERVER);
+			}
+			else
+			{
+				Com_Printf(24, "FPrintln failed, file number %i was not open for writing\n", filenum);
+				Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
+			}
+		}
+		else
+		{
+			Com_Printf(24, "FPrintln failed, invalid file number %i\n", filenum);
+			Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
+		}
+	}
+	else
+	{
+		Com_Printf(24, "fprintln requires at least 2 parameters (file, output)\n");
+		Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
+	}
+}
+
+void GScr_FPrintln()
+{
+	Scr_FPrint_internal(0);
+}
+
+void GScr_FPrintFields()
+{
+	Scr_FPrint_internal(1);
 }

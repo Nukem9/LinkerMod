@@ -39,6 +39,9 @@ static FS_FOpenTextFileWrite_t FS_FOpenTextFileWrite = (FS_FOpenTextFileWrite_t)
 typedef void (__cdecl* FS_FCloseFile_t)(int h);
 static FS_FCloseFile_t FS_FCloseFile = (FS_FCloseFile_t)0x0046CAA0;
 
+typedef int (__cdecl* FS_Write_t)(const void *buffer, int len, int h);
+static FS_Write_t FS_Write = (FS_Write_t)0x00401090;
+
 typedef int (__cdecl* FS_Read_t)(void *buffer, int len, int h);
 static FS_Read_t FS_Read = (FS_Read_t)0x004CFB60;
 
