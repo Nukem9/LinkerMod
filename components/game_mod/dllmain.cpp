@@ -96,6 +96,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00600BF0, (PBYTE)0x006707C0);
 
 	//
+	// Patch openfile, closefile
+	//
+	Scr_PatchFunctions();
+
+	//
 	// Add r_showTess
 	//
 	R_DrawXModelSkinnedCached_o = Detours::X86::DetourFunction((PBYTE)0x0073BF30, (PBYTE)hk_R_DrawXModelSkinnedCached);

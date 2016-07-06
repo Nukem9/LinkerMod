@@ -7,6 +7,14 @@ struct XFile
 	unsigned int blockSize[7];
 };
 
+enum fsMode_t
+{
+	FS_READ,
+	FS_WRITE,
+	FS_APPEND,
+	FS_APPEND_SYNC,
+};
+
 enum DESC_TYPE
 {
 	DESC_ERROR = 0,
@@ -21,6 +29,12 @@ extern char dirList[DIRLIST_LEN];
 
 typedef int (__cdecl* FS_FOpenFileRead_t)(const char *filename, int *file);
 static FS_FOpenFileRead_t FS_FOpenFileRead = (FS_FOpenFileRead_t)0x004C6E20;
+
+typedef int (__cdecl* FS_FOpenFileByMode_t)(const char *qpath, int *f, fsMode_t mode);
+static FS_FOpenFileByMode_t FS_FOpenFileByMode = (FS_FOpenFileByMode_t)0x004DD530;
+
+typedef int (__cdecl* FS_FOpenTextFileWrite_t)(const char *filename);
+static FS_FOpenTextFileWrite_t FS_FOpenTextFileWrite = (FS_FOpenTextFileWrite_t)0x004483C0;
 
 typedef void (__cdecl* FS_FCloseFile_t)(int h);
 static FS_FCloseFile_t FS_FCloseFile = (FS_FCloseFile_t)0x0046CAA0;
