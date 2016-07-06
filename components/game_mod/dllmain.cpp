@@ -91,6 +91,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x008A5980, (PBYTE)&hk_Scr_ReadFile);
 	
 	//
+	// Detour GScr_NewDebugHudElem to GScr_NewHudElem
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00600BF0, (PBYTE)0x006707C0);
+
+	//
 	// Add r_showTess
 	//
 	R_DrawXModelSkinnedCached_o = Detours::X86::DetourFunction((PBYTE)0x0073BF30, (PBYTE)hk_R_DrawXModelSkinnedCached);
