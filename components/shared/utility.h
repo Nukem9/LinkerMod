@@ -22,6 +22,25 @@ static void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 	FlushInstructionCache(GetCurrentProcess(), (LPVOID)Address, Size);
 }
 
+//
+// Only supports the 0xE8 opcode
+//
+static void PatchCall(ULONG_PTR instr, PBYTE dest)
+{
+	BYTE* opcode = (BYTE*)instr;
+	ASSERT(*opcode == 0xE8);
+
+	DWORD d = 0;
+	VirtualProtect((LPVOID)instr, 5, PAGE_EXECUTE_READWRITE, &d);
+
+	DWORD newOperand = reinterpret_cast<DWORD>(dest) - reinterpret_cast<DWORD>(opcode + 5);
+	((DWORD*)(opcode + 1))[0] = newOperand;
+
+	VirtualProtect((LPVOID)instr, 5, d, &d);
+
+	FlushInstructionCache(GetCurrentProcess(), (LPVOID)instr, 5);
+}
+
 static void PatchMemory_WithNOP(ULONG_PTR Address, SIZE_T Size)
 {
 	DWORD d = 0;

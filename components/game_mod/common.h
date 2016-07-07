@@ -19,11 +19,13 @@ void Field_Clear(field_t *edit);
 typedef void(__cdecl* Com_Printf_t)(int channel, const char *fmt, ...);
 static Com_Printf_t Com_Printf = (Com_Printf_t)0x0043BF30;
 static Com_Printf_t Com_PrintWarning = (Com_Printf_t)0x0051CE50;
+static Com_Printf_t Com_Error = (Com_Printf_t)0x00651D90;
 
 //
 // Used to print to Launcher's console, as well as the game's console / logfile
 //
 void Com_ToolPrintf(int channel, const char* fmt, ...);
+void Com_ToolError(int channel, const char* fmt, ...);
 
 typedef char *va_t(const char *format, ...);
 static va_t* va = (va_t*)0x0057CDD0;

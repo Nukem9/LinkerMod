@@ -191,6 +191,32 @@ BOOL GameMod_Init()
 	CL_GetServerIPAddress_o = (CL_GetServerIPAddress_t)Detours::X86::DetourFunction((PBYTE)0x0053BE60, (PBYTE)&CL_GetServerIPAddress);
 	Detours::X86::DetourFunction((PBYTE)0x00890E23, (PBYTE)&mfh_CG_DrawBackdropServerInfo);
 
+	//
+	// Allow Path / Node Vis Print Calls to Print to Launcher's Console
+	//
+	PatchCall(0x004C4794, (PBYTE)Com_ToolPrintf); // Connecting paths...
+	PatchCall(0x004C498D, (PBYTE)Com_ToolPrintf); // %d%%\n
+	PatchCall(0x004C49BF, (PBYTE)Com_ToolPrintf); // Connecting paths done.
+	
+	PatchCall(0x004C47AD, (PBYTE)Com_ToolError); // Cannot calculate paths on a map_restart if paths already exist
+	PatchCall(0x004C47CF, (PBYTE)Com_ToolError); // PATH_MAX_NODES (%i) exceeded.  Check log for nodecount
+
+	PatchCall(0x0081705E, (PBYTE)Com_ToolPrintf); // Building node vis...
+	PatchCall(0x008171B0, (PBYTE)Com_ToolPrintf); // %d%%\n
+	PatchCall(0x008172DD, (PBYTE)Com_ToolPrintf); // %d%%\n
+	PatchCall(0x00817303, (PBYTE)Com_ToolPrintf); // Building node vis done.
+
+	//
+	// Improve Clarity of Path / NodeVis Update Messages
+	//
+	const char* msg_pathUpdate = "Connecting paths: %d%%\n";
+	PatchMemory(0x004C4983, (PBYTE)&msg_pathUpdate, 4);
+
+	const char* msg_nodeVisUpdate = "visnode: %d%%\n";
+	PatchMemory(0x008171A6, (PBYTE)&msg_nodeVisUpdate, 4);
+	PatchMemory(0x008172D3, (PBYTE)&msg_nodeVisUpdate, 4);
+
+
 	if(IsReflectionMode())
 		ReflectionMod_Init();
 

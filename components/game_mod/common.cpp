@@ -35,3 +35,16 @@ void Com_ToolPrintf(int channel, const char* fmt, ...)
 	Com_Printf(channel, "%s", msg);
 	printf("%s", msg);
 }
+
+void Com_ToolError(int channel, const char* fmt, ...)
+{
+	char msg[4096];
+
+	va_list va;
+	va_start(va, fmt);
+	_vsnprintf_s(msg, 4096, fmt, va);
+	va_end(va);
+
+	fprintf(stderr, "%s", msg);
+	Com_Error(channel, "%s", msg);
+}
