@@ -41,10 +41,23 @@ void GScr_OpenFile()
 
 		if (f)
 		{
+			char *fullpathname = va("%s/%s", "scriptdata", filename);
+
+			//
+			// Prevent Scripts from Opening Files Outside of the ScriptData Directory
+			//
+			char* possibleRelativePath = strstr(fullpathname, "..");
+			if (possibleRelativePath == fullpathname || (possibleRelativePath[-1] == '/' || possibleRelativePath[-1] == '\\'))
+			{
+				if (possibleRelativePath[2] == '/' || possibleRelativePath[2] == '\\')
+				{
+					Com_Printf(24, "OpenFile failed.  Relative paths are not allowed!\n");
+					Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
+				}
+			}
+
 			if (!strcmp(mode, "read"))
 			{
-				char *fullpathname = va("%s/%s", "scriptdata", filename);
-				
 				int tempFile = NULL;
 				int filesize = FS_FOpenFileByMode(fullpathname, &tempFile, FS_READ);
 
@@ -69,8 +82,7 @@ void GScr_OpenFile()
 			}
 			else if (!strcmp(mode, "write"))
 			{
-				char* qpath = va("%s/%s", "scriptdata", filename);
-				*f = FS_FOpenTextFileWrite(qpath);
+				*f = FS_FOpenTextFileWrite(fullpathname);
 				if (*f)
 					Scr_AddInt(filenum, SCRIPTINSTANCE_SERVER);
 				else
@@ -78,8 +90,7 @@ void GScr_OpenFile()
 			}
 			else if (!strcmp(mode, "append"))
 			{
-				char* qpath = va("%s/%s", "scriptdata", filename);
-				if (FS_FOpenFileByMode(qpath, f, FS_APPEND) >= 0)
+				if (FS_FOpenFileByMode(fullpathname, f, FS_APPEND) >= 0)
 					Scr_AddInt(filenum, SCRIPTINSTANCE_SERVER);
 				else
 					Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
@@ -144,7 +155,7 @@ void __cdecl Scr_FPrint_internal(bool commaBetweenFields)
 		{
 			if (level_openScriptIOFileHandles[filenum])
 			{
-				for (int arg = 1; arg < Scr_GetNumParam(SCRIPTINSTANCE_SERVER); ++arg)
+				for (unsigned int arg = 1; arg < Scr_GetNumParam(SCRIPTINSTANCE_SERVER); ++arg)
 				{
 					const char* s = Scr_GetString(arg, SCRIPTINSTANCE_SERVER);
 					FS_Write(s, strlen(s), level_openScriptIOFileHandles[filenum]);
