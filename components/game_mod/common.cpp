@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <stdarg.h>
 
 void (__cdecl * Com_Init)(char *commandLine);
 
@@ -20,4 +21,17 @@ void Field_Clear(field_t *edit)
 int nullsub(int arg)
 {
 	return 0;
+}
+
+void Com_ToolPrintf(int channel, const char* fmt, ...)
+{
+	char msg[4096];
+
+	va_list va;
+	va_start(va, fmt);
+	_vsnprintf_s(msg, 4096, fmt, va);
+	va_end(va);
+
+	Com_Printf(channel, "%s", msg);
+	printf("%s", msg);
 }

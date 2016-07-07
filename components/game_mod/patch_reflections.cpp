@@ -145,8 +145,8 @@ char* formatTime(int seconds)
 
 void __cdecl R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData, int probeCount, bool *generateProbe)
 {
-	printf("----------------------------------------\n");
-	printf("Compiling reflections...\n");
+	Com_ToolPrintf(0, "----------------------------------------\n");
+	Com_ToolPrintf(0, "Compiling reflections...\n");
 
 	g_probeCount = probeCount;
 
@@ -164,10 +164,10 @@ void __cdecl R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData
 		float elapsedTime = (float)difftime(cTime, initTime);
 		float remainingTime = elapsedTime / percentComplete - elapsedTime;
 
-		printf("%.1f%% complete, %s done, %s remaining\r", percentComplete * 100.0f, formatTime((int)elapsedTime), formatTime((int)remainingTime));
+		Com_ToolPrintf(0, "%.1f%% complete, %s done, %s remaining\r", percentComplete * 100.0f, formatTime((int)elapsedTime), formatTime((int)remainingTime));
 	}
 
-	printf("Finished in %s.\n", formatTime((int)difftime(cTime, initTime)));
+	Com_ToolPrintf(0, "Finished in %s.\n", formatTime((int)difftime(cTime, initTime)));
 	printf("----------------------------------------\n");
 
 	g_reflectionsUpdated = true;
