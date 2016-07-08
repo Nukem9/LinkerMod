@@ -76,11 +76,12 @@ BOOL GameMod_Init()
 	SV_ValidateMap_o = Detours::X86::DetourFunction((PBYTE)0x0041EEC0, (PBYTE)&SV_ValidateMap);
 
 	//
-	// De-restrict Dvar_ForEachConsoleAccessName and
-	// Cmd_ForEachConsoleAccessName
+	// Unrestrict Dvar_ForEachConsoleAccessName,
+	// Cmd_ForEachConsoleAccessName, and Dvar_ListSingle
 	//
-	PatchMemory(0x005F5D4E, (PBYTE)"\x90\x90", 2);
-	PatchMemory(0x00610A94, (PBYTE)"\x90\x90", 2);
+	PatchMemory_WithNOP(0x005F5D4E, 2);
+	PatchMemory_WithNOP(0x00610A94, 2);
+	PatchMemory_WithNOP(0x0082E63C, 6);
 
 	//
 	// Enable the in-game console
