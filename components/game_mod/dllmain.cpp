@@ -17,7 +17,8 @@ BOOL GameMod_Init()
 	// Bypass CEG's code hashes
 	//
 	Patch_CEG();
-	FixupFunction(0x0060CC10, 0x004F20F0);
+	FixupFunction(0x0060CC10, 0x004F20F0);// CEGObfuscate<LiveStats_Init> => LiveStats_Init
+	FixupFunction(0x00580460, 0x0079E6D0);// CEGObfuscate<Con_Restricted_SetLists> => Con_Restricted_SetLists
 
 	PatchUseFF();
 
@@ -46,10 +47,6 @@ BOOL GameMod_Init()
 	//
 	PatchMemory(0x0082C0F9, (PBYTE)"\x01", 1);
 	PatchMemory(0x0082C111, (PBYTE)"\x01", 1);
-
-	// TEMP CEG
-	// 00580460
-	PatchMemory(0x00580460, (PBYTE)"\xC3", 1);
 
 	//
 	// Always force the cursor to be shown
