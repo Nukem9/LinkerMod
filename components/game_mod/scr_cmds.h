@@ -26,10 +26,10 @@ static Scr_GetInt_t Scr_GetInt = (Scr_GetInt_t)0x004C1BB0;
 typedef void (__cdecl* Scr_AddInt_t)(int value, scriptInstance_t inst);
 static Scr_AddInt_t Scr_AddInt = (Scr_AddInt_t)0x0045DBB0;
 
-void CGScr_OpenFile();
+void CScr_OpenFile();
 void GScr_OpenFile();
 
-void CGScr_CloseFile();
+void CScr_CloseFile();
 void GScr_CloseFile();
 
 void CScr_FPrintln();
