@@ -174,10 +174,6 @@ bool Live_IsSignedIn(int controllerIndex)
 	return true;
 }
 
-void DevGui_AddCommand(const char *path, const char *command)
-{
-}
-
 void(*SteamAPI_Init)();
 
 void(*LiveSteam_Init)();
@@ -490,6 +486,10 @@ BOOL ServerMod_Init()
 	PatchMemory_WithNOP(0x0077697B, 7);// UI_SetLoadingScreenMaterial
 	PatchMemory(0x0073EB5B, (PBYTE)"\xEB", 1);// UI_Gametype_IsUsingCustom (SV_GetLicenseType bypass)
 
+	// DevGui
+	PatchMemory_WithNOP(0x0059676F, 7);// DevGui_CreateMenu
+	PatchMemory_WithNOP(0x005970E4, 5);// DevGui_AddGraph
+
 	// FastFile loading
 	PatchMemory_WithNOP(0x0058F101, 2);// DB_Sleep
 	PatchMemory_WithNOP(0x00594227, 2);// DB_SyncExternalAssets
@@ -592,7 +592,6 @@ BOOL ServerMod_Init()
 	Patch_DDL();
 
 	Detours::X86::DetourFunction((PBYTE)0x009908C0, (PBYTE)&Live_IsSignedIn);
-	Detours::X86::DetourFunction((PBYTE)0x00596EB0, (PBYTE)&DevGui_AddCommand);
 
 	*(uint8_t **)&LiveSteam_Init = Detours::X86::DetourFunction((PBYTE)0x0097D9E0, (PBYTE)&hk_LiveSteam_Init);
 
