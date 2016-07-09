@@ -23,6 +23,11 @@ void Scr_PatchFunctions()
 
 void GScr_OpenFile()
 {
+	if (!(*developer)->current.enabled || !(*developer_script)->current.enabled)
+	{
+		Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
+	}
+
 	int* f = 0;
 	if (Scr_GetNumParam(SCRIPTINSTANCE_SERVER) > 1)
 	{
@@ -111,6 +116,11 @@ void GScr_OpenFile()
 
 void GScr_CloseFile()
 {
+	if (!(*developer)->current.enabled || !(*developer_script)->current.enabled)
+	{
+		Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
+	}
+
 	if (Scr_GetNumParam(SCRIPTINSTANCE_SERVER))
 	{
 		int filenum = Scr_GetInt(0, SCRIPTINSTANCE_SERVER);
@@ -148,6 +158,11 @@ void GScr_CloseFile()
 
 void __cdecl Scr_FPrint_internal(bool commaBetweenFields)
 {
+	if (!(*developer)->current.enabled || !(*developer_script)->current.enabled)
+	{
+		Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
+	}
+
 	if (Scr_GetNumParam(SCRIPTINSTANCE_SERVER) > 1)
 	{
 		int filenum = Scr_GetInt(0, SCRIPTINSTANCE_SERVER);
