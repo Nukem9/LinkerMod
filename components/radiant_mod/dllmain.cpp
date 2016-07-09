@@ -214,7 +214,7 @@ BOOL RadiantMod_Init()
 #endif
 
 	//
-	// Remap Statemap GE255 DepthTest -> GE128
+	// Remap Statemap GE255 DepthTest -> LT128
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0052D1B8, (PBYTE)&mfh_Material_ParseValueForState);
 

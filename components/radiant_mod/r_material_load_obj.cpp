@@ -267,12 +267,12 @@ void __cdecl hk_MaterialValueForState(const char* token)
 {
 	if ( strcmp(token, "GE255") == 0 )
 	{
-		strcpy((char*)token, "GE128");
+		strcpy((char*)token, "LT128");
 	}
 }
 
 //
-// Override GE255 DepthTest to use GE128
+// Override GE255 DepthTest to use LT128
 //
 void* rtn_Material_ParseValueForState = (void*)0x0052D1BE;
 void __declspec(naked) mfh_Material_ParseValueForState() //0052D1B8
