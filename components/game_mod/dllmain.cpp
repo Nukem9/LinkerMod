@@ -179,6 +179,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x005A1732, (PBYTE)&mfh_RuntimeError);
 
 	//
+	// Add com_cfg_readOnly dvar - to allow prevention of writing to the config
+	//
+	Patch_WriteToConfig();
+
+	//
 	// Don't allow `openmenu main` unless the one following conditions are met:
 	// 1: The player is not in a server
 	// 2: The player is on a server with no map loaded

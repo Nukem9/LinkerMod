@@ -63,3 +63,8 @@ static FS_FreeFileList_t FS_FreeFileList = (FS_FreeFileList_t)0x0067DFE0;
 unsigned int __cdecl FS_ReadModDescription(void *ptr, unsigned int len, struct _iobuf *stream);
 
 int __cdecl FS_GetModList(char *listbuf, int bufsize);
+
+//
+// Used only by Com_WriteConfigToFile and Com_WriteKeyConfigToFile
+//
+int __cdecl FS_FOpenFileWriteToDir(const char *filename, const char *dir, const char *osbasepath);

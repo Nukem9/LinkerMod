@@ -157,6 +157,8 @@ VANILLA_DVAR(sys_sysMB, 0x0276DAEC);
 VANILLA_DVAR(sys_gpu, 0x0276D9E4);
 VANILLA_DVAR(sys_configSum, 0x0276F558);
 
+VANILLA_DVAR(showVisionSetDebugInfo, 0x00C23D40);
+
 extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;
 extern dvar_s* radiant_liveDebug;
@@ -172,11 +174,8 @@ extern dvar_s* r_renderSun;
 extern dvar_s* r_renderReflected;
 extern dvar_s* r_renderCloakHDR;
 
-VANILLA_DVAR(showVisionSetDebugInfo, 0x00C23D40);
-
-static dvar_s **developer = (dvar_s **)0x0243FCA0;
-static dvar_s **developer_script = (dvar_s **)0x02481714;
-
+extern bool com_cfg_readOnly_default;
+extern dvar_s* com_cfg_readOnly;
 
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;

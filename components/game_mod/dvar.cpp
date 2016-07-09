@@ -29,6 +29,9 @@ dvar_s* r_renderSun = NULL;
 dvar_s* r_renderReflected = NULL;
 dvar_s* r_renderCloakHDR = NULL;
 
+bool com_cfg_readOnly_default = false;
+dvar_s* com_cfg_readOnly = NULL;
+
 const char* r_showTessNames[] =
 {
 	"off",
@@ -69,6 +72,7 @@ void R_RegisterCustomDvars()
 	PatchMemory(0x00735361, (PBYTE)&smResPower, 1);
 
 	r_showTess = Dvar_RegisterEnum("r_showTess", r_showTessNames, 0, 0x80u, "Show details for each surface");
+	com_cfg_readOnly = Dvar_RegisterInt("com_cfg_readOnly", com_cfg_readOnly_default ? 1 : 0, 0, 1, 0x2001, "Prevent writing to the config");
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;

@@ -122,3 +122,14 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize)
 	FS_FreeFileList((const char**)pFiles, 0);
 	return nMods;
 }
+
+typedef int(__cdecl* FS_FOpenFileWriteToDir_t)(const char *filename, const char *dir, const char *osbasepath);
+FS_FOpenFileWriteToDir_t FS_FOpenFileWriteToDir_o = (FS_FOpenFileWriteToDir_t)0x00625D90;
+
+int __cdecl FS_FOpenFileWriteToDir(const char *filename, const char *dir, const char *osbasepath)
+{
+	if (com_cfg_readOnly && com_cfg_readOnly->current.enabled)
+		return 0;
+
+	return FS_FOpenFileWriteToDir_o(filename, dir, osbasepath);
+}

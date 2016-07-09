@@ -1,11 +1,5 @@
 #pragma once
-
-enum scriptInstance_t
-{
-	SCRIPTINSTANCE_SERVER = 0x0,
-	SCRIPTINSTANCE_CLIENT = 0x1,
-	SCRIPT_INSTANCE_MAX = 0x2,
-};
+#include "cscr_parser.h"
 
 struct BuiltinFunctionDef
 {
