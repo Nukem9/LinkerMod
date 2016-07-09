@@ -72,8 +72,8 @@ void CScr_OpenFile()
 			//
 			// Prevent Scripts from Opening Files Outside of the ScriptData Directory
 			//
-			char* possibleRelativePath = strstr(fullpathname, "..");
-			if (possibleRelativePath == fullpathname || (possibleRelativePath[-1] == '/' || possibleRelativePath[-1] == '\\'))
+			char* possibleRelativePath = strstr((char*)filename, "..");
+			if (possibleRelativePath == filename && strlen(possibleRelativePath) >= 3)
 			{
 				if (possibleRelativePath[2] == '/' || possibleRelativePath[2] == '\\')
 				{
@@ -165,8 +165,8 @@ void GScr_OpenFile()
 			//
 			// Prevent Scripts from Opening Files Outside of the ScriptData Directory
 			//
-			char* possibleRelativePath = strstr(fullpathname, "..");
-			if (possibleRelativePath == fullpathname || (possibleRelativePath[-1] == '/' || possibleRelativePath[-1] == '\\'))
+			char* possibleRelativePath = strstr((char*)filename, "..");
+			if (possibleRelativePath == filename && strlen(possibleRelativePath) >= 3)
 			{
 				if (possibleRelativePath[2] == '/' || possibleRelativePath[2] == '\\')
 				{
