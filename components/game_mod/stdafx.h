@@ -39,6 +39,7 @@
 
 #include "win_localize.h"
 #include "win_exception.h"
+#include "win_common.h"
 
 #include "patch_reflections.h"
 

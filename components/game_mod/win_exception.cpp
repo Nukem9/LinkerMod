@@ -4,9 +4,6 @@
 
 #include <iostream>
 
-#define EXCEPTION_STR_MAXLEN 8192
-#define EXCEPTION_STACKTRACE_MAXFRAMECOUNT 32
-
 static_assert(EXCEPTION_STACKTRACE_MAXFRAMECOUNT < 63, "EXCEPTION_STACKTRACE_MAXFRAMECOUNT must be less than 63 to support Windows XP");
 
 char g_ExceptionStr[EXCEPTION_STR_MAXLEN];
@@ -199,3 +196,4 @@ int __cdecl PrivateUnhandledExceptionFilter(_EXCEPTION_POINTERS *ExceptionInfo)
 	Com_Error(0, g_ExceptionStr);
 	return 1;
 }
+

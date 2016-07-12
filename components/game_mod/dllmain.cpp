@@ -26,7 +26,10 @@ BOOL GameMod_Init()
 	void* ptr = PrivateUnhandledExceptionFilter;
 	PatchMemory(0x0050A7B0, (PBYTE)&ptr, 4);
 
-	PatchUseFF();
+	//
+	// Add stack trace info to Sys_OutOfMemErrorInternal
+	//
+	Detours::X86::DetourFunction((PBYTE)0x004CFC30, (PBYTE)&Sys_OutOfMemErrorInternal, Detours::X86Option::USE_JUMP);
 
 	//
 	// Sys_CheckCrashOrRerun, EAX = TRUE
@@ -220,6 +223,7 @@ BOOL GameMod_Init()
 	PatchMemory(0x008171A6, (PBYTE)&msg_nodeVisUpdate, 4);
 	PatchMemory(0x008172D3, (PBYTE)&msg_nodeVisUpdate, 4);
 
+	PatchUseFF();
 
 	if(IsReflectionMode())
 		ReflectionMod_Init();
