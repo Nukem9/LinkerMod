@@ -20,6 +20,12 @@ BOOL GameMod_Init()
 	FixupFunction(0x0060CC10, 0x004F20F0);// CEGObfuscate<LiveStats_Init> => LiveStats_Init
 	FixupFunction(0x00580460, 0x0079E6D0);// CEGObfuscate<Con_Restricted_SetLists> => Con_Restricted_SetLists
 
+	//
+	// Enable custom exception filter 
+	//
+	void* ptr = PrivateUnhandledExceptionFilter;
+	PatchMemory(0x0050A7B0, (PBYTE)&ptr, 4);
+
 	PatchUseFF();
 
 	//

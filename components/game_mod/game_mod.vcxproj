@@ -103,6 +103,7 @@
     <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="ui_main_pc.cpp" />
+    <ClCompile Include="win_exception.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CEG.h" />
@@ -128,6 +129,8 @@
     <ClInclude Include="sv_ccmds_mp.h" />
     <ClInclude Include="sys_cmds.h" />
     <ClInclude Include="ui_main_pc.h" />
+    <ClInclude Include="win_exception.h" />
+    <ClInclude Include="win_localize.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -37,6 +37,9 @@
 #include "r_reflection_probe.h"
 #include "r_material_load_obj.h"
 
+#include "win_localize.h"
+#include "win_exception.h"
+
 #include "patch_reflections.h"
 
 #define GM_NET_VERSION 0x01
