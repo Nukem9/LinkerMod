@@ -74,6 +74,20 @@ union DvarLimits
 	} vector;
 };
 
+enum dvarFlags_t
+{
+	DVAR_ARCHIVED = 0x1, //seta
+	DVAR_UPDATE = 0x2, //setu
+	DVAR_S = 0x4, //sets
+	DVAR_CHEAT = 0x80,
+	DVAR_CHANGEABLE_RESET = 0x200,
+	DVAR_SERVER_INFO = 0x500,
+	DVAR_SAVED = 0x1000,
+	DVAR_EXTERNAL = 0x4000,
+	DVAR_AUTOEXEC = 0x8000,
+	DVAR_ADMIN = 0x10000,
+};
+
 struct dvar_s
 {
 	const char *name;
