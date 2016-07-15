@@ -24,6 +24,45 @@ struct XZoneInfoInternal
 	int flags;
 };
 
+enum XZoneFlags
+{
+	DB_ZONE_NULL				= 0,
+	DB_ZONE_CODE				= 1 << 0,	// 0x1,
+	DB_ZONE_CODE_LOC			= 1 << 1,	// 0x2,
+	DB_ZONE_DEV					= 1 << 2,	// 0x4, (IN SP: DB_ZONE_DEV == DB_ZONE_DEV_LOC )
+	DB_ZONE_DEV_LOC				= 1 << 2,	// 0x4,
+	DB_ZONE_PATCH				= 1 << 3,	// 0x8,
+	DB_ZONE_PATCH_LOC			= 1 << 4,	// 0x10,
+	DB_ZONE_MOD					= 1 << 5,	// 0x20,
+	DB_ZONE_MOD_LOC				= 1 << 6,	// 0x40,
+	DB_ZONE_COMMON				= 1 << 7,	// 0x80,
+	DB_ZONE_COMMON_LOC			= 1 << 8,	// 0x100,
+	DB_ZONE_FFOTD				= 1 << 9,	// 0x200,
+	DB_ZONE_FFOTD_LOC			= 1 << 10,	// 0x400,
+	DB_ZONE_LEVELCOMMON			= 1 << 11,	// 0x800,
+	DB_ZONE_LEVELCOMMON_LOC		= 1 << 12,	// 0x1000,
+	DB_ZONE_LEVEL				= 1 << 13,	// 0x2000,
+	DB_ZONE_LEVEL_LOC			= 1 << 14,	// 0x4000,
+	DB_ZONE_LEVELOVERLAY		= 1 << 15,	// 0x8000,
+	DB_ZONE_LEVELOVERLAY_LOC	= 1 << 16,	// 0x10000,
+	DB_ZONE_GUMP				= 1 << 17,	// 0x20000,
+	DB_ZONE_GUMP_LOC			= 1 << 18,	// 0x40000,
+	DB_ZONE_LOW_MARKER			= 1 << 19,	// 0x80000,
+	DB_ZONE_MYCHANGES_LOC		= 1 << 20,	// 0x100000,
+	DB_ZONE_MYCHANGES			= 1 << 21,	// 0x200000,
+	DB_ZONE_UI_VIEWER_LOC		= 1 << 22,	// 0x400000,
+	DB_ZONE_UI_VIEWER			= 1 << 23,	// 0x800000,
+	DB_ZONE_FRONTEND_LOC		= 1 << 24,	// 0x1000000,
+	DB_ZONE_FRONTEND			= 1 << 25,	// 0x2000000,
+	DB_ZONE_HIGH_MARKER			= 1 << 26,	// 0x4000000,
+	DB_ZONE_LOAD				= 1 << 27,	// 0x8000000,
+
+	DB_FLAG_NULL				= 0,
+	DB_FLAG_RSTREAM				= 1 << 30,	// 0x40000000,
+	DB_FLAG_STRICTFREE			= 1 << 31,	// 0x80000000,
+};
+
+
 struct XZoneInfo
 {
 	const char *name;
