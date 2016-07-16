@@ -187,16 +187,19 @@ BOOL GameMod_Init()
 	PatchMemory(0x00700492, (PBYTE)&msg_assertion, 4);
 
 	//
-	// Increase Asset Limits
-	//
-	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
-
-	//
 	// Add cg_showServerInfo dvar to show/hide server ip and name in coop scoreboards
 	//
 	CG_RegisterScoreboardDvars_o = (CG_RegisterScoreboardDvars_t)Detours::X86::DetourFunction((PBYTE)0x005C74D0, (PBYTE)&CG_RegisterScoreboardDvars);
 	CL_GetServerIPAddress_o = (CL_GetServerIPAddress_t)Detours::X86::DetourFunction((PBYTE)0x0053BE60, (PBYTE)&CL_GetServerIPAddress);
 	Detours::X86::DetourFunction((PBYTE)0x00890E23, (PBYTE)&mfh_CG_DrawBackdropServerInfo);
+
+	//
+	// Increase PMem size
+	//
+	unsigned int pmemSize = 0x12C00000 * 2;
+	PatchMemory(0x00612302, (PBYTE)&pmemSize, 4);
+	PatchMemory(0x00612341, (PBYTE)&pmemSize, 4);
+	PatchMemory(0x0061234B, (PBYTE)&pmemSize, 4);
 
 	//
 	// Allow Path / Node Vis Print Calls to Print to Launcher's Console
@@ -222,6 +225,11 @@ BOOL GameMod_Init()
 	const char* msg_nodeVisUpdate = "visnode: %d%%\n";
 	PatchMemory(0x008171A6, (PBYTE)&msg_nodeVisUpdate, 4);
 	PatchMemory(0x008172D3, (PBYTE)&msg_nodeVisUpdate, 4);
+
+	//
+	// Increase Asset Limits
+	//
+	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
 
 	PatchUseFF();
 
