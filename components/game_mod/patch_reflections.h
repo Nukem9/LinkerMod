@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include "r_reflection_probe.h"
 
 struct DiskGfxCubemap256
 {

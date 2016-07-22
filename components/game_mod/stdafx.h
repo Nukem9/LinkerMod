@@ -43,4 +43,6 @@
 
 #include "patch_reflections.h"
 
+#include "reshade.h"
+
 #define GM_NET_VERSION 0x01

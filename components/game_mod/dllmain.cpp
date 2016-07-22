@@ -233,8 +233,11 @@ BOOL GameMod_Init()
 
 	PatchUseFF();
 
-	if(IsReflectionMode())
-		ReflectionMod_Init();
+	//
+	// Initialize either reflection mode or ReShade compatibility
+	// depending on whether or not reflections are going to be calculated
+	//
+	IsReflectionMode() ? ReflectionMod_Init() : ReShade_Init();
 
 	g_initted = true;
 	return TRUE;
@@ -249,6 +252,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
+		ReShade_Free();
 		if (ReflectionsWereUpdated() && IsInjectionMode())
 			return InjectReflections();
 	}
