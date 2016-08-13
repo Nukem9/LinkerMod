@@ -46,13 +46,13 @@ void Ent_GenerateDefaultSpotLightKVs(void* ent)
 	//
 	//Ent_KV_SetString_IfMissing(ent, "cut_on", "0");
 	//Ent_KV_SetString_IfMissing(ent, "near_edge", "0");
-	//Ent_KV_SetString_IfMissing(ent, "far_edge", "0");
+	//Ent_KV_SetString_IfMissing(ent, "far_edge", "0.95");
 
 	//Ent_KV_SetString_IfMissing(ent, "falloffdistance", "100");
 
 	//Ent_KV_SetString_IfMissing(ent, "angle", "0 0 0");
 	Ent_KV_SetString_IfMissing(ent, "attenuation", "1 0 0");
-	Ent_KV_SetString_IfMissing(ent, "superellipse", "0 1 0 1");
+	Ent_KV_SetString_IfMissing(ent, "superellipse", "0.75 1 0.75 1");
 }
 
 void* rtn_Ent_Connect = (void*)0x004A81AB;
