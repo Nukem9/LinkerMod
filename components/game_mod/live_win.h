@@ -56,6 +56,8 @@ struct MatchMakingInfo
   int m_membertimesincelastupdate;
 };
 
+extern const int g_protocolVersion;
+
 typedef void __cdecl Session_Modify_t(const int localControllerIndex, void *session, const int flags, const int publicSlots, const int privateSlots);
 extern Session_Modify_t* Session_Modify;
 

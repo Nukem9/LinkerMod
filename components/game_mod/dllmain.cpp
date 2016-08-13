@@ -160,6 +160,19 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x008B3250, (PBYTE)&SV_UpdateCategory);
 
 	//
+	// Update protocol version (3141 -> 3142)
+	//
+	
+	PatchMemory(0x005705FE, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x006983CF, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x006983D4, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x006983D9, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x00458EEA, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x0056F8D8, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x004DA935, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x004BA33E, (PBYTE)&g_protocolVersion, 4);
+
+	//
 	// Nullify Sys_SetBlockSystemHotkeys (SetWindowsHookExA blocking)
 	//
 	PatchMemory(0x0040B397, (PBYTE)"\xEB", 1);

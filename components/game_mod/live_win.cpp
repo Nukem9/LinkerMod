@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+const int g_protocolVersion = 3142;
+
 MatchMakingInfo* mminfo = nullptr;
 
 void* Live_PartyHandler = (void*)0x005C2570;
