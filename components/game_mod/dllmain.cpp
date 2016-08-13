@@ -155,6 +155,11 @@ BOOL GameMod_Init()
 	PatchMemory_WithNOP(0x004521EE, 0x13);
 
 	//
+	// Prevent joining a public (vanilla) lobby
+	//
+	Detours::X86::DetourFunction((PBYTE)0x008B3250, (PBYTE)&SV_UpdateCategory);
+
+	//
 	// Nullify Sys_SetBlockSystemHotkeys (SetWindowsHookExA blocking)
 	//
 	PatchMemory(0x0040B397, (PBYTE)"\xEB", 1);

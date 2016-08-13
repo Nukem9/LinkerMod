@@ -15,9 +15,14 @@ void __cdecl Session_Modify_Fix(const int localControllerIndex, void *session, c
 	
 	g_matchmakingInfo->m_membermod[0] = GM_NET_VERSION;
 	sprintf_s(g_matchmakingInfo->m_membermod + 1, 32, "%.*s", 30, Dvar_GetString("fs_game"));
-	//printf("Settings membermod to %s using net version %d\n",Dvar_GetString("fs_game"), LM_NET_VERSION);
+	//printf("Setting membermod to %s using net version %d\n",Dvar_GetString("fs_game"), LM_NET_VERSION);
 
 	return Session_Modify(localControllerIndex, session, flags, publicSlots, privateSlots);
+}
+
+int SV_UpdateCategory()
+{
+	return 0;
 }
 
 int Live_ClientModMatchesServerMod()
