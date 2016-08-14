@@ -248,7 +248,9 @@ BOOL GameMod_Init()
 	// Increase Asset Limits
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
-	void* g_GfxImagePool_entries = (PBYTE)(DB_ReallocXAssetPool(ASSET_TYPE_IMAGE, 4096)) + 4;
+
+	int g_GfxImagePoolSize = LaunchArg_NoFF() ? 6000 : 4096;
+	void* g_GfxImagePool_entries = (PBYTE)(DB_ReallocXAssetPool(ASSET_TYPE_IMAGE, g_GfxImagePoolSize)) + 4;
 	PatchMemory(0x004561D8, (PBYTE)&g_GfxImagePool_entries, 4); // DB_GetImageAtIndex
 	PatchMemory(0x005A1DC6, (PBYTE)&g_GfxImagePool_entries, 4); // DB_GetImageIndex
 

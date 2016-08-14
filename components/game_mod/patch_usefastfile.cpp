@@ -65,11 +65,6 @@ void PatchUseFF()
 	// Force multithreaded D3D device
 	//
 	PatchMemory_WithNOP(0x006B784D, 2);			// R_CreateDevice
-
-	//
-	// Increase the size of the image asset pool (can cause blurry textures or crash custom maps when loading from FF)
-	//
-	DB_ReallocXAssetPool(ASSET_TYPE_IMAGE, 6000);
 }
 
 bool LaunchArg_NoFF(void)
