@@ -162,15 +162,33 @@ BOOL GameMod_Init()
 	//
 	// Update protocol version (3141 -> 3142)
 	//
-	
-	PatchMemory(0x005705FE, (PBYTE)&g_protocolVersion, 4);
-	PatchMemory(0x006983CF, (PBYTE)&g_protocolVersion, 4);
-	PatchMemory(0x006983D4, (PBYTE)&g_protocolVersion, 4);
-	PatchMemory(0x006983D9, (PBYTE)&g_protocolVersion, 4);
-	PatchMemory(0x00458EEA, (PBYTE)&g_protocolVersion, 4);
-	PatchMemory(0x0056F8D8, (PBYTE)&g_protocolVersion, 4);
-	PatchMemory(0x004DA935, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x00458EEA, (PBYTE)&g_protocolVersion, 4); // SV_DirectConnect
+	PatchMemory(0x00458F2C, (PBYTE)&g_protocolVersion, 4); // SV_DirectConnect
 	PatchMemory(0x004BA33E, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x004DA935, (PBYTE)&g_protocolVersion, 4); // CL_ServerInfoPacket
+	PatchMemory(0x0051E2D6, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x0051E302, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x0056F8D8, (PBYTE)&g_protocolVersion, 4); // SVC_Info
+	PatchMemory(0x005705FE, (PBYTE)&g_protocolVersion, 4); // Session_StartHost
+	PatchMemory(0x00573176, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x005735FA, (PBYTE)&g_protocolVersion, 4); // dwLobbyEventHandler::onSessionStarted
+	PatchMemory(0x00573601, (PBYTE)&g_protocolVersion, 4); // dwLobbyEventHandler::onSessionStarted
+	PatchMemory(0x0059B20B, (PBYTE)&g_protocolVersion, 4); // Party_Awake
+	PatchMemory(0x0059B27D, (PBYTE)&g_protocolVersion, 4); // Party_Awake
+	PatchMemory(0x0059B29C, (PBYTE)&g_protocolVersion, 4); // Party_Awake
+
+	PatchMemory(0x0060EAB9, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x0065A2EE, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x00675AE9, (PBYTE)&g_protocolVersion, 4);
+	PatchMemory(0x006983CF, (PBYTE)&g_protocolVersion, 4); // SV_Init
+	PatchMemory(0x006983D4, (PBYTE)&g_protocolVersion, 4); // SV_Init
+	PatchMemory(0x006983D9, (PBYTE)&g_protocolVersion, 4); // SV_Init
+
+	PatchMemory(0x0088CDD5, (PBYTE)&g_protocolVersion, 4); // JoinParty_f
+	PatchMemory(0x0088CDDD, (PBYTE)&g_protocolVersion, 4); // JoinParty_f
+	PatchMemory(0x008B333B, (PBYTE)&g_protocolVersion, 4);
+
+	// 0x0057360E // A hook can be placed here to provide a notification when users attempt to invite you to a vanilla lobby
 
 	//
 	// Nullify Sys_SetBlockSystemHotkeys (SetWindowsHookExA blocking)
