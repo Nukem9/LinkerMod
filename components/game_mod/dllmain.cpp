@@ -107,7 +107,7 @@ BOOL GameMod_Init()
 	//
 	// CL_Vid_Restart_Complete_f black screen fix
 	//
-	char *data = "vid_restart_complete; wait; map frontend;\n";
+	char *data = "zombiemode 0; vid_restart_complete; wait; map frontend;\n";
 	PatchMemory(0x0045CD78, (PBYTE)&data, 4);
 
 	//
