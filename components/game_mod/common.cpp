@@ -48,3 +48,125 @@ void Com_ToolError(int channel, const char* fmt, ...)
 	fprintf(stderr, "%s", msg);
 	Com_Error(channel, "%s", msg);
 }
+
+char *__cdecl Com_GetLevelSharedFastFile(const char *mapName)
+{
+	char loadBuffer[16384];
+
+	int& gLevelDependenciesInited = *(int*)0x02487BE8;
+	int& gLevelDependenciesCount = *(int*)0x02487BE4;
+	auto gLevelDependencies = *(char(*)[16][2][64])0x02480F08;
+
+	if (!gLevelDependenciesInited)
+	{
+		gLevelDependenciesInited = 1;
+		const char* buffer = Com_LoadInfoString("level_dependencies.csv", "level_dependency_info", "", loadBuffer);
+		Com_BeginParseSession("level_dependencies.csv");
+		Com_SetCSV(1);
+		while (1)
+		{
+			const char* token = Com_Parse(&buffer);
+			
+			if (!*token)
+				break;
+
+			if (*token != '/')
+			{
+				if (gLevelDependenciesCount >= 16)
+				{
+					Com_PrintWarning(10, "Failed to load level dependencies: Max is %d\n", 16);
+				}
+				else
+				{
+					I_strncpyz(gLevelDependencies[gLevelDependenciesCount][0], token, 64);
+					token = Com_Parse(&buffer);
+					I_strncpyz(gLevelDependencies[gLevelDependenciesCount][1], token, 64);
+					gLevelDependenciesCount++;
+				}
+			}
+			else
+			{
+				//
+				// Skip the rest of the line if the token was a comment
+				//
+				Com_ParseRestOfLine(&buffer);
+			}
+		}
+		Com_EndParseSession();
+	}
+
+	for (int i = 0; i < gLevelDependenciesCount; ++i)
+	{
+		if (!I_strcmp(gLevelDependencies[i][0], mapName))
+			return gLevelDependencies[i][1];
+	}
+
+	return NULL;
+}
+
+void __cdecl Com_LoadLevelFastFiles(const char *mapName)
+{
+	int zoneCount = 0;
+	XZoneInfo zoneInfo[5];
+
+	DB_ResetZoneSize(0);
+	UI_SetLoadingScreenMaterial(mapName);
+
+	if (I_stristr(mapName, "zombietron"))
+	{
+		dvar_s* zombiemode = *(dvar_s**)(0x0243FDD4);
+		dvar_s* zombietron = *(dvar_s**)(0x0247FDE8);
+
+		Dvar_SetBool(zombiemode, 1);
+		Dvar_SetBool(zombietron, 1);
+	}
+
+	if (!I_strnicmp(mapName, "menu_", 5) || !I_strcmp(mapName, "frontend"))
+	{
+		zoneInfo[zoneCount].name = "patch_ui";
+		zoneInfo[zoneCount].allocFlags = 0x4000000;
+		zoneInfo[zoneCount++].freeFlags = 0;
+	}
+
+	if (I_strnicmp(mapName, "menu_", 5) && I_strcmp(mapName, "frontend"))
+	{
+		Com_LoadCommonFastFile();
+	}
+	
+	char* levelSharedFastFile = Com_GetLevelSharedFastFile(mapName);
+	if (levelSharedFastFile)
+	{
+		zoneInfo[zoneCount].name = levelSharedFastFile;
+		zoneInfo[zoneCount].allocFlags = 0x800;
+		zoneInfo[zoneCount++].freeFlags = 0;
+	}
+
+	char specOpsZoneName[64];
+	if (!I_strncmp("so_", mapName, strlen("so_")))
+	{
+		const char* basename = NULL;
+		for (basename = &mapName[strlen("so_")]; *basename && *basename != '_'; ++basename) {};
+
+		if (!*basename)
+			Com_PrintError(1, "Bad specop level name\n");
+
+		sprintf_s(specOpsZoneName, 64, "%s", basename + 1);
+		zoneInfo[zoneCount].name = specOpsZoneName;
+		zoneInfo[zoneCount].allocFlags = 0x800;
+		zoneInfo[zoneCount++].freeFlags = 0;
+	}
+
+	int allocFlags = 0x0;
+	if (I_strnicmp(mapName, "menu_", 5) && I_strcmp(mapName, "frontend"))
+		allocFlags = I_strncmp("so_", mapName, 3) != 0 ? 0x800 : 0x4000;
+	else
+		allocFlags = 0x2000000;
+
+	zoneInfo[zoneCount].allocFlags = allocFlags;
+	zoneInfo[zoneCount].name = mapName;
+	zoneInfo[zoneCount++].freeFlags = 0;
+
+	R_BeginRemoteScreenUpdate();
+	DB_LoadXAssets(zoneInfo, zoneCount, 0);
+	R_EndRemoteScreenUpdate(NULL);
+}

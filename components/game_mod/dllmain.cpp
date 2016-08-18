@@ -136,6 +136,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
 
 	//
+	// Enable the use of level_dependencies.csv
+	//
+	PatchMemory_WithNOP(0x0082CA3B, 6);
+	Detours::X86::DetourFunction((PBYTE)0x004C8890, (PBYTE)&Com_LoadLevelFastFiles);
+
+	//
 	// DB_LoadGraphicsAssetsForPC hook to automatically attempt to load frontend_patch.ff
 	// which is can be used to enable the mods button on the main menu
 	//

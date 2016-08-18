@@ -73,11 +73,14 @@ static DB_LoadXAssets_t DB_LoadXAssets = (DB_LoadXAssets_t)0x00631B10;
 typedef bool (__cdecl* DB_ModFileExists_t)();
 static DB_ModFileExists_t DB_ModFileExists = (DB_ModFileExists_t)0x005EEBF0;
 
-typedef void (__cdecl* R_BeginRemoveScreenUpdate_t)();
-static R_BeginRemoveScreenUpdate_t R_BeginRemoveScreenUpdate = (R_BeginRemoveScreenUpdate_t)0x006D7E60;
+typedef void (__cdecl* DB_ResetZoneSize_t)(int trackLoadProgress);
+static DB_ResetZoneSize_t DB_ResetZoneSize = (DB_ResetZoneSize_t)0x00621530;
 
-typedef int  (__cdecl* Sys_SyncDatabase_t)();
+typedef int(__cdecl* Sys_SyncDatabase_t)();
 static Sys_SyncDatabase_t Sys_SyncDatabase = (Sys_SyncDatabase_t)0x0040DC40;
+
+typedef void (__cdecl* R_BeginRemoteScreenUpdate_t)();
+static R_BeginRemoteScreenUpdate_t R_BeginRemoteScreenUpdate = (R_BeginRemoteScreenUpdate_t)0x006D7E60;
 
 typedef void (__cdecl* R_EndRemoteScreenUpdate_t)(void (__cdecl *pumpfunc)());
 static R_EndRemoteScreenUpdate_t R_EndRemoteScreenUpdate = (R_EndRemoteScreenUpdate_t)0x006D7EC0;
