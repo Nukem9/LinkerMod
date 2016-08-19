@@ -135,11 +135,13 @@ BOOL GameMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
 
+#if _UNSTABLE
 	//
 	// Enable the use of level_dependencies.csv
 	//
 	PatchMemory_WithNOP(0x0082CA3B, 6);
 	Detours::X86::DetourFunction((PBYTE)0x004C8890, (PBYTE)&Com_LoadLevelFastFiles);
+#endif
 
 	//
 	// DB_LoadGraphicsAssetsForPC hook to automatically attempt to load frontend_patch.ff
