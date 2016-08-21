@@ -104,6 +104,12 @@ BOOL GameMod_Init()
 	PatchMemory(0x005A16F7, (PBYTE)"\x90\x90", 2);
 	PatchMemory(0x005A1700, (PBYTE)"\x90\x90", 2);
 
+
+	//
+	// Allow joining in-game (set party_joinInProgressAllowed)
+	//
+	PatchMemory_WithNOP(0x0088CFEA, 6);
+
 	//
 	// CL_Vid_Restart_Complete_f black screen fix
 	//
