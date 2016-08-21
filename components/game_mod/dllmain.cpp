@@ -104,6 +104,12 @@ BOOL GameMod_Init()
 	PatchMemory(0x005A16F7, (PBYTE)"\x90\x90", 2);
 	PatchMemory(0x005A1700, (PBYTE)"\x90\x90", 2);
 
+#if _DEBUG || _USE_COM_DPRINTF
+	//
+	// Enable Com_DPrintf
+	//
+	PatchMemory_WithNOP(0x0060F7E7, 2);
+#endif
 
 	//
 	// Allow joining in-game (set party_joinInProgressAllowed)
