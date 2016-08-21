@@ -135,13 +135,18 @@ BOOL GameMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
 
-#if _UNSTABLE
 	//
 	// Enable the use of level_dependencies.csv
 	//
+#if _UNSTABLE && _USE_LEVEL_DEPENDENCIES
 	PatchMemory_WithNOP(0x0082CA3B, 6);
-	Detours::X86::DetourFunction((PBYTE)0x004C8890, (PBYTE)&Com_LoadLevelFastFiles);
 #endif
+
+	//
+	// Enable legacy mod (patch override) support
+	// (This detour is used for both level_dependencies AND patch overrides)
+	//
+	Detours::X86::DetourFunction((PBYTE)0x004C8890, (PBYTE)&Com_LoadLevelFastFiles);
 
 	//
 	// DB_LoadGraphicsAssetsForPC hook to automatically attempt to load frontend_patch.ff

@@ -107,7 +107,7 @@ char *__cdecl Com_GetLevelSharedFastFile(const char *mapName)
 void __cdecl Com_LoadLevelFastFiles(const char *mapName)
 {
 	int zoneCount = 0;
-	XZoneInfo zoneInfo[5];
+	XZoneInfo zoneInfo[6];
 
 	DB_ResetZoneSize(0);
 	UI_SetLoadingScreenMaterial(mapName);
@@ -133,6 +133,10 @@ void __cdecl Com_LoadLevelFastFiles(const char *mapName)
 		Com_LoadCommonFastFile();
 	}
 	
+	//
+	// Enable the use of level_dependencies.csv
+	//
+#if _UNSTABLE && _USE_LEVEL_DEPENDENCIES
 	char* levelSharedFastFile = Com_GetLevelSharedFastFile(mapName);
 	if (levelSharedFastFile)
 	{
@@ -140,6 +144,7 @@ void __cdecl Com_LoadLevelFastFiles(const char *mapName)
 		zoneInfo[zoneCount].allocFlags = 0x800;
 		zoneInfo[zoneCount++].freeFlags = 0;
 	}
+#endif
 
 	char specOpsZoneName[64];
 	if (!I_strncmp("so_", mapName, strlen("so_")))
@@ -164,6 +169,15 @@ void __cdecl Com_LoadLevelFastFiles(const char *mapName)
 
 	zoneInfo[zoneCount].allocFlags = allocFlags;
 	zoneInfo[zoneCount].name = mapName;
+	zoneInfo[zoneCount++].freeFlags = 0;
+
+	//
+	// Enable <mapname>_patch_override.ff for legacy mod support
+	//
+	char patchOverrideFastFile[256];
+	sprintf_s(patchOverrideFastFile, "%s_patch_override", mapName);
+	zoneInfo[zoneCount].name = patchOverrideFastFile;
+	zoneInfo[zoneCount].allocFlags = 0x4000000;
 	zoneInfo[zoneCount++].freeFlags = 0;
 
 	R_BeginRemoteScreenUpdate();
