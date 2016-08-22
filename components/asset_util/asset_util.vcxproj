@@ -78,7 +78,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="assettype\aitype.cpp" />
+    <ClCompile Include="assettype\gdtasset.cpp" />
+    <ClCompile Include="assettype\character.cpp" />
+    <ClCompile Include="assettype\xmodelalias.cpp" />
+    <ClCompile Include="fs.cpp" />
+    <ClCompile Include="gdt.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="assettype\aitype.h" />
+    <ClInclude Include="assettype\gdtasset.h" />
+    <ClInclude Include="assettype\character.h" />
+    <ClInclude Include="assettype\xmodelalias.h" />
+    <ClInclude Include="fs.h" />
+    <ClInclude Include="gdt.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
