@@ -32,6 +32,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3DBSP_Lib", "components\D3
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asset_viewer", "components\asset_viewer\asset_viewer.vcxproj", "{9934C743-9987-4D7C-B847-0E77DDA520C0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asset_util", "components\asset_util\asset_util.vcxproj", "{0045F885-7DD4-4898-B760-ACB4DA32DA6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -76,6 +78,10 @@ Global
 		{9934C743-9987-4D7C-B847-0E77DDA520C0}.Debug|Win32.Build.0 = Debug|Win32
 		{9934C743-9987-4D7C-B847-0E77DDA520C0}.Release|Win32.ActiveCfg = Release|Win32
 		{9934C743-9987-4D7C-B847-0E77DDA520C0}.Release|Win32.Build.0 = Release|Win32
+		{0045F885-7DD4-4898-B760-ACB4DA32DA6B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0045F885-7DD4-4898-B760-ACB4DA32DA6B}.Debug|Win32.Build.0 = Debug|Win32
+		{0045F885-7DD4-4898-B760-ACB4DA32DA6B}.Release|Win32.ActiveCfg = Release|Win32
+		{0045F885-7DD4-4898-B760-ACB4DA32DA6B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
