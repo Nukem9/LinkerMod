@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include "AppInfo.h"
-#include "arg.h"
+#include "cli/arg.h"
 
 #include "common/fs.h"
 
@@ -9,10 +9,10 @@
 #include "process.h"
 #include "setup.h"
 
-#include "assettype\xmodelalias.h"
-#include "assettype\character.h"
-#include "assettype\aitype.h"
-#include "gdt.h"
+#include "gdt/assettype\xmodelalias.h"
+#include "gdt/assettype\character.h"
+#include "gdt/assettype\aitype.h"
+#include "gdt/gdt.h"
 
 GDT gdt;
 

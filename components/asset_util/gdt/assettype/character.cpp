@@ -1,6 +1,5 @@
 #include "Character.h"
 #include "../gsc.h"
-#include "../common/fs.h"
 
 const char* Character::gdf = "character.gdf";
 

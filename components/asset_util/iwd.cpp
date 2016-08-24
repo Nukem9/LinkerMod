@@ -1,5 +1,5 @@
 #include "iwd.h"
-#include "arg.h"
+#include "cli/arg.h"
 #include <Windows.h>
 #include "common/io.h"
 #include "../miniz/miniz.h"

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "assettype\character.h"
+#include "../common/fs.h"
 
 //
 // Extract the value of a variable that is defined using the following format(s):

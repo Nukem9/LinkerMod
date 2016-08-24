@@ -1,5 +1,5 @@
 #include "gdt.h"
-#include "common/fs.h"
+#include "../common/fs.h"
 
 GDT::GDT()
 {

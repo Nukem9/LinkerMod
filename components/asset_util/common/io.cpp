@@ -1,5 +1,5 @@
 #include "io.h"
-#include "../arg.h"
+#include "../cli/arg.h"
 
 int printf_v(const char* fmt, ...)
 {

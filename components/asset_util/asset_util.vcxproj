@@ -12,17 +12,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppInfo.cpp" />
-    <ClCompile Include="arg.cpp" />
-    <ClCompile Include="assettype\aitype.cpp" />
-    <ClCompile Include="assettype\character.cpp" />
-    <ClCompile Include="assettype\gdtasset.cpp" />
-    <ClCompile Include="assettype\xmodelalias.cpp" />
+    <ClCompile Include="cli\arg.cpp" />
     <ClCompile Include="common\fs.cpp" />
     <ClCompile Include="common\io.cpp" />
     <ClCompile Include="common\str.cpp" />
     <ClCompile Include="ff.cpp" />
-    <ClCompile Include="gdt.cpp" />
-    <ClCompile Include="gsc.cpp" />
+    <ClCompile Include="gdt\assettype\aitype.cpp" />
+    <ClCompile Include="gdt\assettype\character.cpp" />
+    <ClCompile Include="gdt\assettype\gdtasset.cpp" />
+    <ClCompile Include="gdt\assettype\xmodelalias.cpp" />
+    <ClCompile Include="gdt\gdt.cpp" />
+    <ClCompile Include="gdt\gsc.cpp" />
     <ClCompile Include="iwd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="process.cpp" />
@@ -30,17 +30,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppInfo.h" />
-    <ClInclude Include="arg.h" />
-    <ClInclude Include="assettype\aitype.h" />
-    <ClInclude Include="assettype\character.h" />
-    <ClInclude Include="assettype\gdtasset.h" />
-    <ClInclude Include="assettype\xmodelalias.h" />
+    <ClInclude Include="cli\arg.h" />
     <ClInclude Include="common\fs.h" />
     <ClInclude Include="common\io.h" />
     <ClInclude Include="common\str.h" />
     <ClInclude Include="ff.h" />
-    <ClInclude Include="gdt.h" />
-    <ClInclude Include="gsc.h" />
+    <ClInclude Include="gdt\assettype\aitype.h" />
+    <ClInclude Include="gdt\assettype\character.h" />
+    <ClInclude Include="gdt\assettype\gdtasset.h" />
+    <ClInclude Include="gdt\assettype\xmodelalias.h" />
+    <ClInclude Include="gdt\gdt.h" />
+    <ClInclude Include="gdt\gsc.h" />
     <ClInclude Include="iwd.h" />
     <ClInclude Include="process.h" />
     <ClInclude Include="setup.h" />
@@ -108,7 +108,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
