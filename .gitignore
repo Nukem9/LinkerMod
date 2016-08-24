@@ -18,3 +18,5 @@ components/D3DBSP_Lib/*/Debug
 
 !*.lib
 *.nvuser
+*.opendb
+*.db
