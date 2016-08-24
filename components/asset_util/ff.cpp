@@ -5,7 +5,7 @@
 #include "common/str.h"
 #include <Windows.h>
 #include "AppInfo.h"
-#include "zlib/zlib.h"
+#include "../zlib/zlib.h"
 
 
 

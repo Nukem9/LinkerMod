@@ -11,56 +11,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AppInfo.cpp" />
-    <ClCompile Include="arg.cpp" />
-    <ClCompile Include="assettype\aitype.cpp" />
-    <ClCompile Include="assettype\character.cpp" />
-    <ClCompile Include="assettype\gdtasset.cpp" />
-    <ClCompile Include="assettype\xmodelalias.cpp" />
-    <ClCompile Include="common\fs.cpp" />
-    <ClCompile Include="common\io.cpp" />
-    <ClCompile Include="common\str.cpp" />
-    <ClCompile Include="ff.cpp" />
-    <ClCompile Include="gdt.cpp" />
-    <ClCompile Include="gsc.cpp" />
-    <ClCompile Include="iwd.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="process.cpp" />
-    <ClCompile Include="setup.cpp" />
+    <ClCompile Include="miniz.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AppInfo.h" />
-    <ClInclude Include="arg.h" />
-    <ClInclude Include="assettype\aitype.h" />
-    <ClInclude Include="assettype\character.h" />
-    <ClInclude Include="assettype\gdtasset.h" />
-    <ClInclude Include="assettype\xmodelalias.h" />
-    <ClInclude Include="common\fs.h" />
-    <ClInclude Include="common\io.h" />
-    <ClInclude Include="common\str.h" />
-    <ClInclude Include="ff.h" />
-    <ClInclude Include="gdt.h" />
-    <ClInclude Include="gsc.h" />
-    <ClInclude Include="iwd.h" />
-    <ClInclude Include="process.h" />
-    <ClInclude Include="setup.h" />
+    <ClInclude Include="miniz.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{0045F885-7DD4-4898-B760-ACB4DA32DA6B}</ProjectGuid>
+    <ProjectGuid>{D8721F95-955F-4931-9EBA-5C7BA28E6875}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>asset_util</RootNamespace>
+    <RootNamespace>miniz</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -76,29 +47,20 @@
     <Import Project="..\common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories />
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies);zlib.lib;miniz.lib;</AdditionalDependencies>
     </Link>
-    <ProjectReference>
-      <UseLibraryDependencyInputs>
-      </UseLibraryDependencyInputs>
-    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -108,19 +70,15 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories />
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>%(AdditionalDependencies);zlib.lib;miniz.lib;</AdditionalDependencies>
     </Link>
-    <ProjectReference>
-      <UseLibraryDependencyInputs>
-      </UseLibraryDependencyInputs>
-    </ProjectReference>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

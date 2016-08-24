@@ -8,6 +8,7 @@
   <ItemDefinitionGroup>
     <Link>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>$(SolutionDir)\build\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)\components\shared</AdditionalIncludeDirectories>

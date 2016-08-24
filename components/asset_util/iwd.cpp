@@ -2,7 +2,7 @@
 #include "arg.h"
 #include <Windows.h>
 #include "common/io.h"
-#include "miniz/miniz.h"
+#include "../miniz/miniz.h"
 #include "common/str.h"
 #include "AppInfo.h"
 
