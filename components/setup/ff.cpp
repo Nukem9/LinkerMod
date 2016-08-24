@@ -135,7 +135,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
-		printf_v("ERROR\n");
+		printf_v("PATH ERROR\n");
 		return 0;
 	}
 
@@ -279,11 +279,15 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 		rawfileString = tmpString;
 
-		if (ARG_FLAG_SND && Str_EndsWith(rawfileString, ".wav"))
+		if (Str_EndsWith(rawfileString, ".wav"))
 		{
-			Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
-			FF_FFExtractSoundFile(snd_info, rawfileString);
+			if (ARG_FLAG_SND)
+			{
+				Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
+				FF_FFExtractSoundFile(snd_info, rawfileString);
+			}
 			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
+			continue;
 		}
 
 		if (!ARG_FLAG_FF)
