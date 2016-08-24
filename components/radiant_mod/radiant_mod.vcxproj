@@ -63,7 +63,8 @@
       <AdditionalOptions>/ignore:4099 /opt:nolbr %(AdditionalOptions) /opt:nolbr </AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)/techset_override.csv" "$(TargetDir)/techset_override.csv"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
