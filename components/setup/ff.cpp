@@ -1,9 +1,9 @@
 #include "ff.h"
-#include "steam.h"
 #include "arg.h"
 #include "files.h"
 #include "io.h"
 #include <Windows.h>
+#include "AppInfo.h"
 
 typedef int __cdecl zlib_func(BYTE *dest, unsigned int* destLen, const BYTE* source, unsigned int sourceLen);
 static zlib_func* compress = nullptr;

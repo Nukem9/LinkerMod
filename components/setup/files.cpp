@@ -1,7 +1,7 @@
 #include "files.h"
 #include <windows.h>
 #include <string>
-#include "steam.h"
+#include "AppInfo.h"
 
 const char* FS_Cwd(void)
 {

@@ -2,8 +2,8 @@
 #include "files.h"
 #include "process.h"
 #include "io.h"
-#include "steam.h"
 #include <Windows.h>
+#include "AppInfo.h"
 
 int Setup_Init(void)
 {

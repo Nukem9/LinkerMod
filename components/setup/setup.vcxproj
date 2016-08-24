@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppInfo.cpp" />
     <ClCompile Include="arg.cpp" />
     <ClCompile Include="ff.cpp" />
     <ClCompile Include="files.cpp" />
@@ -89,10 +90,10 @@
     <ClCompile Include="miniz.c" />
     <ClCompile Include="process.cpp" />
     <ClCompile Include="setup.cpp" />
-    <ClCompile Include="steam.cpp" />
     <ClCompile Include="str.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppInfo.h" />
     <ClInclude Include="arg.h" />
     <ClInclude Include="ff.h" />
     <ClInclude Include="files.h" />
@@ -101,7 +102,6 @@
     <ClInclude Include="miniz.h" />
     <ClInclude Include="process.h" />
     <ClInclude Include="setup.h" />
-    <ClInclude Include="steam.h" />
     <ClInclude Include="str.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

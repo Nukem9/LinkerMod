@@ -4,10 +4,10 @@
 #include "../shared/detours/Typedef.h"
 #include "../shared/detours/Detours.h"
 
-#include "../shared/assert.h"
-
 #include <Windows.h>
 #include <string>
+
+#include "../shared/assert.h"
 
 static void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 {
@@ -68,6 +68,37 @@ static bool StrEndsWith (std::string str, std::string substr)
         return (0 == str.compare (str.length() - substr.length(), substr.length(), substr));
 	else
         return false;
+}
+
+static bool GetGameDirectory(char *Buffer, DWORD BufferSize)
+{
+	// Zero initial value
+	memset(Buffer, 0, sizeof(char) * BufferSize);
+
+	//
+	// 64: HKEY_LOCAL_MACHINE\SOFTWARE\[ Wow6432Node ]\activision\call of duty black ops
+	// 32: HKEY_LOCAL_MACHINE\SOFTWARE\activision\call of duty black ops
+	//
+	// Subkey: installpath
+	//
+	HKEY regKey;
+	if (RegOpenKeyA(HKEY_LOCAL_MACHINE, "SOFTWARE\\activision\\call of duty black ops", &regKey) != ERROR_SUCCESS)
+		return false;
+
+	if (RegQueryValueExA(regKey, "installpath", nullptr, nullptr, (LPBYTE)Buffer, &BufferSize) != ERROR_SUCCESS)
+		return false;
+
+	// Check that the key is filled and the directory exists
+	if (strlen(Buffer) <= 0)
+		return false;
+
+	DWORD dirType = GetFileAttributesA(Buffer);
+
+	if ((dirType == INVALID_FILE_ATTRIBUTES) ||
+		!(dirType & FILE_ATTRIBUTE_DIRECTORY))
+		return false;
+
+	return true;
 }
 
 namespace Detours

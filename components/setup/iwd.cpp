@@ -3,8 +3,8 @@
 #include <Windows.h>
 #include "io.h"
 #include "miniz.h"
-#include "steam.h"
 #include "str.h"
+#include "AppInfo.h"
 
 #define IWD_DIR_SOUND "sound/"
 #define IWD_DIR_IMAGE "images/"
