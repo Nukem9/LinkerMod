@@ -1,12 +1,11 @@
 #include <Windows.h>
-
 #include "arg.h"
-#include "steam.h"
 #include "files.h"
 #include "iwd.h"
 #include "ff.h"
 #include "setup.h"
 #include "process.h"
+#include "AppInfo.h"
 
 int main(int argc, char** argv)
 {
@@ -15,7 +14,7 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	if (AppInfo_Init() != 0)
+	if (!AppInfo_Init())
 	{
 		return 2;
 	}

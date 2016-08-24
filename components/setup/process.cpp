@@ -1,5 +1,7 @@
+#include <Windows.h>
+#include <stdio.h>
 #include "process.h"
-#include "steam.h"
+#include "AppInfo.h"
 
 int Process_ExecuteConverter(void)
 {

@@ -1,8 +1,4 @@
-#include "win_exception.h"
-#include "win_localize.h"
-#include "common.h"
-
-#include <iostream>
+#include "stdafx.h"
 
 static_assert(EXCEPTION_STACKTRACE_MAXFRAMECOUNT < 63, "EXCEPTION_STACKTRACE_MAXFRAMECOUNT must be less than 63 to support Windows XP");
 

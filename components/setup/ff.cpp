@@ -1,13 +1,10 @@
 #include "ff.h"
-#include "steam.h"
 #include "arg.h"
 #include "files.h"
 #include "io.h"
 #include <Windows.h>
-
-typedef int __cdecl zlib_func(BYTE *dest, unsigned int* destLen, const BYTE* source, unsigned int sourceLen);
-static zlib_func* compress = nullptr;
-static zlib_func* uncompress = nullptr;
+#include "AppInfo.h"
+#include "zlib/zlib.h"
 
 bool Str_EndsWith(const char* str, const char* substr)
 {
@@ -89,7 +86,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	}
 
 	BYTE* dBuf = new BYTE[rawfileHeader->uncompressedSize];
-	unsigned int dSize = rawfileHeader->uncompressedSize;
+	unsigned long dSize = rawfileHeader->uncompressedSize;
 	if (uncompress(dBuf, &dSize, &rawfileHeader->fileData, rawfileHeader->compressedSize) != 0)
 	{
 		printf_v("READ ERROR\n");
@@ -138,7 +135,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
-		printf_v("ERROR\n");
+		printf_v("PATH ERROR\n");
 		return 0;
 	}
 
@@ -282,11 +279,15 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 		rawfileString = tmpString;
 
-		if (ARG_FLAG_SND && Str_EndsWith(rawfileString, ".wav"))
+		if (Str_EndsWith(rawfileString, ".wav"))
 		{
-			Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
-			FF_FFExtractSoundFile(snd_info, rawfileString);
+			if (ARG_FLAG_SND)
+			{
+				Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
+				FF_FFExtractSoundFile(snd_info, rawfileString);
+			}
 			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
+			continue;
 		}
 
 		if (!ARG_FLAG_FF)
@@ -339,25 +340,6 @@ int FF_FFExtract(const char* filepath, const char* filename)
 	}
 	rewind(h);
 
-	HMODULE zlib = LoadLibrary(L"zlib1.dll");
-	if (!zlib)
-	{
-		fclose(h);
-		printf("ERROR: zlib1.dll could not be found\n\n");
-		return  FALSE;
-	}
-
-	compress = (zlib_func*)GetProcAddress(zlib, "compress");
-	uncompress = (zlib_func*)GetProcAddress(zlib, "uncompress");
-
-	if (!compress || !uncompress)
-	{
-		printf("ERROR: zlib1.dll appears to be corrupt\n");
-		FreeLibrary(zlib);
-		fclose(h);
-		return FALSE;
-	}
-
 	fseek(h, 0, SEEK_END);
 	size_t fileSize = ftell(h);
 
@@ -369,7 +351,7 @@ int FF_FFExtract(const char* filepath, const char* filename)
 	fread(cBuf, 1, cSize, h);
 
 	XFile ffInfo;
-	size_t dSize = sizeof(XFile);
+	unsigned long dSize = sizeof(XFile);
 	uncompress((BYTE*)&ffInfo, &dSize, cBuf, 0x8000);
 
 	dSize = ffInfo.size + 36;

@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppInfo.cpp" />
     <ClCompile Include="arg.cpp" />
     <ClCompile Include="ff.cpp" />
     <ClCompile Include="files.cpp" />
@@ -89,10 +90,25 @@
     <ClCompile Include="miniz.c" />
     <ClCompile Include="process.cpp" />
     <ClCompile Include="setup.cpp" />
-    <ClCompile Include="steam.cpp" />
     <ClCompile Include="str.cpp" />
+    <ClCompile Include="zlib\adler32.c" />
+    <ClCompile Include="zlib\compress.c" />
+    <ClCompile Include="zlib\crc32.c" />
+    <ClCompile Include="zlib\deflate.c" />
+    <ClCompile Include="zlib\gzclose.c" />
+    <ClCompile Include="zlib\gzlib.c" />
+    <ClCompile Include="zlib\gzread.c" />
+    <ClCompile Include="zlib\gzwrite.c" />
+    <ClCompile Include="zlib\infback.c" />
+    <ClCompile Include="zlib\inffast.c" />
+    <ClCompile Include="zlib\inflate.c" />
+    <ClCompile Include="zlib\inftrees.c" />
+    <ClCompile Include="zlib\trees.c" />
+    <ClCompile Include="zlib\uncompr.c" />
+    <ClCompile Include="zlib\zutil.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppInfo.h" />
     <ClInclude Include="arg.h" />
     <ClInclude Include="ff.h" />
     <ClInclude Include="files.h" />
@@ -101,8 +117,18 @@
     <ClInclude Include="miniz.h" />
     <ClInclude Include="process.h" />
     <ClInclude Include="setup.h" />
-    <ClInclude Include="steam.h" />
     <ClInclude Include="str.h" />
+    <ClInclude Include="zlib\crc32.h" />
+    <ClInclude Include="zlib\deflate.h" />
+    <ClInclude Include="zlib\gzguts.h" />
+    <ClInclude Include="zlib\inffast.h" />
+    <ClInclude Include="zlib\inffixed.h" />
+    <ClInclude Include="zlib\inflate.h" />
+    <ClInclude Include="zlib\inftrees.h" />
+    <ClInclude Include="zlib\trees.h" />
+    <ClInclude Include="zlib\zconf.h" />
+    <ClInclude Include="zlib\zlib.h" />
+    <ClInclude Include="zlib\zutil.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
