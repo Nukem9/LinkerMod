@@ -6,6 +6,8 @@
 *.opensdf
 *.vcxproj.filters
 
+!components/asset_util/asset_util.vcxproj.filters
+
 /build
 /ipch
 
