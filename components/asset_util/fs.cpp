@@ -5,7 +5,8 @@
 
 bool FS_FileExists(const char* qpath)
 {
-	if (FILE* h = fopen(qpath, "r"))
+	FILE* h = NULL;
+	if (fopen_s(&h, qpath, "r") == NULL)
 	{
 		fclose(h);
 		return true;
