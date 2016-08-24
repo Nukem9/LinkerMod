@@ -1,4 +1,13 @@
-#include <iostream>
+#include <Windows.h>
+#include "AppInfo.h"
+#include "arg.h"
+
+#include "common/fs.h"
+
+#include "ff.h"
+#include "iwd.h"
+#include "process.h"
+#include "setup.h"
 
 #include "assettype\xmodelalias.h"
 #include "assettype\character.h"
@@ -7,6 +16,9 @@
 
 GDT gdt;
 
+//
+// Used for debugging the GDT regeneration systems
+//
 int __cdecl fileCallback(const char* filePath, const char* fileName)
 {
 	printf("%s\n", fileName);
@@ -27,29 +39,10 @@ int __cdecl fileCallback(const char* filePath, const char* fileName)
 
 int main(int argc, const char** argv)
 {
-	FS_FileIterator("D:\\SteamLibrary\\steamapps\\common\\Call of Duty Black Ops\\raw\\character", "c_rus_spetznaz_rebirth_1*", fileCallback);
+	//FS_FileIterator("D:\\SteamLibrary\\steamapps\\common\\Call of Duty Black Ops\\raw\\character", "c_rus_spetznaz_rebirth_1*", fileCallback);
+	//gdt.WriteFile("test.gdt", GDT_MODE_OVERWRITE);
 
-	gdt.WriteFile("test.gdt", GDT_MODE_OVERWRITE);
-	return 0;
-}
-
-/*
-//
-// SETUP TOOL MAIN
-//
-
-#include <Windows.h>
-#include "arg.h"
-#include "common/fs.h"
-#include "iwd.h"
-#include "ff.h"
-#include "setup.h"
-#include "process.h"
-#include "AppInfo.h"
-
-int main(int argc, char** argv)
-{
-	if (Arg_HandleArguments(argc, argv) != NULL)
+	if (Arg_HandleArguments(argc, (char**)argv) != NULL)
 	{
 		return 1;
 	}
@@ -71,7 +64,7 @@ int main(int argc, char** argv)
 		FS_FileIterator(AppInfo_IWDDir(), FS_SEARCHPATTERN_IWD, IWD_IWDHandler);
 		execPostConvertStep = true;
 	}
-	
+
 	if (ARG_FLAG_FF || ARG_FLAG_SND)
 	{
 		if (ARG_FLAG_LOCALIZED)
@@ -103,6 +96,3 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-
-
-*/
