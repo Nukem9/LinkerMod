@@ -84,8 +84,8 @@
     <ClCompile Include="assettype\xmodelalias.cpp" />
     <ClCompile Include="fs.cpp" />
     <ClCompile Include="gdt.cpp" />
+    <ClCompile Include="gsc.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="regex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assettype\aitype.h" />
@@ -94,7 +94,7 @@
     <ClInclude Include="assettype\xmodelalias.h" />
     <ClInclude Include="fs.h" />
     <ClInclude Include="gdt.h" />
-    <ClInclude Include="regex.h" />
+    <ClInclude Include="gsc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

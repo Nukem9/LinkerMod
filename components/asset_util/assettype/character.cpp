@@ -1,6 +1,5 @@
 #include "Character.h"
 #include "../fs.h"
-#include <regex>
 
 const char* Character::gdf = "character.gdf";
 
@@ -17,13 +16,13 @@ void ExtractAliasEntry(const std::string& prop, std::string& src, aliasEntry_s* 
 {
 	_ASSERT(dst != NULL);
 
-	dst->model = ExtractStringProperty(prop, "", src);
-	dst->alias = ExtractAliasProperty(prop, "", src);
+	//dst->model = ExtractStringProperty(prop, "", src);
+	//dst->alias = ExtractAliasProperty(prop, "", src);
 }
 
 int Character::ExtractFromGSC(const char* qpath)
 {
-	size_t len = FS_FileSize(qpath);
+	/*size_t len = FS_FileSize(qpath);
 	if (len == -1)
 		return -1;
 
@@ -53,7 +52,7 @@ int Character::ExtractFromGSC(const char* qpath)
 
 	const char* start = FS_GetFilenameSubString(qpath);
 	const char* stop = FS_GetExtensionSubString(qpath);
-	this->_name = std::string(start, stop);
+	this->_name = std::string(start, stop);*/
 
 	return 0;
 }
