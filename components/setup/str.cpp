@@ -1,16 +1,47 @@
+#include <Windows.h>
 #include "str.h"
 
 const char* stristr(const char* s1, const char* s2)
 {
-	unsigned int s2_len = strlen(s2);
+	char *pptr, *sptr, *start;
+	unsigned int  slen, plen;
 
-	for (; (*s1 && strlen(s1) >= s2_len); s1++)
+	for (start = (char *)s1,
+		pptr = (char *)s2,
+		slen = strlen(s1),
+		plen = strlen(s2);
+
+		/* while string length not shorter than pattern length */
+
+		slen >= plen;
+
+		start++, slen--)
 	{
-		if (_strnicmp(s1, s2, s2_len) == 0)
+		/* find start of pattern in string */
+		while (toupper(*start) != toupper(*s2))
 		{
-			return s1;
+			start++;
+			slen--;
+
+			/* if pattern longer than string */
+
+			if (slen < plen)
+				return(NULL);
+		}
+
+		sptr = start;
+		pptr = (char *)s2;
+
+		while (toupper(*sptr) == toupper(*pptr))
+		{
+			sptr++;
+			pptr++;
+
+			/* if end of pattern then pattern was found */
+
+			if ('\0' == *pptr)
+				return (start);
 		}
 	}
-
-	return nullptr;
+	return(NULL);
 }
