@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <Windows.h>
 
 #define ASSERT(cond)			if(!(cond)) assert(__FILE__, __LINE__, #cond);
 #define ASSERT_MSG(cond, msg)	if(!(cond)) assert(__FILE__, __LINE__, "%s\n\n%s", #cond, msg);

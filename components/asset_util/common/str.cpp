@@ -45,3 +45,8 @@ const char* stristr(const char* s1, const char* s2)
 	}
 	return(NULL);
 }
+
+bool Str_EndsWith(const char* str, const char* substr)
+{
+	return (strstr(str, substr) == str + strlen(str) - strlen(substr));
+}

@@ -1,9 +1,9 @@
 #include "iwd.h"
-#include "arg.h"
+#include "cli/arg.h"
 #include <Windows.h>
-#include "io.h"
-#include "miniz.h"
-#include "str.h"
+#include "common/io.h"
+#include "../miniz/miniz.h"
+#include "common/str.h"
 #include "AppInfo.h"
 
 #define IWD_DIR_SOUND "sound/"
@@ -53,7 +53,8 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 		return 0;
 	}
 
-	if (FILE* h = fopen(outPath, "r"))
+	FILE* h = NULL;
+	if (fopen_s(&h, outPath, "r"))
 	{
 		printf_v("Skipping file: \"%s\"\n", filepath);
 		fclose(h);

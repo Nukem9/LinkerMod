@@ -1,7 +1,7 @@
 #include "setup.h"
-#include "files.h"
+#include "common/fs.h"
 #include "process.h"
-#include "io.h"
+#include "common/io.h"
 #include <Windows.h>
 #include "AppInfo.h"
 
