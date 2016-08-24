@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "assettype\character.h"
 
 //
 // Extract the value of a variable that is defined using the following format(s):
@@ -13,6 +14,12 @@ int GSC_ExtractStringVariable(const char* var, const char* src, std::string* dst
 //	self.<prop> = "Value";
 //
 int GSC_ExtractStringProperty(const char* prop, const char* src, std::string* dst, const char* defaultValue="");
+
+//
+// Extract alias properties from lines that use the format:
+//	self.<prop> = ************alias::main******;
+//
+int GSC_ExtractAliasProperty(const char* prop, const char* src, std::string* dst, const char* defaultValue);
 
 //
 // Extract properties that use the format:
@@ -40,3 +47,13 @@ enum AI_ENGAGEMENTTYPE
 // engagementType controls which of the arguments is used
 //
 int GSC_AIType_ExtractEngagementProperty(const char* prop, AI_ENGAGEMENTTYPE engagementType, const char* src, std::string* dst, const char* defaultValue);
+
+//
+// Extract alias / string combos from a source string
+//
+int GSC_Character_ExtractAliasEntry(const char* prop, const char* src, aliasEntry_s* dst, const char* defaultValue);
+
+//
+// Extract gibSpawn / alias combos from a source string
+//
+int GSC_Character_ExtractGibSpawnEntries(const char* src, gibSpawn_s* dst, int maxCount, const char* defaultValue);

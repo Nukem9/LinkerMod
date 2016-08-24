@@ -14,21 +14,20 @@ int __cdecl fileCallback(const char* filePath, const char* fileName)
 	//XModelAlias* alias = new XModelAlias;
 	//alias->ExtractFromGSC(argv[i]);
 
-	AIType* aitype = new AIType;
-	aitype->ExtractFromGSC(filePath);
-	gdt.assets.push_back(aitype);
+	//AIType* aitype = new AIType;
+	//aitype->ExtractFromGSC(filePath);
+	//gdt.assets.push_back(aitype);
 
-	/*Character* character = new Character;
+	Character* character = new Character;
 	character->ExtractFromGSC(filePath);
-
-	gdt.assets.push_back(character);*/
+	gdt.assets.push_back(character);
 	return 0;
 
 }
 
 int main(int argc, const char** argv)
 {
-	FS_FileIterator("D:\\SteamLibrary\\steamapps\\common\\Call of Duty Black Ops\\raw\\aitype", "*.gsc", fileCallback);
+	FS_FileIterator("D:\\SteamLibrary\\steamapps\\common\\Call of Duty Black Ops\\raw\\character", "c_rus_spetznaz_rebirth_1*", fileCallback);
 
 	gdt.WriteFile("test.gdt", GDT_MODE_OVERWRITE);
 	return 0;
