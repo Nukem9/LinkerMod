@@ -1,5 +1,5 @@
 #include "aitype.h"
-#include "../fs.h"
+#include "../common/fs.h"
 #include "../gsc.h"
 
 #include <iostream>

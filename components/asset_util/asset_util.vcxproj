@@ -53,7 +53,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,23 +78,67 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppInfo.cpp" />
+    <ClCompile Include="arg.cpp" />
     <ClCompile Include="assettype\aitype.cpp" />
     <ClCompile Include="assettype\gdtasset.cpp" />
     <ClCompile Include="assettype\character.cpp" />
     <ClCompile Include="assettype\xmodelalias.cpp" />
-    <ClCompile Include="fs.cpp" />
+    <ClCompile Include="common\fs.cpp" />
+    <ClCompile Include="common\io.cpp" />
+    <ClCompile Include="common\str.cpp" />
+    <ClCompile Include="ff.cpp" />
     <ClCompile Include="gdt.cpp" />
     <ClCompile Include="gsc.cpp" />
+    <ClCompile Include="iwd.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="miniz\miniz.c" />
+    <ClCompile Include="process.cpp" />
+    <ClCompile Include="setup.cpp" />
+    <ClCompile Include="zlib\adler32.c" />
+    <ClCompile Include="zlib\compress.c" />
+    <ClCompile Include="zlib\crc32.c" />
+    <ClCompile Include="zlib\deflate.c" />
+    <ClCompile Include="zlib\gzclose.c" />
+    <ClCompile Include="zlib\gzlib.c" />
+    <ClCompile Include="zlib\gzread.c" />
+    <ClCompile Include="zlib\gzwrite.c" />
+    <ClCompile Include="zlib\infback.c" />
+    <ClCompile Include="zlib\inffast.c" />
+    <ClCompile Include="zlib\inflate.c" />
+    <ClCompile Include="zlib\inftrees.c" />
+    <ClCompile Include="zlib\trees.c" />
+    <ClCompile Include="zlib\uncompr.c" />
+    <ClCompile Include="zlib\zutil.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppInfo.h" />
+    <ClInclude Include="arg.h" />
     <ClInclude Include="assettype\aitype.h" />
     <ClInclude Include="assettype\gdtasset.h" />
     <ClInclude Include="assettype\character.h" />
     <ClInclude Include="assettype\xmodelalias.h" />
-    <ClInclude Include="fs.h" />
+    <ClInclude Include="common\fs.h" />
+    <ClInclude Include="common\io.h" />
+    <ClInclude Include="common\str.h" />
+    <ClInclude Include="ff.h" />
     <ClInclude Include="gdt.h" />
     <ClInclude Include="gsc.h" />
+    <ClInclude Include="iwd.h" />
+    <ClInclude Include="miniz\miniz.h" />
+    <ClInclude Include="process.h" />
+    <ClInclude Include="setup.h" />
+    <ClInclude Include="zlib\crc32.h" />
+    <ClInclude Include="zlib\deflate.h" />
+    <ClInclude Include="zlib\gzguts.h" />
+    <ClInclude Include="zlib\inffast.h" />
+    <ClInclude Include="zlib\inffixed.h" />
+    <ClInclude Include="zlib\inflate.h" />
+    <ClInclude Include="zlib\inftrees.h" />
+    <ClInclude Include="zlib\trees.h" />
+    <ClInclude Include="zlib\zconf.h" />
+    <ClInclude Include="zlib\zlib.h" />
+    <ClInclude Include="zlib\zutil.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

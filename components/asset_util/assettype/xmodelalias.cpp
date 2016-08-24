@@ -1,5 +1,5 @@
 #include "xmodelalias.h"
-#include "../fs.h"
+#include "../common/fs.h"
 
 #include <Windows.h>
 #include <regex>

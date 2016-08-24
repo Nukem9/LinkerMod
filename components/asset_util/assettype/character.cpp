@@ -1,6 +1,6 @@
 #include "Character.h"
 #include "../gsc.h"
-#include "../fs.h"
+#include "../common/fs.h"
 
 const char* Character::gdf = "character.gdf";
 
@@ -40,7 +40,7 @@ int Character::ExtractFromGSC(const char* qpath)
 	this->misc[1].model = "";
 	this->misc[2].model = "";
 
-	/*Unsupported
+	/* Unsupported - Can't find any examples of these
 	
 	optionalEntry_s J_Backpack;
 	optionalEntry_s J_ChestGear_LE;

@@ -1,5 +1,5 @@
 #pragma once
-#include "fs.h"
+#include "common/fs.h"
 #include <vector>
 
 #include "assettype\gdtasset.h"
