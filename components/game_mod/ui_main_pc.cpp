@@ -32,7 +32,7 @@ bool __cdecl UI_LoadModArenas()
 		}
 		else
 		{
-			Com_PrintWarning(13, "Customized mod.arena file is empty\n", "mod.arena");
+			Com_PrintWarning(13, "Customized arena file is empty: %s\n", "mod.arena");
 			FS_FCloseFile(file); //Fix for leaked handles
 			return false;
 		}
