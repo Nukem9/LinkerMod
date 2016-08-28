@@ -15,6 +15,8 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>cod2map</RootNamespace>
     <ProjectName>cod2map</ProjectName>
+    <WindowsTargetPlatformVersion>
+    </WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

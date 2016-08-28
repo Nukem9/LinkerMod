@@ -14,6 +14,8 @@
     <ProjectGuid>{6A3FB8CD-BEA3-42F1-B551-A0F56ED9B266}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>radiant</RootNamespace>
+    <WindowsTargetPlatformVersion>
+    </WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
