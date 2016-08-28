@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#define ARENA_FILE_MAX_SIZE 1024
+#define ARENA_FILE_MAX_SIZE 8192
 
 int* ui_numArenas = (int*)0x025F6940;
 
