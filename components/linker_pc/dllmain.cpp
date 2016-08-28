@@ -37,30 +37,8 @@ BOOL LinkerMod_Init()
 	PatchMemory(0x00486C60, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 	PatchMemory(0x00486C6A, (PBYTE)"\xEB", 1);
 
-	// Lump %d has a funny size
-	//VirtualProtect((LPVOID)0x004017A2, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x004017A2 = 0xEB;
-
 	// No primary lights in BSP
 	PatchMemory(0x00401E60, (PBYTE)"\xEB", 1);
-
-	//VirtualProtect((LPVOID)0x00401FE7, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x00401FE7 = 0xEB;
-
-	//VirtualProtect((LPVOID)0x476B10, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x476B10 = 0xC3;
-
-	//VirtualProtect((LPVOID)0x004749BC, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x004749BC = 0xEB;
-
-	//VirtualProtect((LPVOID)0x0047BCEB, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x0047BCEB = 0xEB;
-
-	//VirtualProtect((LPVOID)0x479870, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x479870 = 0xC3;
-
-	//VirtualProtect((LPVOID)0x475B60, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x475B60 = 0xC3;
 
 	//
 	// Fix for early fclose of dependency file

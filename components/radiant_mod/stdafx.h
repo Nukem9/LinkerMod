@@ -31,12 +31,8 @@
 // Shared files
 //
 #include "../shared/utility.h"
-
 #include "../shared/minidx9/Include/d3dx9.h"
 #pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
-//
-// 
-//
 
 //
 // Nvidia Nsight patches
