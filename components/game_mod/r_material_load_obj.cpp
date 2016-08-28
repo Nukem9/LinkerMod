@@ -37,7 +37,7 @@ FILE *Material_OpenShader_BlackOps(const char *shaderTarget, const char *shaderN
 	//
 	char shaderPath[MAX_PATH];
 	sprintf_s(shaderPath, "%s\\raw\\shadercache_mods\\%s_%s_3_0_%s",
-		*(DWORD *)(*(DWORD *)0x25FBF04 + 0x18),
+		*(char **)(*(DWORD *)0x25FBF04 + 0x18),
 		shaderTarget,
 		shaderMain,
 		shaderName);

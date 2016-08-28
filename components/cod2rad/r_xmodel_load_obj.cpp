@@ -11,7 +11,7 @@ void XModelLoadConfigString(const char **pos, char *buffer)
 	*pos += strlen(buffer) + 1;
 }
 
-bool XModelLoadConfigFile(const char **pos, int name, int config)
+bool XModelLoadConfigFile(const char **pos, char *name, int config)
 {
 	//
 	// Check for World at War's version first

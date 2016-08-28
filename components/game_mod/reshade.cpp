@@ -1,6 +1,4 @@
-#include "reshade.h"
-#include "../shared/utility.h"
-#include "patch_reflections.h"
+#include "stdafx.h"
 
 HMODULE hRS = NULL;
 

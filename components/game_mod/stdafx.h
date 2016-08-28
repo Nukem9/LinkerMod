@@ -10,9 +10,6 @@
 // Shared files
 //
 #include "../shared/utility.h"
-//
-// 
-//
 
 #include "CEG.h"
 

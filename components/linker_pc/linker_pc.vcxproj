@@ -93,7 +93,6 @@
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="crc32.h" />
-    <ClInclude Include="Header.h" />
     <ClInclude Include="pathnode_load_obj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />

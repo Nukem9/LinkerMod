@@ -1,9 +1,4 @@
-#include "win_common.h"
-#include "win_localize.h"
-#include "win_exception.h"
-#include "common.h"
-
-#include <iostream>
+#include "stdafx.h"
 
 static char(__cdecl* sub_507A30)() = (char(__cdecl*)())0x004CFC7B;
 
