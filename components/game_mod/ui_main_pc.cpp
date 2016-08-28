@@ -2,7 +2,8 @@
 
 #define ARENA_FILE_MAX_SIZE 8192
 
-int* ui_numArenas = (int*)0x025F6940;
+int& ui_numArenas = *(int*)0x025F6940;
+char** ui_arenaInfos = *(char*(*)[128])0x025F6740;
 
 bool __cdecl UI_LoadModArenas()
 {
@@ -20,7 +21,7 @@ bool __cdecl UI_LoadModArenas()
 				FS_Read(buf, fileSize, file);
 				FS_FCloseFile(file);
 
-				*ui_numArenas = UI_ParseInfos(buf, 128 - *ui_numArenas, (char **)(4 * *ui_numArenas + 0x98A4B50));
+				ui_numArenas = UI_ParseInfos(buf, 128 - ui_numArenas, &ui_arenaInfos[ui_numArenas]);
 				return true;
 			}
 			else
