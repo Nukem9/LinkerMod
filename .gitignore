@@ -5,6 +5,10 @@
 *.log
 *.opensdf
 *.vcxproj.filters
+*.nvuser
+*.opendb
+*.db
+*.tlog
 
 !components/asset_util/asset_util.vcxproj.filters
 
@@ -19,6 +23,3 @@ components/D3DBSP_Lib/*/Release
 components/D3DBSP_Lib/*/Debug
 
 !*.lib
-*.nvuser
-*.opendb
-*.db
