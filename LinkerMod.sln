@@ -36,9 +36,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asset_util", "components\as
 		{612D8EF6-74FD-4E5E-A5C9-F4E8BF20195A} = {612D8EF6-74FD-4E5E-A5C9-F4E8BF20195A}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "components\zlib\zlib.vcxproj", "{612D8EF6-74FD-4E5E-A5C9-F4E8BF20195A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "components\shared\zlib\zlib.vcxproj", "{612D8EF6-74FD-4E5E-A5C9-F4E8BF20195A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "miniz", "components\miniz\miniz.vcxproj", "{D8721F95-955F-4931-9EBA-5C7BA28E6875}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "miniz", "components\shared\miniz\miniz.vcxproj", "{D8721F95-955F-4931-9EBA-5C7BA28E6875}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

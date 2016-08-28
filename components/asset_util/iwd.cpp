@@ -2,7 +2,7 @@
 #include "cli/arg.h"
 #include <Windows.h>
 #include "common/io.h"
-#include "../miniz/miniz.h"
+#include "../shared/miniz/miniz.h"
 #include "common/str.h"
 #include "AppInfo.h"
 
