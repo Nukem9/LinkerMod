@@ -143,6 +143,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0084D2A0, (PBYTE)&UI_LoadModArenas); 
 
 	//
+	// Allow UI_FeederSelection_AllMaps to set ui_preview when an entry is highlighted
+	// (Automatically set ui_preview to the highlighted map's loadName)
+	//
+	Detours::X86::DetourFunction((PBYTE)0x008352F6, (PBYTE)&mfh_UI_FeederSelection_AllMaps);
+
+	//
 	// DB_ModXFileHandle hook to enable loading maps from mods
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
