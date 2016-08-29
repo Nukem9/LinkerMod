@@ -22,7 +22,7 @@ unsigned int R_HashString(const char *string)
 	int hash = 0;
 
 	for (const char *pos = string; *pos; pos++)
-		hash = (char)(*pos | 0x20) ^ 33 * hash;
+		hash = (char)(*pos | 32) ^ 33 * hash;
 
 	return hash;
 }

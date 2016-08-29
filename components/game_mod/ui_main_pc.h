@@ -10,3 +10,6 @@ static UI_SafeTranslateString_t* UI_SafeTranslateString = (UI_SafeTranslateStrin
 
 typedef void __cdecl Live_UpdateUiPopup_t(int unk, const char *popupname);
 static Live_UpdateUiPopup_t* Live_UpdateUiPopup = (Live_UpdateUiPopup_t*)0x005C8FE0;
+
+typedef void (__cdecl* UI_SetLoadingScreenMaterial_t)(const char *name);
+static UI_SetLoadingScreenMaterial_t UI_SetLoadingScreenMaterial = (UI_SetLoadingScreenMaterial_t)0x005C6F70;

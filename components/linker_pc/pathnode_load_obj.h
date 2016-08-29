@@ -153,8 +153,7 @@ struct PathData
 	pathnode_tree_t *nodeTree;
 };
 
-typedef void(__cdecl * Path_ErasePaths_t)(const char *pathsError);
-static Path_ErasePaths_t Path_ErasePaths = (Path_ErasePaths_t)0x416B30;
+void Path_ErasePaths(const char* pathsError);
 
 bool Path_LoadPathsInternal();
 void Path_LoadPaths();

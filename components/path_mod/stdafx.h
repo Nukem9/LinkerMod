@@ -12,6 +12,13 @@
 //
 #include "../shared/utility.h"
 
+#include "../D3DBSP_Lib/D3DBSP_Lib/D3DBSP_Lib.h"
+#if _DEBUG
+#pragma comment(lib, "../../build/Debug/D3DBSP_Lib.lib")
+#else
+#pragma comment(lib, "../../build/Release/D3DBSP_Lib.lib")
+#endif
+
 #include "../shared/minidx9/Include/d3dx9.h"
 #pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
 

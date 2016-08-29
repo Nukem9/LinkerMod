@@ -5,6 +5,12 @@
 *.log
 *.opensdf
 *.vcxproj.filters
+*.nvuser
+*.opendb
+*.db
+*.tlog
+
+!components/asset_util/asset_util.vcxproj.filters
 
 /build
 /ipch

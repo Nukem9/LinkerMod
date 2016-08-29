@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-static char* techsetPath = "waw_pimp/techsets/%s%s.techset";
-static char* techiquePath = "waw_pimp/techniques/%s.tech";
+static char* techsetPath = "pimp/techsets/%s%s.techset";
+static char* techiquePath = "pimp/techniques/%s.tech";
 
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 {
@@ -14,6 +14,11 @@ LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	return EXCEPTION_CONTINUE_SEARCH;
 	//return PageGuard_Check(ExceptionInfo);
 }
+
+const int MAX_MAP_COLLISIONVERTS = 65536 * 2;
+const int MAX_MAP_COLLISIONVERTS_SIZE = MAX_MAP_COLLISIONVERTS * 12;
+BYTE collVertData[MAX_MAP_COLLISIONVERTS_SIZE];
+BYTE *collVertDataPtr = (BYTE *)&collVertData;
 
 bool g_initted = false;
 
@@ -43,6 +48,15 @@ BOOL cod2rad_Init()
 	// Add Custom Cmd Line Arguments (-HDR Support)
 	//
 	PatchArguments();
+
+	//
+	// Increase limits for LUMP_COLLISIONVERTS
+	//
+	PatchMemory(0x00442486, (PBYTE)&MAX_MAP_COLLISIONVERTS_SIZE, 4);
+	PatchMemory(0x00442492, (PBYTE)&MAX_MAP_COLLISIONVERTS_SIZE, 4);
+	PatchMemory(0x00444152, (PBYTE)&MAX_MAP_COLLISIONVERTS_SIZE, 4);
+	PatchMemory(0x0044417B, (PBYTE)&collVertDataPtr, 4);
+	PatchMemory(0x004424B8, (PBYTE)&collVertDataPtr, 4);
 
 	//
 	// Enable Techset / Technique Path Redirection

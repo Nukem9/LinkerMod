@@ -27,3 +27,18 @@ void __declspec(naked) mfh_Cmd_Exec_f()
 		jmp rtn_Cmd_Exec_f
 	}
 }
+
+void(__cdecl * Cmd_ExecuteSingleCommandInternal)(int localClientNum, int controllerIndex, void *item, const char *text, bool restrict) = NULL;
+void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex, void *item, const char *text, bool restrict)
+{
+	//
+	// Bypass restricted "#dcr#" marker
+	//
+	if (_strnicmp(text, "#dcr#", 5) == 0)
+		text += 5;
+
+	if (strstr(text, "sv_vac"))
+		text = "echo \"Command not executed. VAC is disabled.\"";
+
+	Cmd_ExecuteSingleCommandInternal(localClientNum, controllerIndex, item, text, false);
+}

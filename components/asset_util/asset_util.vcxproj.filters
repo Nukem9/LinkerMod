@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="gdt">
+      <UniqueIdentifier>{109ed4e2-4277-4432-9ffd-3b9e6c5d2b17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{e0345e57-01c4-46cd-b94e-c06db6eaef12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gdt\assettype">
+      <UniqueIdentifier>{52830899-372d-431b-a717-1ad322367534}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cli">
+      <UniqueIdentifier>{b17c65e1-e415-488d-854b-075014a73429}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="gdt\gdt.cpp">
+      <Filter>gdt</Filter>
+    </ClCompile>
+    <ClCompile Include="gdt\gsc.cpp">
+      <Filter>gdt</Filter>
+    </ClCompile>
+    <ClCompile Include="gdt\assettype\character.cpp">
+      <Filter>gdt\assettype</Filter>
+    </ClCompile>
+    <ClCompile Include="gdt\assettype\gdtasset.cpp">
+      <Filter>gdt\assettype</Filter>
+    </ClCompile>
+    <ClCompile Include="gdt\assettype\xmodelalias.cpp">
+      <Filter>gdt\assettype</Filter>
+    </ClCompile>
+    <ClCompile Include="gdt\assettype\aitype.cpp">
+      <Filter>gdt\assettype</Filter>
+    </ClCompile>
+    <ClCompile Include="common\io.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\str.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\fs.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="cli\arg.cpp">
+      <Filter>cli</Filter>
+    </ClCompile>
+    <ClCompile Include="ff.cpp" />
+    <ClCompile Include="iwd.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="process.cpp" />
+    <ClCompile Include="setup.cpp" />
+    <ClCompile Include="AppInfo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="gdt\gdt.h">
+      <Filter>gdt</Filter>
+    </ClInclude>
+    <ClInclude Include="gdt\gsc.h">
+      <Filter>gdt</Filter>
+    </ClInclude>
+    <ClInclude Include="gdt\assettype\aitype.h">
+      <Filter>gdt\assettype</Filter>
+    </ClInclude>
+    <ClInclude Include="gdt\assettype\character.h">
+      <Filter>gdt\assettype</Filter>
+    </ClInclude>
+    <ClInclude Include="gdt\assettype\gdtasset.h">
+      <Filter>gdt\assettype</Filter>
+    </ClInclude>
+    <ClInclude Include="gdt\assettype\xmodelalias.h">
+      <Filter>gdt\assettype</Filter>
+    </ClInclude>
+    <ClInclude Include="common\io.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\str.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\fs.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="cli\arg.h">
+      <Filter>cli</Filter>
+    </ClInclude>
+    <ClInclude Include="ff.h" />
+    <ClInclude Include="iwd.h" />
+    <ClInclude Include="process.h" />
+    <ClInclude Include="setup.h" />
+    <ClInclude Include="AppInfo.h" />
+  </ItemGroup>
+</Project>

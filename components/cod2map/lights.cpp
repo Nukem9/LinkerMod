@@ -1,6 +1,4 @@
-#include "lights.h"
-#include <Windows.h>
-#include "kvs.h"
+#include "stdafx.h"
 
 PrimaryLightData* g_tmpPrimaryLightData = nullptr;
 int g_primaryLightCount = 0;
@@ -24,17 +22,17 @@ void __declspec(naked) mfh_PrimaryLightHandler(void)
 void LoadPrimaryLightData(void* ent, PrimaryLightData* dest)
 {
 	dest->near_edge = Ent_KV_Float(ent, "near_edge", 0.0f);
-	dest->far_edge = Ent_KV_Float(ent, "far_edge", 0.0f);
+	dest->far_edge = Ent_KV_Float(ent, "far_edge", 0.95f);
 	dest->cut_on = Ent_KV_Float(ent, "cut_on", 0.0f);
 	dest->roundness = Ent_KV_Float(ent, "roundness", 1.0f);
 
 	if (*Ent_GetKV_String(ent, "superellipse") != '\0')
 	{
-		dest->superellipse = Ent_KV_Vec4(ent, "superellipse", vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		dest->superellipse = Ent_KV_Vec4(ent, "superellipse", vec4(0.75f, 1.0f, 0.75f, 1.0f));
 	}
 	else //catch "superellipsis" too
 	{
-		dest->superellipse = Ent_KV_Vec4(ent, "superellipsis", vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		dest->superellipse = Ent_KV_Vec4(ent, "superellipsis", vec4(0.75f, 1.0f, 0.75f, 1.0f));
 	}
 
 	dest->attenuation = Ent_KV_Vec3(ent, "attenuation", vec3(1.0f, 0.0f, 0.0f));

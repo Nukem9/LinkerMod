@@ -15,18 +15,20 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>game_mod</RootNamespace>
     <ProjectName>game_mod</ProjectName>
+    <WindowsTargetPlatformVersion>
+    </WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -35,18 +37,18 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\build\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\build\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -61,7 +63,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4099 /opt:nolbr %(AdditionalOptions) /opt:nolbr </AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -81,10 +83,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <IgnoreSpecificDefaultLibraries />
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CEG.cpp" />
+    <ClCompile Include="cg_scoreboard.cpp" />
     <ClCompile Include="cl_main_mp.cpp" />
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="common.cpp" />
@@ -93,14 +97,21 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
     <ClCompile Include="live_win.cpp" />
-    <ClCompile Include="reflection_fix.cpp" />
+    <ClCompile Include="patch_common.cpp" />
+    <ClCompile Include="patch_usefastfile.cpp" />
+    <ClCompile Include="patch_reflections.cpp" />
+    <ClCompile Include="reshade.cpp" />
     <ClCompile Include="r_cinematic.cpp" />
+    <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="ui_main_pc.cpp" />
+    <ClCompile Include="win_common.cpp" />
+    <ClCompile Include="win_exception.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CEG.h" />
+    <ClInclude Include="cg_scoreboard.h" />
     <ClInclude Include="cl_main_mp.h" />
     <ClInclude Include="cmd.h" />
     <ClInclude Include="common.h" />
@@ -109,8 +120,12 @@
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
     <ClInclude Include="live_win.h" />
-    <ClInclude Include="reflection_fix.h" />
+    <ClInclude Include="patch_common.h" />
+    <ClInclude Include="patch_usefastfile.h" />
+    <ClInclude Include="patch_reflections.h" />
+    <ClInclude Include="reshade.h" />
     <ClInclude Include="r_cinematic.h" />
+    <ClInclude Include="r_material_load_obj.h" />
     <ClInclude Include="r_reflection_probe.h" />
     <ClInclude Include="r_rendercmds.h" />
     <ClInclude Include="r_scene.h" />
@@ -119,6 +134,9 @@
     <ClInclude Include="sv_ccmds_mp.h" />
     <ClInclude Include="sys_cmds.h" />
     <ClInclude Include="ui_main_pc.h" />
+    <ClInclude Include="win_common.h" />
+    <ClInclude Include="win_exception.h" />
+    <ClInclude Include="win_localize.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

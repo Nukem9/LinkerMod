@@ -5,7 +5,7 @@ DWORD* g_poolSize = (DWORD*)0x00B73EF8;
 
 void DB_SyncXAssets()
 {
-	R_BeginRemoveScreenUpdate();
+	R_BeginRemoteScreenUpdate();
 	Sys_SyncDatabase();
 	R_EndRemoteScreenUpdate(0);
 	SocketRouter_EmergencyFrame("DB_SyncXAssets");

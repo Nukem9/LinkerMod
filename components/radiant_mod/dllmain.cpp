@@ -57,6 +57,15 @@ BOOL RadiantMod_Init()
 		freopen("CONIN$", "r", stdin);
 	}
 
+#if USE_NSIGHT_FIX
+	if (PatchNvidiaTools())
+	{
+		// Force windows to always be redrawn
+		PatchMemory_WithNOP(0x0042EDC4, 10);
+		*(DWORD *)0x027C32F4 = 0xFFFFFFFF;
+	}
+#endif
+
 	//
 	// Hook any needed functions
 	//
@@ -78,17 +87,20 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0052BE30, (PBYTE)&Material_ReloadTextures);
 	Detours::X86::DetourFunction((PBYTE)0x005675B0, (PBYTE)&hk_Image_LoadFromFileWithReader);
 
+#if WAW_PIMP
 	//
 	// Load techset override data
 	//
 	FS_Init_TechsetOverride();
+#endif
 
 	//
 	// Hook shader/technique/techset loading functions for PIMP (ShaderWorks)
 	//
-	//Detours::X86::DetourFunction((PBYTE)0x0052FE70, (PBYTE)&hk_Material_SetPassShaderArguments_DX);
-	//Detours::X86::DetourFunction((PBYTE)0x00530550, (PBYTE)&Material_LoadPass);
-	//Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
+#if !WAW_PIMP
+	Detours::X86::DetourFunction((PBYTE)0x00530550, (PBYTE)&hk_Material_LoadPass);
+	Detours::X86::DetourFunction((PBYTE)0x0052F700, (PBYTE)&hk_Material_LoadShader);
+#endif
 	Detours::X86::DetourFunction((PBYTE)0x00530D60, (PBYTE)&Material_LoadTechniqueSet);
 
 	//
@@ -125,8 +137,8 @@ BOOL RadiantMod_Init()
 	//
 	// Debug INT3 to make sure specific functions are not called
 	//
+#if !WAW_PIMP
 #define DO_NOT_USE(x) PatchMemory((x), (PBYTE)"\xCC", 1)
-	/*
 	DO_NOT_USE(0x0052EA20);// Material_ParseArgumentSource
 	DO_NOT_USE(0x0052E2C0);// Material_ParseSamplerSource
 	DO_NOT_USE(0x0052E6E0);// Material_ParseConstantSource
@@ -144,8 +156,10 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052E990);// Material_ElemCountForParamName
 	DO_NOT_USE(0x0052D140);// Material_UsingTechnique
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
-	*/
+	DO_NOT_USE(0x0052FE70);// Material_SetPassShaderArguments_DX
+	DO_NOT_USE(0x00567450);// Image_LoadFromData
 #undef DO_NOT_USE
+#endif
 
 	//
 	// Increase the maximum number of files used by FS_ListFilteredFiles
@@ -164,8 +178,92 @@ BOOL RadiantMod_Init()
 	//
 	PatchMemory(0x006F7378, (PBYTE)".pts", 4);
 
-	g_Initted = true;
+	//
+	// Fix for misleading (incorrect) assertion message
+	//
+	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
+	PatchMemory(0x0052E7F0, (PBYTE)&msg_assertion, 4);
 
+	//
+	// Fix for omni light previews being cut off at sqrt(radius)
+	//
+	R_SetLightProperties_o = (R_SetLightProperties_t)Detours::X86::DetourFunction((PBYTE)0x0056E4A0, (PBYTE)&R_SetLightProperties);
+
+	//
+	// Disable Spam
+	//
+#if RADIANT_DISABLE_SPAM_MSG_SCAN
+	PatchMemory_WithNOP(0x004A7418, 5); //ScanDestructibleDef
+	PatchMemory_WithNOP(0x004A74CD, 5); //StrCpy
+	PatchMemory_WithNOP(0x004A71C2, 5); //ScanWeapon
+	PatchMemory_WithNOP(0x0049B5F2, 5); //ScanFile
+#endif
+#if RADIANT_DISABLE_SPAM_MSG_IMAGE
+
+	// ERROR: image '%s' is missing\n
+	PatchMemory_WithNOP(0x0056762C, 5); // Com_Printf
+	PatchMemory_WithNOP(0x00576C50, 5); // Com_Error
+	
+	// ERROR: failed to load image '%s'\n
+	PatchMemory_WithNOP(0x0052B4D4, 5);
+	PatchMemory_WithNOP(0x0052B61D, 5);
+#endif
+#if RADIANT_DISABLE_SPAM_MSG_MATERIAL
+	PatchMemory_WithNOP(0x00472C28, 5); // WARNING: Could not find material '%s'
+	PatchMemory_WithNOP(0x00519A5A, 5);
+#endif
+
+	//
+	// Remap Statemap GE255 DepthTest -> LT128
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0052D1B8, (PBYTE)&mfh_Material_ParseValueForState);
+
+	//
+	// Override BO1 codeConsts before pushing data to the shader
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0053F625, (PBYTE)&mfh_R_SetPassPixelShaderStableArguments);
+
+	//
+	// Add support for BO1 KVs in the lighting preview
+	// 
+	Detours::X86::DetourFunction((PBYTE)0x00408367, (PBYTE)&mfh_Ent_BuildLightInfo);
+	Detours::X86::DetourFunction((PBYTE)0x004A814E, (PBYTE)&mfh_Ent_Connect); // Generate the new default spotLight KVs when creating a spotLight
+
+#if RADIANT_USE_AFX_OVERRIDES
+	CWnd::OnCtlColor_o = (OnCtlColor_t)Detours::X86::DetourClassFunction((PBYTE)0x0059B96E, &CWnd::OnCtlColor);
+#endif
+
+#if RADIANT_USE_SPLASH
+	//
+	// Generate Splash Screen on Launch (WinMain)
+	//
+	rtn_WinMain = Detours::X86::DetourFunction((PBYTE)0x00635355, (PBYTE)&mfh_WinMain, Detours::X86Option::USE_JUMP);
+
+	//
+	// Destroy Splash Screen Upon Entering MessageLoop
+	//
+	Com_LoadProject_o = (Com_LoadProject_t)Detours::X86::DetourFunction((PBYTE)0x0042E9C0, (PBYTE)&Com_LoadProject);
+
+	//
+	// Disable the initial SetWindowPlacement call for the corresponding windows
+	// (Used to prevent the windows from showing upon placement, but prevents the placement from being restored from the registry keys)
+	//
+	//PatchMemory_WithNOP(0x0042F87E, 8); // Main Window (Resets the saved placement settings at every launch)
+	PatchMemory_WithNOP(0x004B36DB, 8); // Entity Window
+	PatchMemory_WithNOP(0x004018AC, 8); // Advanced Curve Dialog
+
+	//
+	// Override the initial SetWindowPlacement call for the corresponding windows
+	// (Forces SW_HIDE for SetWindowPlacement, but doesn't always prevent certain windows from displaying)
+	//
+	void* ppfn = &pfn_SetWindowPlacement_Hidden;
+	PatchMemory(0x0042F882, (PBYTE)&ppfn, 4); // Main Window
+	//PatchMemory(0x004B36DF, (PBYTE)&ppfn, 4); // Entity Window (Doesn't work)
+	//PatchMemory(0x004018B0, (PBYTE)&ppfn, 4); // Advanced Curve Dialog (Doesn''t work)
+
+#endif
+
+	g_Initted = true;
 	return TRUE;
 }
 

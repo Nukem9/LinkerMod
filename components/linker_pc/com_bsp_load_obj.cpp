@@ -17,7 +17,7 @@ bool Com_BspError()
 
 void Com_GetBspFilename(char *filename, int size, const char *mapname)
 {
-	sprintf_s(filename, size, "maps/%s.d3dbsp");
+	sprintf_s(filename, size, "maps/%s.d3dbsp", mapname);
 }
 
 void Com_LoadBsp(const char *filename)

@@ -2,7 +2,7 @@
 //DWORD (__cdecl *R_CubemapShotSetInitialState)() = (DWORD (__cdecl*)())0x00708710;
 //void (__cdecl *R_EndCubemapShot)(int) = (void (__cdecl*)(int))0x00708890;
 
-typedef DWORD _D3DFORMAT;
+static_assert(sizeof(_D3DFORMAT) == sizeof(DWORD), "_D3DFORMAT must be 4 bytes!");
 
 struct GfxMetrics
 {
