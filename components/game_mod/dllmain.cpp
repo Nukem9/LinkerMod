@@ -80,6 +80,7 @@ BOOL GameMod_Init()
 	// PLATFORM_MISSINGMAP fix
 	//
 	SV_ValidateMap_o = Detours::X86::DetourFunction((PBYTE)0x0041EEC0, (PBYTE)&SV_ValidateMap);
+	PartyClient_CheckMapExists_o = (PartyClient_CheckMapExists_t)Detours::X86::DetourFunction((PBYTE)0x0061B480, (PBYTE)&PartyClient_CheckMapExists);
 
 	//
 	// Unrestrict Dvar_ForEachConsoleAccessName,
