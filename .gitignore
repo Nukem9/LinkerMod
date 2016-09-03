@@ -18,7 +18,8 @@
 components/sdk
 components/*/Debug
 components/*/Release
-
+components/shared/*/Debug
+components/shared/*/Release
 components/D3DBSP_Lib/*/Release
 components/D3DBSP_Lib/*/Debug
 
