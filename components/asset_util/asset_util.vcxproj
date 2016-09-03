@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="AppInfo.cpp" />
     <ClCompile Include="cli\arg.cpp" />
+    <ClCompile Include="cmd_ents.cpp" />
     <ClCompile Include="common\fs.cpp" />
     <ClCompile Include="common\io.cpp" />
     <ClCompile Include="common\str.cpp" />
@@ -31,6 +32,7 @@
   <ItemGroup>
     <ClInclude Include="AppInfo.h" />
     <ClInclude Include="cli\arg.h" />
+    <ClInclude Include="cmd_ents.h" />
     <ClInclude Include="common\fs.h" />
     <ClInclude Include="common\io.h" />
     <ClInclude Include="common\str.h" />

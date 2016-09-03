@@ -14,6 +14,8 @@
 #include "gdt/assettype\aitype.h"
 #include "gdt/gdt.h"
 
+#include "cmd_ents.h"
+
 GDT gdt;
 
 //

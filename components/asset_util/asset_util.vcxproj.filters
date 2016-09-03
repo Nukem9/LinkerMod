@@ -51,6 +51,7 @@
     <ClCompile Include="process.cpp" />
     <ClCompile Include="setup.cpp" />
     <ClCompile Include="AppInfo.cpp" />
+    <ClCompile Include="cmd_ents.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gdt\gdt.h">
@@ -88,5 +89,6 @@
     <ClInclude Include="process.h" />
     <ClInclude Include="setup.h" />
     <ClInclude Include="AppInfo.h" />
+    <ClInclude Include="cmd_ents.h" />
   </ItemGroup>
 </Project>
