@@ -65,7 +65,7 @@ void __cdecl Com_LoadCommonFastFile()
 		zoneInfo[zoneCount].allocFlags = 0;
 		zoneInfo[zoneCount++].freeFlags = 0x100;
 
-		DB_LoadXAssets(zoneInfo, ++zoneCount, 0);
+		DB_LoadXAssets(zoneInfo, zoneCount, 0);
 		return;
 	}
 
