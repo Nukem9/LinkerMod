@@ -56,8 +56,7 @@ typedef ParseThreadInfo *(__cdecl* Com_EndParseSession_t)();
 static Com_EndParseSession_t Com_EndParseSession = (Com_EndParseSession_t)0x005C11C0;
 
 
-typedef void (__cdecl* Com_LoadCommonFastFile_t)();
-static Com_LoadCommonFastFile_t Com_LoadCommonFastFile = (Com_LoadCommonFastFile_t)0x0082CB50;
+void __cdecl Com_LoadCommonFastFile();
 
 typedef int (__cdecl* I_strcmp_t)(const char *s0, const char *s1);
 static I_strcmp_t I_strcmp = (I_strcmp_t)0x0063E630;

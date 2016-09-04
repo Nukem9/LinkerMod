@@ -49,6 +49,52 @@ void Com_ToolError(int channel, const char* fmt, ...)
 	Com_Error(channel, "%s", msg);
 }
 
+void __cdecl Com_LoadCommonFastFile()
+{
+	XZoneInfo zoneInfo[2];
+	int zoneCount = 0;
+
+	DB_ResetZoneSize(0);
+
+	if (useFastFile->current.enabled)
+		DB_ReleaseXAssets();
+
+	if (zombietron->current.enabled)
+	{
+		zoneInfo[zoneCount].name = NULL;
+		zoneInfo[zoneCount].allocFlags = 0;
+		zoneInfo[zoneCount++].freeFlags = 0x100;
+
+		DB_LoadXAssets(zoneInfo, ++zoneCount, 0);
+		return;
+	}
+
+	//
+	// blackopsmode requires common_zombie for technique data, and common for scripts
+	//
+	if (zombiemode->current.enabled || blackopsmode->current.enabled)
+	{
+		if ( DB_IsZoneLoaded("common_zombie") )
+			return;
+
+		zoneInfo[zoneCount].name = "common_zombie";
+		zoneInfo[zoneCount].allocFlags = 0x100;
+		zoneInfo[zoneCount++].freeFlags = 0;
+	}
+	
+	if (!zombiemode->current.enabled)
+	{
+		if ( DB_IsZoneLoaded("common") )
+			return;
+		
+		zoneInfo[zoneCount].name = "common";
+		zoneInfo[zoneCount].allocFlags = 0x100;
+		zoneInfo[zoneCount++].freeFlags = 0;
+	}
+
+	DB_LoadXAssets(zoneInfo, zoneCount, 0);
+}
+
 char *__cdecl Com_GetLevelSharedFastFile(const char *mapName)
 {
 	char loadBuffer[16384];

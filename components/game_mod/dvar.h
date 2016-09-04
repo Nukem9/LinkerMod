@@ -82,6 +82,17 @@ struct dvar_s
 
 static dvar_s **com_sv_running = (dvar_s **)0x0243FD3C;
 
+static dvar_s **developer = (dvar_s **)0x0243FCA0;
+static dvar_s **developer_script = (dvar_s **)0x02481714;
+
+static dvar_s*& zombietron = *(dvar_s**)0x0247FDE8;
+static dvar_s*& zombiemode = *(dvar_s**)0x0243FDD4;
+static dvar_s*& blackopsmode = *(dvar_s**)0x0243FD24;
+static dvar_s*& useFastFile = *(dvar_s**)0x0247FEC8;
+
+extern bool com_cfg_readOnly_default;
+extern dvar_s* com_cfg_readOnly;
+
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;
 

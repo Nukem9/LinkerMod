@@ -176,6 +176,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004C8890, (PBYTE)&Com_LoadLevelFastFiles);
 
 	//
+	// Enable loading of common fastfiles in blackopsmode
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0082CB50, (PBYTE)&Com_LoadCommonFastFile);
+
+	//
 	// DB_LoadGraphicsAssetsForPC hook to automatically attempt to load frontend_patch.ff
 	// which is can be used to enable the mods button on the main menu
 	//
