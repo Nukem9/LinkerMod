@@ -126,8 +126,15 @@ CVar::~CVar(void)
 {
 }
 
-/*bool CVar::Enable(void)
+CVAR_TYPE CVar::Type(void) const
 {
+	return this->type;
+}
+
+bool CVar::Enable(void)
+{
+	_ASSERT(this->type == CVAR_BOOL);
+
 	switch(this->type)
 	{
 		case CVAR_BOOL:
@@ -136,7 +143,7 @@ CVar::~CVar(void)
 			else if (stricmp(this->str_val, "true") == 0)
 				this->bool_val = true;
 			else
-				this->bool_val = (bool)atoi(str_val);
+				this->bool_val = (!!atoi(str_val));
 			this->int_val = bool_val ? 1 : 0;
 			this->float_val = (float)int_val;
 			break;
@@ -158,15 +165,29 @@ CVar::~CVar(void)
 		default:
 			return 1;
 	}
+
+	return this->bool_val;
 }
 
 bool CVar::Disable(void)
 {
+	_ASSERT(this->type == CVAR_BOOL);
+
 	this->bool_val = false;
 	this->int_val = 0;
 	this->float_val = 0.0f;
-	this->str_val = "NULL";
-}*/
+	strncpy_s(this->str_val, "NULL", 32);
+
+	return this->bool_val;
+}
+
+bool CVar::Toggle(void)
+{
+	if (this->ValueBool())
+		return this->Disable();
+	else
+		return this->Enable();
+}
 
 //
 // Assign raw command line string data

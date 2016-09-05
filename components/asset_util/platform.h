@@ -22,6 +22,8 @@
 
 W32_WARNING_DISABLE(4996) // Disable POSIX Name Deprecation
 
+#include <assert.h>
+
 #else //LINUX
 
 #include <unistd.h>	// required for isatty (LINUX)

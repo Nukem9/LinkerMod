@@ -38,13 +38,16 @@ public:
 
 	~CVar(void);
 
+	CVAR_TYPE Type(void) const;
+
 	//
 	// Currently only supports bool cvars
 	//
-	//bool		Enable(void);
-	//bool		Disable(void);
+	bool		Enable(void);
+	bool		Disable(void);
+	bool		Toggle(void);
 
-	//int			AssignValue(bool value);
+	int			AssignValue(bool value);
 	//int			AssignValue(int value);
 	//int			AssignValue(float value);
 	//int			AssignValue(const char* value);
