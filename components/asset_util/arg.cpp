@@ -90,14 +90,11 @@ char* ArgParsedInfo::Argv(int index) const
 	return this->argv[index];
 }
 
-//
-// The EXAMPLE: line is currently disabled - enable it when the project transition has completed
-//
 void Arg_PrintUsage(void)
 {
 	printf(	"%-9s%s\n%-9s%s\n\n",
-			"Usage:",	APPLICATION_NAME" [command] [options]"/*,
-			"Example:",	APPLICATION_NAME" --tree -f 'maps/utility.gsc'"*/);
+			"Usage:",	APPLICATION_NAME" [command] [options]",
+			"Example:",	APPLICATION_NAME" --ents -v 'zone/Common/mp_cairo.ff'");
 	
 	printf("Options:\n");
 	for(int i = 0; i < 255; i++)
