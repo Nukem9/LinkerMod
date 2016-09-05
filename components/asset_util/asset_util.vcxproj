@@ -14,6 +14,7 @@
     <ClCompile Include="arg.cpp" />
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="cmds\cmd_ents.cpp" />
+    <ClCompile Include="cmds\cmd_extract.cpp" />
     <ClCompile Include="cmds\cmd_help.cpp" />
     <ClCompile Include="common\ff.cpp" />
     <ClCompile Include="common\fs.cpp" />

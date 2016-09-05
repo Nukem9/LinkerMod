@@ -59,6 +59,9 @@ char* FindEntsString(BYTE* start, BYTE* end)
 	return nullptr;
 }
 
+//
+// Argument format: argv[1...n] are zone filenames
+//
 int Cmd_Ents_f(int argc, char** argv)
 {
 	//

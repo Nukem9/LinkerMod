@@ -24,5 +24,7 @@ public:
 
 REGISTER_GLOBAL_COMMAND(g_cmd_help);
 REGISTER_GLOBAL_COMMAND(g_cmd_ents);
+REGISTER_GLOBAL_COMMAND(g_cmd_extract_ff);
+REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd);
 
 #undef REGISTER_GLOBAL_COMMAND

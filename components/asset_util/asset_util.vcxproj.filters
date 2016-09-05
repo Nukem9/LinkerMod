@@ -51,6 +51,9 @@
     <ClCompile Include="common\iwd.cpp">
       <Filter>common</Filter>
     </ClCompile>
+    <ClCompile Include="cmds\cmd_extract.cpp">
+      <Filter>cmds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cmd.h" />
