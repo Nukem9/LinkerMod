@@ -94,7 +94,7 @@ void Arg_PrintUsage(void)
 {
 	printf(	"%-9s%s\n%-9s%s\n\n",
 			"Usage:",	APPLICATION_NAME" [command] [options]",
-			"Example:",	APPLICATION_NAME" --ents -v 'zone/Common/mp_cairo.ff'");
+			"Example:",	APPLICATION_NAME" ents -v 'zone/Common/mp_cairo.ff'");
 	
 	printf("Options:\n");
 	for(int i = 0; i < 255; i++)
