@@ -31,13 +31,15 @@ Command::Command(const char* name, const char* description,  cmd_func_t func) : 
 
 int Command::Exec(int argc, char** argv) const
 {
+#if _DEBUG
 	printf("Executing command: '%s' with the following arguments:\n", this->name);
 	for(int i = 0; i < argc; i++)
 	{
 		printf("  [%d] %s\n", i, argv[i]);
 	}
 	printf("\n");
-	
+#endif
+
 	return this->func(argc, argv);
 }
 
