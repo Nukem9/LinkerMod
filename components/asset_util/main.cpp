@@ -15,7 +15,12 @@
 
 #include "common/io.h"
 
-int main(int argc, char** argv)
+//
+// Sub-main function
+//	- run AFTER global setup 
+//	- run BEFORE global cleanup
+//
+int app_main(int argc, char** argv)
 {
 	if(argc <= 1)
 	{
@@ -26,18 +31,30 @@ int main(int argc, char** argv)
 	ArgParsedInfo cmd_info;
 	if(int err = Arg_ParseArguments(argc - 1, argv + 1, &cmd_info))
 	{
-		fprintf(stderr, "Fatal Error: %d\n", err);
+		Con_Error("Fatal Error: %d\n", err);
 		return err;
 	}
 
 	if (g_dumpCVars.ValueBool())
 		CVar::DumpList();
 	else
-		printf("\n");
+		Con_Print("\n");
 	
 	AppInfo_Init();
 
 	return cmd_info.Cmd()->Exec(cmd_info.Argc(), cmd_info.Argv());
+}
+
+//
+// The true main function:
+//	- do any global setup or cleanup here
+//
+int main(int argc, char** argv)
+{
+	Con_Init();
+	int out = app_main(argc, argv);
+	Con_Free();
+	return out;
 }
 
 //
