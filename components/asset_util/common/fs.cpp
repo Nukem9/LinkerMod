@@ -1,6 +1,6 @@
 #pragma once
 #include "fs.h"
-#include "../AppInfo.h"
+#include "../sys/AppInfo.h"
 #include <sys/stat.h>
 #include <Windows.h>
 

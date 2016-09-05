@@ -1,3 +1,66 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
+#ifdef _WIN32
+	#include <Windows.h>
+#endif
+
+#include "sys\AppInfo.h"
+
+#include "platform.h"
+#include "arg.h"
+#include "cvar.h"
+#include "cmd.h"
+
+#include "common/io.h"
+
+//
+// Sub-main function
+//	- run AFTER global setup 
+//	- run BEFORE global cleanup
+//
+int app_main(int argc, char** argv)
+{
+	if(argc <= 1)
+	{
+		Arg_PrintUsage();
+		return 1;
+	}
+	
+	ArgParsedInfo cmd_info;
+	if(int err = Arg_ParseArguments(argc - 1, argv + 1, &cmd_info))
+	{
+		Con_Error("Fatal Error: %d\n", err);
+		return err;
+	}
+
+	if (g_dumpCVars.ValueBool())
+		CVar::DumpList();
+	else
+		Con_Print("\n");
+	
+	AppInfo_Init();
+
+	return cmd_info.Cmd()->Exec(cmd_info.Argc(), cmd_info.Argv());
+}
+
+//
+// The true main function:
+//	- do any global setup or cleanup here
+//
+int main(int argc, char** argv)
+{
+	Con_Init();
+	int out = app_main(argc, argv);
+	Con_Free();
+	return out;
+}
+
+//
+// Pre-Transition main.cpp
+//
+#if LEGACY
 #include <Windows.h>
 #include "AppInfo.h"
 #include "cli/arg.h"
@@ -98,3 +161,5 @@ int main(int argc, const char** argv)
 
 	return 0;
 }
+
+#endif

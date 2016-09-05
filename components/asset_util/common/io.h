@@ -2,17 +2,22 @@
 
 #include <iostream>
 #include <stdarg.h>
+#include <WTypes.h>
 
-//int printf(const char* fmt, ...);
+int Con_Init(void);
+int Con_Free(void);
 
-//
-// printf for verbose mode
-// prints only when verbose mode is active
-//
-int printf_v(const char* fmt, ...);
+WORD Con_SetAttributes(WORD wAttribs);
+WORD Con_GetAttributes(void);
 
-//
-// printf for verbose mode
-// prints only when verbose mode is NOT active
-//
-int printf_nv(const char* fmt, ...);
+int Con_Print(const char* fmt, ...);
+int Con_Error(const char* fmt, ...);
+int Con_Warning(const char* fmt, ...);
+
+int Con_Print_v(const char* fmt, ...);
+int Con_Error_v(const char* fmt, ...);
+int Con_Warning_v(const char* fmt, ...);
+
+int Con_Print_nv(const char* fmt, ...);
+int Con_Error_nv(const char* fmt, ...);
+int Con_Warning_nv(const char* fmt, ...);
