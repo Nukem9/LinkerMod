@@ -8,6 +8,7 @@
 
 Command* Command::g_cmds = NULL;
 REGISTER_GLOBAL_COMMAND(g_cmd_help, "help", "Print usage information", Cmd_Help_f);
+REGISTER_GLOBAL_COMMAND(g_cmd_ents, "ents", "Extract the entity string from a fastfile", Cmd_Ents_f);
 
 #undef REGISTER_GLOBAL_COMMAND
 
