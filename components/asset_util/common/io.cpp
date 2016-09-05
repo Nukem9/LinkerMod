@@ -1,9 +1,9 @@
 #include "io.h"
-#include "../cli/arg.h"
+#include "../cvar.h"
 
 int printf_v(const char* fmt, ...)
 {
-	if (!ARG_FLAG_VERBOSE)
+	if (!g_verbose.ValueBool()) 
 		return 0;
 
 	va_list args;
@@ -16,7 +16,7 @@ int printf_v(const char* fmt, ...)
 
 int printf_nv(const char* fmt, ...)
 {
-	if (ARG_FLAG_VERBOSE)
+	if (g_verbose.ValueBool())
 		return 0;
 
 	va_list args;

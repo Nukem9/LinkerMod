@@ -1,25 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="gdt">
-      <UniqueIdentifier>{109ed4e2-4277-4432-9ffd-3b9e6c5d2b17}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common">
-      <UniqueIdentifier>{e0345e57-01c4-46cd-b94e-c06db6eaef12}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="gdt\assettype">
-      <UniqueIdentifier>{52830899-372d-431b-a717-1ad322367534}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="cli">
-      <UniqueIdentifier>{b17c65e1-e415-488d-854b-075014a73429}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="cmd.cpp" />
+    <ClCompile Include="cvar.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="arg.cpp" />
     <ClCompile Include="gdt\gdt.cpp">
       <Filter>gdt</Filter>
     </ClCompile>
     <ClCompile Include="gdt\gsc.cpp">
       <Filter>gdt</Filter>
+    </ClCompile>
+    <ClCompile Include="gdt\assettype\aitype.cpp">
+      <Filter>gdt\assettype</Filter>
     </ClCompile>
     <ClCompile Include="gdt\assettype\character.cpp">
       <Filter>gdt\assettype</Filter>
@@ -28,9 +21,6 @@
       <Filter>gdt\assettype</Filter>
     </ClCompile>
     <ClCompile Include="gdt\assettype\xmodelalias.cpp">
-      <Filter>gdt\assettype</Filter>
-    </ClCompile>
-    <ClCompile Include="gdt\assettype\aitype.cpp">
       <Filter>gdt\assettype</Filter>
     </ClCompile>
     <ClCompile Include="common\io.cpp">
@@ -42,18 +32,34 @@
     <ClCompile Include="common\fs.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="cli\arg.cpp">
-      <Filter>cli</Filter>
+    <ClCompile Include="sys\AppInfo.cpp">
+      <Filter>sys</Filter>
     </ClCompile>
-    <ClCompile Include="ff.cpp" />
-    <ClCompile Include="iwd.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="process.cpp" />
+    <ClCompile Include="sys\process.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
     <ClCompile Include="setup.cpp" />
-    <ClCompile Include="AppInfo.cpp" />
-    <ClCompile Include="cmd_ents.cpp" />
+    <ClCompile Include="cmds\cmd_ents.cpp">
+      <Filter>cmds</Filter>
+    </ClCompile>
+    <ClCompile Include="cmds\cmd_help.cpp">
+      <Filter>cmds</Filter>
+    </ClCompile>
+    <ClCompile Include="common\ff.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\iwd.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cmd.h" />
+    <ClInclude Include="cvar.h" />
+    <ClInclude Include="platform.h" />
+    <ClInclude Include="arg.h" />
+    <ClInclude Include="common\llist.h">
+      <Filter>common</Filter>
+    </ClInclude>
     <ClInclude Include="gdt\gdt.h">
       <Filter>gdt</Filter>
     </ClInclude>
@@ -81,14 +87,38 @@
     <ClInclude Include="common\fs.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="cli\arg.h">
-      <Filter>cli</Filter>
+    <ClInclude Include="sys\AppInfo.h">
+      <Filter>sys</Filter>
     </ClInclude>
-    <ClInclude Include="ff.h" />
-    <ClInclude Include="iwd.h" />
-    <ClInclude Include="process.h" />
+    <ClInclude Include="sys\process.h">
+      <Filter>sys</Filter>
+    </ClInclude>
     <ClInclude Include="setup.h" />
-    <ClInclude Include="AppInfo.h" />
-    <ClInclude Include="cmd_ents.h" />
+    <ClInclude Include="cmds\cmd_common.h">
+      <Filter>cmds</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ff.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\iwd.h">
+      <Filter>common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{e31f8666-3bf2-493e-b899-8525c6a3e30d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gdt">
+      <UniqueIdentifier>{a2820f3d-03e5-4b69-a7d7-70c512eec423}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gdt\assettype">
+      <UniqueIdentifier>{13d2159d-d88c-4815-a20b-01003f049aef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sys">
+      <UniqueIdentifier>{ec18eb97-7da4-4fc0-8511-297a43a51eae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cmds">
+      <UniqueIdentifier>{f2eaf143-9cec-4b52-b528-477c8590ac00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

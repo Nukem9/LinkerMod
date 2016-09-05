@@ -1,4 +1,4 @@
-#include "ff.h"
+#include "../common/ff.h"
 #include "zlib\zlib.h"
 #include <iostream>
 
@@ -59,8 +59,14 @@ char* FindEntsString(BYTE* start, BYTE* end)
 	return nullptr;
 }
 
-bool Cmd_ExtractEnts(const char* filepath)
+int Cmd_ExtractEnts(int argc, char** argv)
 {
+	//
+	// Temp arg handler
+	//
+	_ASSERT(argc > 1);
+	char* filepath = argv[1];
+
 	printf("Extracting ents from \"%s\"...\n", filepath);
 
 	FILE* h = nullptr;

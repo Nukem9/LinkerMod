@@ -1,10 +1,10 @@
 #include "iwd.h"
-#include "cli/arg.h"
+#include "../cvar.h"
 #include <Windows.h>
-#include "common/io.h"
+#include "io.h"
 #include "../shared/miniz/miniz.h"
-#include "common/str.h"
-#include "AppInfo.h"
+#include "str.h"
+#include "../sys/AppInfo.h"
 
 #define IWD_DIR_SOUND "sound/"
 #define IWD_DIR_IMAGE "images/"

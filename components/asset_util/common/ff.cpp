@@ -1,11 +1,11 @@
 #include "ff.h"
-#include "cli/arg.h"
-#include "common/fs.h"
-#include "common/io.h"
-#include "common/str.h"
+#include "../cvar.h"
+#include "fs.h"
+#include "io.h"
+#include "str.h"
 #include <Windows.h>
-#include "AppInfo.h"
-#include "../shared/zlib/zlib.h"
+#include "../sys/AppInfo.h"
+#include "zlib\zlib.h"
 
 char* FindRawfileString(BYTE* start, BYTE* end)
 {

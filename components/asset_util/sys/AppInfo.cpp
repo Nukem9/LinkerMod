@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include "setup.h"
+#include "../setup.h"
 #include "AppInfo.h"
 
 char g_GameDirectory[MAX_PATH];

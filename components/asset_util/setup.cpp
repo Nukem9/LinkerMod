@@ -3,7 +3,7 @@
 #include "process.h"
 #include "common/io.h"
 #include <Windows.h>
-#include "AppInfo.h"
+#include "sys/AppInfo.h"
 
 int Setup_Init(void)
 {
