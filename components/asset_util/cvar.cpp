@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-CVar* g_cvar[GLOBAL_CVAR_MAX];
+CVar* g_cvar[GLOBAL_CVAR_MAX] = { NULL };
 
 int g_cvar_count = 0;
 
@@ -27,6 +27,10 @@ public:
 
 REGISTER_GLOBAL_CVAR(g_verbose, "verbose", 'v', "Enable verbose logging", false);
 REGISTER_GLOBAL_CVAR(g_logfile, "logfile", 'l', "Enable logging to file", false);
+#if _DEBUG
+REGISTER_GLOBAL_CVAR(g_dumpCVars, "dumpCVars", 'd', "Print all cvar values to the console", false);
+#endif
+REGISTER_GLOBAL_CVAR(g_outPath, "outPath", NULL, "Target directory for file output", "/");
 
 #undef REGISTER_GLOBAL_CVAR
 
@@ -135,6 +139,12 @@ bool CVar::Enable(void)
 {
 	_ASSERT(this->type == CVAR_BOOL);
 
+	this->bool_val = true;
+	this->int_val = 1;
+	this->float_val = 1.0f;
+	strncpy_s(this->str_val, "true", 32);
+
+/*
 	switch(this->type)
 	{
 		case CVAR_BOOL:
@@ -165,7 +175,7 @@ bool CVar::Enable(void)
 		default:
 			return 1;
 	}
-
+*/
 	return this->bool_val;
 }
 
@@ -176,7 +186,7 @@ bool CVar::Disable(void)
 	this->bool_val = false;
 	this->int_val = 0;
 	this->float_val = 0.0f;
-	strncpy_s(this->str_val, "NULL", 32);
+	strncpy_s(this->str_val, "false", 32);
 
 	return this->bool_val;
 }
@@ -252,8 +262,14 @@ const char*	CVar::ValueString(void) const
 	return this->str_val;
 }
 
-void CVar_DumpCVars(void)
+//
+// Print a list of all known cvars and their current values
+//
+void CVar::DumpList(void)
 {
+	printf("\n");
+	printf("Dumping %d cvars...\n", g_cvar_count);
+
 	for(int i = 0; i < GLOBAL_CVAR_MAX; i++)
 	{
 		if(CVar* cvar = g_cvar[i])
@@ -268,4 +284,23 @@ void CVar_DumpCVars(void)
 			}
 		}
 	}
+
+	printf("\n");
+}
+
+//
+// Attempts to resolve a cvar from a given argument string
+// Returns NULL if there is no match
+//
+CVar* CVar::ResolveCVar(const char* str)
+{
+	for (int i = 0; i < GLOBAL_CVAR_MAX; i++)
+	{
+		if (strcmp(g_cvar[i]->Name(), str) == 0)
+		{
+			return g_cvar[i];
+		}
+	}
+
+	return NULL;
 }

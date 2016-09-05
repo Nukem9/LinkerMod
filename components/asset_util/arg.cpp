@@ -122,42 +122,61 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 	const char* argStr = argv[0];
 
 	int len = strlen(argStr);
-	if(!len)
+	if( (len == 0) || 
+		(len == 1 && (argStr[0] == '-')) ||
+		(len == 2 && (argStr[0] == '-' && argStr[1] == '-')) )
 	{
 		fprintf(stderr, "Error: Zero length argument\n");
 		return 1;
 	}
-	
-	if(len >= 2 && (argStr[0] == '-' && argStr[1] == '-'))
+
+	CVar* cvar = NULL;
+	if (len == 2 && argStr[0] == '-')
 	{
-		printf("Full name found\n");
+		cvar = (CVar*)g_shortcut[(int)argStr[1]];
+	}
+	else if(len > 2 && (argStr[0] == '-' && argStr[1] == '-'))
+	{
+		cvar = CVar::ResolveCVar(argStr + 2);
+	}
+	
+	//
+	// An undefined CVar was used - print error & abort oncoming infinite loop
+	//
+	if (cvar == NULL)
+	{
+		fprintf(stderr, "Error: Unrecognized argument '%s'\n", argStr);
+		return 1;
+	}
+
+	if (cvar->Flags() & (ARG_CVAR | ARG_GLOBAL))
+	{
+		//
+		// Automatically toggle implicit bools
+		//
+		if (cvar->Flags() & ARG_IMPLICIT_VALUE && cvar->Type() == CVAR_BOOL)
+		{
+			cvar->Toggle();
+			argc--;
+			argv++;
+			return 0;
+		}
+
+		if (argc < 2)
+		{
+			fprintf(stderr, "Error: No value provided for argument '%s'\n", argStr);
+			return 3;
+		}
+
+		//
+		// Consume both the cvar name and the value string
+		//
+		cvar->AssignRawString(argv[1]);
+		argc -= 2;
+		argv += 2;
 		return 0;
 	}
 
-	if(len == 2 && argStr[0] == '-')
-	{
-		CVar* cvar = (CVar*)g_shortcut[(int)argStr[1]];
-		if(!cvar)
-		{
-			fprintf(stderr, "Error: Unrecognized argument '%s'\n", argStr);
-			return 1;
-		}
-		
-		if(cvar->Flags() & (ARG_CVAR | ARG_GLOBAL))
-		{
-			if(argc < 2)
-			{
-				fprintf(stderr, "Error: No value provided for argument '%s'\n", argStr);
-				return 3;
-			}
-			
-			cvar->AssignRawString(argv[1]);
-			argc-=2;
-			argv+=2;
-			return 0;
-		}
-	}
-	
 	//
 	// No arguments were consumed - print error & abort oncoming infinite loop
 	//
@@ -174,21 +193,25 @@ int Arg_ParseArguments(int argc, char** argv, ArgParsedInfo* out_info)
 		return 2;
 	}
 	
+	//
+	// CVar Support
+	// Extract the CVar data from the arg list before passing the rest of the args to the command
+	//
+	char** consumable_argv = &argv[1];
+	for (int consumable_argc = argc - 1; consumable_argc; /*automatically decremented by Arg_ParseArgument*/ )
+	{
+		if (int err = Arg_ParseArgument(&consumable_argv, &consumable_argc))
+		{
+			return err;
+		}
+	}
+
 	out_info->argc = argc;
 	out_info->argv = new char*[argc];
 	for(int i = 0; i < argc; i++)
 	{
 		out_info->argv[i] = strdup(argv[i]);
 	} 
-	
-	/*char** consumable_argv = &argv[1];
-	for(int consumable_argc = argc - 1; consumable_argc; )
-	{
-		if(int err = Arg_ParseArgument(&consumable_argv, &consumable_argc))
-		{
-			return err;
-		}
-	}*/
 	
 	return 0;
 }

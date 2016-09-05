@@ -30,9 +30,12 @@ int main(int argc, char** argv)
 		return err;
 	}
 
-	printf_v("\n");
+	if (g_dumpCVars.ValueBool())
+		CVar::DumpList();
+	else
+		printf("\n");
+	
 	AppInfo_Init();
-	printf_v("\n");
 
 	return cmd_info.Cmd()->Exec(cmd_info.Argc(), cmd_info.Argv());
 }

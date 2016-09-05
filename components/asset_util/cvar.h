@@ -62,16 +62,21 @@ public:
 	bool		ValueBool(void) const;
 	float		ValueFloat(void) const;
 	const char*	ValueString(void) const;
+
+	static void	DumpList(void);
+
+	static CVar* ResolveCVar(const char* str);
 };
 
 #define REGISTER_GLOBAL_CVAR(IDENTIFIER) extern CVar IDENTIFIER;
 
 REGISTER_GLOBAL_CVAR(g_verbose);
 REGISTER_GLOBAL_CVAR(g_logfile);
+#if _DEBUG
+REGISTER_GLOBAL_CVAR(g_dumpCVars);
+#endif
 
 #undef REGISTER_GLOBAL_CVAR
-
-void CVar_DumpCVars(void);
 
 //
 // Temporary Definitions for Use During Transition
