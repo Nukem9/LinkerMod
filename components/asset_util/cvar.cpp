@@ -27,7 +27,6 @@ public:
 
 REGISTER_GLOBAL_CVAR(g_verbose, "verbose", 'v', "Enable verbose logging", false);
 REGISTER_GLOBAL_CVAR(g_logfile, "logfile", 'l', "Enable logging to file", false);
-REGISTER_GLOBAL_CVAR(g_dumpCVars, "dump_cvars", 'd', "Print the cvar values to the console", false);
 
 #undef REGISTER_GLOBAL_CVAR
 

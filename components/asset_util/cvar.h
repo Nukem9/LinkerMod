@@ -65,7 +65,6 @@ public:
 
 REGISTER_GLOBAL_CVAR(g_verbose);
 REGISTER_GLOBAL_CVAR(g_logfile);
-REGISTER_GLOBAL_CVAR(g_dumpCVars);
 
 #undef REGISTER_GLOBAL_CVAR
 
