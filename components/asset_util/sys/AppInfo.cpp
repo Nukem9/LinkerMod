@@ -9,8 +9,11 @@ bool AppInfo_Init()
 {
 	bool foundPath = GetGameDirectory(g_GameDirectory, ARRAYSIZE(g_GameDirectory));
 
-	printf_v("GAME_DIR: \"%s\"\n", foundPath ? g_GameDirectory : "NOT FOUND");
-	printf_v("\n");
+	if(foundPath)
+		Con_Print_v("GAME_DIR: \"%s\"\n", g_GameDirectory);
+	else
+		Con_Warning_v("GAME_DIR: \"%s\"\n", "NOT_FOUND");
+	Con_Print_v("\n");
 
 	return foundPath;
 }

@@ -46,7 +46,7 @@ char* FindRawfileStringReverseLookup(BYTE* start)
 
 int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char* rawfilePath)
 {
-	printf_v("Extracting file: \"%s\"...	", rawfilePath);
+	Con_Print_v("Extracting file: \"%s\"...	", rawfilePath);
 
 	char qpath[1024] = "";
 	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
@@ -59,7 +59,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
-			printf_v("SKIPPED\n");
+			Con_Print_v("SKIPPED\n");
 
 			fclose(h);
 			return 0;
@@ -68,7 +68,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
-		printf_v("ERROR\n");
+		Con_Print_v("ERROR\n");
 		return 0;
 	}
 
@@ -77,7 +77,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	//
 	if (rawfileHeader->uncompressedSize > 1024 * 1024 * 16)
 	{
-		printf_v("IGNORED\n");
+		Con_Print_v("IGNORED\n");
 		return 0;
 	}
 
@@ -85,7 +85,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	unsigned long dSize = rawfileHeader->uncompressedSize;
 	if (uncompress(dBuf, &dSize, &rawfileHeader->fileData, rawfileHeader->compressedSize) != 0)
 	{
-		printf_v("READ ERROR\n");
+		Con_Print_v("READ ERROR\n");
 		delete[] dBuf;
 		return 0;
 	}
@@ -95,7 +95,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 		fwrite(dBuf, 1, rawfileHeader->uncompressedSize, h);
 		fclose(h);
 
-		printf_v("SUCCESS\n");
+		Con_Print_v("SUCCESS\n");
 
 		delete[] dBuf;
 		return 1;
@@ -103,13 +103,13 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 
 	delete[] dBuf;
 
-	printf_v("WRITE ERROR\n");
+	Con_Print_v("WRITE ERROR\n");
 	return 0;
 }
 
 int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 {
-	printf_v("Extracting file: \"%s\"...	", rawfilePath);
+	Con_Print_v("Extracting file: \"%s\"...	", rawfilePath);
 
 	char qpath[1024] = "";
 	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
@@ -122,7 +122,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
-			printf_v("SKIPPED\n");
+			Con_Print_v("SKIPPED\n");
 
 			fclose(h);
 			return 0;
@@ -131,7 +131,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
-		printf_v("PATH ERROR\n");
+		Con_Print_v("PATH ERROR\n");
 		return 0;
 	}
 
@@ -140,7 +140,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 	//
 	if (strlen(rawfileData) > 1024 * 1024 * 16)
 	{
-		printf_v("IGNORED\n");
+		Con_Print_v("IGNORED\n");
 		return 0;
 	}
 
@@ -149,21 +149,21 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 		fwrite(rawfileData, 1, strlen(rawfileData), h);
 		fclose(h);
 
-		printf_v("SUCCESS\n");
+		Con_Print_v("SUCCESS\n");
 		return strlen(rawfileData);
 	}
 
-	printf_v("ERROR\n");
+	Con_Print_v("ERROR\n");
 	return 0;
 }
 
 int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 {
-	printf_v("Extracting file: \"%s\"...	\n", sndfilePath);
+	Con_Print_v("Extracting file: \"%s\"...	\n", sndfilePath);
 
-	/*printf_v("Format: %d\n", snd_header->format);
-	printf_v("Size: %d (0x%X)\n", snd_header->data_size, snd_header->data_size);
-	printf_v("Seek Table Size: %d\n", snd_header->seek_table_count);*/
+	/*Con_Print_v("Format: %d\n", snd_header->format);
+	Con_Print_v("Size: %d (0x%X)\n", snd_header->data_size, snd_header->data_size);
+	Con_Print_v("Seek Table Size: %d\n", snd_header->seek_table_count);*/
 
 	char qpath[1024] = "";
 #if _DEBUG
@@ -182,7 +182,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
-			printf_v("SKIPPED\n");
+			Con_Print_v("SKIPPED\n");
 
 			fclose(h);
 			return 0;
@@ -191,7 +191,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 
 	if (FS_CreatePath(sndfilePath) != 0)
 	{
-		printf_v("PATH ERROR\n");
+		Con_Print_v("PATH ERROR\n");
 		return 0;
 	}
 
@@ -200,7 +200,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	//
 	if (snd_header->format != 6 && snd_header->format != 7)
 	{
-		printf_v("IGNORED\n");
+		Con_Print_v("IGNORED\n");
 		return 0;
 	}
 	
@@ -209,7 +209,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	//
 	if (snd_header->data_size == 0)
 	{
-		printf_v("IGNORED\n");
+		Con_Print_v("IGNORED\n");
 		return 0;
 	}
 
@@ -236,11 +236,11 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 
 		fclose(h);
 
-		printf_v("SUCCESS\n");
+		Con_Print_v("SUCCESS\n");
 		return snd_header->data_size;
 	}
 
-	printf_v("ERROR\n");
+	Con_Print_v("ERROR\n");
 	return 0;
 }
 

@@ -1,32 +1,6 @@
 #include "io.h"
 #include "../cvar.h"
 
-int printf_v(const char* fmt, ...)
-{
-	if (!g_verbose.ValueBool()) 
-		return 0;
-
-	va_list args;
-	va_start(args, fmt);
-	int result = vprintf(fmt, args);
-	va_end(args);
-
-	return result;
-}
-
-int printf_nv(const char* fmt, ...)
-{
-	if (g_verbose.ValueBool())
-		return 0;
-
-	va_list args;
-	va_start(args, fmt);
-	int result = vprintf(fmt, args);
-	va_end(args);
-
-	return result;
-}
-
 static HANDLE con_h = NULL;
 static WORD con_defaultAttributes = NULL;
 
@@ -68,15 +42,34 @@ static WORD Con_ResetScreenBuferAttributes(void)
 	return Con_SetScreenBufferAttributes(con_h, con_defaultAttributes);
 }
 
+#define CON_PRINTFUNC_DEF_BODY(DEST) \
+	if (!con_h) \
+		return -1; \
+	va_list ap;	\
+	va_start(ap, fmt);\
+	int out = vfprintf(DEST, fmt, ap);\
+	va_end(ap);
+
+#define CON_PRINTFUNC_VERBOSE if(!g_verbose.ValueBool()) return -1;
+#define CON_PRINTFUNC_NONVERBOSE if(g_verbose.ValueBool()) return -1;
+
 int Con_Print(const char* fmt, ...)
 {
-	if (!con_h)
-		return -1;
+	CON_PRINTFUNC_DEF_BODY(stdout);
+	return out;
+}
 
-	va_list ap;
-	va_start(ap, fmt);
-	int out = vfprintf(stdout, fmt, ap);
-	va_end(ap);
+int Con_Print_v(const char* fmt, ...)
+{
+	CON_PRINTFUNC_VERBOSE;
+	CON_PRINTFUNC_DEF_BODY(stdout);
+	return out;
+}
+
+int Con_Print_nv(const char* fmt, ...)
+{
+	CON_PRINTFUNC_NONVERBOSE;
+	CON_PRINTFUNC_DEF_BODY(stdout);
 	return out;
 }
 
@@ -84,15 +77,27 @@ int Con_Error(const char* fmt, ...)
 {
 	WORD attribs = Con_GetAttributes();
 	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+	CON_PRINTFUNC_DEF_BODY(stderr);
+	Con_SetAttributes(attribs);
+	return out;
+}
 
-	if (!con_h)
-		return -1;
+int Con_Error_v(const char* fmt, ...)
+{
+	CON_PRINTFUNC_VERBOSE;
+	WORD attribs = Con_GetAttributes();
+	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+	CON_PRINTFUNC_DEF_BODY(stderr);
+	Con_SetAttributes(attribs);
+	return out;
+}
 
-	va_list ap;
-	va_start(ap, fmt);
-	int out = vfprintf(stderr, fmt, ap);
-	va_end(ap);
-
+int Con_Error_nv(const char* fmt, ...)
+{
+	CON_PRINTFUNC_NONVERBOSE;
+	WORD attribs = Con_GetAttributes();
+	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+	CON_PRINTFUNC_DEF_BODY(stderr);
 	Con_SetAttributes(attribs);
 	return out;
 }
@@ -101,18 +106,32 @@ int Con_Warning(const char* fmt, ...)
 {
 	WORD attribs = Con_GetAttributes();
 	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-
-	if (!con_h)
-		return -1;
-
-	va_list ap;
-	va_start(ap, fmt);
-	int out = vfprintf(stdout, fmt, ap);
-	va_end(ap);
-
+	CON_PRINTFUNC_DEF_BODY(stdout);
 	Con_SetAttributes(attribs);
 	return out;
 }
+
+int Con_Warning_v(const char* fmt, ...)
+{
+	CON_PRINTFUNC_VERBOSE;
+	WORD attribs = Con_GetAttributes();
+	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	CON_PRINTFUNC_DEF_BODY(stdout);
+	Con_SetAttributes(attribs);
+	return out;
+}
+
+int Con_Warning_nv(const char* fmt, ...)
+{
+	CON_PRINTFUNC_NONVERBOSE;
+	WORD attribs = Con_GetAttributes();
+	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	CON_PRINTFUNC_DEF_BODY(stdout);
+	Con_SetAttributes(attribs);
+	return out;
+}
+
+#undef CON_PRINT_FUNCDEF_BODY
 
 int Con_Init(void)
 {
