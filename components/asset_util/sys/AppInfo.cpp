@@ -1,12 +1,17 @@
 #include <Windows.h>
 #include "../setup.h"
 #include "AppInfo.h"
+#include "../common/io.h"
 
 char g_GameDirectory[MAX_PATH];
 
 bool AppInfo_Init()
 {
-	return GetGameDirectory(g_GameDirectory, ARRAYSIZE(g_GameDirectory));
+	bool foundPath = GetGameDirectory(g_GameDirectory, ARRAYSIZE(g_GameDirectory));
+
+	printf_v("GAME_DIR: \"%s\"\n", foundPath ? g_GameDirectory : "NOT FOUND");
+
+	return foundPath;
 }
 
 const char* AppInfo_AppDir()

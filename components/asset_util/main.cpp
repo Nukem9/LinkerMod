@@ -6,10 +6,14 @@
 	#include <Windows.h>
 #endif
 
+#include "sys\AppInfo.h"
+
 #include "platform.h"
 #include "arg.h"
 #include "cvar.h"
 #include "cmd.h"
+
+#include "common/io.h"
 
 int main(int argc, char** argv)
 {
@@ -25,6 +29,10 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Fatal Error: %d\n", err);
 		return err;
 	}
+
+	printf_v("\n");
+	AppInfo_Init();
+	printf_v("\n");
 
 	return cmd_info.Cmd()->Exec(cmd_info.Argc(), cmd_info.Argv());
 }
