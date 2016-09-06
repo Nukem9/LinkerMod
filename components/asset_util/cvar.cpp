@@ -297,6 +297,9 @@ CVar* CVar::ResolveCVar(const char* str)
 {
 	for (int i = 0; i < GLOBAL_CVAR_MAX; i++)
 	{
+		if (g_cvar[i] == NULL)
+			continue;
+
 		if (strcmp(g_cvar[i]->Name(), str) == 0)
 		{
 			return g_cvar[i];
