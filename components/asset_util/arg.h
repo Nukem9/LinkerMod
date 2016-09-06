@@ -60,4 +60,5 @@ public:
 };
 
 void Arg_PrintUsage(void);
+void Arg_PrintUsage(Command* cmd);
 int Arg_ParseArguments(int argc, char** argv, ArgParsedInfo* out_info);

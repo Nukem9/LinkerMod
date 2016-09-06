@@ -91,21 +91,50 @@ char* ArgParsedInfo::Argv(int index) const
 	return this->argv[index];
 }
 
-void Arg_PrintUsage(void)
+static void Arg_PrintUsage_GlobalOptions(void)
 {
-	Con_Print("%-9s%s\n%-9s%s\n\n",
-		"Usage:", APPLICATION_NAME" [command] [options]",
-		"Example:", APPLICATION_NAME" ents -v 'zone/Common/mp_cairo.ff'");
-
-	Con_Print("Options:\n");
+	Con_Print("Global Options:\n");
 	for (int i = 0; i < 255; i++)
 	{
+		//
+		// Currently hides any cvars that do not have a shortcut
+		//
 		if (g_shortcut[i] && g_shortcut[i]->Flags() & (ARG_GLOBAL | ARG_CVAR))
 		{
 			Con_Print("  -%c, --%-22s%s\n", i, g_shortcut[i]->Name(), g_shortcut[i]->Description());
 		}
 	}
 	Con_Print("\n");
+}
+
+static void Arg_PrintUsage_CommandCVars(Command* cmd)
+{
+	if (cmd->CVars() == NULL)
+		return;
+
+	Con_Print("Command Options:\n");
+	bool empty = true;
+	for (int i = 0; cmd->CVars()[i]; i++)
+	{
+		Con_Print("  --%-22s%s\n", cmd->CVars()[i]->Name(), cmd->CVars()[i]->Description());
+		empty = false;
+	}
+
+	if (empty)
+	{
+		Con_Print("  %-22s\n", "None (use global options)");
+	}
+
+	Con_Print("\n");
+}
+
+void Arg_PrintUsage(void)
+{
+	Con_Print("%-9s%s\n%-9s%s\n\n",
+		"Usage:", APPLICATION_NAME" [command] [options]",
+		"Example:", APPLICATION_NAME" ents -v 'zone/Common/mp_cairo.ff'");
+
+	Arg_PrintUsage_GlobalOptions();
 
 	Con_Print("Commands:\n");
 	for (Command* cmd = Command::GlobalCommands(); cmd; cmd = cmd->NextElem())
@@ -113,6 +142,17 @@ void Arg_PrintUsage(void)
 		Con_Print("  %-22s%s\n", cmd->Name(), cmd->Description());
 	}
 	Con_Print("\n");
+}
+
+void Arg_PrintUsage(Command* cmd)
+{
+	ASSERT(cmd != NULL);
+
+	Con_Print("%-9s%s %s %s\n\n",
+		"Usage:", APPLICATION_NAME, cmd->Name(), "[options]");
+
+	Arg_PrintUsage_GlobalOptions();
+	Arg_PrintUsage_CommandCVars(cmd);
 }
 
 int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc, CVar** const cmdCVars = NULL)
