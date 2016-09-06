@@ -35,9 +35,11 @@ int app_main(int argc, char** argv)
 		return err;
 	}
 
+#if _DEBUG
 	if (g_dumpCVars.ValueBool())
 		CVar::DumpList();
 	else
+#endif
 		Con_Print("\n");
 	
 	AppInfo_Init();
