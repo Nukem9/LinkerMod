@@ -142,12 +142,15 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 	}
 
 	//
-	// An undefined CVar was used - print error & abort oncoming infinite loop
+	// An undefined CVar was used (It was probably an argument meant for the command)
+	//	- print verbosemode warning & consume the arg anyway
 	//
 	if (cvar == NULL)
 	{
-		Con_Error("Error: Unrecognized argument '%s'\n", argStr);
-		return 1;
+		Con_Warning_v("Error: Unrecognized argument '%s'\n", argStr);
+		argc--;
+		argv++;
+		return 0;
 	}
 
 	if (cvar->Flags() & (ARG_CVAR | ARG_GLOBAL))
