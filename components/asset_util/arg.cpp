@@ -172,17 +172,48 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc, CVar** cons
 	}
 
 	CVar* cvar = NULL;
-	if (len == 2 && argStr[0] == '-')
-	{
-		cvar = (CVar*)g_shortcut[(int)argStr[1]];
-	}
-	else if (len > 2 && (argStr[0] == '-' && argStr[1] == '-'))
+	if (len > 2 && (argStr[0] == '-' && argStr[1] == '-'))
 	{
 		cvar = CVar::ResolveCVar(argStr + 2, cmdCVars);
 	}
+	else if (len >= 2 && argStr[0] == '-')
+	{
+		int count = 0;
+		for (const char* c = argStr + 1; *c; c++)
+		{
+			cvar = (CVar*)g_shortcut[*c];
+			if (cvar == NULL)
+			{
+				Con_Warning("Warning: Unrecognized flag '%c' in argument '%s'\n", *c, argStr);
+				continue;
+			}
+
+			if (cvar->Flags() & ARG_IMPLICIT_VALUE && cvar->Type() == CVAR_BOOL)
+			{
+				cvar->Toggle();
+				count++;
+			}
+		}
+		
+		if (count == 0)
+		{
+			Con_Error("Error: Implicit CVar argument group '%s' is completely unrecognized\n", argStr);
+			return 2;
+		}
+
+		**argv++ = '\0';
+		argc--;
+		return 0;
+	}
+	else // A non CVar argument was used, ignore it and pass it on to the command
+	{
+		argc--;
+		argv++;
+		return 0;
+	}
 
 	//
-	// An undefined CVar was used (It was probably an argument meant for the command)
+	// An recognized CVar was used (It was probably an argument meant for the command)
 	//	- print verbosemode warning & consume the arg anyway
 	//
 	if (cvar == NULL)
@@ -193,34 +224,33 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc, CVar** cons
 		return 0;
 	}
 
-	if (cvar->Flags() & (ARG_CVAR | ARG_GLOBAL))
+
+	//
+	// Automatically toggle implicit bools
+	//
+	if (cvar->Flags() & ARG_IMPLICIT_VALUE && cvar->Type() == CVAR_BOOL)
 	{
-		//
-		// Automatically toggle implicit bools
-		//
-		if (cvar->Flags() & ARG_IMPLICIT_VALUE && cvar->Type() == CVAR_BOOL)
-		{
-			cvar->Toggle();
-			argc--;
-			**argv++ = '\0'; // Prevent the cvar argument from being passed to the command
-			return 0;
-		}
-
-		if (argc < 2)
-		{
-			Con_Error("Error: No value provided for argument '%s'\n", argStr);
-			return 3;
-		}
-
-		//
-		// Consume both the cvar name and the value string
-		//
-		cvar->AssignRawString(argv[1]);
+		cvar->Toggle();
+		argc--;
 		**argv++ = '\0'; // Prevent the cvar argument from being passed to the command
-		**argv++ = '\0';
-		argc -= 2;
 		return 0;
 	}
+
+	if (argc < 2)
+	{
+		Con_Error("Error: No value provided for explicit argument '%s'\n", argStr);
+		return 3;
+	}
+
+	//
+	// Consume both the cvar name and the value string
+	//
+	cvar->AssignRawString(argv[1]);
+	**argv++ = '\0'; // Prevent the cvar argument from being passed to the command
+	**argv++ = '\0';
+	argc -= 2;
+	return 0;
+
 
 	//
 	// No arguments were consumed - print error & abort oncoming infinite loop

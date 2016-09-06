@@ -14,6 +14,7 @@ int Cmd_Help_f(int argc, char** argv)
 	if (cmd == NULL)
 	{
 		Con_Error("ERROR: Unrecognized command '%s'\n", argv[1]);
+		return 1;
 	}
 
 	Arg_PrintUsage(cmd);
