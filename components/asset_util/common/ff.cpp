@@ -55,7 +55,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
 	//
-	if (!ARG_FLAG_OVERWRITE)
+	if (!fs_overwrite.ValueBool())
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
@@ -118,7 +118,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
 	//
-	if (!ARG_FLAG_OVERWRITE)
+	if (!fs_overwrite.ValueBool())
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
@@ -178,7 +178,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
 	//
-	if (!ARG_FLAG_OVERWRITE)
+	if (!fs_overwrite.ValueBool())
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
@@ -277,7 +277,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 		if (Str_EndsWith(rawfileString, ".wav"))
 		{
-			if (ARG_FLAG_SND)
+			if (g_extractSounds.ValueBool())
 			{
 				Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
 				FF_FFExtractSoundFile(snd_info, rawfileString);
@@ -286,11 +286,16 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 			continue;
 		}
 
+		//
+		// ARG_FLAG_FF Should never been false if this function is running
+		//
+		/*
 		if (!ARG_FLAG_FF)
 		{
 			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
 			continue;
 		}
+		*/
 
 		if (Str_EndsWith(rawfileString, ".vision"))
 		{
@@ -326,12 +331,12 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 int FF_FFExtract(const char* filepath, const char* filename)
 {
-	printf("Extracting rawfiles from \"%s\"...\n", filename);
+	Con_Print("Extracting rawfiles from \"%s\"...\n", filename);
 
 	FILE* h = nullptr;
 	if (fopen_s(&h, filepath, "r+b") != 0)
 	{
-		printf("ERROR: Fastfile %s could not be found\n\n", filepath);
+		Con_Print("ERROR: Fastfile %s could not be found\n\n", filepath);
 		return FALSE;
 	}
 	rewind(h);
@@ -355,7 +360,7 @@ int FF_FFExtract(const char* filepath, const char* filename)
 	{
 		//Any fastfiles that claim they decompress to a file >= 1GB
 		//are either corrupt or do not belong to the vanilla game
-		printf("ERROR: Skipping %s\n", filename);
+		Con_Print("ERROR: Skipping %s\n", filename);
 		return 1;
 	}
 
@@ -365,12 +370,12 @@ int FF_FFExtract(const char* filepath, const char* filename)
 
 
 	/*XAssetList* xal = (XAssetList*)(dBuf + 36);
-	printf("XAssetList\n");
-	printf("	StringList\n");
-	printf("		count 0x%X %d\n", xal->stringList.count, xal->stringList.count);
-	printf("		strings 0x%X\n", xal->stringList.strings);
-	printf("	assetCount 0x%X %d\n", xal->assetCount, xal->assetCount);
-	printf("	assets 0x%X\n", xal->assets);
+	Con_Print("XAssetList\n");
+	Con_Print("	StringList\n");
+	Con_Print("		count 0x%X %d\n", xal->stringList.count, xal->stringList.count);
+	Con_Print("		strings 0x%X\n", xal->stringList.strings);
+	Con_Print("	assetCount 0x%X %d\n", xal->assetCount, xal->assetCount);
+	Con_Print("	assets 0x%X\n", xal->assets);
 
 	char* stringList = (char*)(dBuf + 36 + sizeof(XAssetList));
 	stringList += xal->stringList.count * sizeof(char*);

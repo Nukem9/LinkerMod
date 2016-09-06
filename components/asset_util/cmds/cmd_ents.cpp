@@ -1,6 +1,6 @@
 #include "../common/ff.h"
 #include "zlib\zlib.h"
-#include <iostream>
+#include "../common/io.h"
 
 char* FindEntsString(BYTE* start, BYTE* end)
 {
@@ -48,7 +48,7 @@ char* FindEntsString(BYTE* start, BYTE* end)
 					return p;
 				}
 
-				printf("Trying different offset... (%d attempts remaining)\n", retryCount - 1);
+				Con_Print("Trying different offset... (%d attempts remaining)\n", retryCount - 1);
 				p--;
 			}
 		}
@@ -70,12 +70,12 @@ int Cmd_Ents_f(int argc, char** argv)
 	_ASSERT(argc > 1);
 	char* filepath = argv[1];
 
-	printf("Extracting ents from \"%s\"...\n", filepath);
+	Con_Print("Extracting ents from \"%s\"...\n", filepath);
 
 	FILE* h = nullptr;
 	if (fopen_s(&h, filepath, "r+b") != 0)
 	{
-		printf("ERROR: Fastfile %s could not be found\n\n", filepath);
+		Con_Print("ERROR: Fastfile %s could not be found\n\n", filepath);
 		return FALSE;
 	}
 	rewind(h);
@@ -99,7 +99,7 @@ int Cmd_Ents_f(int argc, char** argv)
 	{
 		//Any fastfiles that claim they decompress to a file >= 1GB
 		//are either corrupt or do not belong to the vanilla game
-		printf("ERROR: Skipping %s\n", filepath);
+		Con_Error("ERROR: Skipping %s\n", filepath);
 		return 1;
 	}
 
@@ -110,11 +110,11 @@ int Cmd_Ents_f(int argc, char** argv)
 	char* result = FindEntsString((BYTE*)dBuf, dBuf + ffInfo.size + 36);
 	if (result == NULL)
 	{
-		printf("Error: Could not find entity string\n");
+		Con_Error("Error: Could not find entity string\n");
 	}
 	else
 	{
-		printf("%s\n", result);
+		Con_Print("%s\n", result);
 	}
 
 	delete[] dBuf;

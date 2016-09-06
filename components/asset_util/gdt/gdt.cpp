@@ -1,5 +1,6 @@
 #include "gdt.h"
 #include "../common/fs.h"
+#include "../platform.h"
 
 GDT::GDT()
 {
@@ -42,7 +43,7 @@ int GDT::WriteFile(const char* qpath, GDT_MODE mode)
 
 	if (this->h == NULL)
 	{
-		printf("%s\n", "FS_ERROR");
+		Con_Print("%s\n", "FS_ERROR");
 	}
 
 	fprintf(h, "{\n");

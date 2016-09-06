@@ -1,23 +1,29 @@
 #include "cmd.h"
+#include "cvar.h"
 #include <stdio.h>
 #include <string.h>
 
 #include "cmds/cmd_common.h"
+#include "common\io.h"
 
-#define REGISTER_GLOBAL_COMMAND(IDENTIFIER, NAME, DESCRIPTION, FUNC) Command IDENTIFIER(NAME, DESCRIPTION, FUNC);
+#define REGISTER_GLOBAL_COMMAND(IDENTIFIER, NAME, DESCRIPTION, FUNC, CVARS) CVar* IDENTIFIER##_cvarlist[] = CVARS; Command IDENTIFIER(NAME, DESCRIPTION, FUNC, IDENTIFIER##_cvarlist);
+#define CMD_CVARS(...) { __VA_ARGS__ , NULL }
+#define CMD_GLOBALCVARS { NULL }
 
 Command* Command::g_cmds = NULL;
 #if _DEBUG
-REGISTER_GLOBAL_COMMAND(g_cmd_test, "test", "An empty test command", Cmd_Test_f);
+REGISTER_GLOBAL_COMMAND(g_cmd_test, "test", "An empty test command", Cmd_Test_f, CMD_CVARS(&g_var));
 #endif
-REGISTER_GLOBAL_COMMAND(g_cmd_help, "help", "Print usage information", Cmd_Help_f);
-REGISTER_GLOBAL_COMMAND(g_cmd_ents, "ents", "Extract the entity string from a fastfile", Cmd_Ents_f);
-REGISTER_GLOBAL_COMMAND(g_cmd_extract_ff, "extract-ff", "Extract assets from *.ff files", Cmd_Extract_FF_f);
-REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd, "extract-iwd", "Extract assets from *.iwd files", Cmd_Extract_IWD_f);
+REGISTER_GLOBAL_COMMAND(g_cmd_help, "help", "Print usage information", Cmd_Help_f, CMD_GLOBALCVARS);
+REGISTER_GLOBAL_COMMAND(g_cmd_ents, "ents", "Extract the entity string from a fastfile", Cmd_Ents_f, CMD_GLOBALCVARS);
+REGISTER_GLOBAL_COMMAND(g_cmd_extract_ff, "extract-ff", "Extract assets from *.ff files", Cmd_Extract_FF_f, CMD_CVARS(&g_extractAll, &g_extractSounds,&g_useLocalized));
+REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd, "extract-iwd", "Extract assets from *.iwd files", Cmd_Extract_IWD_f, CMD_CVARS(&g_extractAll, &g_extractImages, &g_extractSounds));
 
+#undef CMD_GLOBALCVARS
+#undef CMD_CVARS
 #undef REGISTER_GLOBAL_COMMAND
 
-Command::Command(const char* name, const char* description,  cmd_func_t func) : func(func)
+Command::Command(const char* name, const char* description, cmd_func_t func, CVar** const cvars) : func(func), cvars(cvars)
 {
 	this->SetOwner(this);
 	
@@ -38,15 +44,25 @@ Command::Command(const char* name, const char* description,  cmd_func_t func) : 
 int Command::Exec(int argc, char** argv) const
 {
 #if _DEBUG
-	printf("Executing command: '%s' with the following arguments:\n", this->name);
+	Con_Print("Executing command: '%s' with the following arguments:\n", this->name);
 	for(int i = 0; i < argc; i++)
 	{
-		printf("  [%d] %s\n", i, argv[i]);
+		Con_Print("  [%d] %s\n", i, argv[i]);
 	}
-	printf("\n");
+	Con_Print("\n");
 #endif
 
 	return this->func(argc, argv);
+}
+
+CVar** const Command::CVars(void) const
+{
+	return this->cvars;
+}
+
+void Command::DumpLocalCVars(void) const
+{
+	CVar::DumpCVars(this->cvars);
 }
 
 Command* Command::GlobalCommands(void)

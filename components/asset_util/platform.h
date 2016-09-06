@@ -23,6 +23,7 @@
 W32_WARNING_DISABLE(4996) // Disable POSIX Name Deprecation
 
 #include <assert.h>
+#include "common\io.h"
 
 #else //LINUX
 

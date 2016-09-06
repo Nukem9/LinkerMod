@@ -1,10 +1,12 @@
 #pragma once
 #include "arg.h"
+#include <Windows.h>
 
 //
 // The maximum number of global cvars
 //
 #define GLOBAL_CVAR_MAX 32
+#define CVAR_STRLEN MAX_PATH
 
 enum CVAR_TYPE
 {
@@ -23,8 +25,8 @@ private:
 	
 	int		int_val;
 	bool	bool_val;
-	char	str_val[32];
 	float	float_val;
+	char	str_val[CVAR_STRLEN];
 	
 	friend class GCVar;
 	
@@ -63,30 +65,45 @@ public:
 	float		ValueFloat(void) const;
 	const char*	ValueString(void) const;
 
-	static void	DumpList(void);
+	//
+	// Dump all global CVars and their values
+	//
+	static void	DumpCVars(void);
 
-	static CVar* ResolveCVar(const char* str);
+	//
+	// Dump all cvars in the given null-terminated list and their values
+	//
+	static void	DumpCVars(CVar** const cvars);
+
+	//
+	// Attempts to resolve a cvar from a given argument string
+	// localCVars (NULL terminated) has higher priority than the global CVars
+	// Returns NULL if there is no match
+	//
+	static CVar* ResolveCVar(const char* str, CVar** localCVars = NULL);
 };
 
-#define REGISTER_GLOBAL_CVAR(IDENTIFIER) extern CVar IDENTIFIER;
+#define REGISTER_CVAR(IDENTIFIER) extern CVar IDENTIFIER;
+#define REGISTER_GLOBAL_CVAR(IDENTIFIER) REGISTER_CVAR(IDENTIFIER)
 
+//
+// Register Global CVars
+//
 REGISTER_GLOBAL_CVAR(g_verbose);
 REGISTER_GLOBAL_CVAR(g_logfile);
+REGISTER_GLOBAL_CVAR(fs_overwrite);
 #if _DEBUG
 REGISTER_GLOBAL_CVAR(g_dumpCVars);
 #endif
 
-#undef REGISTER_GLOBAL_CVAR
+//
+// Register Standard CVars
+//
+REGISTER_CVAR(g_var);
+REGISTER_CVAR(g_extractAll);
+REGISTER_CVAR(g_extractImages);
+REGISTER_CVAR(g_extractSounds);
+REGISTER_CVAR(g_useLocalized);
 
-//
-// Temporary Definitions for Use During Transition
-//
-#define ARG_FLAG_AUDIO		0
-#define ARG_FLAG_CONVERT	0
-#define ARG_FLAG_EVERY		0
-#define ARG_FLAG_IMAGE		0
-#define ARG_FLAG_SND		0
-#define ARG_FLAG_FF			0
-#define ARG_FLAG_LOCALIZED	0
-#define ARG_FLAG_OVERWRITE	0
-#define ARG_FLAG_SETUP		0
+#undef REGISTER_GLOBAL_CVAR
+#undef REGISTER_CVAR

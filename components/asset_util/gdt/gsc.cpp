@@ -1,6 +1,7 @@
 #include "../shared/utility.h"
 #include "gsc.h"
 #include "assettype\character.h"
+#include "../common/io.h"
 #include <regex>
 
 int GSC_ExtractStringVariable(const char* var, const char* src, std::string* dst, const char* defaultValue)
@@ -129,7 +130,7 @@ int GSC_AIType_ExtractCharacters(std::string src, std::string* dst, int maxCount
 
 			if (matchCount > maxCount)
 			{
-				printf("Too many model entries\n");
+				Con_Print("Too many model entries\n");
 				return matchCount;
 			}
 		}
