@@ -174,8 +174,8 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 		// Consume both the cvar name and the value string
 		//
 		cvar->AssignRawString(argv[1]);
-		//*(argv[0]) = '\0'; // Prevent the cvar argument from being passed to the command
-		//*argv[1] = '\0';
+		*(argv[0]) = '\0'; // Prevent the cvar argument from being passed to the command
+		*(argv[1]) = '\0';
 		argc -= 2;
 		argv += 2;
 		return 0;
