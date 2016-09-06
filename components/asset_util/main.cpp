@@ -37,7 +37,10 @@ int app_main(int argc, char** argv)
 
 #if _DEBUG
 	if (g_dumpCVars.ValueBool())
-		CVar::DumpList();
+	{
+		CVar::DumpCVars();
+		cmd_info.Cmd()->DumpLocalCVars();
+	}
 	else
 #endif
 		Con_Print("\n");

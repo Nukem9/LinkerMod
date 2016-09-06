@@ -115,7 +115,7 @@ void Arg_PrintUsage(void)
 	Con_Print("\n");
 }
 
-int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
+int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc, CVar** const cmdCVars = NULL)
 {
 	char**& argv = *consumable_argv;
 	int& argc = *consumable_argc;
@@ -138,7 +138,7 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 	}
 	else if (len > 2 && (argStr[0] == '-' && argStr[1] == '-'))
 	{
-		cvar = CVar::ResolveCVar(argStr + 2);
+		cvar = CVar::ResolveCVar(argStr + 2, cmdCVars);
 	}
 
 	//
@@ -205,7 +205,7 @@ int Arg_ParseArguments(int argc, char** argv, ArgParsedInfo* out_info)
 	char** consumable_argv = &argv[1];
 	for (int consumable_argc = argc - 1; consumable_argc; /*automatically decremented by Arg_ParseArgument*/)
 	{
-		if (int err = Arg_ParseArgument(&consumable_argv, &consumable_argc))
+		if (int err = Arg_ParseArgument(&consumable_argv, &consumable_argc, out_info->cmd->CVars()))
 		{
 			return err;
 		}

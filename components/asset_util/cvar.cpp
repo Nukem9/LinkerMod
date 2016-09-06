@@ -24,8 +24,12 @@ public:
 	~GCVar(void) { }
 };
 
-#define REGISTER_GLOBAL_CVAR(IDENTIFIER, NAME, SHORTCUT, DESCRIPTION, VALUE) CVar IDENTIFIER (NAME, SHORTCUT, DESCRIPTION, VALUE); GCVar gcv_##IDENTIFIER ( &IDENTIFIER );
+#define REGISTER_CVAR(IDENTIFIER, NAME, SHORTCUT, DESCRIPTION, VALUE) CVar IDENTIFIER (NAME, SHORTCUT, DESCRIPTION, VALUE);
+#define REGISTER_GLOBAL_CVAR(IDENTIFIER, NAME, SHORTCUT, DESCRIPTION, VALUE) REGISTER_CVAR(IDENTIFIER, NAME, SHORTCUT, DESCRIPTION, VALUE) GCVar gcv_##IDENTIFIER ( &IDENTIFIER );
 
+//
+// Register Global CVars
+//
 REGISTER_GLOBAL_CVAR(g_verbose, "verbose", 'v', "Enable verbose logging", false);
 REGISTER_GLOBAL_CVAR(g_logfile, "logfile", 'l', "Enable logging to file", false);
 #if _DEBUG
@@ -33,7 +37,13 @@ REGISTER_GLOBAL_CVAR(g_dumpCVars, "dumpCVars", 'd', "Print all cvar values to th
 #endif
 REGISTER_GLOBAL_CVAR(g_outPath, "outPath", NULL, "Target directory for file output", "/");
 
+//
+// Register Standard CVars
+//
+REGISTER_CVAR(g_var, "dvar", NULL, "A test dvar", "/");
+
 #undef REGISTER_GLOBAL_CVAR
+#undef REGISTER_CVAR
 
 CVar::CVar(void)
 {
@@ -266,10 +276,10 @@ const char*	CVar::ValueString(void) const
 //
 // Print a list of all known cvars and their current values
 //
-void CVar::DumpList(void)
+void CVar::DumpCVars(void)
 {
 	Con_Print("\n");
-	Con_Print("Dumping %d cvars...\n", g_cvar_count);
+	Con_Print("Dumping %d global cvars...\n", g_cvar_count);
 
 	for(int i = 0; i < GLOBAL_CVAR_MAX; i++)
 	{
@@ -289,12 +299,49 @@ void CVar::DumpList(void)
 	Con_Print("\n");
 }
 
+void CVar::DumpCVars(CVar** const cvars)
+{
+	if (cvars == NULL)
+		return;
+
+	int count = 0;
+	for (count = 0; cvars[count]; count++);
+
+	Con_Print("Dumping %d local cvars...\n", count);
+
+	for (int i = 0; i < count; i++)
+	{
+		if (CVar* cvar = cvars[i])
+		{
+			if (strlen(cvar->Name()) <= 16)
+			{
+				Con_Print("  %-16s : %-22s\n", cvar->Name(), cvar->ValueString());
+			}
+			else
+			{
+				Con_Print("  %-32s : %-22s\n", cvar->Name(), cvar->ValueString());
+			}
+		}
+	}
+	Con_Print("\n");
+}
+
 //
 // Attempts to resolve a cvar from a given argument string
+// localCVars (NULL terminated) has higher priority than the global CVars
 // Returns NULL if there is no match
 //
-CVar* CVar::ResolveCVar(const char* str)
+CVar* CVar::ResolveCVar(const char* str, CVar** const localCVars)
 {
+	if (localCVars)
+	{
+		for (int i = 0; localCVars[i]; i++)
+		{
+			if (strcmp(localCVars[i]->Name(), str) == 0)
+				return localCVars[i];
+		}
+	}
+
 	for (int i = 0; i < GLOBAL_CVAR_MAX; i++)
 	{
 		if (g_cvar[i] == NULL)

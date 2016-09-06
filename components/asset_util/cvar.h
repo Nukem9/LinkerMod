@@ -65,20 +65,43 @@ public:
 	float		ValueFloat(void) const;
 	const char*	ValueString(void) const;
 
-	static void	DumpList(void);
+	//
+	// Dump all global CVars and their values
+	//
+	static void	DumpCVars(void);
 
-	static CVar* ResolveCVar(const char* str);
+	//
+	// Dump all cvars in the given null-terminated list and their values
+	//
+	static void	DumpCVars(CVar** const cvars);
+
+	//
+	// Attempts to resolve a cvar from a given argument string
+	// localCVars (NULL terminated) has higher priority than the global CVars
+	// Returns NULL if there is no match
+	//
+	static CVar* ResolveCVar(const char* str, CVar** localCVars = NULL);
 };
 
-#define REGISTER_GLOBAL_CVAR(IDENTIFIER) extern CVar IDENTIFIER;
+#define REGISTER_CVAR(IDENTIFIER) extern CVar IDENTIFIER;
+#define REGISTER_GLOBAL_CVAR(IDENTIFIER) REGISTER_CVAR(IDENTIFIER)
 
+//
+// Register Global CVars
+//
 REGISTER_GLOBAL_CVAR(g_verbose);
 REGISTER_GLOBAL_CVAR(g_logfile);
 #if _DEBUG
 REGISTER_GLOBAL_CVAR(g_dumpCVars);
 #endif
 
+//
+// Register Standard CVars
+//
+REGISTER_CVAR(g_var);
+
 #undef REGISTER_GLOBAL_CVAR
+#undef REGISTER_CVAR
 
 //
 // Temporary Definitions for Use During Transition
