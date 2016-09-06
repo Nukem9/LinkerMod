@@ -68,7 +68,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
-		Con_Print_v("ERROR\n");
+		Con_Error_v("ERROR\n");
 		return 0;
 	}
 
@@ -85,7 +85,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	unsigned long dSize = rawfileHeader->uncompressedSize;
 	if (uncompress(dBuf, &dSize, &rawfileHeader->fileData, rawfileHeader->compressedSize) != 0)
 	{
-		Con_Print_v("READ ERROR\n");
+		Con_Error_v("READ ERROR\n");
 		delete[] dBuf;
 		return 0;
 	}
@@ -103,7 +103,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 
 	delete[] dBuf;
 
-	Con_Print_v("WRITE ERROR\n");
+	Con_Error_v("WRITE ERROR\n");
 	return 0;
 }
 
@@ -131,7 +131,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
-		Con_Print_v("PATH ERROR\n");
+		Con_Error_v("PATH ERROR\n");
 		return 0;
 	}
 
@@ -153,7 +153,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 		return strlen(rawfileData);
 	}
 
-	Con_Print_v("ERROR\n");
+	Con_Error_v("ERROR\n");
 	return 0;
 }
 
@@ -191,7 +191,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 
 	if (FS_CreatePath(sndfilePath) != 0)
 	{
-		Con_Print_v("PATH ERROR\n");
+		Con_Error_v("PATH ERROR\n");
 		return 0;
 	}
 
@@ -240,7 +240,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 		return snd_header->data_size;
 	}
 
-	Con_Print_v("ERROR\n");
+	Con_Error_v("ERROR\n");
 	return 0;
 }
 
@@ -336,7 +336,7 @@ int FF_FFExtract(const char* filepath, const char* filename)
 	FILE* h = nullptr;
 	if (fopen_s(&h, filepath, "r+b") != 0)
 	{
-		Con_Print("ERROR: Fastfile %s could not be found\n\n", filepath);
+		Con_Error("ERROR: Fastfile '%s' could not be found\n\n", filepath);
 		return FALSE;
 	}
 	rewind(h);
@@ -360,7 +360,7 @@ int FF_FFExtract(const char* filepath, const char* filename)
 	{
 		//Any fastfiles that claim they decompress to a file >= 1GB
 		//are either corrupt or do not belong to the vanilla game
-		Con_Print("ERROR: Skipping %s\n", filename);
+		Con_Error("ERROR: Skipping %s\n", filename);
 		return 1;
 	}
 

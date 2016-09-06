@@ -65,13 +65,13 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 		Con_Print_v("Extracting file: \"%s\"...	", filepath);
 		if (FS_CreatePath(filepath) != 0)
 		{
-			Con_Print_v("DIR ERROR\n");
+			Con_Error_v("DIR ERROR\n");
 			return 1;
 		}
 		
 		if (!mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0))
 		{
-			Con_Print_v("ERROR\n");
+			Con_Error_v("ERROR\n");
 			return 1;
 		}
 
@@ -89,7 +89,7 @@ int __cdecl IWD_IWDExtract(const char* iwdPath, const char* iwdName)
 
 	if (!mz_zip_reader_init_file(&iwd, iwdPath, 0))
 	{
-		Con_Print_v("ERROR: Could not open %s\n", iwdPath);
+		Con_Error_v("ERROR: Could not open %s\n", iwdPath);
 		return 2;
 	}
 
@@ -99,7 +99,7 @@ int __cdecl IWD_IWDExtract(const char* iwdPath, const char* iwdName)
 		mz_zip_archive_file_stat file_stat;
 		if (!mz_zip_reader_file_stat(&iwd, f, &file_stat))
 		{
-			Con_Print_v("ERROR: Could Get Info for Compressed File\n");
+			Con_Error_v("ERROR: Could Get Info for Compressed File\n");
 			mz_zip_reader_end(&iwd);
 			return -1;
 		}
