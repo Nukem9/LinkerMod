@@ -7,19 +7,19 @@
 #include "platform.h"
 #include "common\io.h"
 
-Argument* g_shortcut[255] = {NULL};
+Argument* g_shortcut[255] = { NULL };
 
 int Argument::RegisterShortcut(char shortcut)
 {
-	if(this->shortcut)
+	if (this->shortcut)
 	{
-		fprintf(stderr, "Error: Could not register shortcut '-%c' for argument '%s' - arg already has shortcut '-%c'\n", shortcut, this->name, this->shortcut);
+		Con_Error("Error: Could not register shortcut '-%c' for argument '%s' - arg already has shortcut '-%c'\n", shortcut, this->name, this->shortcut);
 		return 3;
 	}
-	
-	if(shortcut)
+
+	if (shortcut)
 	{
-		if(!g_shortcut[(int)shortcut])
+		if (!g_shortcut[(int)shortcut])
 		{
 			this->shortcut = shortcut;
 			g_shortcut[(int)shortcut] = this;
@@ -27,12 +27,12 @@ int Argument::RegisterShortcut(char shortcut)
 		}
 		else
 		{
-			fprintf(stderr, "Error: Could not initialize argument '%s' - shortcut '-%c' already exists for another argument\n", name, shortcut);
+			Con_Error("Error: Could not initialize argument '%s' - shortcut '-%c' already exists for another argument\n", name, shortcut);
 			return 1;
 		}
 	}
-	
-	fprintf(stderr, "Error: Could not register shortcut'-%c' for argument '%s'\n", shortcut, this->name);
+
+	Con_Error("Error: Could not register shortcut'-%c' for argument '%s'\n", shortcut, this->name);
 	return 2;
 }
 
@@ -57,11 +57,11 @@ ArgParsedInfo::ArgParsedInfo(void) : cmd(NULL), argc(0), argv(NULL)
 
 ArgParsedInfo::~ArgParsedInfo(void)
 {
-	for(; argc; )
+	for (; argc;)
 	{
 		free((void*)this->argv[--argc]);
 	}
-	
+
 	delete[] this->argv;
 	this->argv = NULL;
 }
@@ -83,32 +83,32 @@ char** ArgParsedInfo::Argv(void) const
 
 char* ArgParsedInfo::Argv(int index) const
 {
-	if(index >= argc || index < 0)
+	if (index >= argc || index < 0)
 	{
 		return (char*)"";
 	}
-	
+
 	return this->argv[index];
 }
 
 void Arg_PrintUsage(void)
 {
-	Con_Print(	"%-9s%s\n%-9s%s\n\n",
-			"Usage:",	APPLICATION_NAME" [command] [options]",
-			"Example:",	APPLICATION_NAME" ents -v 'zone/Common/mp_cairo.ff'");
-	
+	Con_Print("%-9s%s\n%-9s%s\n\n",
+		"Usage:", APPLICATION_NAME" [command] [options]",
+		"Example:", APPLICATION_NAME" ents -v 'zone/Common/mp_cairo.ff'");
+
 	Con_Print("Options:\n");
-	for(int i = 0; i < 255; i++)
+	for (int i = 0; i < 255; i++)
 	{
-		if(g_shortcut[i] && g_shortcut[i]->Flags() & (ARG_GLOBAL | ARG_CVAR))
+		if (g_shortcut[i] && g_shortcut[i]->Flags() & (ARG_GLOBAL | ARG_CVAR))
 		{
 			Con_Print("  -%c, --%-22s%s\n", i, g_shortcut[i]->Name(), g_shortcut[i]->Description());
 		}
 	}
 	Con_Print("\n");
-	
+
 	Con_Print("Commands:\n");
-	for(Command* cmd = Command::GlobalCommands(); cmd; cmd = cmd->NextElem())
+	for (Command* cmd = Command::GlobalCommands(); cmd; cmd = cmd->NextElem())
 	{
 		Con_Print("  %-22s%s\n", cmd->Name(), cmd->Description());
 	}
@@ -119,15 +119,15 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 {
 	char**& argv = *consumable_argv;
 	int& argc = *consumable_argc;
-	
+
 	const char* argStr = argv[0];
 
 	int len = strlen(argStr);
-	if( (len == 0) || 
+	if ((len == 0) ||
 		(len == 1 && (argStr[0] == '-')) ||
-		(len == 2 && (argStr[0] == '-' && argStr[1] == '-')) )
+		(len == 2 && (argStr[0] == '-' && argStr[1] == '-')))
 	{
-		fprintf(stderr, "Error: Zero length argument\n");
+		Con_Error("Error: Zero length argument\n");
 		return 1;
 	}
 
@@ -136,17 +136,17 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 	{
 		cvar = (CVar*)g_shortcut[(int)argStr[1]];
 	}
-	else if(len > 2 && (argStr[0] == '-' && argStr[1] == '-'))
+	else if (len > 2 && (argStr[0] == '-' && argStr[1] == '-'))
 	{
 		cvar = CVar::ResolveCVar(argStr + 2);
 	}
-	
+
 	//
 	// An undefined CVar was used - print error & abort oncoming infinite loop
 	//
 	if (cvar == NULL)
 	{
-		fprintf(stderr, "Error: Unrecognized argument '%s'\n", argStr);
+		Con_Error("Error: Unrecognized argument '%s'\n", argStr);
 		return 1;
 	}
 
@@ -159,13 +159,14 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 		{
 			cvar->Toggle();
 			argc--;
+			**argv = '\0'; // Prevent the cvar argument from being passed to the command
 			argv++;
 			return 0;
 		}
 
 		if (argc < 2)
 		{
-			fprintf(stderr, "Error: No value provided for argument '%s'\n", argStr);
+			Con_Error("Error: No value provided for argument '%s'\n", argStr);
 			return 3;
 		}
 
@@ -173,6 +174,8 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 		// Consume both the cvar name and the value string
 		//
 		cvar->AssignRawString(argv[1]);
+		//*(argv[0]) = '\0'; // Prevent the cvar argument from being passed to the command
+		//*argv[1] = '\0';
 		argc -= 2;
 		argv += 2;
 		return 0;
@@ -181,25 +184,25 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 	//
 	// No arguments were consumed - print error & abort oncoming infinite loop
 	//
-	fprintf(stderr, "Error: Unrecognized argument '%s'\n", argStr);
+	Con_Error("Error: Unrecognized argument '%s'\n", argStr);
 	return 1;
 }
 
 int Arg_ParseArguments(int argc, char** argv, ArgParsedInfo* out_info)
 {
 	out_info->cmd = Command::ResolveCommand(*argv);
-	if(!out_info->cmd)
+	if (!out_info->cmd)
 	{
-		fprintf(stderr, "Error: Command '%s' not recognized\n", *argv);
+		Con_Error("Error: Command '%s' not recognized\n", *argv);
 		return 2;
 	}
-	
+
 	//
 	// CVar Support
 	// Extract the CVar data from the arg list before passing the rest of the args to the command
 	//
 	char** consumable_argv = &argv[1];
-	for (int consumable_argc = argc - 1; consumable_argc; /*automatically decremented by Arg_ParseArgument*/ )
+	for (int consumable_argc = argc - 1; consumable_argc; /*automatically decremented by Arg_ParseArgument*/)
 	{
 		if (int err = Arg_ParseArgument(&consumable_argv, &consumable_argc))
 		{
@@ -207,12 +210,17 @@ int Arg_ParseArguments(int argc, char** argv, ArgParsedInfo* out_info)
 		}
 	}
 
-	out_info->argc = argc;
+	out_info->argc = 0;
 	out_info->argv = new char*[argc];
-	for(int i = 0; i < argc; i++)
+	for (int i = 0; i < argc; i++)
 	{
-		out_info->argv[i] = strdup(argv[i]);
-	} 
-	
+		if (argv[i][0] == '\0')
+			continue;
+
+		out_info->argv[out_info->argc] = strdup(argv[i]);
+		out_info->argc++;
+
+	}
+
 	return 0;
 }
