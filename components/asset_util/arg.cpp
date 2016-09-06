@@ -5,6 +5,7 @@
 #include "cmd.h"
 #include "common/llist.h"
 #include "platform.h"
+#include "common\io.h"
 
 Argument* g_shortcut[255] = {NULL};
 
@@ -92,26 +93,26 @@ char* ArgParsedInfo::Argv(int index) const
 
 void Arg_PrintUsage(void)
 {
-	printf(	"%-9s%s\n%-9s%s\n\n",
+	Con_Print(	"%-9s%s\n%-9s%s\n\n",
 			"Usage:",	APPLICATION_NAME" [command] [options]",
 			"Example:",	APPLICATION_NAME" ents -v 'zone/Common/mp_cairo.ff'");
 	
-	printf("Options:\n");
+	Con_Print("Options:\n");
 	for(int i = 0; i < 255; i++)
 	{
 		if(g_shortcut[i] && g_shortcut[i]->Flags() & (ARG_GLOBAL | ARG_CVAR))
 		{
-			printf("  -%c, --%-22s%s\n", i, g_shortcut[i]->Name(), g_shortcut[i]->Description());
+			Con_Print("  -%c, --%-22s%s\n", i, g_shortcut[i]->Name(), g_shortcut[i]->Description());
 		}
 	}
-	printf("\n");
+	Con_Print("\n");
 	
-	printf("Commands:\n");
+	Con_Print("Commands:\n");
 	for(Command* cmd = Command::GlobalCommands(); cmd; cmd = cmd->NextElem())
 	{
-		printf("  %-22s%s\n", cmd->Name(), cmd->Description());
+		Con_Print("  %-22s%s\n", cmd->Name(), cmd->Description());
 	}
-	printf("\n");
+	Con_Print("\n");
 }
 
 int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)

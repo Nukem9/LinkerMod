@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 CVar* g_cvar[GLOBAL_CVAR_MAX] = { NULL };
 
 int g_cvar_count = 0;
@@ -267,8 +268,8 @@ const char*	CVar::ValueString(void) const
 //
 void CVar::DumpList(void)
 {
-	printf("\n");
-	printf("Dumping %d cvars...\n", g_cvar_count);
+	Con_Print("\n");
+	Con_Print("Dumping %d cvars...\n", g_cvar_count);
 
 	for(int i = 0; i < GLOBAL_CVAR_MAX; i++)
 	{
@@ -276,16 +277,16 @@ void CVar::DumpList(void)
 		{
 			if(strlen(cvar->Name()) <= 16)
 			{
-				printf("  %-16s : %-22s\n", cvar->Name(), cvar->ValueString());	
+				Con_Print("  %-16s : %-22s\n", cvar->Name(), cvar->ValueString());	
 			}
 			else
 			{
-				printf("  %-32s : %-22s\n", cvar->Name(), cvar->ValueString());
+				Con_Print("  %-32s : %-22s\n", cvar->Name(), cvar->ValueString());
 			}
 		}
 	}
 
-	printf("\n");
+	Con_Print("\n");
 }
 
 //

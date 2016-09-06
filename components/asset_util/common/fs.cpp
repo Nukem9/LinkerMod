@@ -1,6 +1,7 @@
 #pragma once
 #include "fs.h"
 #include "../sys/AppInfo.h"
+#include "../common/io.h"
 #include <sys/stat.h>
 #include <Windows.h>
 
@@ -82,7 +83,7 @@ int FS_FileCount(const char* path, const char* pattern)
 
 	char spath[MAX_PATH];
 	sprintf_s(spath, "%s/%s", path, pattern);
-	printf("%s\n", spath);
+	Con_Print("%s\n", spath);
 
 	if ((dir = FindFirstFileA(spath, &file_data)) == INVALID_HANDLE_VALUE)
 	{

@@ -86,7 +86,7 @@ GDT gdt;
 //
 int __cdecl fileCallback(const char* filePath, const char* fileName)
 {
-	printf("%s\n", fileName);
+	Con_Print("%s\n", fileName);
 
 	//XModelAlias* alias = new XModelAlias;
 	//alias->ExtractFromGSC(argv[i]);
@@ -148,14 +148,14 @@ int main(int argc, const char** argv)
 	{
 		if (Process_ExecuteConverter() != 0)
 		{
-			printf("ERROR: Converter could not be executed\n");
+			Con_Print("ERROR: Converter could not be executed\n");
 
 			if (ARG_FLAG_SETUP)
 			{
-				printf("\tConverter must be run manually via Launcher to complete the setup\n");
+				Con_Print("\tConverter must be run manually via Launcher to complete the setup\n");
 			}
 
-			printf("\n");
+			Con_Print("\n");
 		}
 	}
 

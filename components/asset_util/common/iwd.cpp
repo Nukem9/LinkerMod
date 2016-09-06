@@ -36,7 +36,7 @@ int __cdecl IWD_IWDHandler(const char* iwdPath, const char* iwdName)
 		sprintf_s(sub, "AUDIO");
 	}
 
-	printf("Extracting %s files from: \"%s\"...\n", sub, iwdName);
+	Con_Print("Extracting %s files from: \"%s\"...\n", sub, iwdName);
 	IWD_IWDExtract(iwdPath, iwdName);
 	return 0;
 }
@@ -75,7 +75,7 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 			return 1;
 		}
 
-		printf("SUCCESS\n");
+		Con_Print("SUCCESS\n");
 		return 0;
 	}
 	

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "cmds/cmd_common.h"
+#include "common\io.h"
 
 #define REGISTER_GLOBAL_COMMAND(IDENTIFIER, NAME, DESCRIPTION, FUNC) Command IDENTIFIER(NAME, DESCRIPTION, FUNC);
 
@@ -38,12 +39,12 @@ Command::Command(const char* name, const char* description,  cmd_func_t func) : 
 int Command::Exec(int argc, char** argv) const
 {
 #if _DEBUG
-	printf("Executing command: '%s' with the following arguments:\n", this->name);
+	Con_Print("Executing command: '%s' with the following arguments:\n", this->name);
 	for(int i = 0; i < argc; i++)
 	{
-		printf("  [%d] %s\n", i, argv[i]);
+		Con_Print("  [%d] %s\n", i, argv[i]);
 	}
-	printf("\n");
+	Con_Print("\n");
 #endif
 
 	return this->func(argc, argv);
