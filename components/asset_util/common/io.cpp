@@ -1,6 +1,9 @@
 #include "io.h"
 #include "../cvar.h"
 
+#define CON_ERROR_COLOR FOREGROUND_RED | FOREGROUND_INTENSITY
+#define CON_WARNING_COLOR FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY
+
 static HANDLE con_h = NULL;
 static WORD con_defaultAttributes = NULL;
 
@@ -76,7 +79,7 @@ int Con_Print_nv(const char* fmt, ...)
 int Con_Error(const char* fmt, ...)
 {
 	WORD attribs = Con_GetAttributes();
-	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+	Con_SetScreenBufferAttributes(con_h, CON_ERROR_COLOR);
 	CON_PRINTFUNC_DEF_BODY(stderr);
 	Con_SetAttributes(attribs);
 	return out;
@@ -86,7 +89,7 @@ int Con_Error_v(const char* fmt, ...)
 {
 	CON_PRINTFUNC_VERBOSE;
 	WORD attribs = Con_GetAttributes();
-	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+	Con_SetScreenBufferAttributes(con_h, CON_ERROR_COLOR);
 	CON_PRINTFUNC_DEF_BODY(stderr);
 	Con_SetAttributes(attribs);
 	return out;
@@ -96,7 +99,7 @@ int Con_Error_nv(const char* fmt, ...)
 {
 	CON_PRINTFUNC_NONVERBOSE;
 	WORD attribs = Con_GetAttributes();
-	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_INTENSITY);
+	Con_SetScreenBufferAttributes(con_h, CON_ERROR_COLOR);
 	CON_PRINTFUNC_DEF_BODY(stderr);
 	Con_SetAttributes(attribs);
 	return out;
@@ -105,7 +108,7 @@ int Con_Error_nv(const char* fmt, ...)
 int Con_Warning(const char* fmt, ...)
 {
 	WORD attribs = Con_GetAttributes();
-	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	Con_SetScreenBufferAttributes(con_h, CON_WARNING_COLOR);
 	CON_PRINTFUNC_DEF_BODY(stdout);
 	Con_SetAttributes(attribs);
 	return out;
@@ -115,7 +118,7 @@ int Con_Warning_v(const char* fmt, ...)
 {
 	CON_PRINTFUNC_VERBOSE;
 	WORD attribs = Con_GetAttributes();
-	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	Con_SetScreenBufferAttributes(con_h, CON_WARNING_COLOR);
 	CON_PRINTFUNC_DEF_BODY(stdout);
 	Con_SetAttributes(attribs);
 	return out;
@@ -125,12 +128,14 @@ int Con_Warning_nv(const char* fmt, ...)
 {
 	CON_PRINTFUNC_NONVERBOSE;
 	WORD attribs = Con_GetAttributes();
-	Con_SetScreenBufferAttributes(con_h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	Con_SetScreenBufferAttributes(con_h, CON_WARNING_COLOR);
 	CON_PRINTFUNC_DEF_BODY(stdout);
 	Con_SetAttributes(attribs);
 	return out;
 }
 
+#undef CON_PRINTFUNC_VERBOSE
+#undef CON_PRINTFUNC_NONVERBOSE
 #undef CON_PRINT_FUNCDEF_BODY
 
 int Con_Init(void)
