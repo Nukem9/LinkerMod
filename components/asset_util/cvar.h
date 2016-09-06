@@ -1,10 +1,12 @@
 #pragma once
 #include "arg.h"
+#include <Windows.h>
 
 //
 // The maximum number of global cvars
 //
 #define GLOBAL_CVAR_MAX 32
+#define CVAR_STRLEN MAX_PATH
 
 enum CVAR_TYPE
 {
@@ -23,8 +25,8 @@ private:
 	
 	int		int_val;
 	bool	bool_val;
-	char	str_val[32];
 	float	float_val;
+	char	str_val[CVAR_STRLEN];
 	
 	friend class GCVar;
 	

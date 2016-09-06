@@ -57,7 +57,7 @@ CVar::CVar(const char* name, char shortcut, const char* description, int default
 	}
 	
 	this->bool_val = (int_val != 0);
-	snprintf(str_val, 32, "%d", int_val);
+	snprintf(str_val, CVAR_STRLEN, "%d", int_val);
 	this->float_val = (float)int_val;
 }
 
@@ -81,7 +81,7 @@ CVar::CVar(const char* name, char shortcut, const char* description, bool defaul
 	}
 	
 	this->int_val = bool_val ? 1 : 0;
-	snprintf(str_val, 32, "%s", bool_val ? "true" : "false");
+	snprintf(str_val, CVAR_STRLEN, "%s", bool_val ? "true" : "false");
 	this->float_val = (float)int_val;
 }
 
@@ -101,7 +101,7 @@ CVar::CVar(const char* name, char shortcut, const char* description, float defau
 	
 	this->int_val = (int)float_val;
 	this->bool_val = (int_val != 0);
-	snprintf(str_val, 32, "%f", float_val);
+	snprintf(str_val, CVAR_STRLEN, "%f", float_val);
 }
 
 CVar::CVar(const char* name, char shortcut, const char* description, const char* defaultValue)
@@ -118,8 +118,8 @@ CVar::CVar(const char* name, char shortcut, const char* description, const char*
 		this->RegisterShortcut(shortcut);
 	}
 	
-	strncpy(this->str_val, defaultValue, 31);
-	this->str_val[31] = '\0';
+	strncpy(this->str_val, defaultValue, CVAR_STRLEN-1);
+	this->str_val[CVAR_STRLEN-1] = '\0';
 	
 	this->bool_val = (str_val[0] != 0);
 	this->int_val = bool_val ? 1 : 0;
@@ -143,7 +143,7 @@ bool CVar::Enable(void)
 	this->bool_val = true;
 	this->int_val = 1;
 	this->float_val = 1.0f;
-	strncpy_s(this->str_val, "true", 32);
+	strncpy_s(this->str_val, "true", CVAR_STRLEN);
 
 /*
 	switch(this->type)
@@ -187,7 +187,7 @@ bool CVar::Disable(void)
 	this->bool_val = false;
 	this->int_val = 0;
 	this->float_val = 0.0f;
-	strncpy_s(this->str_val, "false", 32);
+	strncpy_s(this->str_val, "false", CVAR_STRLEN);
 
 	return this->bool_val;
 }
@@ -206,8 +206,8 @@ bool CVar::Toggle(void)
 //
 int CVar::AssignRawString(const char* val)
 {
-	strncpy(this->str_val, val, 31);
-	this->str_val[31] = '\0';
+	strncpy(this->str_val, val, CVAR_STRLEN - 1);
+	this->str_val[CVAR_STRLEN - 1] = '\0';
 	
 	switch(this->type)
 	{
