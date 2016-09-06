@@ -55,7 +55,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
 	//
-	if (!ARG_FLAG_OVERWRITE)
+	if (!fs_overwrite.ValueBool())
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
@@ -118,7 +118,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
 	//
-	if (!ARG_FLAG_OVERWRITE)
+	if (!fs_overwrite.ValueBool())
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
@@ -178,7 +178,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
 	//
-	if (!ARG_FLAG_OVERWRITE)
+	if (!fs_overwrite.ValueBool())
 	{
 		if (FILE* h = fopen(qpath, "r"))
 		{
@@ -277,7 +277,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 		if (Str_EndsWith(rawfileString, ".wav"))
 		{
-			if (ARG_FLAG_SND)
+			if (g_extractSounds.ValueBool())
 			{
 				Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
 				FF_FFExtractSoundFile(snd_info, rawfileString);
@@ -286,11 +286,16 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 			continue;
 		}
 
+		//
+		// ARG_FLAG_FF Should never been false if this function is running
+		//
+		/*
 		if (!ARG_FLAG_FF)
 		{
 			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
 			continue;
 		}
+		*/
 
 		if (Str_EndsWith(rawfileString, ".vision"))
 		{

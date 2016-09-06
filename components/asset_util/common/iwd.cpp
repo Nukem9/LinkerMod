@@ -11,22 +11,22 @@
 
 int __cdecl IWD_IWDHandler(const char* iwdPath, const char* iwdName)
 {
-	if (!ARG_FLAG_LOCALIZED && stristr(iwdName, "localized"))
+	if (!g_useLocalized.ValueBool() && stristr(iwdName, "localized"))
 	{
 		return 0;
 	}
 
 
 	char sub[MAX_PATH];
-	if (ARG_FLAG_EVERY)
+	if (g_extractAll.ValueBool())
 	{
 		sprintf_s(sub, "ALL");
 	}
-	else if (ARG_FLAG_IMAGE)
+	else if (g_extractImages.ValueBool())
 	{
 		sprintf_s(sub, "IMAGE");
 
-		if (ARG_FLAG_AUDIO)
+		if (g_extractSounds.ValueBool())
 		{
 			sprintf_s(sub, "%s and %s", sub, "AUDIO");
 		}
@@ -46,7 +46,7 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 	char outPath[MAX_PATH];
 	sprintf_s(outPath, "%s/%s", AppInfo_RawDir(), filepath);
 
-	if (ARG_FLAG_OVERWRITE)
+	if (fs_overwrite.ValueBool())
 	{
 		Con_Print_v("Extracting file: \"%s\"\n", filepath);
 		mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0);
@@ -104,17 +104,17 @@ int __cdecl IWD_IWDExtract(const char* iwdPath, const char* iwdName)
 			return -1;
 		}
 
-		if (ARG_FLAG_EVERY)
+		if (g_extractAll.ValueBool())
 		{
 			IWD_IWDExtractFile(&iwd, file_stat.m_filename);
 			continue;
 		}
-		else if (ARG_FLAG_IMAGE && _strnicmp(IWD_DIR_IMAGE, file_stat.m_filename, strlen(IWD_DIR_IMAGE)) == 0)
+		else if (g_extractImages.ValueBool() && _strnicmp(IWD_DIR_IMAGE, file_stat.m_filename, strlen(IWD_DIR_IMAGE)) == 0)
 		{
 			IWD_IWDExtractFile(&iwd, file_stat.m_filename);
 			continue;
 		}
-		else if (ARG_FLAG_AUDIO && _strnicmp(IWD_DIR_SOUND, file_stat.m_filename, strlen(IWD_DIR_SOUND)) == 0)
+		else if (g_extractSounds.ValueBool() && _strnicmp(IWD_DIR_SOUND, file_stat.m_filename, strlen(IWD_DIR_SOUND)) == 0)
 		{
 			IWD_IWDExtractFile(&iwd, file_stat.m_filename);
 			continue;

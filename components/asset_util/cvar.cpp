@@ -32,6 +32,7 @@ public:
 //
 REGISTER_GLOBAL_CVAR(g_verbose, "verbose", 'v', "Enable verbose logging", false);
 REGISTER_GLOBAL_CVAR(g_logfile, "logfile", 'l', "Enable logging to file", false);
+REGISTER_GLOBAL_CVAR(fs_overwrite, "overwrite", 'o', "Overwrite existing files", false);
 #if _DEBUG
 REGISTER_GLOBAL_CVAR(g_dumpCVars, "dumpCVars", 'd', "Print all cvar values to the console", false);
 #endif
@@ -41,6 +42,10 @@ REGISTER_GLOBAL_CVAR(g_outPath, "outPath", NULL, "Target directory for file outp
 // Register Standard CVars
 //
 REGISTER_CVAR(g_var, "dvar", NULL, "A test dvar", "/");
+REGISTER_CVAR(g_extractAll, "all", NULL, "Extract all supported files", false);
+REGISTER_CVAR(g_extractImages, "images", NULL, "Extract image files", false);
+REGISTER_CVAR(g_extractSounds, "sounds", NULL, "Extract audio files", false);
+REGISTER_CVAR(g_useLocalized, "includeLocalized", NULL, "Extract from localized files as well", false);
 
 #undef REGISTER_GLOBAL_CVAR
 #undef REGISTER_CVAR

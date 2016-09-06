@@ -91,6 +91,7 @@ public:
 //
 REGISTER_GLOBAL_CVAR(g_verbose);
 REGISTER_GLOBAL_CVAR(g_logfile);
+REGISTER_GLOBAL_CVAR(fs_overwrite);
 #if _DEBUG
 REGISTER_GLOBAL_CVAR(g_dumpCVars);
 #endif
@@ -99,19 +100,10 @@ REGISTER_GLOBAL_CVAR(g_dumpCVars);
 // Register Standard CVars
 //
 REGISTER_CVAR(g_var);
+REGISTER_CVAR(g_extractAll);
+REGISTER_CVAR(g_extractImages);
+REGISTER_CVAR(g_extractSounds);
+REGISTER_CVAR(g_useLocalized);
 
 #undef REGISTER_GLOBAL_CVAR
 #undef REGISTER_CVAR
-
-//
-// Temporary Definitions for Use During Transition
-//
-#define ARG_FLAG_AUDIO		0
-#define ARG_FLAG_CONVERT	0
-#define ARG_FLAG_EVERY		0
-#define ARG_FLAG_IMAGE		0
-#define ARG_FLAG_SND		0
-#define ARG_FLAG_FF			0
-#define ARG_FLAG_LOCALIZED	0
-#define ARG_FLAG_OVERWRITE	0
-#define ARG_FLAG_SETUP		0
