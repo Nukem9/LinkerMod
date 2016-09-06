@@ -147,7 +147,7 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 	//
 	if (cvar == NULL)
 	{
-		Con_Warning_v("Error: Unrecognized argument '%s'\n", argStr);
+		Con_Warning_v("Warning: Unrecognized argument '%s'\n", argStr);
 		argc--;
 		argv++;
 		return 0;
@@ -162,8 +162,7 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 		{
 			cvar->Toggle();
 			argc--;
-			**argv = '\0'; // Prevent the cvar argument from being passed to the command
-			argv++;
+			**argv++ = '\0'; // Prevent the cvar argument from being passed to the command
 			return 0;
 		}
 
@@ -177,10 +176,9 @@ int Arg_ParseArgument(char*** consumable_argv, int* consumable_argc)
 		// Consume both the cvar name and the value string
 		//
 		cvar->AssignRawString(argv[1]);
-		*(argv[0]) = '\0'; // Prevent the cvar argument from being passed to the command
-		*(argv[1]) = '\0';
+		**argv++ = '\0'; // Prevent the cvar argument from being passed to the command
+		**argv++ = '\0';
 		argc -= 2;
-		argv += 2;
 		return 0;
 	}
 
