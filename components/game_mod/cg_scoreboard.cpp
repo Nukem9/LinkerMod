@@ -12,9 +12,7 @@ dvar_s* CG_RegisterScoreboardDvars()
 const char* CG_GetServerName(const char* name)
 {
 	if (cg_showServerInfo->current.enabled)
-	{
 		return name;
-	}
 
 	return "";
 }

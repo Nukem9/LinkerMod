@@ -14,7 +14,7 @@ LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 		ExceptionCodeToString(ExceptionInfo->ExceptionRecord->ExceptionCode));
 
 	char buf[256];
-	sprintf_s(buf, "Exception Address: %08x\n\n", ExceptionInfo->ExceptionRecord->ExceptionAddress);
+	sprintf_s(buf, "Exception Address: %p\n\n", ExceptionInfo->ExceptionRecord->ExceptionAddress);
 	strcat_s(g_ExceptionStr, buf);
 	
 	if (ExceptionInfo->ContextRecord->ContextFlags & 0x10001)

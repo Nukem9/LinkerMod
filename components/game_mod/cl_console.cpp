@@ -10,8 +10,8 @@ bool Con_CancelAutoComplete()
 {
 	if (Con_HasActiveAutoComplete())
 	{
-		*(int *)0xC48A48 = -1;
-		((BYTE *)0xC48A08)[0] = 0;
+		*(int *)0xC48A48 = -1;		// conDrawInputGlob.matchIndex
+		((BYTE *)0xC48A08)[0] = 0;	// conDrawInputGlob.autoCompleteChoice[0]
 
 		return true;
 	}

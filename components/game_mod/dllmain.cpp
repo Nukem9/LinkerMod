@@ -1,13 +1,7 @@
 #include "stdafx.h"
-#include "patch_usefastfile.h"
 
-bool g_initted = false;
 BOOL GameMod_Init()
 {
-	ASSERT(g_initted == false);
-	if(g_initted)
-		return TRUE;
-
 	//
 	// Disable STDOUT buffering
 	//
@@ -17,8 +11,6 @@ BOOL GameMod_Init()
 	// Bypass CEG's code hashes
 	//
 	Patch_CEG();
-	FixupFunction(0x0060CC10, 0x004F20F0);// CEGObfuscate<LiveStats_Init> => LiveStats_Init
-	FixupFunction(0x00580460, 0x0079E6D0);// CEGObfuscate<Con_Restricted_SetLists> => Con_Restricted_SetLists
 
 	//
 	// Enable custom exception filter 
@@ -329,7 +321,6 @@ BOOL GameMod_Init()
 	//
 	IsReflectionMode() ? ReflectionMod_Init() : ReShade_Init();
 
-	g_initted = true;
 	return TRUE;
 }
 

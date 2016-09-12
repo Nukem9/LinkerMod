@@ -1,7 +1,4 @@
-#include "patch_common.h"
-#include "patch_usefastfile.h"
-
-#include <shellapi.h>
+#include "stdafx.h"
 
 unsigned __int64 LiveSteam_GetUid()
 {

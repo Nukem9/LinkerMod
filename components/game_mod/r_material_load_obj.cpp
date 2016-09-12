@@ -1,16 +1,12 @@
 #include "stdafx.h"
 
-#include <stdio.h>
-#include "../shared/minidx9/Include/d3dx9.h"
-#pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
-
 bool Material_CopyTextToDXBuffer(void *cachedShader, unsigned int shaderLen, LPD3DXBUFFER *shader)
 {
 	HRESULT hr = D3DXCreateBuffer(shaderLen, shader);
 
 	if (!SUCCEEDED(hr))
 	{
-		// Com_PrintError(8, "ERROR: Material_CopyTextToDXBuffer: D3DXCreateBuffer(%d) failed: %s (0x%08x)\n", shaderLen, R_ErrorDescription(hr), hr);
+		Com_PrintError(8, "ERROR: Material_CopyTextToDXBuffer: D3DXCreateBuffer(%d) failed: %s (0x%08x)\n", shaderLen, /*R_ErrorDescription(hr)*/"HRESULT", hr);
 
 		free(cachedShader);
 		return false;
@@ -53,18 +49,17 @@ FILE *Material_OpenShader_BlackOps(const char *shaderTarget, const char *shaderN
 
 ID3DXBuffer *Material_CompileShader(const char *shaderName, int shaderType, const char *entryPoint, const char *target)
 {
-	int shaderDataSize = 0;
-	ID3DXBuffer *shader = nullptr;
 	FILE *shaderFile = Material_OpenShader_BlackOps(target, shaderName);
 
 	if (!shaderFile)
 		return nullptr;
 
-	// Skip the first 4 bytes (zeros)
+	// Skip the first 4 bytes (shader ascii text length)
 	fpos_t pos = 4;
 	fsetpos(shaderFile, &pos);
 
-	// Read the real data size
+	// Read the binary data size
+	int shaderDataSize;
 	if (fread(&shaderDataSize, 4, 1, shaderFile) < 1)
 	{
 		fclose(shaderFile);
@@ -74,6 +69,7 @@ ID3DXBuffer *Material_CompileShader(const char *shaderName, int shaderType, cons
 	void *shaderMemory = malloc(shaderDataSize);
 	fread(shaderMemory, 1, shaderDataSize, shaderFile);
 
+	ID3DXBuffer *shader = nullptr;
 	if (!Material_CopyTextToDXBuffer(shaderMemory, shaderDataSize, &shader))
 		ASSERT_MSG(false, "SHADER UPLOAD FAILED\n");
 

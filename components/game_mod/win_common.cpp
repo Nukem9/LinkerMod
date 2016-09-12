@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-static char(__cdecl* sub_507A30)() = (char(__cdecl*)())0x004CFC7B;
-
 void __cdecl Sys_OutOfMemErrorInternal(const char *filename, int line)
 {
 	Sys_EnterCriticalSection(CRITSECT_FATAL_ERROR);
@@ -15,22 +13,18 @@ void __cdecl Sys_OutOfMemErrorInternal(const char *filename, int line)
 	sprintf_s(msg, "%s\n\n", body);
 
 	void* frame[EXCEPTION_STACKTRACE_MAXFRAMECOUNT];
-	int frameCount = CaptureStackBackTrace(0, EXCEPTION_STACKTRACE_MAXFRAMECOUNT, frame, NULL);
+	int frameCount = CaptureStackBackTrace(0, ARRAYSIZE(frame), frame, nullptr);
 
 	if (frameCount != 0)
-	{
-		strcat_s(msg, EXCEPTION_STR_MAXLEN, "Stack Trace:\n");
-	}
+		strcat_s(msg, "Stack Trace:\n");
 
 	for (int i = 0; i < frameCount; i++)
 	{
 		char buf[256];
 		sprintf_s(buf, "frame[%s%d]: %08x%s", i < 10 ? " " : "", i, frame[i], i % 2 ? "\n" : "\t");
-		strcat_s(msg, EXCEPTION_STR_MAXLEN, buf);
+		strcat_s(msg, buf);
 	}
 
 	MessageBoxA(hWnd, msg, title, MB_ICONERROR);
-
-	sub_507A30();
 	exit(-1);
 }

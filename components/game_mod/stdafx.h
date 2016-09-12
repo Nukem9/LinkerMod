@@ -5,11 +5,14 @@
 #include <stdio.h>
 #include <intrin.h>
 #include <Psapi.h>
+#include <shellapi.h>
 
 //
 // Shared files
 //
 #include "../shared/utility.h"
+#include "../shared/minidx9/Include/d3dx9.h"
+#pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
 
 #include "CEG.h"
 
@@ -37,7 +40,9 @@
 #include "win_exception.h"
 #include "win_common.h"
 
+#include "patch_common.h"
 #include "patch_reflections.h"
+#include "patch_usefastfile.h"
 
 #include "reshade.h"
 

@@ -22,13 +22,13 @@ void Sys_ConsoleThread(unsigned int index)
 
 void Sys_CreateThread(void(__cdecl * function)(unsigned int index), unsigned int threadContext)
 {
-	// ASSERT_TRUE(threadFunc[threadContext] == nullptr);
-	// ASSERT_TRUE(threadContext < THREAD_CONTEXT_COUNT);
+	ASSERT(threadFunc[threadContext] == nullptr);
+	ASSERT(threadContext < THREAD_CONTEXT_COUNT);
 
 	threadFunc[threadContext]	= function;
 	threadHandle[threadContext] = CreateThread(nullptr, 0, Sys_ThreadMain, (LPVOID)threadContext, 0, &threadId[threadContext]);
 
-	// ASSERT_TRUE(threadHandle[threadContext] != nullptr);
+	ASSERT(threadHandle[threadContext] != nullptr);
 
 	if (!threadHandle[threadContext])
 		Com_Printf(1, "Error %d while creating thread %d\n", GetLastError(), threadContext);

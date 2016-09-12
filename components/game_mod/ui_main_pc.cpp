@@ -9,44 +9,36 @@ char** ui_arenaInfos = *(char*(*)[128])0x025F6740;
 
 bool __cdecl UI_LoadModArenas()
 {
-	int file = NULL;
-	size_t fileSize = FS_FOpenFileRead("mod.arena", &file);
-	
-	if(file)
-	{
-		if(fileSize)
-		{
-			if(fileSize <= ARENA_FILE_MAX_SIZE)
-			{
-				char buf[ARENA_FILE_MAX_SIZE];
-				
-				FS_Read(buf, fileSize, file);
-				FS_FCloseFile(file);
+	int fileHandle = 0;
+	size_t fileSize = FS_FOpenFileRead("mod.arena", &fileHandle);
 
-				ui_numArenas = UI_ParseInfos(buf, 128 - ui_numArenas, &ui_arenaInfos[ui_numArenas]);
-				return true;
-			}
-			else
-			{
-				Com_PrintWarning(13, "Customized arena file size is too big to load > %d: %s\n", ARENA_FILE_MAX_SIZE, "mod.arena");
-				FS_FCloseFile(file); //Fix for leaked handles
-				return false;
-			}
-		}
-		else
-		{
-			Com_PrintWarning(13, "Customized arena file is empty: %s\n", "mod.arena");
-			FS_FCloseFile(file); //Fix for leaked handles
-			return false;
-		}
-	}
-	else
+	if (!fileHandle)
 	{
-		Com_PrintWarning(13, "Customized arena file not found: %s\n", "mod.arena"); 
+		Com_PrintWarning(13, "Customized arena file not found: %s\n", "mod.arena");
 		return false;
 	}
-}
 
+	if (!fileSize)
+	{
+		Com_PrintWarning(13, "Customized arena file is empty: %s\n", "mod.arena");
+		FS_FCloseFile(fileHandle); //Fix for leaked handles
+		return false;
+	}
+
+	if (fileSize <= ARENA_FILE_MAX_SIZE)
+	{
+		Com_PrintWarning(13, "Customized arena file size is too big to load > %d: %s\n", ARENA_FILE_MAX_SIZE, "mod.arena");
+		FS_FCloseFile(fileHandle); //Fix for leaked handles
+		return false;
+	}
+
+	char buf[ARENA_FILE_MAX_SIZE];
+	FS_Read(buf, fileSize, fileHandle);
+	FS_FCloseFile(fileHandle);
+
+	ui_numArenas = UI_ParseInfos(buf, 128 - ui_numArenas, &ui_arenaInfos[ui_numArenas]);
+	return true;
+}
 
 const char* __cdecl UI_SelectedMap_LoadName(int index, int* actual)
 {

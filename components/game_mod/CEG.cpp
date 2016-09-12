@@ -48,6 +48,9 @@ void Patch_CEG()
 	Detours::X86::DetourFunction((PBYTE)0x967760, (PBYTE)&hk_memcpy);
 	Detours::X86::DetourFunction((PBYTE)0x8EF04F, (PBYTE)&hk_inline_memcpy);
 	Detours::X86::DetourFunction((PBYTE)0x8EF168, (PBYTE)&hk_inline_memcpy2);
+
+	FixupFunction(0x0060CC10, 0x004F20F0);// CEGObfuscate<LiveStats_Init> => LiveStats_Init
+	FixupFunction(0x00580460, 0x0079E6D0);// CEGObfuscate<Con_Restricted_SetLists> => Con_Restricted_SetLists
 }
 
 DWORD __declspec(noinline) GetNewAddress(DWORD dwOld)

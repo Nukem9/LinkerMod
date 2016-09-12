@@ -59,7 +59,7 @@ void __cdecl Com_LoadCommonFastFile()
 
 	if (zombietron->current.enabled)
 	{
-		zoneInfo[zoneCount].name = NULL;
+		zoneInfo[zoneCount].name = nullptr;
 		zoneInfo[zoneCount].allocFlags = 0;
 		zoneInfo[zoneCount++].freeFlags = 0x100;
 
