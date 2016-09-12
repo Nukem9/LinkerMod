@@ -23,9 +23,7 @@
 #include "db_registry.h"
 #include "ui_main_pc.h"
 #include "live_win.h"
-
 #include "cg_scoreboard.h"
-
 #include "sys_cmds.h"
 #include "r_rendercmds.h"
 #include "r_cinematic.h"
@@ -33,6 +31,7 @@
 #include "r_scene.h"
 #include "r_reflection_probe.h"
 #include "r_material_load_obj.h"
+#include "threads.h"
 
 #include "win_localize.h"
 #include "win_exception.h"
