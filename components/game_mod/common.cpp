@@ -4,11 +4,17 @@ void (__cdecl * Com_Init)(char *commandLine);
 
 void hk_Com_Init(char *commandLine)
 {
-	// Hijack thread index #9 ("Worker7") to use as the console update thread
-	Sys_CreateThread(Sys_ConsoleThread, 9);
-
 	// Fix up the command line because devs removed it
-	Com_Init((char *)0x276D0D8);
+	commandLine = (char *)0x276D0D8;
+
+	if (strstr(commandLine, " +extconsole"))
+	{
+		// Hijack thread index #9 ("Worker7") to use as the console update thread
+		Sys_CreateThread(Sys_ConsoleThread, 9);
+	}
+
+	// Call original function
+	Com_Init(commandLine);
 }
 
 void Field_Clear(field_t *edit)

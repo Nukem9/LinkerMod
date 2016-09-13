@@ -21,7 +21,7 @@ BOOL GameMod_Init()
 	//
 	// Add stack trace info to Sys_OutOfMemErrorInternal
 	//
-	Detours::X86::DetourFunction((PBYTE)0x004CFC30, (PBYTE)&Sys_OutOfMemErrorInternal, Detours::X86Option::USE_JUMP);
+	Detours::X86::DetourFunction((PBYTE)0x004CFC30, (PBYTE)&Sys_OutOfMemErrorInternal);
 
 	//
 	// Sys_CheckCrashOrRerun, EAX = TRUE
