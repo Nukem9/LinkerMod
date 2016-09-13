@@ -43,6 +43,12 @@ BOOL GameMod_Init()
 	PatchMemory(0x00655051, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 
 	//
+	// Disable steam kicking users for random reasons
+	//
+	PatchMemory(0x008B4240, (PBYTE)"\xC3", 1);// KickClientFromSteamGameServer
+	PatchMemory(0x00616628, (PBYTE)"\xEB", 1);// Runframe
+
+	//
 	// "com_introPlayed"
 	// "com_startupIntroPlayed"
 	// "cg_fov" (disable DVAR_CHEAT flag)
