@@ -6,7 +6,7 @@ auto threadFunc			= (void(__cdecl **)(unsigned int))0x0251CB44;
 HANDLE *threadHandle	= (HANDLE *)0x0251CADC;
 DWORD *threadId			= (DWORD *)0x0251CA98;
 
-void Sys_ConsoleThread(unsigned int index)
+void con_extconsoleThread(unsigned int index)
 {
 	// Sys_ShowConsole
 	((void(__cdecl *)())0x00586100)();

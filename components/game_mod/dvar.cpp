@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+dvar_s* sm_quality = 0x0;
+dvar_s* con_extcon = 0x0;
+
 void R_RegisterCustomDvars()
 {
 	//this can go up to 13 - but anything > 11 has artifacts
@@ -34,5 +37,19 @@ void __declspec(naked) mfh_R_RegisterDvars()
 		call Dvar_RegisterInt
 		add esp, 0x48
 		jmp rtn_R_RegisterDvars
+	}
+}
+
+CG_RegisterDvars_t CG_RegisterDvars_o = NULL;
+void __cdecl CG_RegisterDvars(void)
+{
+	CG_RegisterDvars_o();
+
+	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 0x1, "Enable external console window (requires restart)");
+
+	if (con_extcon->current.enabled)
+	{
+		// Hijack thread index #9 ("Worker7") to use as the console update thread
+		Sys_CreateThread(con_extconsoleThread, 9);
 	}
 }

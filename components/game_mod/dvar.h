@@ -93,6 +93,9 @@ static dvar_s*& useFastFile = *(dvar_s**)0x0247FEC8;
 extern bool com_cfg_readOnly_default;
 extern dvar_s* com_cfg_readOnly;
 
+extern dvar_s* sm_quality;
+extern dvar_s* con_extcon;
+
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;
 
@@ -110,4 +113,7 @@ static Dvar_RegisterInt_t* Dvar_RegisterInt = (Dvar_RegisterInt_t*)0x00651910;
 
 void mfh_R_RegisterDvars();
 
-static dvar_s* sm_quality;
+typedef void (__cdecl* CG_RegisterDvars_t)(void);
+extern CG_RegisterDvars_t CG_RegisterDvars_o;
+
+void __cdecl CG_RegisterDvars(void);

@@ -252,9 +252,10 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x006D98F0, (PBYTE)&hk_R_Cinematic_BinkOpen);
 
 	//
-	// Enable Custom Render Dvars
+	// Enable Custom Dvars
 	//
 	Detours::X86::DetourFunction((PBYTE)0x006CA27B, (PBYTE)&mfh_R_RegisterDvars);
+	CG_RegisterDvars_o = (CG_RegisterDvars_t)Detours::X86::DetourFunction((PBYTE)0x004A3860, (PBYTE)&CG_RegisterDvars);
 
 	//
 	// Misc Bug Fixes
