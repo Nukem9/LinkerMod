@@ -59,11 +59,5 @@ void __cdecl CG_RegisterDvars(void)
 {
 	CG_RegisterDvars_o();
 
-	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 0x1, "Enable external console window (requires restart)");
-
-	if (con_extcon->current.enabled)
-	{
-		// Hijack thread index #9 ("Worker7") to use as the console update thread
-		Sys_CreateThread(con_extconsoleThread, 9);
-	}
+	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 1, "Enable external console window");
 }

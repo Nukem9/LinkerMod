@@ -6,13 +6,23 @@ auto threadFunc			= (void(__cdecl **)(unsigned int))0x0251CB44;
 HANDLE *threadHandle	= (HANDLE *)0x0251CADC;
 DWORD *threadId			= (DWORD *)0x0251CA98;
 
-void con_extconsoleThread(unsigned int index)
+void Sys_ConsoleThread(unsigned int index)
 {
+	// Loop forever until someone enables this
+	while (true)
+	{
+		if (con_extcon && con_extcon->current.value)
+			break;
+
+		Sleep(50);
+	}
+
 	// Sys_ShowConsole
 	((void(__cdecl *)())0x00586100)();
 
 	// Continue handling messages for the window
 	MSG msg;
+
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
 		TranslateMessage(&msg);

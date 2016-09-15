@@ -7,6 +7,9 @@ void hk_Com_Init(char *commandLine)
 	// Fix up the command line because devs removed it
 	commandLine = (char *)0x276D0D8;
 
+	// Hijack thread index #9 ("Worker7") to use as the console update thread
+	Sys_CreateThread(Sys_ConsoleThread, 9);
+
 	// Call original function
 	Com_Init(commandLine);
 }
