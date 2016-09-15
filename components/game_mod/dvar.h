@@ -94,6 +94,7 @@ extern bool com_cfg_readOnly_default;
 extern dvar_s* com_cfg_readOnly;
 
 extern dvar_s* sm_quality;
+extern dvar_s* r_noborder;
 extern dvar_s* con_extcon;
 
 typedef const char* Dvar_GetString_t(const char* dvarName);

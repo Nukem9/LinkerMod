@@ -52,10 +52,12 @@ BOOL GameMod_Init()
 	// "com_introPlayed"
 	// "com_startupIntroPlayed"
 	// "cg_fov" (disable DVAR_CHEAT flag)
+	// "cg_fov_default"  (max 165.0)
 	//
 	PatchMemory(0x0082C0F9, (PBYTE)"\x01", 1);
 	PatchMemory(0x0082C111, (PBYTE)"\x01", 1);
-	PatchMemory(0x004A3920, (PBYTE)"\x68\x00\x00\x00\x00", 5);
+	PatchMemory(0x004A3920, (PBYTE)"\x68\x01\x00\x00\x00", 5);
+	PatchMemory(0x004A394A, (PBYTE)"\xD9\x05\xE4\x9F\xA1\x00", 6);
 
 	//
 	// Always force the cursor to be shown
