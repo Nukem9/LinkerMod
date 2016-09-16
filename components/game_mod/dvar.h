@@ -82,6 +82,21 @@ struct dvar_s
 
 static dvar_s **com_sv_running = (dvar_s **)0x0243FD3C;
 
+static dvar_s **developer = (dvar_s **)0x0243FCA0;
+static dvar_s **developer_script = (dvar_s **)0x02481714;
+
+static dvar_s*& zombietron = *(dvar_s**)0x0247FDE8;
+static dvar_s*& zombiemode = *(dvar_s**)0x0243FDD4;
+static dvar_s*& blackopsmode = *(dvar_s**)0x0243FD24;
+static dvar_s*& useFastFile = *(dvar_s**)0x0247FEC8;
+
+extern bool com_cfg_readOnly_default;
+extern dvar_s* com_cfg_readOnly;
+
+extern dvar_s* sm_quality;
+extern dvar_s* r_noborder;
+extern dvar_s* con_extcon;
+
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;
 
@@ -91,9 +106,15 @@ static Dvar_SetString_t* Dvar_SetString = (Dvar_SetString_t*)0x0044A2A0;
 typedef void __cdecl Dvar_SetStringByName_t(const char *dvarName, const char *value);
 static Dvar_SetStringByName_t* Dvar_SetStringByName = (Dvar_SetStringByName_t*)0x00666F30;
 
+typedef void __cdecl Dvar_SetBool_t(dvar_s *dvar, bool value);
+static Dvar_SetBool_t* Dvar_SetBool = (Dvar_SetBool_t*)0x004B0C10;
+
 typedef dvar_s *__cdecl Dvar_RegisterInt_t(const char *dvarName, int value, int min, int max, unsigned __int16 flags, const char *description);
 static Dvar_RegisterInt_t* Dvar_RegisterInt = (Dvar_RegisterInt_t*)0x00651910;
 
 void mfh_R_RegisterDvars();
 
-static dvar_s* sm_quality;
+typedef void (__cdecl* CG_RegisterDvars_t)(void);
+extern CG_RegisterDvars_t CG_RegisterDvars_o;
+
+void __cdecl CG_RegisterDvars(void);

@@ -14,18 +14,20 @@
     <ProjectGuid>{6A3FB8CD-BEA3-42F1-B551-A0F56ED9B266}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>radiant</RootNamespace>
+    <WindowsTargetPlatformVersion>
+    </WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -34,18 +36,18 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\build\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\build\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -60,10 +62,11 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/ignore:4099 /opt:nolbr %(AdditionalOptions) /opt:nolbr </AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)/techset_override.csv" "$(TargetDir)/techset_override.csv"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,44 +86,67 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <IgnoreSpecificDefaultLibraries />
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)/techset_override.csv" "$(TargetDir)/techset_override.csv"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="afx.cpp" />
     <ClCompile Include="com_files.cpp" />
+    <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="CWinApp.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="ent_light.cpp" />
+    <ClCompile Include="kvs.cpp" />
+    <ClCompile Include="nvidia.cpp" />
     <ClCompile Include="q_parse.cpp" />
+    <ClCompile Include="q_project.cpp" />
+    <ClCompile Include="r_draw_shadowablelight.cpp" />
     <ClCompile Include="r_image.cpp" />
     <ClCompile Include="r_image_load_common.cpp" />
     <ClCompile Include="r_image_load_obj.cpp" />
     <ClCompile Include="r_init.cpp" />
     <ClCompile Include="r_material.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
+    <ClCompile Include="r_material_load_obj_waw.cpp" />
+    <ClCompile Include="r_shade.cpp" />
     <ClCompile Include="r_utils.cpp" />
     <ClCompile Include="r_xsurface_load_obj.cpp" />
     <ClCompile Include="win_main.cpp" />
+    <ClCompile Include="win_splash.cpp" />
     <ClCompile Include="xmodel_load_obj.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="afx.h" />
+    <ClInclude Include="afx_colors.h" />
     <ClInclude Include="com_files.h" />
+    <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="CWinApp.h" />
+    <ClInclude Include="ent_light.h" />
+    <ClInclude Include="kvs.h" />
+    <ClInclude Include="nvidia.h" />
     <ClInclude Include="q_parse.h" />
+    <ClInclude Include="q_project.h" />
+    <ClInclude Include="r_draw_shadowablelight.h" />
     <ClInclude Include="r_image.h" />
     <ClInclude Include="r_image_load_common.h" />
     <ClInclude Include="r_image_load_obj.h" />
     <ClInclude Include="r_init.h" />
     <ClInclude Include="r_material.h" />
     <ClInclude Include="r_material_load_obj.h" />
+    <ClInclude Include="r_material_load_obj_waw.h" />
+    <ClInclude Include="r_shade.h" />
     <ClInclude Include="r_utils.h" />
     <ClInclude Include="r_xsurface_load_obj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />
     <ClInclude Include="win_main.h" />
+    <ClInclude Include="win_splash.h" />
     <ClInclude Include="xmodel_load_obj.h" />
   </ItemGroup>
   <ItemGroup>

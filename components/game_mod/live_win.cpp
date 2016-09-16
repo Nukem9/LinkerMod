@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+const int g_protocolVersion = 3142;
+
 MatchMakingInfo* mminfo = nullptr;
 
 void* Live_PartyHandler = (void*)0x005C2570;
@@ -15,9 +17,14 @@ void __cdecl Session_Modify_Fix(const int localControllerIndex, void *session, c
 	
 	g_matchmakingInfo->m_membermod[0] = GM_NET_VERSION;
 	sprintf_s(g_matchmakingInfo->m_membermod + 1, 32, "%.*s", 30, Dvar_GetString("fs_game"));
-	//printf("Settings membermod to %s using net version %d\n",Dvar_GetString("fs_game"), LM_NET_VERSION);
+	//printf("Setting membermod to %s using net version %d\n",Dvar_GetString("fs_game"), LM_NET_VERSION);
 
 	return Session_Modify(localControllerIndex, session, flags, publicSlots, privateSlots);
+}
+
+int SV_UpdateCategory()
+{
+	return 0;
 }
 
 int Live_ClientModMatchesServerMod()
@@ -31,9 +38,14 @@ int Live_ClientModMatchesServerMod()
 		Dvar_SetStringByName("notice_popmenuTitle", UI_SafeTranslateString("@MENU_NOTICE_CAPS"));
 		char* msg;
 		if (mminfo->m_membermod[0] != c_membermod[0])
-			msg = va("^7This server is running an incompatible version of game_mod.dll.\n" \
-						"Host is running game_mod with net version: ^3%d^7\n" \
-						"You are running game_mod with net version: ^3%d^7", mminfo->m_membermod[0], c_membermod[0]);
+		{
+			if (mminfo->m_membermod[0] == NULL)
+				msg = va("^7This server is not running game_mod.dll.\n Please restart the game without game_mod to join.\n");
+			else
+				msg = va("^7This server is running an incompatible version of game_mod.dll.\n" \
+							"Host is running game_mod with net version: ^3%d^7\n" \
+							"You are running game_mod with net version: ^3%d^7", mminfo->m_membermod[0], c_membermod[0]);
+		}
 		else if (mminfo->m_membermod[1] == 0)
 			msg = va("^7This server is not running a mod.\nYou need to unload the current mod before you can join the server.");
 		else

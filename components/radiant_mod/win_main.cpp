@@ -43,3 +43,26 @@ void __declspec(naked) mfh3_Sys_ListFiles()
 		jmp rtn3_Sys_ListFiles
 	}
 }
+
+//
+// Specialized WinMain detour to allow for SplashScreen generation
+// without permanently adding another function to the call stack
+//
+void* rtn_WinMain = 0x0;
+void __declspec(naked) mfh_WinMain()
+{
+	_asm
+	{
+		pushad
+		call App_CreateSplash
+		popad
+
+		jmp rtn_WinMain;
+	}
+}
+
+BOOL __stdcall SetWindowPlacement_Hidden(HWND hWnd, WINDOWPLACEMENT *lpwndpl)
+{
+	lpwndpl->showCmd = SW_HIDE;
+	return SetWindowPlacement(hWnd, lpwndpl);
+}

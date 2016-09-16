@@ -5,6 +5,12 @@
 *.log
 *.opensdf
 *.vcxproj.filters
+*.nvuser
+*.opendb
+*.db
+*.tlog
+
+!components/asset_util/asset_util.vcxproj.filters
 
 /build
 /ipch
@@ -12,5 +18,9 @@
 components/sdk
 components/*/Debug
 components/*/Release
+components/shared/*/Debug
+components/shared/*/Release
+components/D3DBSP_Lib/*/Release
+components/D3DBSP_Lib/*/Debug
 
 !*.lib

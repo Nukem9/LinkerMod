@@ -29,3 +29,25 @@ DEFAULT:
 		retn
 	}
 }
+
+PartyClient_CheckMapExists_t PartyClient_CheckMapExists_o = (PartyClient_CheckMapExists_t)0x0;
+bool __cdecl PartyClient_CheckMapExists(const char *map)
+{
+	if (!I_strncmp("so_", map, strlen("so_")))
+	{
+		const char* basename = nullptr;
+		for (basename = &map[strlen("so_")]; *basename && *basename != '_'; ++basename)
+		{
+			// Loop through each char until a '_' char is found.
+		}
+		
+		if (*basename == NULL)
+		{
+			Com_PrintError(1, "Bad specop level name\n");
+		}
+
+		map = basename + 1;
+	}
+
+	return PartyClient_CheckMapExists_o(map);
+}
