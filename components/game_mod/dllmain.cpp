@@ -278,6 +278,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00890E23, (PBYTE)&mfh_CG_DrawBackdropServerInfo);
 
 	//
+	// Live radiant initialization hook
+	//
+	Detours::X86::DetourFunction((PBYTE)0x004B7870, (PBYTE)&RadiantRemoteInit);
+
+	//
 	// Increase PMem size
 	//
 	unsigned int pmemSize = 0x12C00000 * 2;

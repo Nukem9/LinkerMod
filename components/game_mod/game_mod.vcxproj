@@ -100,6 +100,7 @@
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
     <ClCompile Include="patch_reflections.cpp" />
+    <ClCompile Include="radiant_remote.cpp" />
     <ClCompile Include="reshade.cpp" />
     <ClCompile Include="r_cinematic.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
@@ -124,6 +125,7 @@
     <ClInclude Include="patch_common.h" />
     <ClInclude Include="patch_usefastfile.h" />
     <ClInclude Include="patch_reflections.h" />
+    <ClInclude Include="radiant_remote.h" />
     <ClInclude Include="reshade.h" />
     <ClInclude Include="r_cinematic.h" />
     <ClInclude Include="r_material_load_obj.h" />
