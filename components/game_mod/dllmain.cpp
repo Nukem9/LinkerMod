@@ -72,6 +72,7 @@ BOOL GameMod_Init()
 	PatchMemory(0x00887575, (PBYTE)"\x90\x90\x90\x90\x90", 5); // "Party_StopParty"
 	PatchMemory(0x0043C6DB, (PBYTE)"\x90\x90\x90\x90\x90", 5); // "Clearing migration data\n"
 	PatchMemory(0x0051B809, (PBYTE)"\x90\x90\x90\x90\x90", 5); // "Failed to log on.\n"
+	PatchMemory(0x00659EDC, (PBYTE)"\x90\x90\x90\x90\x90", 5); // "Live_UpdateUiPopup: %s\n"
 
 	//
 	// EXE_TOOFEWPLAYERS in a party game

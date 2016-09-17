@@ -26,5 +26,8 @@ struct RadaintToGameMapping
 	int cg_gameId;
 };
 
+static_assert(sizeof(RadiantCommand) == 520, "Size check");
+static_assert(sizeof(RadaintToGameMapping) == 16, "Size check");
+
 void RadiantRemoteInit();
 DWORD WINAPI RadiantRemoteThread(LPVOID Arg);

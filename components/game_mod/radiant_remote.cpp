@@ -3,7 +3,7 @@
 HANDLE liveUpdateThread;
 
 int& savedCommandCount		= *(int *)0x0251AE58;
-auto savedCommands			= (RadiantCommand *)0x02517D90;
+auto savedCommands			= (RadiantCommand *)0x02507990;
 int& gCommandCount			= *(int *)0x251AE50;
 auto gCommands				= (RadiantCommand *)0x02517D90;
 int& gObjectMappingCount	= *(int *)0x0251AE60;
