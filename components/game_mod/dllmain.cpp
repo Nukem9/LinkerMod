@@ -281,7 +281,9 @@ BOOL GameMod_Init()
 	//
 	// Live radiant initialization hook
 	//
+#if _UNSTABLE
 	Detours::X86::DetourFunction((PBYTE)0x004B7870, (PBYTE)&RadiantRemoteInit);
+#endif
 
 	//
 	// Increase PMem size
