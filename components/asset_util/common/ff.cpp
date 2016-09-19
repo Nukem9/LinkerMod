@@ -277,13 +277,15 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 		if (Str_EndsWith(rawfileString, ".wav"))
 		{
-			if (g_extractSounds.ValueBool())
+			if (!g_extractSounds.ValueBool())
 			{
-				Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
-				FF_FFExtractSoundFile(snd_info, rawfileString);
+				searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
+				continue;
 			}
+
+			Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
+			FF_FFExtractSoundFile(snd_info, rawfileString);
 			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
-			continue;
 		}
 
 		//
