@@ -25,7 +25,7 @@ bool __cdecl UI_LoadModArenas()
 		return false;
 	}
 
-	if (fileSize <= ARENA_FILE_MAX_SIZE)
+	if (fileSize > ARENA_FILE_MAX_SIZE)
 	{
 		Com_PrintWarning(13, "Customized arena file size is too big to load > %d: %s\n", ARENA_FILE_MAX_SIZE, "mod.arena");
 		FS_FCloseFile(fileHandle); //Fix for leaked handles
