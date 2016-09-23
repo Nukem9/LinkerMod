@@ -6,6 +6,9 @@
 #include <intrin.h>
 #include <Psapi.h>
 #include <shellapi.h>
+#include <winsock.h>
+
+#pragma comment(lib, "ws2_32.lib")
 
 //
 // Shared files
@@ -35,6 +38,7 @@
 #include "r_reflection_probe.h"
 #include "r_material_load_obj.h"
 #include "threads.h"
+#include "radiant_remote.h"
 
 #include "win_localize.h"
 #include "win_exception.h"

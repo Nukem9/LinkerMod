@@ -72,6 +72,7 @@ BOOL GameMod_Init()
 	PatchMemory(0x00887575, (PBYTE)"\x90\x90\x90\x90\x90", 5); // "Party_StopParty"
 	PatchMemory(0x0043C6DB, (PBYTE)"\x90\x90\x90\x90\x90", 5); // "Clearing migration data\n"
 	PatchMemory(0x0051B809, (PBYTE)"\x90\x90\x90\x90\x90", 5); // "Failed to log on.\n"
+	PatchMemory(0x00659EDC, (PBYTE)"\x90\x90\x90\x90\x90", 5); // "Live_UpdateUiPopup: %s\n"
 
 	//
 	// EXE_TOOFEWPLAYERS in a party game
@@ -276,6 +277,13 @@ BOOL GameMod_Init()
 	CG_RegisterScoreboardDvars_o = (CG_RegisterScoreboardDvars_t)Detours::X86::DetourFunction((PBYTE)0x005C74D0, (PBYTE)&CG_RegisterScoreboardDvars);
 	CL_GetServerIPAddress_o = (CL_GetServerIPAddress_t)Detours::X86::DetourFunction((PBYTE)0x0053BE60, (PBYTE)&CL_GetServerIPAddress);
 	Detours::X86::DetourFunction((PBYTE)0x00890E23, (PBYTE)&mfh_CG_DrawBackdropServerInfo);
+
+	//
+	// Live radiant initialization hook
+	//
+#if _UNSTABLE
+	Detours::X86::DetourFunction((PBYTE)0x004B7870, (PBYTE)&RadiantRemoteInit);
+#endif
 
 	//
 	// Increase PMem size
