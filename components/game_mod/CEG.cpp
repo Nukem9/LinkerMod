@@ -49,6 +49,8 @@ void Patch_CEG()
 	Detours::X86::DetourFunction((PBYTE)0x8EF04F, (PBYTE)&hk_inline_memcpy);
 	Detours::X86::DetourFunction((PBYTE)0x8EF168, (PBYTE)&hk_inline_memcpy2);
 
+	Detours::X86::DetourFunction((PBYTE)0x8EE640, (PBYTE)&sub_8EE640);
+
 	FixupFunction(0x0060CC10, 0x004F20F0);// CEGObfuscate<LiveStats_Init> => LiveStats_Init
 	FixupFunction(0x00580460, 0x0079E6D0);// CEGObfuscate<Con_Restricted_SetLists> => Con_Restricted_SetLists
 }
@@ -117,6 +119,15 @@ void __declspec(naked) hk_inline_memcpy2()
 		mov ecx, dword ptr ss : [esp + 0x24]
 		jmp DWORD PTR ds : [dwJmp]
 	}
+}
+
+void *sub_8EE640(void *Nullptr1, void *Nullptr2)
+{
+	if (Nullptr1 != nullptr || Nullptr2 != nullptr)
+		__debugbreak();
+
+	*(void **)0xBA1C24 = Nullptr2;
+	return (void *)0xBA1C24;
 }
 
 void __fastcall sub_5CBF00(void *thisptr, PVOID _EDX, DWORD address, size_t scanSize)
