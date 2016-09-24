@@ -37,7 +37,8 @@ void R_RegisterCustomDvars()
 	if (r_noborder->current.enabled)
 		style = WS_VISIBLE | WS_POPUP;
 
-	PatchMemory(0x006B7A74, (PBYTE)&style, sizeof(DWORD));
+	PatchMemory(0x006B7A74, (PBYTE)&style, sizeof(DWORD));// R_CreateWindow
+	PatchMemory(0x006B7EC1, (PBYTE)&style, sizeof(DWORD));// R_ResizeWindow
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;
