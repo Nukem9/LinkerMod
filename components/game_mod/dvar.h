@@ -109,12 +109,15 @@ static Dvar_SetStringByName_t* Dvar_SetStringByName = (Dvar_SetStringByName_t*)0
 typedef void __cdecl Dvar_SetBool_t(dvar_s *dvar, bool value);
 static Dvar_SetBool_t* Dvar_SetBool = (Dvar_SetBool_t*)0x004B0C10;
 
+typedef dvar_s *__cdecl Dvar_RegisterString_t(const char *dvarName, const char *value, unsigned __int16 flags, const char *description);
+static Dvar_RegisterString_t* Dvar_RegisterString = (Dvar_RegisterString_t*)0x0059B3B0;
+
 typedef dvar_s *__cdecl Dvar_RegisterInt_t(const char *dvarName, int value, int min, int max, unsigned __int16 flags, const char *description);
 static Dvar_RegisterInt_t* Dvar_RegisterInt = (Dvar_RegisterInt_t*)0x00651910;
 
 void mfh_R_RegisterDvars();
 
-typedef void (__cdecl* CG_RegisterDvars_t)(void);
+typedef void (__cdecl* CG_RegisterDvars_t)();
 extern CG_RegisterDvars_t CG_RegisterDvars_o;
 
-void __cdecl CG_RegisterDvars(void);
+void __cdecl CG_RegisterDvars();

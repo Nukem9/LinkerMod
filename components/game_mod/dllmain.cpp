@@ -102,14 +102,6 @@ BOOL GameMod_Init()
 	PatchMemory(0x00587633, (PBYTE)"\xE8", 1);
 	PatchMemory(0x0058761C, (PBYTE)"\xEB", 1);
 
-#if _DEBUG
-	//
-	// Set the max number of suggestions to show in the console autocomplete preview
-	//
-	unsigned int con_inputMaxMatchesShown = 32;
-	PatchMemory(0x00B72F7C, (PBYTE)&con_inputMaxMatchesShown, 4);
-#endif
-
 	//
 	// Disable error message boxes with developer_script
 	//
