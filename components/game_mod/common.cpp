@@ -52,7 +52,9 @@ void Com_ToolError(int channel, const char* fmt, ...)
 
 void __cdecl Com_LoadCommonFastFile()
 {
-	XZoneInfo zoneInfo[2];
+	dvar_s** fs_gameDirVar = (dvar_s**)0x025FADE8;
+
+	XZoneInfo zoneInfo[4];
 	int zoneCount = 0;
 
 	DB_ResetZoneSize(0);
@@ -81,6 +83,16 @@ void __cdecl Com_LoadCommonFastFile()
 		zoneInfo[zoneCount].name = "common_zombie";
 		zoneInfo[zoneCount].allocFlags = 0x100;
 		zoneInfo[zoneCount++].freeFlags = 0;
+
+		if ((*fs_gameDirVar) != NULL && (*fs_gameDirVar)->current.string[0] != NULL)
+		{
+			if (DB_IsZoneLoaded("common_zombie_patch_override"))
+				return;
+
+			zoneInfo[zoneCount].name = "common_zombie_patch_override";
+			zoneInfo[zoneCount].allocFlags = 0x100;
+			zoneInfo[zoneCount++].freeFlags = 0;
+		}
 	}
 	
 	if (!zombiemode->current.enabled)
@@ -91,6 +103,19 @@ void __cdecl Com_LoadCommonFastFile()
 		zoneInfo[zoneCount].name = "common";
 		zoneInfo[zoneCount].allocFlags = 0x100;
 		zoneInfo[zoneCount++].freeFlags = 0;
+
+		//
+		// No override is needed for common_patch because common_patch doesn't exist in the vanilla game
+		//
+		/*if ((*fs_gameDirVar) != NULL && (*fs_gameDirVar)->current.string[0] != NULL)
+		{
+			if (DB_IsZoneLoaded("common_patch_override"))
+				return;
+
+			zoneInfo[zoneCount].name = "common_patch_override";
+			zoneInfo[zoneCount].allocFlags = 0x100;
+			zoneInfo[zoneCount++].freeFlags = 0;
+		}*/
 	}
 
 	DB_LoadXAssets(zoneInfo, zoneCount, 0);
