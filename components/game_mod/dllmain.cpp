@@ -311,6 +311,11 @@ BOOL GameMod_Init()
 	PatchMemory(0x008172D3, (PBYTE)&msg_nodeVisUpdate, 4);
 
 	//
+	// Replace "Missing Image" assertion with silent warning (and add image to missingasset.csv)
+	//
+	PatchCall(0x0070A4CD, (PBYTE)&Image_HandleMissingImage);
+
+	//
 	// Increase Asset Limits
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);

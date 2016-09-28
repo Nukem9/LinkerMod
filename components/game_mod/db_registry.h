@@ -100,6 +100,9 @@ static DB_PostLoadXZone_t DB_PostLoadXZone = (DB_PostLoadXZone_t)0x007A48D0;
 typedef int (__cdecl* DB_GetXAssetTypeSize_t)(int type);
 static DB_GetXAssetTypeSize_t DB_GetXAssetTypeSize = (DB_GetXAssetTypeSize_t)0x00514840;
 
+typedef void(__cdecl* DB_LogMissingAsset_t)(XAssetType type, const char *name);
+static DB_LogMissingAsset_t DB_LogMissingAsset = (DB_LogMissingAsset_t)0x004AEC20;
+
 void DB_SyncXAssets();
 void DB_LoadGraphicsAssetsForPC();
 void DB_ModXFileHandle_hk();

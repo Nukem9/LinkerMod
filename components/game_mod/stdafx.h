@@ -31,6 +31,7 @@
 #include "live_win.h"
 #include "cg_scoreboard.h"
 #include "sys_cmds.h"
+#include "r_image.h"
 #include "r_rendercmds.h"
 #include "r_cinematic.h"
 #include "r_screenshot.h"
