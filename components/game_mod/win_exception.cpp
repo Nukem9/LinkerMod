@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <DbgHelp.h>
 
 static_assert(EXCEPTION_STACKTRACE_MAXFRAMECOUNT < 63, "EXCEPTION_STACKTRACE_MAXFRAMECOUNT must be less than 63 to support Windows XP");
 
@@ -17,7 +18,7 @@ LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	sprintf_s(buf, "Exception Address: %p\n\n", ExceptionInfo->ExceptionRecord->ExceptionAddress);
 	strcat_s(g_ExceptionStr, buf);
 	
-	if (ExceptionInfo->ContextRecord->ContextFlags & 0x10001)
+	if (ExceptionInfo->ContextRecord->ContextFlags & CONTEXT_CONTROL)
 	{
 		sprintf_s(buf, "EBP: %08x\tEIP: %08x\nESP: %08x\tEFLAGS: %08x\n\nSEGCS: %08x\tSEGSS: %08x\t\n",
 			ExceptionInfo->ContextRecord->Ebp,
@@ -29,7 +30,7 @@ LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 		strcat_s(g_ExceptionStr, buf);
 	}
 
-	if (ExceptionInfo->ContextRecord->ContextFlags & 0x10004)
+	if (ExceptionInfo->ContextRecord->ContextFlags & CONTEXT_SEGMENTS)
 	{
 		sprintf_s(buf, "SEGGS: %08x\tSEGFS: %08x\nSEGES: %08x\tSEGDS: %08x\n",
 			ExceptionInfo->ContextRecord->SegGs,
@@ -39,10 +40,10 @@ LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 		strcat_s(g_ExceptionStr, buf);
 	}
 
-	if (ExceptionInfo->ContextRecord->ContextFlags & (0x10001 | 0x10004))
+	if (ExceptionInfo->ContextRecord->ContextFlags & (CONTEXT_CONTROL | CONTEXT_SEGMENTS))
 		strcat_s(g_ExceptionStr, "\n");
 
-	if (ExceptionInfo->ContextRecord->ContextFlags & 0x10002)
+	if (ExceptionInfo->ContextRecord->ContextFlags & CONTEXT_INTEGER)
 	{
 		sprintf_s(buf, "EDI: %08x\tESI: %08x\nEAX: %08x\tEBX: %08x\nECX: %08x\tEDX: %08x\n\n",
 			ExceptionInfo->ContextRecord->Edi,
@@ -54,55 +55,66 @@ LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 		strcat_s(g_ExceptionStr, buf);
 	}
 
-	//
-	// Print the stack context bytes (disabled due to overflow issues)
-	//
-	/*if (ExceptionInfo->ContextRecord->ContextFlags & 0x10001)
+	HMODULE dbgHelp = LoadLibraryA("dbghelp.dll");
+
+	if (dbgHelp)
 	{
-		strcat_s( g_ExceptionStr, EXCEPTION_STR_MAXLEN, "Stack Bytes: \n");
+		auto pStackWalk64			= (decltype(&StackWalk64))GetProcAddress(dbgHelp, "StackWalk64");
+		auto pFunctionTableAccess	= (decltype(&SymFunctionTableAccess64))GetProcAddress(dbgHelp, "SymFunctionTableAccess64");
+		auto pGetModuleBase			= (decltype(&SymGetModuleBase64))GetProcAddress(dbgHelp, "SymGetModuleBase64");
 
-		for (int i = 0; i < 128; ++i)
+		if (pStackWalk64 && pFunctionTableAccess && pGetModuleBase)
 		{
-			for (int j = 0; j < 8; ++j)
-			{
-				sprintf_s(buf, "%02x ", *(BYTE*)(ExceptionInfo->ContextRecord->Esp + j + 8 * i));
-				strcat_s(g_ExceptionStr, EXCEPTION_STR_MAXLEN, buf);
-			}
+			strcat_s(g_ExceptionStr, "Stack Trace:\n");
 
-			strcat_s(g_ExceptionStr, EXCEPTION_STR_MAXLEN, "\t[");
+			STACKFRAME64 frame;
+			memset(&frame, 0, sizeof(STACKFRAME64));
 
-			for (int j = 0; j < 8; ++j)
+			frame.AddrPC.Offset = ExceptionInfo->ContextRecord->Eip;
+			frame.AddrPC.Mode = AddrModeFlat;
+			frame.AddrFrame.Offset = ExceptionInfo->ContextRecord->Ebp;
+			frame.AddrFrame.Mode = AddrModeFlat;
+			frame.AddrStack.Offset = ExceptionInfo->ContextRecord->Esp;
+			frame.AddrStack.Mode = AddrModeFlat;
+
+			for (int i = 0; i < EXCEPTION_STACKTRACE_MAXFRAMECOUNT; i++)
 			{
-				if ((signed int)*(BYTE*)(ExceptionInfo->ContextRecord->Esp + j + 8 * i) >= 33)
+				if (!pStackWalk64(
+					IMAGE_FILE_MACHINE_I386,
+					GetCurrentProcess(),
+					GetCurrentThread(),
+					&frame,
+					ExceptionInfo->ContextRecord,
+					nullptr,
+					pFunctionTableAccess,
+					pGetModuleBase,
+					nullptr))
 				{
-					sprintf_s(buf, "%c", *(BYTE*)(ExceptionInfo->ContextRecord->Esp + j + 8 * i));
-					strcat_s(g_ExceptionStr, EXCEPTION_STR_MAXLEN, buf);
+					// Failed or no frames left
+					break;
+				}
+
+				if (frame.AddrPC.Offset != 0)
+				{
+					// Valid frame
+					sprintf_s(buf, "frame[%02d]: %08llX %08llX %08llX %08llX\n",
+						i,
+						frame.AddrPC.Offset - sizeof(PVOID),
+						frame.AddrReturn.Offset,
+						frame.AddrFrame.Offset,
+						frame.AddrStack.Offset);
+
+					strcat_s(g_ExceptionStr, buf);
 				}
 				else
 				{
-					sprintf_s(buf, ".");
-					strcat_s(g_ExceptionStr, EXCEPTION_STR_MAXLEN, buf);
+					// Base reached
+					break;
 				}
 			}
-
-			strcat_s(g_ExceptionStr, EXCEPTION_STR_MAXLEN, "]\n");
 		}
-		
-		strcat_s(g_ExceptionStr, EXCEPTION_STR_MAXLEN, "\n");
-	}*/
-	
-	void* frame[EXCEPTION_STACKTRACE_MAXFRAMECOUNT];
-	int frameCount = CaptureStackBackTrace(0, ARRAYSIZE(frame), frame, nullptr);
-
-	if (frameCount != 0)
-		strcat_s(g_ExceptionStr, "Stack Trace:\n");
-
-	for (int i = 0; i < frameCount; i++)
-	{
-		sprintf_s(buf, "frame[%s%d]: %08x%s", i < 10 ? " " : "", i, frame[i], i % 2 ? "\n" : "\t");
-		strcat_s(g_ExceptionStr, buf);
 	}
-
+	
 #else
 	sprintf_s(g_ExceptionStr, "%s", localizedErr);
 #endif
