@@ -25,6 +25,7 @@ struct CachedAssets_t
 	void *itemFocusSound; // snd_alias_list_t*
 };
 
+#pragma pack(push, 2)
 struct __declspec(align(2)) mapInfo
 {
 	char mapName[32];
@@ -45,6 +46,7 @@ struct __declspec(align(2)) sharedUiInfo_t
 	mapInfo mapList[128];
 	char gap_tmp[1];
 };
+#pragma pack(pop)
 
 extern sharedUiInfo_t * const sharedUiInfo;
 
