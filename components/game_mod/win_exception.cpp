@@ -97,7 +97,7 @@ LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 				if (frame.AddrPC.Offset != 0)
 				{
 					// Valid frame
-					sprintf_s(buf, "frame[%02d]: %08llX %08llX %08llX %08llX\n",
+					sprintf_s(buf, "frame[%02d]: %08llX\t%08llX\t%08llX\t%08llX\n",
 						i,
 						frame.AddrPC.Offset - sizeof(PVOID),
 						frame.AddrReturn.Offset,
