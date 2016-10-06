@@ -113,6 +113,13 @@ BOOL GameMod_Init()
 	// Enable Com_DPrintf
 	//
 	PatchMemory_WithNOP(0x0060F7E7, 2);
+
+	PatchMemory_WithNOP(0x007A499B, 5);// "Redundant asset: '%s','%s'\n"
+	PatchMemory_WithNOP(0x007A2E82, 5);// "Could not load %s \"%s\".\n"
+	PatchMemory_WithNOP(0x007A2E9B, 5);// "Could not load %s \"%s\".\n"
+	PatchMemory_WithNOP(0x007A2EC6, 5);// "Could not load %s \"%s\".\n"
+	PatchMemory_WithNOP(0x004775E7, 5);// Scr_LoadScriptInternal
+	PatchMemory_WithNOP(0x00477602, 5);// Scr_LoadScriptInternal
 #endif
 
 	//
