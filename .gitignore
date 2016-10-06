@@ -16,6 +16,7 @@
 /ipch
 
 components/sdk
+components/game_mod/steam
 components/*/Debug
 components/*/Release
 components/shared/*/Debug
