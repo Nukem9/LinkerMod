@@ -58,6 +58,12 @@ BOOL GameMod_Init()
 	PatchMemory(0x0082C111, (PBYTE)"\x01", 1);
 	PatchMemory(0x004A3920, (PBYTE)"\x68\x01\x00\x00\x00", 5);
 	PatchMemory(0x004A394A, (PBYTE)"\xD9\x05\xE4\x9F\xA1\x00", 6);
+	
+	DWORD flags = 0x1000; //DVAR_SAVED
+	PatchMemory(0x006CA4D6, (PBYTE)&flags, 4); //r_lodScaleRigid
+	PatchMemory(0x006CA504, (PBYTE)&flags, 4); //r_lodBiasRigid
+	PatchMemory(0x006CA53A, (PBYTE)&flags, 4); //r_lodScaleSkinned
+	PatchMemory(0x006CA568, (PBYTE)&flags, 4); //r_lodBiasSkinned
 
 	//
 	// Always force the cursor to be shown
@@ -260,6 +266,13 @@ BOOL GameMod_Init()
 	CG_RegisterDvars_o = (CG_RegisterDvars_t)Detours::X86::DetourFunction((PBYTE)0x004A3860, (PBYTE)&CG_RegisterDvars);
 
 	//
+	// Add cg_showServerInfo dvar to show/hide server ip and name in coop scoreboards
+	//
+	CG_RegisterScoreboardDvars_o = (CG_RegisterScoreboardDvars_t)Detours::X86::DetourFunction((PBYTE)0x005C74D0, (PBYTE)&CG_RegisterScoreboardDvars);
+	CL_GetServerIPAddress_o = (CL_GetServerIPAddress_t)Detours::X86::DetourFunction((PBYTE)0x0053BE60, (PBYTE)&CL_GetServerIPAddress);
+	Detours::X86::DetourFunction((PBYTE)0x00890E23, (PBYTE)&mfh_CG_DrawBackdropServerInfo);
+
+	//
 	// Misc Bug Fixes
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007D9590, (PBYTE)&nullsub);
@@ -269,13 +282,6 @@ BOOL GameMod_Init()
 	//
 	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
 	PatchMemory(0x00700492, (PBYTE)&msg_assertion, 4);
-
-	//
-	// Add cg_showServerInfo dvar to show/hide server ip and name in coop scoreboards
-	//
-	CG_RegisterScoreboardDvars_o = (CG_RegisterScoreboardDvars_t)Detours::X86::DetourFunction((PBYTE)0x005C74D0, (PBYTE)&CG_RegisterScoreboardDvars);
-	CL_GetServerIPAddress_o = (CL_GetServerIPAddress_t)Detours::X86::DetourFunction((PBYTE)0x0053BE60, (PBYTE)&CL_GetServerIPAddress);
-	Detours::X86::DetourFunction((PBYTE)0x00890E23, (PBYTE)&mfh_CG_DrawBackdropServerInfo);
 
 	//
 	// Live radiant initialization hook
