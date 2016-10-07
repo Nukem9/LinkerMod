@@ -21,6 +21,7 @@
 
 #include "common.h"
 #include "com_files.h"
+#include "com_math.h"
 #include "cmd.h"
 #include "dvar.h"
 #include "sv_ccmds_mp.h"
@@ -40,6 +41,9 @@
 #include "r_material_load_obj.h"
 #include "threads.h"
 #include "radiant_remote.h"
+#include "ragdoll.h"
+#include "ragdoll_update.h"
+#include "phys_main.h"
 
 #include "win_localize.h"
 #include "win_exception.h"

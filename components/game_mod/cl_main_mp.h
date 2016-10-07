@@ -9,3 +9,5 @@ typedef const char *(__cdecl* CL_GetServerIPAddress_t)();
 extern CL_GetServerIPAddress_t CL_GetServerIPAddress_o;
 
 const char *__cdecl CL_GetServerIPAddress();
+
+char *CG_GetLocalClientGlobals(int localClientNum);

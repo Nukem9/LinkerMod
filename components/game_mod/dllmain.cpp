@@ -323,6 +323,13 @@ BOOL GameMod_Init()
 	PatchCall(0x0070A4CD, (PBYTE)&Image_HandleMissingImage);
 
 	//
+	// Increase the maximum number of ragdolls
+	//
+	PatchMemory(0x00830076, (PBYTE)"\x40", 1); // Ragdoll_GetUnusedBody
+	PatchMemory(0x00621694, (PBYTE)"\x40", 1); // ragdoll_max_simulating
+	Detours::X86::DetourFunction((PBYTE)0x004672D0, (PBYTE)&Ragdoll_ExplosionEvent);
+
+	//
 	// Increase Asset Limits
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);

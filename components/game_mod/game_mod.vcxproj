@@ -93,6 +93,7 @@
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="cl_console.cpp" />
+    <ClCompile Include="com_math.cpp" />
     <ClCompile Include="db_registry.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
@@ -100,7 +101,10 @@
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
     <ClCompile Include="patch_reflections.cpp" />
+    <ClCompile Include="phys_main.cpp" />
     <ClCompile Include="radiant_remote.cpp" />
+    <ClCompile Include="ragdoll.cpp" />
+    <ClCompile Include="ragdoll_update.cpp" />
     <ClCompile Include="reshade.cpp" />
     <ClCompile Include="r_cinematic.cpp" />
     <ClCompile Include="r_image.cpp" />
@@ -120,13 +124,17 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="cl_console.h" />
     <ClInclude Include="com_files.h" />
+    <ClInclude Include="com_math.h" />
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
     <ClInclude Include="live_win.h" />
     <ClInclude Include="patch_common.h" />
     <ClInclude Include="patch_usefastfile.h" />
     <ClInclude Include="patch_reflections.h" />
+    <ClInclude Include="phys_main.h" />
     <ClInclude Include="radiant_remote.h" />
+    <ClInclude Include="ragdoll.h" />
+    <ClInclude Include="ragdoll_update.h" />
     <ClInclude Include="reshade.h" />
     <ClInclude Include="r_cinematic.h" />
     <ClInclude Include="r_image.h" />
