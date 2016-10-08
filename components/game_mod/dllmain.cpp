@@ -59,7 +59,7 @@ BOOL GameMod_Init()
 	PatchMemory(0x004A3920, (PBYTE)"\x68\x01\x00\x00\x00", 5);
 	PatchMemory(0x004A394A, (PBYTE)"\xD9\x05\xE4\x9F\xA1\x00", 6);
 	
-	DWORD flags = 0x1000; //DVAR_SAVED
+	DWORD flags = 0x1; //DVAR_ARCHIVED
 	PatchMemory(0x006CA4D6, (PBYTE)&flags, 4); //r_lodScaleRigid
 	PatchMemory(0x006CA504, (PBYTE)&flags, 4); //r_lodBiasRigid
 	PatchMemory(0x006CA53A, (PBYTE)&flags, 4); //r_lodScaleSkinned
