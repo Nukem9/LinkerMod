@@ -51,19 +51,20 @@ BOOL GameMod_Init()
 	//
 	// "com_introPlayed"
 	// "com_startupIntroPlayed"
-	// "cg_fov" (disable DVAR_CHEAT flag)
 	// "cg_fov_default"  (max 165.0)
 	//
 	PatchMemory(0x0082C0F9, (PBYTE)"\x01", 1);
 	PatchMemory(0x0082C111, (PBYTE)"\x01", 1);
-	PatchMemory(0x004A3920, (PBYTE)"\x68\x01\x00\x00\x00", 5);
 	PatchMemory(0x004A394A, (PBYTE)"\xD9\x05\xE4\x9F\xA1\x00", 6);
+	PatchMemory(0x006CBE24, (PBYTE)"\x00", 1);
 	
-	DWORD flags = 0x1; //DVAR_ARCHIVED
-	PatchMemory(0x006CA4D6, (PBYTE)&flags, 4); //r_lodScaleRigid
-	PatchMemory(0x006CA504, (PBYTE)&flags, 4); //r_lodBiasRigid
-	PatchMemory(0x006CA53A, (PBYTE)&flags, 4); //r_lodScaleSkinned
-	PatchMemory(0x006CA568, (PBYTE)&flags, 4); //r_lodBiasSkinned
+	DWORD flags = 0x1; // DVAR_ARCHIVED only
+	PatchMemory(0x004A3921, (PBYTE)&flags, 4); // cg_fov
+	PatchMemory(0x006CA4D6, (PBYTE)&flags, 4); // r_lodScaleRigid
+	PatchMemory(0x006CA504, (PBYTE)&flags, 4); // r_lodBiasRigid
+	PatchMemory(0x006CA53A, (PBYTE)&flags, 4); // r_lodScaleSkinned
+	PatchMemory(0x006CA568, (PBYTE)&flags, 4); // r_lodBiasSkinned
+	PatchMemory(0x006CBE29, (PBYTE)&flags, 4); // r_enablePlayerShadow
 
 	//
 	// Always force the cursor to be shown
@@ -120,12 +121,12 @@ BOOL GameMod_Init()
 	//
 	PatchMemory_WithNOP(0x0060F7E7, 2);
 
-	PatchMemory_WithNOP(0x007A499B, 5);// "Redundant asset: '%s','%s'\n"
-	PatchMemory_WithNOP(0x007A2E82, 5);// "Could not load %s \"%s\".\n"
-	PatchMemory_WithNOP(0x007A2E9B, 5);// "Could not load %s \"%s\".\n"
-	PatchMemory_WithNOP(0x007A2EC6, 5);// "Could not load %s \"%s\".\n"
-	PatchMemory_WithNOP(0x004775E7, 5);// Scr_LoadScriptInternal
-	PatchMemory_WithNOP(0x00477602, 5);// Scr_LoadScriptInternal
+	PatchMemory_WithNOP(0x007A499B, 5); // "Redundant asset: '%s','%s'\n"
+	PatchMemory_WithNOP(0x007A2E82, 5); // "Could not load %s \"%s\".\n"
+	PatchMemory_WithNOP(0x007A2E9B, 5); // "Could not load %s \"%s\".\n"
+	PatchMemory_WithNOP(0x007A2EC6, 5); // "Could not load %s \"%s\".\n"
+	PatchMemory_WithNOP(0x004775E7, 5); // Scr_LoadScriptInternal
+	PatchMemory_WithNOP(0x00477602, 5); // Scr_LoadScriptInternal
 #endif
 
 	//
