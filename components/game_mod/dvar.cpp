@@ -4,6 +4,7 @@ dvar_s* sm_quality;
 dvar_s* r_noborder;
 dvar_s* con_extcon;
 dvar_s* con_inputMaxMatchesShown;
+dvar_s* cg_drawViewpos;
 dvar_s* gm_build_date;
 
 void R_RegisterCustomDvars()
@@ -64,8 +65,12 @@ void __cdecl CG_RegisterDvars()
 
 	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 1, "Enable external console window");
 	con_inputMaxMatchesShown = Dvar_RegisterInt("con_inputMaxMatchesShown", 24, 1, 64, 1, "Maximum number of suggestions in the console autocomplete preview");
+	cg_drawViewpos = Dvar_RegisterInt("cg_drawViewpos", 0, 0, 1, 1, "Draw the current player origin and view angles");
 	gm_build_date = Dvar_RegisterString("gm_build_date", __TIMESTAMP__, 0x10 | 0x8, "Compile time for game_mod");
 
 	// Set the max number of suggestions to show in the console autocomplete preview
 	PatchMemory(0x00B72F7C, (PBYTE)&con_inputMaxMatchesShown->current.value, 4);
+
+	// Remap "debug_show_viewpos" to "cg_drawViewpos"
+	PatchMemory(0x005BF103, (PBYTE)&cg_drawViewpos->name, 4);
 }
