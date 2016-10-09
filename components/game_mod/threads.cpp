@@ -11,7 +11,7 @@ void Sys_ConsoleThread(unsigned int index)
 	// Loop forever until someone enables this
 	while (true)
 	{
-		if (con_extcon && con_extcon->current.value)
+		if (con_extcon && con_extcon->current.enabled)
 			break;
 
 		Sleep(50);
@@ -48,5 +48,5 @@ void Sys_CreateThread(void(__cdecl * function)(unsigned int index), unsigned int
 
 DWORD WINAPI Sys_ThreadMain(LPVOID Arg)
 {
-	return ((DWORD(WINAPI *)(LPVOID))0x0082FDE0)(Arg);
+	return ((LPTHREAD_START_ROUTINE)0x0082FDE0)(Arg);
 }
