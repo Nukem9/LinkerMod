@@ -110,6 +110,14 @@ BOOL GameMod_Init()
 	PatchMemory(0x0058761C, (PBYTE)"\xEB", 1);
 
 	//
+	// Don't automatically close the console when loading a map
+	//
+	PatchMemory_WithNOP(0x0057011A, 5);
+	PatchMemory_WithNOP(0x0051B0BD, 5);
+	PatchMemory_WithNOP(0x00445AA1, 5);
+	PatchMemory_WithNOP(0x00570130, 10);
+
+	//
 	// Disable error message boxes with developer_script
 	//
 	PatchMemory(0x005A16F7, (PBYTE)"\x90\x90", 2);
