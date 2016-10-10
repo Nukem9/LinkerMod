@@ -282,6 +282,14 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00890E23, (PBYTE)&mfh_CG_DrawBackdropServerInfo);
 
 	//
+	// Add Game_Mod Version info to the 'version' dvar
+	//	can be viewed via 'cg_drawVersion 1'
+	//
+	static const char* version = "%s %s build %s %s\n"
+		"\rGame_Mod - "__CONFIGURATION__" - "__TIMESTAMP__;
+	PatchMemory(0x0082D0D5, (PBYTE)&version, 4);
+
+	//
 	// Misc Bug Fixes
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007D9590, (PBYTE)&nullsub);
