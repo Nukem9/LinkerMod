@@ -12,6 +12,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)\components\shared</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__CONFIGURATION__="$(ConfigurationName)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
