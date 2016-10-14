@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include <string>
 
-#include "../shared/assert.h"
+#include "../shared/shared_assert.h"
 
 static void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 {

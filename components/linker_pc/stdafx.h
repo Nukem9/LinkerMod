@@ -8,7 +8,7 @@
 //
 // Shared files
 //
-#include "../shared/utility.h"
+#include "../shared/shared_utility.h"
 
 #include "T5.h"
 #include "crc32.h"

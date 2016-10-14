@@ -1,6 +1,6 @@
-#include "../shared/utility.h"
+#include "../shared/shared_utility.h"
 #include "gsc.h"
-#include "assettype\character.h"
+#include "assettype/character.h"
 #include "../common/io.h"
 #include <regex>
 

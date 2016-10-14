@@ -7,7 +7,7 @@
 //
 // Shared files
 //
-#include "../shared/utility.h"
+#include "../shared/shared_utility.h"
 
 #include "PageGuard.h"
 #include "console.h"
