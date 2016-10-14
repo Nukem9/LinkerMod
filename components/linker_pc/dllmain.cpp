@@ -29,7 +29,7 @@ BOOL LinkerMod_Init()
 
 	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
 
-	Detours::X86::DetourFunction((PBYTE)0x004C3D30, (PBYTE)assert);
+	Detours::X86::DetourFunction((PBYTE)0x004C3D30, (PBYTE)shared_assert);
 	Detours::X86::DetourFunction((PBYTE)0x00401940, (PBYTE)Com_LoadBsp);
 	Detours::X86::DetourFunction((PBYTE)0x004A6D20, (PBYTE)Path_LoadPaths);
 
