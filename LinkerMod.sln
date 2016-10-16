@@ -8,6 +8,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linker_pc", "components\linker_pc\linker_pc.vcxproj", "{3A1FA19B-CC11-4725-AC86-6B3CF539E1B2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game_mod", "components\game_mod\game_mod.vcxproj", "{69B41EFB-E992-4351-AA29-FDC61F4DBDE0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{86C18FD7-1144-440C-B5E3-265194BBC934} = {86C18FD7-1144-440C-B5E3-265194BBC934}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "radiant_mod", "components\radiant_mod\radiant_mod.vcxproj", "{6A3FB8CD-BEA3-42F1-B551-A0F56ED9B266}"
 EndProject
@@ -41,6 +44,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "miniz", "components\shared\miniz\miniz.vcxproj", "{D8721F95-955F-4931-9EBA-5C7BA28E6875}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "launcher", "components\launcher\launcher.vcxproj", "{99C1298E-362E-455B-B938-04CB5B5510BA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{86C18FD7-1144-440C-B5E3-265194BBC934} = {86C18FD7-1144-440C-B5E3-265194BBC934}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "components\shared\imgui\imgui.vcxproj", "{86C18FD7-1144-440C-B5E3-265194BBC934}"
 EndProject
