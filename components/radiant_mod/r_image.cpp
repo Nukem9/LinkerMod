@@ -14,14 +14,13 @@ unsigned int Image_GetUsage(int imageFlags, D3DFORMAT imageFormat)
 		if (imageFormat != D3DFMT_D24S8
 			&& imageFormat != D3DFMT_D24X8
 			&& imageFormat != D3DFMT_D16)
-			return 1;
+			return D3DUSAGE_RENDERTARGET;
 
-		return 2;
+		return D3DUSAGE_DEPTHSTENCIL;
 	}
-	else if (imageFlags & 0x10000)
-	{
-		return 512;
-	}
+
+	if (imageFlags & 0x10000)
+		return D3DUSAGE_DYNAMIC;
 
 	return 0;
 }
