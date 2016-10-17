@@ -39,13 +39,10 @@ void Image_Create2DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned 
 	D3DPOOL memPool		= D3DPOOL_DEFAULT;
 	unsigned int usage	= Image_GetUsage(imageFlags, imageFormat);
 
-	if (imageFlags & 0x40000)
+	if (imageFlags & 0x40000 || imageFlags & 0x100)
 		memPool = D3DPOOL_SYSTEMMEM;
 	else
 		memPool = (usage == 0) ? D3DPOOL_MANAGED : D3DPOOL_DEFAULT;
-
-	if (imageFlags & 0x100)
-		memPool = D3DPOOL_SYSTEMMEM;
 
 	// ASSERT(Sys_IsRenderThread());
 
