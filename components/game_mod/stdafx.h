@@ -19,6 +19,7 @@
 
 #include "CEG.h"
 
+#include "d3d9ex.h"
 #include "common.h"
 #include "com_files.h"
 #include "com_math.h"

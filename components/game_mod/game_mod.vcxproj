@@ -110,6 +110,7 @@
     <ClCompile Include="reshade.cpp" />
     <ClCompile Include="r_cinematic.cpp" />
     <ClCompile Include="r_image.cpp" />
+    <ClCompile Include="d3d9ex.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
@@ -127,6 +128,7 @@
     <ClInclude Include="cl_console.h" />
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
+    <ClInclude Include="d3d9ex.h" />
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
     <ClInclude Include="live_win.h" />
