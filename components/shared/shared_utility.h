@@ -1,7 +1,6 @@
 #pragma once
 
 #pragma comment(lib, "../shared/detours/Detours.lib")
-#include "../shared/detours/Typedef.h"
 #include "../shared/detours/Detours.h"
 
 #include <Windows.h>
