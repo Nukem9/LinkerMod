@@ -53,17 +53,15 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 		return 0;
 	}
 
-	FILE* h = NULL;
-	if (fopen_s(&h, outPath, "r"))
+	if (FS_FileExists(outPath))
 	{
 		Con_Print_v("Skipping file: \"%s\"\n", filepath);
-		fclose(h);
 		return 1;
 	}
 	else
 	{
 		Con_Print_v("Extracting file: \"%s\"...	", filepath);
-		if (FS_CreatePath(filepath) != 0)
+		if (FS_CreatePath(outPath) != 0)
 		{
 			Con_Error_v("DIR ERROR\n");
 			return 1;

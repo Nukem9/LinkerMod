@@ -57,11 +57,9 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	//
 	if (!fs_overwrite.ValueBool())
 	{
-		if (FILE* h = fopen(qpath, "r"))
+		if (FS_FileExists(qpath))
 		{
 			Con_Print_v("SKIPPED\n");
-
-			fclose(h);
 			return 0;
 		}
 	}
