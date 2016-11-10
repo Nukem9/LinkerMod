@@ -1,11 +1,12 @@
 #pragma once
 
-#if _MSC_VER >= 1900
-#pragma comment(lib, "../shared/detours/detours_vs2015.lib")
-#else
-#pragma comment(lib, "../shared/detours/detours_vs2013.lib")
-#endif
+#pragma comment(lib, "detours.lib")
 #include "../shared/detours/Detours.h"
+
+//
+// Fix for typedef errors regarding int8_t etc.
+//
+#include <stdint.h>
 
 #include <Windows.h>
 #include <string>
