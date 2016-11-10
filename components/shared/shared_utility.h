@@ -3,7 +3,6 @@
 #if _MSC_VER >= 1900
 #pragma comment(lib, "../shared/detours/detours_vs2015.lib")
 #else
-#error Go bother SE2Dev to upload the VS2013 version
 #pragma comment(lib, "../shared/detours/detours_vs2013.lib")
 #endif
 #include "../shared/detours/Detours.h"
