@@ -2,6 +2,9 @@
 
 #define _CRT_SECURE_NO_WARNINGS 1
 
+#pragma comment(lib, "detours.lib")
+#include "../shared/detours/Detours.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>

@@ -1,8 +1,5 @@
 #pragma once
 
-#pragma comment(lib, "detours.lib")
-#include "../shared/detours/Detours.h"
-
 //
 // Fix for typedef errors regarding int8_t etc.
 //
@@ -105,6 +102,7 @@ static bool GetGameDirectory(char *Buffer, DWORD BufferSize)
 	return true;
 }
 
+#if _DEPRECATED
 namespace Detours
 {
 	namespace X86
@@ -181,3 +179,4 @@ namespace Detours
 		}
 	}
 }
+#endif
