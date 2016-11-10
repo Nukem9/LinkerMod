@@ -5,7 +5,13 @@
 #else
 #pragma comment(lib, "../shared/detours/detours_vs2013.lib")
 #endif
+
 #include "../shared/detours/Detours.h"
+
+//
+// Fix for typedef errors regarding int8_t etc.
+//
+#include <stdint.h>
 
 #include <Windows.h>
 #include <string>
