@@ -1,6 +1,4 @@
 #pragma once
-#include <Windows.h>
-#include "r_reflection_probe.h"
 
 struct DiskGfxCubemap256
 {
@@ -16,7 +14,7 @@ struct DiskGfxCubemap256
 		char mip4[8];
 		char mip2[8];
 		char mip1[8];
-	}mips[6];
+	} mips[6];
 };
 
 struct ZoneCubemapFace256
@@ -35,10 +33,6 @@ struct ZoneCubemapFace256
 BOOL IsReflectionMode();
 BOOL IsInjectionMode();
 BOOL ReflectionMod_Init();
-
-void hk_R_GenerateReflectionRawDataAll();
-void __cdecl R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData, int probeCount, bool *generateProbe);
-void __cdecl R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData);
 
 BOOL ReflectionsWereUpdated();
 BOOL InjectReflections();

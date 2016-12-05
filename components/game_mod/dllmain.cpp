@@ -369,6 +369,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004672D0, (PBYTE)&Ragdoll_ExplosionEvent);
 
 	//
+	// Increase maximum number of reflection probes from 8
+	//
+	Detours::X86::DetourFunction((PBYTE)0x006CF200, (PBYTE)&hk_R_GenerateReflections);
+
+	//
 	// Increase Asset Limits
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);

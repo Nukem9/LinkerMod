@@ -10,6 +10,7 @@
 #include <Psapi.h>
 #include <shellapi.h>
 #include <winsock.h>
+#include <time.h>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -26,6 +27,7 @@
 #include "common.h"
 #include "com_files.h"
 #include "com_math.h"
+#include "com_memory.h"
 #include "cmd.h"
 #include "dvar.h"
 #include "sv_ccmds_mp.h"
@@ -48,10 +50,12 @@
 #include "ragdoll.h"
 #include "ragdoll_update.h"
 #include "phys_main.h"
+#include "com_bsp_load_obj.h"
 
 #include "win_localize.h"
 #include "win_exception.h"
 #include "win_common.h"
+#include "win_main.h"
 
 #include "patch_common.h"
 #include "patch_reflections.h"

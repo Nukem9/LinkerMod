@@ -90,6 +90,10 @@ static dvar_s*& zombiemode = *(dvar_s**)0x0243FDD4;
 static dvar_s*& blackopsmode = *(dvar_s**)0x0243FD24;
 static dvar_s*& useFastFile = *(dvar_s**)0x0247FEC8;
 
+static dvar_s*& r_reflectionProbeGenerate = *(dvar_s**)0x03B35038;
+static dvar_s*& r_reflectionProbeGenerateExit = *(dvar_s**)0x03B3503C;
+static dvar_s*& r_reflectionProbeRegenerateAll = *(dvar_s**)0x03B20030;
+
 extern bool com_cfg_readOnly_default;
 extern dvar_s* com_cfg_readOnly;
 

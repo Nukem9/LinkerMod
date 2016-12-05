@@ -1,5 +1,7 @@
 #pragma once
 
+#define MAX_MAP_REFLECTION_PROBES 64
+
 struct GfxFilm
 {
 	float filmMidStart;
@@ -358,9 +360,28 @@ struct DiskGfxReflectionProbe
 	char colorCorrectionFilename[64];
 	char name[64];
 };
+static_assert(sizeof(DiskGfxReflectionProbe) == 0x406E0, "Size mismatch");
 
-typedef void __cdecl R_CalcCubeMapViewValues_t(refdef_s *refdef, CubemapShot cubemapShot, int cubemapSize);
-static R_CalcCubeMapViewValues_t* R_CalcCubeMapViewValues = (R_CalcCubeMapViewValues_t*)0x006CEC80;
+struct GfxReflectionProbeVolumeData
+{
+	float volumePlanes[6][4];
+};
 
-typedef int __cdecl R_CreateReflectionRawDataFromCubemapShot_t(DiskGfxReflectionProbe *probeRawData);
-static R_CreateReflectionRawDataFromCubemapShot_t* R_CreateReflectionRawDataFromCubemapShot = (R_CreateReflectionRawDataFromCubemapShot_t*)0x007088E0;
+struct GfxReflectionProbe
+{
+	float origin[3];
+	GfxImage *reflectionImage;
+	GfxReflectionProbeVolumeData *probeVolumes;
+	unsigned int probeVolumeCount;
+};
+static_assert(sizeof(GfxReflectionProbe) == 0x18, "Size mismatch");
+
+void R_CalcCubeMapViewValues(refdef_s *refdef, CubemapShot cubemapShot, int cubemapSize);
+void R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData);
+void R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData, int probeCount, bool *generateProbe);
+bool R_CopyReflectionsFromLumpData(DiskGfxReflectionProbe *probeRawData, DiskGfxReflectionProbe *probeRawLumpData, const int lumpProbeCount);
+void R_GenerateReflections(const char *mapname, GfxReflectionProbe *probes, const unsigned int probeCount);
+bool R_ReflectionProbeGenerateExitWhenDone();
+void R_GenerateReflectionImages(GfxReflectionProbe *probes, DiskGfxReflectionProbe *probeRawData, const int probeCount, const int probeBaseIndex);
+
+void hk_R_GenerateReflections();

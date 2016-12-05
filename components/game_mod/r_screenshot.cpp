@@ -8,3 +8,8 @@ void R_BeginCubemapShot(const int pixelWidthHeight, const int pixelBorder)
 	gfxMetrics->cubemapShotPixelBorder = pixelBorder;
 	R_CubemapShotSetInitialState();
 }
+
+void R_CreateReflectionRawDataFromCubemapShot(DiskGfxReflectionProbe *probeRawData)
+{
+	((void(__cdecl *)(DiskGfxReflectionProbe *))0x007088E0)(probeRawData);
+}
