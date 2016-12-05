@@ -162,7 +162,7 @@ void R_GenerateReflections(const char *mapname, GfxReflectionProbe *probes, cons
 		lumpSize				= sizeof(DiskGfxReflectionProbe) * probeCount;
 		probeRawGeneratedData	= (DiskGfxReflectionProbe *)Z_Malloc(lumpSize, "R_GenerateReflections", 0);
 
-		for (int probeIndex = 0; probeIndex < lumpProbeCount; ++probeIndex)
+		for (unsigned int probeIndex = 0; probeIndex < lumpProbeCount; ++probeIndex)
 		{
 			strcpy_s(probeRawGeneratedData[probeIndex].colorCorrectionFilename, probeRawLumpData[probeIndex].colorCorrectionFilename);
 
