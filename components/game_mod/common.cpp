@@ -186,9 +186,6 @@ void __cdecl Com_LoadLevelFastFiles(const char *mapName)
 
 	if (I_stristr(mapName, "zombietron"))
 	{
-		dvar_s* zombiemode = *(dvar_s**)(0x0243FDD4);
-		dvar_s* zombietron = *(dvar_s**)(0x0247FDE8);
-
 		Dvar_SetBool(zombiemode, 1);
 		Dvar_SetBool(zombietron, 1);
 	}

@@ -351,8 +351,8 @@ BOOL GameMod_Init()
 	ptr = (void *)&hk_Direct3DCreate9;
 	PatchMemory(0x009A34DC, (PBYTE)&ptr, 4);
 
-	Detours::X86::DetourFunction((PBYTE)0x0071F387, (PBYTE)&hk_GetSwapChain, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x006B7597, (PBYTE)&hk_CreateDevice, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0071F387, (PBYTE)&hk_GetSwapChain, Detours::X86Option::USE_CALL);
 
 	Detours::X86::DetourFunction((PBYTE)0x0070A050, (PBYTE)&hk_Image_Create2DTexture_PC);
 	Detours::X86::DetourFunction((PBYTE)0x0070A0F0, (PBYTE)&hk_Image_Create3DTexture_PC);
@@ -382,8 +382,7 @@ BOOL GameMod_Init()
 	PatchMemory(0x0052C28B, (PBYTE)&g_MaterialPool_entries, 4); // DB_GetMaterialAtIndex
 	PatchMemory(0x005FB286, (PBYTE)&g_MaterialPool_entries, 4); // DB_GetMaterialIndex
 
-	int g_GfxImagePoolSize = 6000;
-	void* g_GfxImagePool_entries = (PBYTE)(DB_ReallocXAssetPool(ASSET_TYPE_IMAGE, g_GfxImagePoolSize)) + 4;
+	void* g_GfxImagePool_entries = (PBYTE)(DB_ReallocXAssetPool(ASSET_TYPE_IMAGE, 6000)) + 4;
 	PatchMemory(0x004561D8, (PBYTE)&g_GfxImagePool_entries, 4); // DB_GetImageAtIndex
 	PatchMemory(0x005A1DC6, (PBYTE)&g_GfxImagePool_entries, 4); // DB_GetImageIndex
 

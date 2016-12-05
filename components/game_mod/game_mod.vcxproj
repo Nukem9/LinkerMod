@@ -95,7 +95,9 @@
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="cl_console.cpp" />
+    <ClCompile Include="com_bsp_load_obj.cpp" />
     <ClCompile Include="com_math.cpp" />
+    <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="db_registry.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
@@ -112,12 +114,14 @@
     <ClCompile Include="r_image.cpp" />
     <ClCompile Include="d3d9ex.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
+    <ClCompile Include="r_reflection_probe.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="threads.cpp" />
     <ClCompile Include="ui_main_pc.cpp" />
     <ClCompile Include="win_common.cpp" />
     <ClCompile Include="win_exception.cpp" />
+    <ClCompile Include="win_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CEG.h" />
@@ -126,8 +130,10 @@
     <ClInclude Include="cmd.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="cl_console.h" />
+    <ClInclude Include="com_bsp_load_obj.h" />
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
+    <ClInclude Include="com_memory.h" />
     <ClInclude Include="d3d9ex.h" />
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
@@ -155,6 +161,7 @@
     <ClInclude Include="win_common.h" />
     <ClInclude Include="win_exception.h" />
     <ClInclude Include="win_localize.h" />
+    <ClInclude Include="win_main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -36,9 +36,9 @@ void PatchUseFF()
 	PatchMemory_WithNOP(0x005FEC99, 5);												// LiveSteam_Client_SteamDisconnect
 	Detours::X86::DetourFunction((PBYTE)0x00501320, (PBYTE)LiveSteam_GetUid);		// LiveSteam_GetUid, nullptr crash fix
 
-	BYTE data[] = "\xB8\x00\x00\x00\x00";
-	PatchMemory(0x0057362A, data, 5);	// nullptr fix
-	PatchMemory(0x00866C92, data, 5);	// ^
+	BYTE data[] = "\xB8\x00\x00\x00\x00";											// SteamApps() nullptr crash fix
+	PatchMemory(0x0057362A, data, 5);
+	PatchMemory(0x00866C92, data, 5);
 
 	//
 	// Shaders

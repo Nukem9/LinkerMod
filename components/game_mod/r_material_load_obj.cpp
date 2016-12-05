@@ -18,9 +18,7 @@ bool Material_CopyTextToDXBuffer(void *cachedShader, unsigned int shaderLen, LPD
 
 FILE *Material_OpenShader_BlackOps(const char *shaderTarget, const char *shaderName)
 {
-	//
 	// Determine if this was a vertex shader or pixel shader
-	//
 	const char *shaderMain;
 
 	if (shaderTarget[0] == 'v' && shaderTarget[1] == 's')
@@ -28,9 +26,7 @@ FILE *Material_OpenShader_BlackOps(const char *shaderTarget, const char *shaderN
 	else
 		shaderMain = "ps";
 
-	//
 	// Load the shader directly from the name
-	//
 	char shaderPath[MAX_PATH];
 	sprintf_s(shaderPath, "%s\\raw\\shadercache_mods\\%s_%s_3_0_%s",
 		*(char **)(*(DWORD *)0x25FBF04 + 0x18),
@@ -38,13 +34,11 @@ FILE *Material_OpenShader_BlackOps(const char *shaderTarget, const char *shaderN
 		shaderMain,
 		shaderName);
 
-	FILE* h = NULL;
-	if (fopen_s(&h, shaderPath, "rb") != 0)
-	{
-		return NULL;
-	}
+	FILE *handle;
+	if (fopen_s(&handle, shaderPath, "rb") != 0)
+		return nullptr;
 	
-	return h;
+	return handle;
 }
 
 ID3DXBuffer *Material_CompileShader(const char *shaderName, int shaderType, const char *entryPoint, const char *target)

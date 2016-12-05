@@ -2,7 +2,7 @@
 
 bool Con_HasActiveAutoComplete()
 {
-	//return conDrawInputGlob.matchIndex >= 0 && conDrawInputGlob.autoCompleteChoice[0];
+	// return conDrawInputGlob.matchIndex >= 0 && conDrawInputGlob.autoCompleteChoice[0];
 	return (*(int *)0xC48A48 >= 0 && ((BYTE *)0xC48A08)[0]);
 }
 
