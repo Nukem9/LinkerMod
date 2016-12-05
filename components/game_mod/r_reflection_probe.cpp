@@ -211,10 +211,11 @@ void R_GenerateReflections(const char *mapname, GfxReflectionProbe *probes, cons
 
 bool R_ReflectionProbeGenerateExitWhenDone()
 {
-	return r_reflectionProbeGenerate
-		&& r_reflectionProbeGenerate->current.enabled
-		&& r_reflectionProbeGenerateExit
-		&& r_reflectionProbeGenerateExit->current.enabled;
+	// Note: Launching with +set r_reflectionProbeGenerateExit 1 currently causes the game to crash
+	// so we just force the game to exit if reflections were successfully generated
+	return r_reflectionProbeGenerate && r_reflectionProbeGenerate->current.enabled && 
+		//r_reflectionProbeGenerateExit && r_reflectionProbeGenerateExit->current.enabled;
+		g_reflectionsUpdated == true; 
 }
 
 void R_GenerateReflectionImages(GfxReflectionProbe *probes, DiskGfxReflectionProbe *probeRawData, const int probeCount, const int probeBaseIndex)
