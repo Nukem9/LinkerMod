@@ -106,6 +106,13 @@ BOOL ReflectionMod_Init()
 	//
 	PatchMemory(0x008A5C10, (PBYTE)"\xC3", 1); // RuntimeErrorInternal
 
+	//
+	// Fake the return value of G_ExitAfterToolComplete (return false) when injecting reflections or
+	// using fastfiles to prevent a crash
+	//
+	if (IsInjectionMode() || !LaunchArg_NoFF())
+		PatchMemory(0x0049EF60, (PBYTE)"\xB8\x00\x00\x00\x00\xC3", 6);
+
 	return TRUE;
 }
 

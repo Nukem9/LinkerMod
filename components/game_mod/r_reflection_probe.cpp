@@ -2,7 +2,6 @@
 
 // Declarations in patch_reflections.cpp
 char* formatTime(int seconds);
-extern char	g_mapName[256];
 extern bool	g_reflectionsUpdated;
 extern char	g_ffDir[MAX_PATH];
 extern int	g_probeCount;
@@ -211,11 +210,8 @@ void R_GenerateReflections(const char *mapname, GfxReflectionProbe *probes, cons
 
 bool R_ReflectionProbeGenerateExitWhenDone()
 {
-	// Note: Launching with +set r_reflectionProbeGenerateExit 1 currently causes the game to crash
-	// so we just force the game to exit if reflections were successfully generated
 	return r_reflectionProbeGenerate && r_reflectionProbeGenerate->current.enabled && 
-		//r_reflectionProbeGenerateExit && r_reflectionProbeGenerateExit->current.enabled;
-		g_reflectionsUpdated == true; 
+		r_reflectionProbeGenerateExit && r_reflectionProbeGenerateExit->current.enabled;
 }
 
 void R_GenerateReflectionImages(GfxReflectionProbe *probes, DiskGfxReflectionProbe *probeRawData, const int probeCount, const int probeBaseIndex)
