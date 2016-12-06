@@ -113,6 +113,13 @@ BOOL ReflectionMod_Init()
 	if (IsInjectionMode() || !LaunchArg_NoFF())
 		PatchMemory(0x0049EF60, (PBYTE)"\xB8\x00\x00\x00\x00\xC3", 6);
 
+	//
+	// Change each cubemap shot delay to 16ms
+	//
+	PatchMemory(0x006E4F52, (PBYTE)"\x6A\x16", 2);				// R_Resolve
+	PatchMemory(0x00708AD8, (PBYTE)"\x68\x16\x00\x00\x00", 5);	// R_CreateReflectionRawDataFromCubemapShot
+	PatchMemory(0x00707146, (PBYTE)"\x68\x40\x00\x00\x00", 5);	// R_GetBackBufferDataHDR
+
 	return TRUE;
 }
 
