@@ -136,11 +136,16 @@ void Init_MapMod()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0043D649, (PBYTE)&mfh_PrimaryLightHandler);
 
+	//
+	// (Deprecated): Replacement for the pointfile extension
+	//
+	/*
 	void* stringPatch = ".pts";
 	PatchMemory(0x0042626F, (PBYTE)&stringPatch, 4);
 	PatchMemory(0x00426514, (PBYTE)&stringPatch, 4);
 	stringPatch = "%s.pts";
 	PatchMemory(0x00406F4E, (PBYTE)&stringPatch, 4);
+	*/
 
 	//
 	// Increase (double) the max amount of curvenn/terrain collision verts
