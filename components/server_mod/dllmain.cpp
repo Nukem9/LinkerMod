@@ -226,7 +226,7 @@ void(__cdecl *__cdecl BuiltIn_GetMethod(const char **pName, int *type))(scr_entr
 		}
 	}
 
-	if (!stricmp(*pName, "GetClientFlag"))
+	if (!_stricmp(*pName, "GetClientFlag"))
 	{
 		*pName = "getclientflag";
 		*type = 0;
