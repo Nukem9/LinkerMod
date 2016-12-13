@@ -1,45 +1,82 @@
 #include "stdafx.h"
 
-#define ARENA_FILE_MAX_SIZE 1024
+#define ARENA_FILE_MAX_SIZE 8192
 
-int* ui_numArenas = (int*)0x025F6940;
+sharedUiInfo_t * const sharedUiInfo = (sharedUiInfo_t * const)0x025760F0;
+
+int& ui_numArenas = *(int*)0x025F6940;
+char** ui_arenaInfos = *(char*(*)[128])0x025F6740;
 
 bool __cdecl UI_LoadModArenas()
 {
-	int file = NULL;
-	size_t fileSize = FS_FOpenFileRead("mod.arena", &file);
-	
-	if(file)
-	{
-		if(fileSize)
-		{
-			if(fileSize <= ARENA_FILE_MAX_SIZE)
-			{
-				char buf[ARENA_FILE_MAX_SIZE];
-				
-				FS_Read(buf, fileSize, file);
-				FS_FCloseFile(file);
+	int fileHandle = 0;
+	size_t fileSize = FS_FOpenFileRead("mod.arena", &fileHandle);
 
-				*ui_numArenas = UI_ParseInfos(buf, 128 - *ui_numArenas, (char **)(4 * *ui_numArenas + 0x98A4B50));
-				return true;
-			}
-			else
-			{
-				Com_PrintWarning(13, "Customized arena file size is too big to load > %d: %s\n", ARENA_FILE_MAX_SIZE, "mod.arena");
-				FS_FCloseFile(file); //Fix for leaked handles
-				return false;
-			}
-		}
-		else
+	if (!fileHandle)
+	{
+		Com_PrintWarning(13, "Customized arena file not found: %s\n", "mod.arena");
+		return false;
+	}
+
+	if (!fileSize)
+	{
+		Com_PrintWarning(13, "Customized arena file is empty: %s\n", "mod.arena");
+		FS_FCloseFile(fileHandle); //Fix for leaked handles
+		return false;
+	}
+
+	if (fileSize > ARENA_FILE_MAX_SIZE)
+	{
+		Com_PrintWarning(13, "Customized arena file size is too big to load > %d: %s\n", ARENA_FILE_MAX_SIZE, "mod.arena");
+		FS_FCloseFile(fileHandle); //Fix for leaked handles
+		return false;
+	}
+
+	char buf[ARENA_FILE_MAX_SIZE];
+	FS_Read(buf, fileSize, fileHandle);
+	FS_FCloseFile(fileHandle);
+
+	ui_numArenas = UI_ParseInfos(buf, 128 - ui_numArenas, &ui_arenaInfos[ui_numArenas]);
+	return true;
+}
+
+const char* __cdecl UI_SelectedMap_LoadName(int index, int* actual)
+{
+	*actual = 0;
+
+	for (int i = 0, c = 0; i < sharedUiInfo->mapCount; i++)
+	{
+		if (sharedUiInfo->mapList[i].active)
 		{
-			Com_PrintWarning(13, "Customized mod.arena file is empty\n", "mod.arena");
-			FS_FCloseFile(file); //Fix for leaked handles
-			return false;
+			if (c == index)
+			{
+				*actual = i;
+				return UI_SafeTranslateString(sharedUiInfo->mapList[i].mapLoadName);
+			}
+
+			c++;
 		}
 	}
-	else
+
+	return "";
+}
+
+void* rtn_UI_FeederSelection_AllMaps = (void*)0x00835304;
+void __declspec(naked) mfh_UI_FeederSelection_AllMaps()
+{
+	_asm
 	{
-		Com_PrintWarning(13, "Customized arena file not found: %s\n", "mod.arena"); 
-		return false;
+		call UI_SelectedMap_LoadName
+		add esp, 8
+
+		pushad
+		push eax
+		push 0x00A2869C
+		call Dvar_SetStringByName
+		add esp, 8
+		popad
+
+		movss   xmm0, [esp + 0x10]
+		jmp rtn_UI_FeederSelection_AllMaps
 	}
 }

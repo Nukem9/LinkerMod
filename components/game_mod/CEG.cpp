@@ -21,6 +21,9 @@ sub_640020_t sub_640020_o;
 typedef void(__thiscall * sub_51A140_t)(void *thisptr, DWORD address, size_t scanSize);
 sub_51A140_t sub_51A140_o;
 
+typedef void(__thiscall * sub_54A430_t)(void *thisptr, DWORD address, size_t scanSize);
+sub_51A140_t sub_54A430_o;
+
 LPVOID g_MemoryBuffer;
 ULONG_PTR g_ImageBase;
 ULONG_PTR g_ImageEnd;
@@ -28,9 +31,9 @@ ULONG_PTR g_ImageCodeSize;
 
 void Patch_CEG()
 {
-	g_ImageBase		= (ULONG_PTR)GetModuleHandle(nullptr);
+	g_ImageBase = (ULONG_PTR)GetModuleHandle(nullptr);
 	g_ImageCodeSize = 0x5A1C00;
-	g_ImageEnd		= g_ImageBase + g_ImageCodeSize;
+	g_ImageEnd = g_ImageBase + g_ImageCodeSize;
 
 	g_MemoryBuffer = VirtualAlloc(nullptr, g_ImageCodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	memcpy(g_MemoryBuffer, (LPVOID)g_ImageBase, g_ImageCodeSize);
@@ -40,10 +43,16 @@ void Patch_CEG()
 	sub_4E9880_o = (sub_4E9880_t)Detours::X86::DetourFunction((PBYTE)0x4E9880, (PBYTE)&sub_4E9880);
 	sub_640020_o = (sub_640020_t)Detours::X86::DetourFunction((PBYTE)0x640020, (PBYTE)&sub_640020);
 	sub_51A140_o = (sub_51A140_t)Detours::X86::DetourFunction((PBYTE)0x51A140, (PBYTE)&sub_51A140);
+	sub_54A430_o = (sub_51A140_t)Detours::X86::DetourFunction((PBYTE)0x54A430, (PBYTE)&sub_54A430);
 
 	Detours::X86::DetourFunction((PBYTE)0x967760, (PBYTE)&hk_memcpy);
 	Detours::X86::DetourFunction((PBYTE)0x8EF04F, (PBYTE)&hk_inline_memcpy);
 	Detours::X86::DetourFunction((PBYTE)0x8EF168, (PBYTE)&hk_inline_memcpy2);
+
+	Detours::X86::DetourFunction((PBYTE)0x8EE640, (PBYTE)&sub_8EE640);
+
+	FixupFunction(0x0060CC10, 0x004F20F0);// CEGObfuscate<LiveStats_Init> => LiveStats_Init
+	FixupFunction(0x00580460, 0x0079E6D0);// CEGObfuscate<Con_Restricted_SetLists> => Con_Restricted_SetLists
 }
 
 DWORD __declspec(noinline) GetNewAddress(DWORD dwOld)
@@ -81,9 +90,9 @@ void __declspec(naked) hk_inline_memcpy()
 		pop ecx
 		pop eax
 
-		rep movs dword ptr es:[edi], dword ptr ds:[esi]
-		call DWORD PTR ds:[dwCall]
-		jmp DWORD PTR ds:[dwJmp]
+		rep movs dword ptr es : [edi], dword ptr ds : [esi]
+		call DWORD PTR ds : [dwCall]
+		jmp DWORD PTR ds : [dwJmp]
 	}
 }
 
@@ -106,10 +115,19 @@ void __declspec(naked) hk_inline_memcpy2()
 		pop ecx
 		pop eax
 
-		rep movs dword ptr es:[edi], dword ptr ds:[esi]
-		mov ecx, dword ptr ss:[esp+0x24]
-		jmp DWORD PTR ds:[dwJmp]
+		rep movs dword ptr es : [edi], dword ptr ds : [esi]
+		mov ecx, dword ptr ss : [esp + 0x24]
+		jmp DWORD PTR ds : [dwJmp]
 	}
+}
+
+void *sub_8EE640(void *Nullptr1, void *Nullptr2)
+{
+	if (Nullptr1 != nullptr || Nullptr2 != nullptr)
+		__debugbreak();
+
+	*(void **)0xBA1C24 = Nullptr2;
+	return (void *)0xBA1C24;
 }
 
 void __fastcall sub_5CBF00(void *thisptr, PVOID _EDX, DWORD address, size_t scanSize)
@@ -155,4 +173,13 @@ void __fastcall sub_51A140(void *thisptr, PVOID _EDX, DWORD address, size_t scan
 	CEG_DEBUG_PRINT;
 
 	sub_51A140_o(thisptr, dwNew, scanSize);
+}
+
+void __fastcall sub_54A430(void *thisptr, PVOID _EDX, DWORD address, size_t scanSize)
+{
+	DWORD dwNew = GetNewAddress(address);
+
+	CEG_DEBUG_PRINT;
+
+	sub_54A430_o(thisptr, dwNew, scanSize);
 }

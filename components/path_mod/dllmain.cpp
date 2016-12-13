@@ -87,6 +87,12 @@ BOOL PathMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00521066, (PBYTE)&mfh_Com_LoadBsp);
 	Detours::X86::DetourFunction((PBYTE)0x0052CBF9, (PBYTE)&SV_SavePaths);
 
+	//
+	// Fix for misleading (incorrect) assertion message
+	//
+	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
+	PatchMemory(0x0067BC29, (PBYTE)&msg_assertion, 4);
+
 	g_initted = true;
 
 	return TRUE;

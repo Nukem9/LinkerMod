@@ -29,7 +29,7 @@ BOOL LinkerMod_Init()
 
 	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
 
-	Detours::X86::DetourFunction((PBYTE)0x004C3D30, (PBYTE)assert);
+	Detours::X86::DetourFunction((PBYTE)0x004C3D30, (PBYTE)shared_assert);
 	Detours::X86::DetourFunction((PBYTE)0x00401940, (PBYTE)Com_LoadBsp);
 	Detours::X86::DetourFunction((PBYTE)0x004A6D20, (PBYTE)Path_LoadPaths);
 
@@ -37,36 +37,20 @@ BOOL LinkerMod_Init()
 	PatchMemory(0x00486C60, (PBYTE)"\x90\x90\x90\x90\x90", 5);
 	PatchMemory(0x00486C6A, (PBYTE)"\xEB", 1);
 
-	// Lump %d has a funny size
-	//VirtualProtect((LPVOID)0x004017A2, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x004017A2 = 0xEB;
-
 	// No primary lights in BSP
 	PatchMemory(0x00401E60, (PBYTE)"\xEB", 1);
-
-	//VirtualProtect((LPVOID)0x00401FE7, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x00401FE7 = 0xEB;
-
-	//VirtualProtect((LPVOID)0x476B10, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x476B10 = 0xC3;
-
-	//VirtualProtect((LPVOID)0x004749BC, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x004749BC = 0xEB;
-
-	//VirtualProtect((LPVOID)0x0047BCEB, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x0047BCEB = 0xEB;
-
-	//VirtualProtect((LPVOID)0x479870, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x479870 = 0xC3;
-
-	//VirtualProtect((LPVOID)0x475B60, 1, PAGE_EXECUTE_READWRITE, &d);
-	//*(BYTE *)0x475B60 = 0xC3;
 
 	//
 	// Fix for early fclose of dependency file
 	//
 	PatchMemory_WithNOP(0x0041E5B1, 5);
 	Detours::X86::DetourFunction((PBYTE)0x0041E689, (PBYTE)&mfh_fcloseDeps);
+
+	//
+	// Fix for misleading (incorrect) assertion message
+	//
+	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
+	PatchMemory(0x00480D10, (PBYTE)&msg_assertion, 4);
 
 	g_initted = TRUE;
 	return TRUE;

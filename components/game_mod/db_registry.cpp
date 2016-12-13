@@ -1,8 +1,11 @@
 #include "stdafx.h"
 
+void** DB_XAssetPool = (void**)0x00B741B8;
+DWORD* g_poolSize = (DWORD*)0x00B73EF8;
+
 void DB_SyncXAssets()
 {
-	R_BeginRemoveScreenUpdate();
+	R_BeginRemoteScreenUpdate();
 	Sys_SyncDatabase();
 	R_EndRemoteScreenUpdate(0);
 	SocketRouter_EmergencyFrame("DB_SyncXAssets");
@@ -25,6 +28,12 @@ void DB_LoadGraphicsAssetsForPC()
 	zoneInfo[0].allocFlags = 8;
 	zoneInfo[0].freeFlags = 0;
 
+	//Add frontend_patch to the zone list (enable mods button)
+	zoneInfo[zoneCount].name = "frontend_patch";
+	zoneInfo[zoneCount].allocFlags = 32;
+	zoneInfo[zoneCount].freeFlags = 0;
+	zoneCount++;
+
 	if(DB_ModFileExists())
 	{
 		zoneInfo[zoneCount].name = "mod";
@@ -32,12 +41,6 @@ void DB_LoadGraphicsAssetsForPC()
 		zoneInfo[zoneCount].freeFlags = 0;
 		zoneCount++;
 	}
-
-	//Add frontend_patch to the zone list
-	zoneInfo[zoneCount].name = "frontend_patch";
-	zoneInfo[zoneCount].allocFlags = 32;
-	zoneInfo[zoneCount].freeFlags = 0;
-	zoneCount++;
 
 	DB_LoadXAssets(zoneInfo, zoneCount, 0);
 }
@@ -98,3 +101,12 @@ void DB_ModXFileHandle(HANDLE *zoneFile, char* zoneName, FF_DIR *zoneDir)
 	}
 }
 
+void* DB_ReallocXAssetPool(XAssetType type, unsigned int size)
+{
+	int assetSize = DB_GetXAssetTypeSize(type);
+	void* assetPool = malloc(size * assetSize + sizeof(void*));
+	DB_XAssetPool[type] = assetPool;
+	g_poolSize[type] = size;
+	
+	return assetPool;
+}

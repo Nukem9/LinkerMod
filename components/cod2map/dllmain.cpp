@@ -1,8 +1,16 @@
-#include <Windows.h>
-#include "../shared/utility.h"
-#include "../shared/detours/Detours.h"
+#include "stdafx.h"
 
-#include "com_files.h"
+LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
+{
+	//printf("\n\nEXCEPTION DETECTED:\n");
+	//printf("EIP: 0x%p\n", ExceptionInfo->ContextRecord->Eip);
+	//printf("EX0: 0x%p\n", ExceptionInfo->ExceptionRecord->ExceptionInformation[0]);
+	//printf("EX1: 0x%p\n", ExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+	//printf("\n\n");
+
+	//return EXCEPTION_CONTINUE_SEARCH;
+	return PageGuard_Check(ExceptionInfo);
+}
 
 int __cdecl hk_FS_ReadFile(const char* path, BYTE** fileData)
 {
@@ -33,6 +41,9 @@ int __cdecl ConvertBSP_Post(FILE* h)
 	delete[] buf;
 
 	iBSP->Convert(BSPVERSION_COD_BO);
+
+	Light_FixPrimaryLightInfo(&iBSP->lumps[LUMP_PRIMARY_LIGHTS]);
+
 	len = iBSP->PotentialFileSize();
 	buf = new BYTE[len];
 	iBSP->Write(buf);
@@ -69,6 +80,11 @@ void __declspec(naked) hk_ConvertBSP_Post()
 static char* g_fmode = "wb+";
 bool g_modInitialized = false;
 
+const int MAX_MAP_COLLISIONVERTS = 65536 * 2;
+const int MAX_MAP_COLLISIONVERTS_SIZE = MAX_MAP_COLLISIONVERTS * 12;
+BYTE collVertData[MAX_MAP_COLLISIONVERTS_SIZE];
+BYTE *collVertDataPtr = (BYTE *)&collVertData;
+
 void Init_MapMod()
 {
 	if(g_modInitialized)
@@ -77,11 +93,30 @@ void Init_MapMod()
 	setvbuf(stdout, nullptr, _IONBF, 0);
 	
 	//
+	// Logo to let the user know this loaded
+	//
+	printf("----> Loading custom cod2map\n");
+	AddVectoredExceptionHandler(TRUE, (PVECTORED_EXCEPTION_HANDLER)MyUnhandledExceptionFilter);
+
+	//
+	// MAX_MAP_COLLISIONVERTS -> Double maximum limit
+	//
+	PageGuard_Monitor(0x15890C88, 12 * 65536);
+
+	PatchMemory(0x0041ADB2, (PBYTE)&MAX_MAP_COLLISIONVERTS, 4);
+	PatchMemory(0x0040AC32, (PBYTE)&MAX_MAP_COLLISIONVERTS_SIZE, 4);
+	PatchMemory(0x0040891A, (PBYTE)&MAX_MAP_COLLISIONVERTS_SIZE, 4);
+	PatchMemory(0x00408926, (PBYTE)&MAX_MAP_COLLISIONVERTS_SIZE, 4);
+	PatchMemory(0x0041ADDD, (PBYTE)&collVertDataPtr, 4);
+	PatchMemory(0x0040AC5E, (PBYTE)&collVertDataPtr, 4);
+	PatchMemory(0x0040895A, (PBYTE)&collVertDataPtr, 4);
+
+	//
 	// Change the file mode for saving d3dbsp files to "wb+"
 	//
 	PBYTE p_fmode = (PBYTE)&g_fmode;
 	PatchMemory(0x00407DE4, p_fmode, sizeof(p_fmode));
-	PatchMemory(0x00407E65, p_fmode, sizeof(p_fmode));
+	PatchMemory(0x00407E67, p_fmode, sizeof(p_fmode));
 	PatchMemory(0x00407EAF, p_fmode, sizeof(p_fmode));
 	PatchMemory(0x00407EE6, p_fmode, sizeof(p_fmode));
 
@@ -96,10 +131,29 @@ void Init_MapMod()
 	Detours::X86::DetourFunction((PBYTE)0x00409509, (PBYTE)&hk_ConvertBSP_Post); 
 	Detours::X86::DetourFunction((PBYTE)0x0040947A, (PBYTE)&hk_ConvertBSP_Update_Post);
 
+	//
+	// Add Support for Custom KVs
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0043D649, (PBYTE)&mfh_PrimaryLightHandler);
+
+	void* stringPatch = ".pts";
+	PatchMemory(0x0042626F, (PBYTE)&stringPatch, 4);
+	PatchMemory(0x00426514, (PBYTE)&stringPatch, 4);
+	stringPatch = "%s.pts";
+	PatchMemory(0x00406F4E, (PBYTE)&stringPatch, 4);
+
+	//
+	// Increase (double) the max amount of curvenn/terrain collision verts
+	//
+	int maxCollisionVerts = 131072;
+	PatchMemory(0x004197F9, (PBYTE)&maxCollisionVerts, 4);
+
+	Detours::X86::DetourFunction((PBYTE)0x004B3550, (PBYTE)qh_normalize2);
+
 	g_modInitialized = true;
 }
 
-BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call,LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call,LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
 	{
@@ -111,6 +165,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call,LPVOID lpReser
 		Con_Restore();
 		break;
 	}
+
 	return TRUE;
 }
 

@@ -1,0 +1,4 @@
+#pragma once
+
+#define RADIANT_AFX_CONSOLE_BG RGB(37, 37, 38)
+#define RADIANT_AFX_CONSOLE_TEXT RGB(241, 241, 241)

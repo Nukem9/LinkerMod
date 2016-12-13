@@ -6,7 +6,7 @@ char Image_GetPcStreamedMips(GfxImageFileHeader *fileHeader)
 	if (fileHeader->flags & 0x10)
 	{
 		if (fileHeader->flags & 0xC)
-			return false;
+			return 0;
 
 		char streamedMipLevels	= 0;
 		signed int minDimension = 0;
@@ -22,7 +22,7 @@ char Image_GetPcStreamedMips(GfxImageFileHeader *fileHeader)
 		return streamedMipLevels;
 	}
 
-	return false;
+	return 0;
 }
 
 SRCLINE(127)
@@ -67,7 +67,7 @@ void Image_SetupFromFile(GfxImage *image, GfxImageFileHeader *fileHeader, D3DFOR
 	if ((fileHeader->dimensions[2] >> picmip) > 1)
 		depth = fileHeader->dimensions[2] >> picmip;
 
-	Image_Setup(image, width, height, depth, fileHeader->flags, imageFormat);
+	Image_Setup(image, width, height, depth, fileHeader->flags & 0xFF, imageFormat);
 
 	ASSERT(image->cardMemory.platform[PICMIP_PLATFORM_USED] > 0);
 }
@@ -200,7 +200,7 @@ void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char 
 SRCLINE(526)
 void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *srcData, unsigned int allocFlags)
 {
-	image->texture.ptr = nullptr;
+	image->texture.basemap = nullptr;
 
 	switch (fileHeader->format)
 	{
@@ -255,7 +255,7 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 		Image_LoadDxtc(image, fileHeader, srcData, D3DFMT_A16B16G16R16F, 128, allocFlags);
 		break;
 	default:
-		ASSERT(false && "Unhandled case");
+		ASSERT_MSG(false, "Unhandled case");
 		break;
 	}
 }
@@ -282,11 +282,9 @@ SRCLINE(1449)
 bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(const char *, int *))
 {
 	ASSERT(image->category == IMG_CATEGORY_LOAD_FROM_FILE);
-	ASSERT(image->texture.ptr == nullptr);
+	ASSERT(image->texture.basemap == nullptr);
 
-	//
 	// Create and validate the IWI file path
-	//
 	char filepath[64];
 
 	if (Com_sprintf(filepath, ARRAYSIZE(filepath), "images/%s.iwi", image->name) < 0)
@@ -295,21 +293,19 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 		return false;
 	}
 
-	//
 	// Get a handle to the file
-	//
 	int fileHandle;
 	int fileSize = OpenFileRead(filepath, &fileHandle);
 
 	if (fileSize == -1)
 	{
+#if !RADIANT_DISABLE_SPAM_MSG_IMAGE
 		Com_PrintError(8, "ERROR: image '%s' is missing\n", filepath);
+#endif
 		return false;
 	}
 
-	//
 	// Read the IWI header
-	//
 	GfxImageFileHeader fileHeader;
 
 	if (FS_Read(&fileHeader, sizeof(GfxImageFileHeader), fileHandle) != sizeof(GfxImageFileHeader))
@@ -318,23 +314,19 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 		return false;
 	}
 
-	//
 	// Validate header
-	//
 	if (!Image_ValidateHeader(&fileHeader, filepath))
 	{
 		FS_FCloseFile(fileHandle);
 		return false;
 	}
 
-	//
 	// Determine picture mipmapping levels
-	//
 	int dimension;
 
 	if (fileHeader.flags & 3 ||
 		(fileHeader.dimensions[1] < fileHeader.dimensions[0] ? (dimension = fileHeader.dimensions[1]) : (dimension = fileHeader.dimensions[0]), dimension < 32))
-		image->noPicmip = 1;
+		image->noPicmip = true;
 
 	Image_GetPicmip(image, &image->picmip);
 

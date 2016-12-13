@@ -2,11 +2,14 @@
 
 const static int MAX_THREADS = 32;
 
+const static int MAX_MAP_DRAW_VERTS = 0x90000;
+const static int MAX_MAP_TRIANGLES = 0x60000;
+
 //
 // Reallocated structures
 //
 BYTE	g_GeoGlob[12 * MAX_THREADS];
-BYTE	g_TrisData[4 + 36 * 12 + 4000000];
+BYTE	g_TrisData[36 * MAX_MAP_TRIANGLES];
 BYTE	g_BlockAllocData[2 * 36 * MAX_THREADS];
 DWORD	g_SuppressedLightingSamples[MAX_THREADS];
 DWORD	g_RadiosityBounce[MAX_THREADS];

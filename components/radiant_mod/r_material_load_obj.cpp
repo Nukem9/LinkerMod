@@ -20,7 +20,6 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 
 	int elemIndex = 0;
 
-	printf("new -- 0x%X\n", elemTable);
 	while (streamCount > 0)
 	{
 		ASSERT_MSG((unsigned)(routingData->source) < (unsigned)(STREAM_SRC_COUNT), "routingData->source doesn't index STREAM_SRC_COUNT\n\t%i not in [0, 10)");
@@ -36,7 +35,7 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 		for (; elemIndexInsert > 0 && elemTable[elemIndexInsert].Stream > sourceInfo->Stream; elemIndexInsert--)
 			memcpy(&elemTable[elemIndexInsert], &endDecl, sizeof(D3DVERTEXELEMENT9));
 
-		printf("Type: %d %d\n", sourceInfo->Type, destInfo->Usage);
+		_VERBOSE(printf("Type: %d %d\n", sourceInfo->Type, destInfo->Usage));
 
 		elemTable[elemIndexInsert].Stream		= sourceInfo->Stream;
 		elemTable[elemIndexInsert].Offset		= sourceInfo->Offset;
@@ -55,19 +54,15 @@ LPDIRECT3DVERTEXDECLARATION9 Material_BuildVertexDecl(MaterialStreamRouting *rou
 	//
 	memcpy(&elemTable[elemIndex], &endDecl, sizeof(D3DVERTEXELEMENT9));
 
-	IDirect3DDevice9 *d3d_device = *(IDirect3DDevice9 **)0x13A15A0;
-
-	if (d3d_device)
+	if (*dx_device)
 	{
 		LPDIRECT3DVERTEXDECLARATION9 decl	= nullptr;
-		HRESULT hr							= d3d_device->CreateVertexDeclaration(elemTable, &decl);
+		HRESULT hr							= (*dx_device)->CreateVertexDeclaration(elemTable, &decl);
 
-		if (!SUCCEEDED(hr))
+		if (FAILED(hr))
 		{
-			//++g_disableRendering;
-			(*(DWORD *)0xEE4F80)++;
-
-			Com_Error(ERR_FATAL, "dx.device->CreateVertexDeclaration( elemTable, &decl ) failed: %s\n", R_ErrorDescription(hr));
+			(*g_disableRendering)++;
+			Com_Error(ERR_FATAL, "dx.device->CreateVertexDeclaration(elemTable, &decl) failed: %s\n", R_ErrorDescription(hr));
 		}
 
 		ASSERT(decl != nullptr);
@@ -85,6 +80,7 @@ void Load_BuildVertexDecl(MaterialVertexDeclaration **mtlVertDecl)
 
 	for (int vertDeclType = 0; vertDeclType < 18; vertDeclType++)
 	{
+		// r_loadForRenderer->current.enabled
 		if (*(BYTE *)(*(DWORD *)0x0191D574 + 12))
 		{
 			(*mtlVertDecl)->routing.decl[vertDeclType] = Material_BuildVertexDecl(
@@ -148,7 +144,7 @@ MaterialVertexDeclaration *Material_AllocVertexDecl(MaterialStreamRouting *routi
 	// Maximum index check
 	//
 	if (materialVertexDeclCount == 63)
-		Com_Error(ERR_DROP, "More than %i vertex declarations in use", 63);
+		Com_Error(ERR_DROP, "More than %i vertex declarations in use", materialVertexDeclCount);
 
 	materialVertexDeclCount++;
 
@@ -204,10 +200,13 @@ const char *Material_RegisterString(const char *string)
 SRCLINE(2819)
 bool Material_UsingTechnique(int techType)
 {
+#ifndef BO1_BUILD
+	return Material_UsingTechnique_WAW(techType);
+#else
 	ASSERT(techType < ARRAYSIZE(g_useTechnique));
 
-	return ((bool *)0x0064B67C)[techType];
-	//return g_useTechnique[techType];
+	return g_useTechnique[techType];
+#endif
 }
 
 SRCLINE(2825)
@@ -264,9 +263,43 @@ bool Material_ParseIndex(const char **text, int indexCount, int *index)
 	return Material_MatchToken(text, "]");
 }
 
+void __cdecl hk_MaterialValueForState(const char* token)
+{
+	if ( strcmp(token, "GE255") == 0 )
+	{
+		strcpy((char*)token, "LT128");
+	}
+}
+
+//
+// Override GE255 DepthTest to use LT128
+//
+void* rtn_Material_ParseValueForState = (void*)0x0052D1BE;
+void __declspec(naked) mfh_Material_ParseValueForState() //0052D1B8
+{
+	_asm
+	{
+		pushad
+		push eax //token
+		call hk_MaterialValueForState
+		add esp, 4
+		popad
+
+		mov		edx, [edi]
+		xor		esi, esi
+		test	edx, edx
+
+		jmp rtn_Material_ParseValueForState
+	}
+}
+
+
 SRCLINE(3168)
 const char *Material_NameForStreamDest(char dest)
 {
+#ifndef BO1_BUILD
+	return Material_NameForStreamDest_WAW(dest);
+#else
 	switch (dest)
 	{
 	case 0:	return "position";
@@ -296,11 +329,15 @@ const char *Material_NameForStreamDest(char dest)
 	}
 
 	return "";
+#endif
 }
 
 SRCLINE(3221)
 bool Material_StreamDestForName(const char **text, const char *destName, char *dest)
 {
+#ifndef BO1_SEMI_NATIVE_BUILD
+	return Material_StreamDestForName_WAW(text, destName, dest);
+#else
 	int index;
 
 	if (!strcmp(destName, "position"))
@@ -327,16 +364,20 @@ bool Material_StreamDestForName(const char **text, const char *destName, char *d
 		*dest = 19;
 	else
 	{
-		Com_ScriptError("unknown stream destination '%s'\n", destName);
+		Com_ScriptError("Unknown stream destination '%s'\n", destName);
 		return false;
 	}
 
 	return true;
+#endif
 }
 
 SRCLINE(3263)
 bool Material_StreamSourceForName(const char **text, const char *sourceName, char *source)
 {
+#ifndef BO1_SEMI_NATIVE_BUILD
+	return Material_StreamSourceForName_WAW(text, sourceName, source);
+#else
 	int index = 0;
 
 	if (!strcmp(sourceName, "position"))
@@ -373,6 +414,7 @@ bool Material_StreamSourceForName(const char **text, const char *sourceName, cha
 	}
 
 	return true;
+#endif
 }
 
 SRCLINE(3314)
@@ -426,7 +468,7 @@ bool Material_LoadPassVertexDecl(const char **text, ShaderVaryingDef *inputTable
 	//
 	// Material pass vertex stream routing
 	//
-	MaterialStreamRouting routing[16 + 1];
+	MaterialStreamRouting routing[16];
 	memset(routing, 0, sizeof(routing));
 
 	int routingIndex = 0;
@@ -642,8 +684,6 @@ bool Material_ParseSamplerSource(const char **text, ShaderArgumentSource *argSou
 
 	if (!strcmp(token, "sampler"))
 		return Material_CodeSamplerSource_r(text, 0, s_codeSamplers, argSource);
-		// FIX
-		//return Material_CodeSamplerSource_r(text, 0, (CodeSamplerSource *)0x0064B7B0, argSource);
 
 	if (!strcmp(token, "material"))
 	{
@@ -651,12 +691,12 @@ bool Material_ParseSamplerSource(const char **text, ShaderArgumentSource *argSou
 			return false;
 		
 		argSource->type						= MTL_ARG_MATERIAL_PIXEL_SAMPLER;
-		argSource->u.literalConst			= (const float *)Material_RegisterString(Com_Parse(text));
+		argSource->u.name					= Material_RegisterString(Com_Parse(text));
 		argSource->indexRange.first			= 0;
 		argSource->indexRange.count			= 1;
 		argSource->indexRange.isImplicit	= true;
 
-		return argSource->u.literalConst != nullptr;
+		return argSource->u.name != nullptr;
 	}
 
 	Com_ScriptError("expected 'sampler' or 'material', found '%s' instead\n", token);
@@ -689,9 +729,7 @@ bool Material_DefaultSamplerSourceFromTable(const char *constantName, ShaderInde
 SRCLINE(3606)
 bool Material_DefaultSamplerSource(const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
-	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource) != false;
-	// FIX
-	//return Material_DefaultSamplerSourceFromTable(constantName, indexRange, (CodeSamplerSource *)0x0064B9A8, argSource) != false;
+	return Material_DefaultSamplerSourceFromTable(constantName, indexRange, s_defaultCodeSamplers, argSource);
 }
 
 SRCLINE(3613)
@@ -841,8 +879,6 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 
 	if (!strcmp(token, "constant"))
 		return Material_ParseCodeConstantSource_r(shaderType, text, 0, s_codeConsts, argSource);
-		// FIX
-		//return Material_ParseCodeConstantSource_r(shaderType, text, 0, (CodeConstantSource *)0x0064BCD0, argSource);
 
 	if (!strcmp(token, "material"))
 	{
@@ -851,22 +887,23 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 
 		token = Com_Parse(text);
 		argSource->type						= (shaderType == MTL_VERTEX_SHADER) ? MTL_ARG_MATERIAL_VERTEX_CONST : MTL_ARG_MATERIAL_PIXEL_CONST;
-		argSource->u.literalConst			= (const float *)Material_RegisterString(token);
+		argSource->u.name					= Material_RegisterString(token);
 		argSource->indexRange.first			= 0;
 		argSource->indexRange.count			= 1;
 		argSource->indexRange.isImplicit	= true;
 
-		return argSource->u.literalConst != nullptr;
+		return argSource->u.name != nullptr;
 	}
 
-	Com_ScriptError("expected 'sampler' or 'material', found '%s' instead\n", token);
+	Com_ScriptError("expected 'constant' or 'material', found '%s' instead\n", token);
 	return false;
 }
 
 SRCLINE(3758)
 bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, const char *constantName, ShaderIndexRange *indexRange, CodeConstantSource *sourceTable, ShaderArgumentSource *argSource)
 {
-	printf("CONST: %s\n", constantName);
+	_VERBOSE( printf("CONST: %s\n", constantName) );
+
 
 	int sourceIndex = 0;
 	for (;; sourceIndex++)
@@ -878,7 +915,7 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 		{
 			unsigned int arrayCount;
 
-			printf("MATCH: %s\n", constantName);
+			_VERBOSE( printf("MATCH: %s\n", constantName) );
 
 			if (sourceTable[sourceIndex].source < R_MAX_CODE_INDEX)
 			{
@@ -908,13 +945,9 @@ SRCLINE(3791)
 bool Material_DefaultConstantSource(MaterialShaderType shaderType, const char *constantName, ShaderIndexRange *indexRange, ShaderArgumentSource *argSource)
 {
 	if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_codeConsts, argSource))
-	// FIX
-	//if (Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064BCD0, argSource))
 		return true;
 
-	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_defaultCodeConsts, argSource) != 0;
-	// FIX
-	//return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, (CodeConstantSource *)0x0064C558, argSource) != false;
+	return Material_DefaultConstantSourceFromTable(shaderType, constantName, indexRange, s_defaultCodeConsts, argSource);
 }
 
 SRCLINE(3800)
@@ -993,7 +1026,7 @@ bool Material_DefaultArgumentSource(MaterialShaderType shaderType, const char *c
 	ASSERT(constantName != nullptr);
 	ASSERT(argSource != nullptr);
 
-	printf("type: %d name: %s param: %d\n", shaderType, constantName, paramType);
+	_VERBOSE( printf("type: %d name: %s param: %d\n", shaderType, constantName, paramType) );
 
 	if (paramType)
 	{
@@ -1033,7 +1066,7 @@ unsigned int R_SetParameterDefArray(LPD3DXSHADER_CONSTANTTABLE constantTable, un
 	case D3DXPT_SAMPLERCUBE:type = SHADER_PARAM_SAMPLER_CUBE;	break;
 
 	default:
-		Com_ScriptError("Unknown constant type '%i' (%s)", typeInfo->Type, name);
+		Com_ScriptError("Unknown constant type '%i' (%s)\n", typeInfo->Type, name);
 		return 0;
 	}
 
@@ -1057,12 +1090,12 @@ int Material_PrepareToParseShaderArguments(D3DXSHADER_CONSTANTTABLE *constantTab
 {
 	int usedCount = 0;
 
-	printf("const count: %d\n", constantTable->Constants);
+	_VERBOSE(printf("const count: %d\n", constantTable->Constants));
 
 	for (unsigned int constantIndex = 0; constantIndex < constantTable->Constants; constantIndex++)
 		usedCount += R_SetParameterDefArray(constantTable, constantIndex, &paramTable[usedCount]);
 
-	printf("used count: %d\n", usedCount);
+	_VERBOSE(printf("used count: %d\n", usedCount));
 
 	return usedCount;
 }
@@ -1094,9 +1127,7 @@ bool Material_AttemptCombineShaderArguments(MaterialShaderArgument *arg0, Materi
 	if (arg0->u.codeConst.rowCount + arg0->dest != arg1->dest)
 		return false;
 
-	ASSERT((signed int)LOWORD(arg0->u.literalConst) == arg0->u.codeConst.index);
-
-	if ((signed int)LOWORD(arg0->u.literalConst) < R_MAX_CODE_INDEX)
+	if (arg0->u.codeConst.index < R_MAX_CODE_INDEX)
 		return false;
 
 	if (arg0->u.codeConst.index != arg1->u.codeConst.index)
@@ -1447,10 +1478,6 @@ bool CodeConstIsOneOf(unsigned __int16 constCodeIndex, const unsigned __int16 *c
 SRCLINE(4285)
 bool Material_ParseShaderArguments(const char **text, const char *shaderName, MaterialShaderType shaderType, ShaderUniformDef *paramTable, unsigned int paramCount, unsigned __int16 *techFlags, unsigned int argLimit, unsigned int *argCount, MaterialShaderArgument *args)
 {
-	unsigned __int16 v10 = 0; // cx@54
-	__int16 v14 = 0; // [sp+18h] [bp-5134h]@24
-	unsigned __int16 v15 = 0; // [sp+1Ch] [bp-5130h]@25
-
 	ASSERT(techFlags != nullptr);
 	ASSERT(paramTable  != nullptr);
 
@@ -1460,7 +1487,7 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 	//
 	// Values for shader registers stored as 64-byte strings
 	//
-	char registerUsage[16384];
+	char registerUsage[R_MAX_PIXEL_SHADER_CONSTS][64];
 	memset(registerUsage, 0, sizeof(registerUsage));
 
 	//
@@ -1515,12 +1542,12 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 				paramCount,
 				&usedCount,
 				localArgs,
-				(char(*)[64])registerUsage))
+				registerUsage))
 				return false;
 
-			if (v14 == 4)
+			if (argSource.type == MTL_ARG_CODE_PIXEL_SAMPLER)
 			{
-				switch (v15)
+				switch (argSource.u.codeIndex)
 				{
 				case 9:
 					*techFlags |= 1;
@@ -1568,38 +1595,48 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 			&argDest.indexRange,
 			&argSource))
 		{
-			printf("success\n");
+			_VERBOSE(printf("success\n"));
 
-			if (v14 == 5)
+			if (argSource.type == MTL_ARG_CODE_PIXEL_CONST)
 			{
-				if (v15 == 4)
+				if (argSource.u.codeIndex == 4)
 					*techFlags |= 0x10u;
 			}
-			else if (v14 == 4 && (v15 == 19 || v15 == 20 || v15 == 21))
+			else if (argSource.type == MTL_ARG_CODE_PIXEL_SAMPLER)
 			{
-				*techFlags |= 0x40u;
+				if (argSource.u.codeIndex == 19 || argSource.u.codeIndex == 20 || argSource.u.codeIndex == 21)
+					*techFlags |= 0x40u;
 			}
 
-			if (v14 == 3 && v15 == 120)
+			if (argSource.type == MTL_ARG_CODE_VERTEX_CONST && argSource.u.codeIndex == 120)
 				*techFlags |= 0x100u;
 			
-			if (v14 == 3)
+			if (argSource.type == MTL_ARG_CODE_VERTEX_CONST)
 			{
-				v10 = *techFlags;
-				if (!(v10 & 0x20))
+				if (!(*techFlags & 0x20))
 				{
-					static unsigned short foliageConsts[4] = { 81, 82, 83, 84 };
+					static unsigned short foliageConsts[4] =
+					{
+						81,
+						82,
+						83,
+						84
+					};
 
-					if (CodeConstIsOneOf(v15, foliageConsts, 4))
+					if (CodeConstIsOneOf(argSource.u.codeIndex, foliageConsts, 4))
 						*techFlags |= 0x20u;
 				}
 			}
 
-			if (v14 == 3 && !(*techFlags & 0x200))
+			if (argSource.type == MTL_ARG_CODE_PRIM_BEGIN && !(*techFlags & 0x200))
 			{
-				static unsigned short scorchConsts[2] = { 114, 118 };
+				static unsigned short scorchConsts[2] =
+				{
+					114,
+					118
+				};
 
-				if (CodeConstIsOneOf(v15, scorchConsts, 2))
+				if (CodeConstIsOneOf(argSource.u.codeIndex, scorchConsts, 2))
 					*techFlags |= 0x200u;
 			}
 
@@ -1611,7 +1648,7 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 				paramCount,
 				&usedCount,
 				localArgs,
-				(char(*)[64])registerUsage))
+				registerUsage))
 				return false;
 		}
 	}
@@ -1642,7 +1679,7 @@ bool Material_CopyTextToDXBuffer(void *cachedShader, unsigned int shaderLen, LPD
 {
 	HRESULT hr = D3DXCreateBuffer(shaderLen, shader);
 
-	if (!SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
 		Com_PrintError(8, "ERROR: Material_CopyTextToDXBuffer: D3DXCreateBuffer(%d) failed: %s (0x%08x)\n", shaderLen, R_ErrorDescription(hr), hr);
 
@@ -1710,15 +1747,11 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 	
 	if (shaderFile)
 	{
-		//
 		// Skip the first 4 bytes (zeros)
-		//
 		fpos_t pos = 4;
 		fsetpos(shaderFile, &pos);
 
-		//
 		// Read the real data size
-		//
 		if (fread(&shaderDataSize, 4, 1, shaderFile) < 1)
 		{
 			fclose(shaderFile);
@@ -1727,6 +1760,7 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 	}
 	else
 	{
+#if WAW_PIMP
 		//
 		// Load the WAW version if it wasn't found
 		//
@@ -1740,12 +1774,17 @@ void *Material_LoadShader(const char *shaderName, const char *shaderVersion)
 			fclose(shaderFile);
 			return nullptr;
 		}
+#else
+		// WAW PIMP disabled and the shader wasn't found. Function has failed.
+		return nullptr;
+#endif
 	}
 
 	void *shaderMemory	= Z_Malloc(shaderDataSize);
 	LPD3DXBUFFER shader	= nullptr;
 
-	fread(shaderMemory, 1, shaderDataSize, shaderFile);
+	if (fread(shaderMemory, 1, shaderDataSize, shaderFile) != shaderDataSize)
+		ASSERT_MSG(false, "Unable to read shader file data");
 
 	if (!Material_CopyTextToDXBuffer(shaderMemory, shaderDataSize, &shader))
 		ASSERT_MSG(false, "SHADER UPLOAD FAILED\n");
@@ -1804,6 +1843,9 @@ char Material_ParseShaderVersion(const char **text)
 SRCLINE(7866)
 char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 {
+#ifndef BO1_SEMI_NATIVE_BUILD
+	return Material_GetStreamDestForSemantic_WAW(semantic);
+#else
 	switch (semantic->Usage)
 	{
 	case D3DDECLUSAGE_POSITION:
@@ -1818,18 +1860,17 @@ char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 
 		return 19;
 
-	case D3DDECLUSAGE_TEXCOORD:
-		printf("TEXCOORD! %d %d\n", semantic->Usage, semantic->UsageIndex);
-		if (semantic->UsageIndex < 0 || semantic->UsageIndex >= 14)
-			break;
-
-		return semantic->UsageIndex + 5;
-
 	case D3DDECLUSAGE_NORMAL:
 		if (semantic->UsageIndex)
 			break;
 
 		return 1;
+
+	case D3DDECLUSAGE_TEXCOORD:
+		if (semantic->UsageIndex < 0 || semantic->UsageIndex >= 14)
+			break;
+
+		return semantic->UsageIndex + 5;
 
 	case D3DDECLUSAGE_COLOR:
 		if (semantic->UsageIndex < 0 || semantic->UsageIndex >= 2)
@@ -1846,6 +1887,7 @@ char Material_GetStreamDestForSemantic(D3DXSEMANTIC *semantic)
 
 	Com_Error(ERR_DROP, "Unknown shader input/output usage %i:%i\n", semantic->Usage, semantic->UsageIndex);
 	return 0;
+#endif
 }
 
 SRCLINE(7929)
@@ -1867,7 +1909,7 @@ bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderNam
 	//
 	LPD3DXCONSTANTTABLE constants;
 
-	if (!SUCCEEDED(hr = D3DXGetShaderConstantTable(program, &constants)))
+	if (FAILED(hr = D3DXGetShaderConstantTable(program, &constants)))
 		goto __d3dfail;
 
 	ASSERT(constants != nullptr);
@@ -1903,11 +1945,11 @@ bool Material_SetPassShaderArguments_DX(const char **text, const char *shaderNam
 		D3DXSEMANTIC outputSemantics[MAXD3DDECLLENGTH];
 
 		UINT inputCount;
-		if (!SUCCEEDED(hr = D3DXGetShaderInputSemantics(program, inputSemantics, &inputCount)))
+		if (FAILED(hr = D3DXGetShaderInputSemantics(program, inputSemantics, &inputCount)))
 			goto __d3dfail;
 
 		UINT outputCount;
-		if (!SUCCEEDED(hr = D3DXGetShaderOutputSemantics(program, outputSemantics, &outputCount)))
+		if (FAILED(hr = D3DXGetShaderOutputSemantics(program, outputSemantics, &outputCount)))
 			goto __d3dfail;
 
 		//
@@ -2085,7 +2127,7 @@ MaterialUpdateFrequency Material_GetArgUpdateFrequency(MaterialShaderArgument *a
 	case MTL_ARG_CODE_PIXEL_CONST:
 		updateFreq = s_codeConstUpdateFreq[arg->u.codeConst.index];
 
-		ASSERT(updateFreq == MTL_UPDATE_RARELY);
+		//ASSERT(updateFreq == MTL_UPDATE_RARELY); TODO
 		break;
 
 	default:
@@ -2137,7 +2179,7 @@ char Material_CountArgsWithUpdateFrequency(MaterialUpdateFrequency updateFreq, M
 }
 
 SRCLINE(8375)
-bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap)
+bool Material_LoadPass(const char **text, unsigned __int16 *techFlags, MaterialPass *pass, MaterialStateMap **stateMap, int rendererInUse)
 {
 	memset(pass, 0, sizeof(MaterialPass));
 
@@ -2208,7 +2250,7 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 				if (customArg->u.codeSampler == g_customSamplerSrc[customSamplerIndex])
 				{
 					ASSERT(!(pass->customSamplerFlags & (1 << customSamplerIndex)));
-					ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]);
+					//ASSERT(customArg->dest == g_customSamplerDest[customSamplerIndex]); TODO
 
 					pass->customSamplerFlags |= 1 << customSamplerIndex;
 					break;
@@ -2223,14 +2265,11 @@ bool __cdecl Material_LoadPass(const char **text, unsigned __int16 *techFlags, M
 	}
 
 	//
-	// Allocate space for the local arguments
+	// Allocate space for the local arguments and copy
 	//
 	argCount		= pass->stableArgCount + pass->perObjArgCount + pass->perPrimArgCount;
 	pass->localArgs = (MaterialShaderArgument *)Material_Alloc(sizeof(MaterialShaderArgument) * argCount);
 
-	//
-	// Copy the data over to the pointer
-	//
 	memcpy(pass->localArgs, args, sizeof(MaterialShaderArgument) * argCount);
 
 	//
@@ -2320,7 +2359,11 @@ bool Material_IgnoreTechnique(const char *name)
 SRCLINE(8763)
 int Material_TechniqueTypeForName(const char *name)
 {
-	const char *techniqueNames[59];
+//#ifndef BO1_BUILD
+	return Material_TechniqueTypeForName_WAW(name);
+//#else
+#if 0
+	const char *techniqueNames[130];
 	techniqueNames[0] = "\"depth prepass\"";
 	techniqueNames[1] = "\"build floatz\"";
 	techniqueNames[2] = "\"build shadowmap depth\"";
@@ -2328,78 +2371,152 @@ int Material_TechniqueTypeForName(const char *name)
 	techniqueNames[4] = "\"unlit\"";
 	techniqueNames[5] = "\"emissive\"";
 	techniqueNames[6] = "\"emissive shadow\"";
-	techniqueNames[7] = "\"emissive reflected\"";
-	techniqueNames[8] = "\"lit\"";
-	techniqueNames[9] = "\"lit fade\"";
-	techniqueNames[10] = "\"lit sun\"";
-	techniqueNames[11] = "\"lit sun fade\"";
+	techniqueNames[7] = "\"emissive nvintz\"";
+	techniqueNames[8] = "\"emissive shadow nvintz\"";
+	techniqueNames[9] = "\"emissive reflected\"";
+	techniqueNames[10] = "\"lit\"";
+	techniqueNames[11] = "\"lit sun\"";
 	techniqueNames[12] = "\"lit sun shadow\"";
-	techniqueNames[13] = "\"lit sun shadow fade\"";
-	techniqueNames[14] = "\"lit spot\"";
-	techniqueNames[15] = "\"lit spot fade\"";
-	techniqueNames[16] = "\"lit spot shadow\"";
-	techniqueNames[17] = "\"lit spot shadow fade\"";
-	techniqueNames[18] = "\"lit omni\"";
-	techniqueNames[19] = "\"lit omni fade\"";
-	techniqueNames[20] = "\"lit omni shadow\"";
-	techniqueNames[21] = "\"lit omni shadow fade\"";
-	techniqueNames[22] = "\"lit charred\"";
-	techniqueNames[23] = "\"lit fade charred\"";
-	techniqueNames[24] = "\"lit sun charred\"";
-	techniqueNames[25] = "\"lit sun fade charred\"";
-	techniqueNames[26] = "\"lit sun shadow charred\"";
-	techniqueNames[27] = "\"lit sun shadow fade charred\"";
-	techniqueNames[28] = "\"lit spot charred\"";
-	techniqueNames[29] = "\"lit spot fade charred\"";
-	techniqueNames[30] = "\"lit spot shadow charred\"";
-	techniqueNames[31] = "\"lit spot shadow fade charred\"";
-	techniqueNames[32] = "\"lit omni charred\"";
-	techniqueNames[33] = "\"lit omni fade charred\"";
-	techniqueNames[34] = "\"lit omni shadow charred\"";
-	techniqueNames[35] = "\"lit omni shadow fade charred\"";
-	techniqueNames[36] = "\"lit instanced\"";
-	techniqueNames[37] = "\"lit instanced sun\"";
-	techniqueNames[38] = "\"lit instanced sun shadow\"";
-	techniqueNames[39] = "\"lit instanced spot\"";
-	techniqueNames[40] = "\"lit instanced spot shadow\"";
-	techniqueNames[41] = "\"lit instanced omni\"";
-	techniqueNames[42] = "\"lit instanced omni shadow\"";
-	techniqueNames[43] = "\"light spot\"";
-	techniqueNames[44] = "\"light omni\"";
-	techniqueNames[45] = "\"light spot shadow\"";
-	techniqueNames[46] = "\"light spot charred\"";
-	techniqueNames[47] = "\"light omni charred\"";
-	techniqueNames[48] = "\"light spot shadow charred\"";
-	techniqueNames[49] = "\"fakelight normal\"";
-	techniqueNames[50] = "\"fakelight view\"";
-	techniqueNames[51] = "\"sunlight preview\"";
-	techniqueNames[52] = "\"case texture\"";
-	techniqueNames[53] = "\"solid wireframe\"";
-	techniqueNames[54] = "\"shaded wireframe\"";
-	techniqueNames[55] = "\"shadowcookie caster\"";
-	techniqueNames[56] = "\"shadowcookie receiver\"";
-	techniqueNames[57] = "\"debug bumpmap\"";
-	techniqueNames[58] = "\"debug bumpmap instanced\"";
+	techniqueNames[13] = "\"lit spot\"";
+	techniqueNames[14] = "\"lit spot shadow\"";
+	techniqueNames[15] = "\"lit omni\"";
+	techniqueNames[16] = "\"lit omni shadow\"";
+	techniqueNames[17] = "\"lit dlight\"";
+	techniqueNames[18] = "\"lit sun dlight\"";
+	techniqueNames[19] = "\"lit sun shadow dlight\"";
+	techniqueNames[20] = "\"lit spot dlight\"";
+	techniqueNames[21] = "\"lit spot shadow dlight\"";
+	techniqueNames[22] = "\"lit omni dlight\"";
+	techniqueNames[23] = "\"lit omni shadow dlight\"";
+	techniqueNames[24] = "\"lit glight\"";
+	techniqueNames[25] = "\"lit sun glight\"";
+	techniqueNames[26] = "\"lit sun shadow glight\"";
+	techniqueNames[27] = "\"lit spot glight\"";
+	techniqueNames[28] = "\"lit spot shadow glight\"";
+	techniqueNames[29] = "\"lit omni glight\"";
+	techniqueNames[30] = "\"lit omni shadow glight\"";
+	techniqueNames[31] = "\"lit dlight glight\"";
+	techniqueNames[32] = "\"lit sun dlight glight\"";
+	techniqueNames[33] = "\"lit sun shadow dlight glight\"";
+	techniqueNames[34] = "\"lit spot dlight glight\"";
+	techniqueNames[35] = "\"lit spot shadow dlight glight\"";
+	techniqueNames[36] = "\"lit omni dlight glight\"";
+	techniqueNames[37] = "\"lit omni shadow dlight glight\"";
+	techniqueNames[38] = "\"lit alpha\"";
+	techniqueNames[39] = "\"lit sun alpha\"";
+	techniqueNames[40] = "\"lit sun shadow alpha\"";
+	techniqueNames[41] = "\"lit spot alpha\"";
+	techniqueNames[42] = "\"lit spot shadow alpha\"";
+	techniqueNames[43] = "\"lit omni alpha\"";
+	techniqueNames[44] = "\"lit omni shadow alpha\"";
+	techniqueNames[45] = "\"lit remap\"";
+	techniqueNames[46] = "\"lit sun remap\"";
+	techniqueNames[47] = "\"lit sun shadow remap\"";
+	techniqueNames[48] = "\"lit spot remap\"";
+	techniqueNames[49] = "\"lit spot shadow remap\"";
+	techniqueNames[50] = "\"lit omni remap\"";
+	techniqueNames[51] = "\"lit omni shadow remap\"";
+	techniqueNames[52] = "\"lit fade\"";
+	techniqueNames[53] = "\"lit sun fade\"";
+	techniqueNames[54] = "\"lit sun shadow fade\"";
+	techniqueNames[55] = "\"lit spot fade\"";
+	techniqueNames[56] = "\"lit spot shadow fade\"";
+	techniqueNames[57] = "\"lit omni fade\"";
+	techniqueNames[58] = "\"lit omni shadow fade\"";
+	techniqueNames[59] = "\"lit charred\"";
+	techniqueNames[60] = "\"lit fade charred\"";
+	techniqueNames[61] = "\"lit sun charred\"";
+	techniqueNames[62] = "\"lit sun fade charred\"";
+	techniqueNames[63] = "\"lit sun shadow charred\"";
+	techniqueNames[64] = "\"lit sun shadow fade charred\"";
+	techniqueNames[65] = "\"lit spot charred\"";
+	techniqueNames[66] = "\"lit spot fade charred\"";
+	techniqueNames[67] = "\"lit spot shadow charred\"";
+	techniqueNames[68] = "\"lit spot shadow fade charred\"";
+	techniqueNames[69] = "\"lit omni charred\"";
+	techniqueNames[70] = "\"lit omni fade charred\"";
+	techniqueNames[71] = "\"lit omni shadow charred\"";
+	techniqueNames[72] = "\"lit omni shadow fade charred\"";
+	techniqueNames[73] = "\"lit instanced\"";
+	techniqueNames[74] = "\"lit instanced sun\"";
+	techniqueNames[75] = "\"lit instanced sun shadow\"";
+	techniqueNames[76] = "\"lit instanced spot\"";
+	techniqueNames[77] = "\"lit instanced spot shadow\"";
+	techniqueNames[78] = "\"lit instanced omni\"";
+	techniqueNames[79] = "\"lit instanced omni shadow\"";
+	techniqueNames[80] = "\"lit nvintz\"";
+	techniqueNames[81] = "\"lit sun nvintz\"";
+	techniqueNames[82] = "\"lit sun shadow nvintz\"";
+	techniqueNames[83] = "\"lit spot nvintz\"";
+	techniqueNames[84] = "\"lit spot shadow nvintz\"";
+	techniqueNames[85] = "\"lit omni nvintz\"";
+	techniqueNames[86] = "\"lit omni shadow nvintz\"";
+	techniqueNames[87] = "\"lit dlight nvintz\"";
+	techniqueNames[88] = "\"lit sun dlight nvintz\"";
+	techniqueNames[89] = "\"lit sun shadow dlight nvintz\"";
+	techniqueNames[90] = "\"lit spot dlight nvintz\"";
+	techniqueNames[91] = "\"lit spot shadow dlight nvintz\"";
+	techniqueNames[92] = "\"lit omni dlight nvintz\"";
+	techniqueNames[93] = "\"lit omni shadow dlight nvintz\"";
+	techniqueNames[94] = "\"lit glight nvintz\"";
+	techniqueNames[95] = "\"lit sun glight nvintz\"";
+	techniqueNames[96] = "\"lit sun shadow glight nvintz\"";
+	techniqueNames[97] = "\"lit spot glight nvintz\"";
+	techniqueNames[98] = "\"lit spot shadow glight nvintz\"";
+	techniqueNames[99] = "\"lit omni glight nvintz\"";
+	techniqueNames[100] = "\"lit omni shadow glight nvintz\"";
+	techniqueNames[101] = "\"lit dlight glight nvintz\"";
+	techniqueNames[102] = "\"lit sun dlight glight nvintz\"";
+	techniqueNames[103] = "\"lit sun shadow dlight glight nvintz\"";
+	techniqueNames[104] = "\"lit spot dlight glight nvintz\"";
+	techniqueNames[105] = "\"lit spot shadow dlight glight nvintz\"";
+	techniqueNames[106] = "\"lit omni dlight glight nvintz\"";
+	techniqueNames[107] = "\"lit omni shadow dlight glight nvintz\"";
+	techniqueNames[108] = "\"lit instanced nvintz\"";
+	techniqueNames[109] = "\"lit instanced sun nvintz\"";
+	techniqueNames[110] = "\"lit instanced sun shadow nvintz\"";
+	techniqueNames[111] = "\"lit instanced spot nvintz\"";
+	techniqueNames[112] = "\"lit instanced spot shadow nvintz\"";
+	techniqueNames[113] = "\"lit instanced omni nvintz\"";
+	techniqueNames[114] = "\"lit instanced omni shadow nvintz\"";
+	techniqueNames[115] = "\"light spot\"";
+	techniqueNames[116] = "\"light omni\"";
+	techniqueNames[117] = "\"light spot shadow\"";
+	techniqueNames[118] = "\"light spot charred\"";
+	techniqueNames[119] = "\"light omni charred\"";
+	techniqueNames[120] = "\"light spot shadow charred\"";
+	techniqueNames[121] = "\"fakelight normal\"";
+	techniqueNames[122] = "\"fakelight view\"";
+	techniqueNames[123] = "\"sunlight preview\"";
+	techniqueNames[124] = "\"case texture\"";
+	techniqueNames[125] = "\"solid wireframe\"";
+	techniqueNames[126] = "\"shaded wireframe\"";
+	techniqueNames[127] = "\"debug bumpmap\"";
+	techniqueNames[128] = "\"debug bumpmap instanced\"";
+	techniqueNames[129] = "\"impact mask\"";
 
-	for (int techniqueIndex = 0; techniqueIndex < 59; techniqueIndex++)
+	for (unsigned int techniqueIndex = 0; techniqueIndex < 130; ++techniqueIndex)
 	{
 		if (!strcmp(name, techniqueNames[techniqueIndex]))
 			return techniqueIndex;
 	}
 
-	return 59;
+	return 130;
+#endif
 }
 
 SRCLINE(9023)
 void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 {
-	char techType[130];
-
 	//
 	// Create a file path using normal techsets and read data
 	//
 	char filename[MAX_PATH];
+#if WAW_PIMP
 	Com_sprintf(filename, MAX_PATH, "waw_pimp/techsets/%s.techset", name);
+#else
+	Com_sprintf(filename, MAX_PATH, "techsets/%s.techset", name);
+#endif
 
 	void *fileData;
 	int fileSize = FS_ReadFile(filename, (void **)&fileData);
@@ -2432,32 +2549,30 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 	//
 	// Allocate the techset structure
 	//
-	const char *textData	= (const char *)fileData;
-	size_t nameSize			= strlen(name) + 1;
-	char *techniqueSet		= (char *)Z_Malloc(nameSize + 248);
+	const char *textData = (const char *)fileData;
+	size_t nameSize = strlen(name) + 1;
+	char *techniqueSet = (char *)Z_Malloc(nameSize + 249);
 
-	*(char **)(techniqueSet + 0)	= techniqueSet + 248;
-	*(BYTE *)(techniqueSet + 4)		= 0;
-	*(char **)(techniqueSet + 8)	= techniqueSet;
+	*(char **)(techniqueSet + 0) = techniqueSet + 248;
+	*(BYTE *)(techniqueSet + 4) = 0;
+	*(char **)(techniqueSet + 8) = techniqueSet;
 
 	memcpy(techniqueSet + 248, name, nameSize);
 
 	//
-	// TODO: What does this function actually do?
-	//
-	((void(__cdecl *)())0x005525D0)();
-
-	//
 	// Begin the text parsing session
 	//
+	// TODO: What does this function actually do?
+	((void(__cdecl *)())0x005525D0)();
 	Com_BeginParseSession(filename);
 	Com_SetScriptWarningPrefix("^1ERROR: ");
 	Com_SetSpaceDelimited(0);
 	Com_SetKeepStringQuotes(1);
 
+	char techType[TECH_TYPE_COUNT];
 	int techTypeCount	= 0;
 	bool usingTechnique = false;
-	while (1)
+	while (true)
 	{
 		const char *token = Com_Parse(&textData);
 
@@ -2466,7 +2581,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 
 		if (*token == '"')
 		{
-			if (techTypeCount == 59)
+			if (techTypeCount == TECH_TYPE_COUNT)
 			{
 				Com_ScriptError("Too many labels in technique set\n");
 				techniqueSet = 0;
@@ -2477,7 +2592,7 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 			{
 				techType[techTypeCount] = Material_TechniqueTypeForName(token);
 
-				if (techType[techTypeCount] == 59)
+				if (techType[techTypeCount] == TECH_TYPE_COUNT)
 				{
 					Com_ScriptError("Unknown technique type '%s'\n", token);
 					techniqueSet = 0;
@@ -2519,8 +2634,8 @@ void *__cdecl Material_LoadTechniqueSet(const char *name, int renderer)
 					*(DWORD *)&techniqueSet[4 * techType[techTypeIndex] + 12] = (DWORD)technique;
 			}
 
-			techTypeCount	= 0;
-			usingTechnique	= false;
+			techTypeCount = 0;
+			usingTechnique = false;
 			if (!Material_MatchToken(&textData, ";"))
 			{
 				techniqueSet = 0;
@@ -2545,6 +2660,26 @@ void __declspec(naked) hk_Material_LoadShader()
 		push [ebp + 0x8]
 		call Material_LoadShader
 		add esp, 0x8
+
+		pop ebp
+		retn
+	}
+}
+
+void __declspec(naked) hk_Material_LoadPass()
+{
+	__asm
+	{
+		push ebp
+		mov ebp, esp
+
+		push [ebp + 0xC]	// a5: rendererInUse
+		push [ebp + 0x14]	// a4: stateMap
+		push [ebp + 0x10]	// a3: pass
+		push ecx			// a2: techFlags
+		push [ebp + 0x8]	// a1: text
+		call Material_LoadPass
+		add esp, 0x14
 
 		pop ebp
 		retn
@@ -2872,6 +3007,7 @@ const bool g_useTechnique[130] =
 	1, 0, 0, 0, 0, 1, 0, 1, 1, 1,
 };
 
+#if USE_BO1_CODE_SAMPLERS
 CodeSamplerSource s_lightmapSamplers[] =
 {
 	{ "primary", 4, 0, 0, 0 },
@@ -2909,6 +3045,9 @@ CodeSamplerSource s_codeSamplers[] =
 	{ "floatZ", 19, 0, 0, 0 },
 	{ "processedFloatZ", 20, 0, 0, 0 },
 	{ "rawFloatZ", 21, 0, 0, 0 },
+
+	{ "caseTexture", 22, 0, 0, 0 }, // from linker_pc
+
 	{ "codeTexture0", 34, 0, 0, 0 },
 	{ "codeTexture1", 35, 0, 0, 0 },
 	{ "codeTexture2", 36, 0, 0, 0 },
@@ -2952,7 +3091,97 @@ CodeSamplerSource s_defaultCodeSamplers[] =
 
 	{ nullptr, 0, 0, 0, 0 },
 };
+#else
+CodeSamplerSource s_lightmapSamplers[] =
+{
+	{ "primary", 4, 0, 0, 0 },
+	{ "secondary", 5, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
 
+CodeSamplerSource s_lightSamplers[] =
+{
+	{ "attenuation", 17, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeSamplerSource s_codeSamplers[] =
+{
+	{ "white", 1, 0, 0, 0 },
+	{ "black", 0, 0, 0, 0 },
+	{ "identityNormalMap", 2, 0, 0, 0 },
+	{ "lightmap", 4, s_lightmapSamplers, 0, 0 },
+	{ "outdoor", 19, 0, 0, 0 },
+	{ "shadowmapSun", 7, 0, 0, 0 },
+	{ "shadowmapSpot", 8, 0, 0, 0 },
+	{ "shadowCookie", 6, 0, 0, 0 },
+	{ "dynamicShadow", 18, 0, 0, 0 },
+	{ "feedback", 9, 0, 0, 0 },
+	{ "resolvedPostSun", 10, 0, 0, 0 },
+	{ "resolvedScene", 11, 0, 0, 0 },
+	{ "postEffectSrc", 12, 0, 0, 0 },
+	{ "postEffectGodRays", 13, 0, 0, 0 },
+	{ "postEffect0", 14, 0, 0, 0 },
+	{ "postEffect1", 15, 0, 0, 0 },
+	{ "sky", 16, 0, 0, 0 },
+	{ "light", 17, s_lightSamplers, 0, 0 },
+	{ "floatZ", 20, 0, 0, 0 },
+	{ "processedFloatZ", 21, 0, 0, 0 },
+	{ "rawFloatZ", 22, 0, 0, 0 },
+	{ "halfParticleColorSampler", 23, 0, 0, 0 },
+	{ "halfParticleDepthSampler", 24, 0, 0, 0 },
+	{ "caseTexture", 25, 0, 0, 0 },
+
+	//
+	// Remapped from BO1
+	//
+	{ "ui3d", 25, 0, 0, 0 },
+	{ "missileCam", 25, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeSamplerSource s_defaultCodeSamplers[] =
+{
+	{ "shadowmapSamplerSun", 7, 0, 0, 0 },
+	{ "shadowmapSamplerSpot", 8, 0, 0, 0 },
+	{ "shadowCookieSampler", 6, 0, 0, 0 },
+	{ "feedbackSampler", 9, 0, 0, 0 },
+	{ "dynamicShadowSampler", 18, 0, 0, 0 },
+	{ "floatZSampler", 20, 0, 0, 0 },
+	{ "processedFloatZSampler", 21, 0, 0, 0 },
+	{ "rawFloatZSampler", 22, 0, 0, 0 },
+	{ "halfParticleColorSampler", 23, 0, 0, 0 },
+	{ "halfParticleDepthSampler", 24, 0, 0, 0 },
+	{ "attenuationSampler", 17, 0, 0, 0 },
+	{ "lightmapSamplerPrimary", 4, 0, 0, 0 },
+	{ "lightmapSamplerSecondary", 5, 0, 0, 0 },
+	{ "modelLightingSampler", 3, 0, 0, 0 },
+	{ "cinematicYSampler", 26, 0, 0, 0 },
+	{ "cinematicCrSampler", 27, 0, 0, 0 },
+	{ "cinematicCbSampler", 28, 0, 0, 0 },
+	{ "cinematicASampler", 29, 0, 0, 0 },
+	{ "reflectionProbeSampler", 30, 0, 0, 0 },
+	{ "terrainScorchTextureSampler0", 31, 0, 0, 0 },
+	{ "terrainScorchTextureSampler1", 32, 0, 0, 0 },
+	{ "terrainScorchTextureSampler2", 33, 0, 0, 0 },
+	{ "terrainScorchTextureSampler3", 34, 0, 0, 0 },
+	{ "terrainScorchTextureSampler4", 35, 0, 0, 0 },
+
+	//
+	// Remapped from BO1
+	// 
+	{ "lightmapSamplerSecondaryB", 5, 0, 0, 0 },
+	{ "dlightAttenuationSampler", 17, 0, 0, 0 },
+
+	{ "ui3dSampler", 26, 0, 0, 0 },
+	{ "missileCamSampler", 27, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
+};
+#endif
+
+#if USE_BO1_CODE_CONSTS
 CodeConstantSource s_nearPlaneConsts[] =
 {
 	{ "org", 16, 0, 0, 0 },
@@ -3215,6 +3444,257 @@ CodeConstantSource s_defaultCodeConsts[] =
 
 	{ nullptr, 0, 0, 0, 0 },
 };
+#else
+CodeConstantSource s_nearPlaneConsts[] =
+{
+	{ "org", 5, 0, 0, 0 },
+	{ "dx", 6, 0, 0, 0 },
+	{ "dy", 7, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeConstantSource s_sunConsts[] =
+{
+	{ "position", 36, 0, 0, 0 },
+	{ "diffuse", 37, 0, 0, 0 },
+	{ "specular", 38, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeConstantSource s_lightConsts[] =
+{
+	{ "position", 0, 0, 0, 0 },
+	{ "diffuse", 1, 0, 0, 0 },
+	{ "specular", 2, 0, 0, 0 },
+	{ "spotDir", 3, 0, 0, 0 },
+	{ "spotFactors", 4, 0, 0, 0 },
+	{ "falloffPlacement", 11, 0, 0, 0 },
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeConstantSource s_codeConsts[] =
+{
+	{ "nearPlane", 142, s_nearPlaneConsts, 0, 0 },
+	{ "sun", 142, s_sunConsts, 0, 0 },
+	{ "light", 142, s_lightConsts, 0, 0 },
+	{ "baseLightingCoords", 59, 0, 0, 0 },
+	{ "lightingLookupScale", 39, 0, 0, 0 },
+	{ "debugBumpmap", 40, 0, 0, 0 },
+	{ "pixelCostFracs", 20, 0, 0, 0 },
+	{ "pixelCostDecode", 21, 0, 0, 0 },
+	{ "materialColor", 41, 0, 0, 0 },
+	{ "fogConsts", 42, 0, 0, 0 },
+	{ "fogColor", 43, 0, 0, 0 },
+	{ "glowSetup", 44, 0, 0, 0 },
+	{ "glowApply", 45, 0, 0, 0 },
+	{ "filterTap", 22, 0, 8, 1 },
+	{ "codeMeshArg", 57, 0, 2, 1 },
+	{ "renderTargetSize", 10, 0, 0, 0 },
+	{ "shadowmapSwitchPartition", 33, 0, 0, 0 },
+	{ "shadowmapScale", 34, 0, 0, 0 },
+	{ "shadowmapPolygonOffset", 9, 0, 0, 0 },
+	{ "shadowParms", 8, 0, 0, 0 },
+	{ "zNear", 35, 0, 0, 0 },
+	{ "clipSpaceLookupScale", 53, 0, 0, 0 },
+	{ "clipSpaceLookupOffset", 54, 0, 0, 0 },
+	{ "dofEquationViewModelAndFarBlur", 12, 0, 0, 0 },
+	{ "dofEquationScene", 13, 0, 0, 0 },
+	{ "dofLerpScale", 14, 0, 0, 0 },
+	{ "dofLerpBias", 15, 0, 0, 0 },
+	{ "dofRowDelta", 16, 0, 0, 0 },
+	{ "depthFromClip", 56, 0, 0, 0 },
+	{ "outdoorFeatherParms", 49, 0, 0, 0 },
+	{ "skyTransition", 50, 0, 0, 0 },
+	{ "envMapParms", 51, 0, 0, 0 },
+	{ "waterParms", 61, 0, 0, 0 },
+
+	//
+	// The actual const values for colorMatrix are overridden to identity values in r_shade.cpp for now
+	//
+	{ "colorMatrixR", 30, 0, 0, 0 },
+	{ "colorMatrixG", 31, 0, 0, 0 },
+	{ "colorMatrixB", 32, 0, 0, 0 },
+
+	{ "colorBias", 46, 0, 0, 0 },
+	{ "colorTintBase", 47, 0, 0, 0 },
+	{ "colorTintDelta", 48, 0, 0, 0 },
+	{ "gameTime", 18, 0, 0, 0 },
+	{ "alphaFade", 19, 0, 0, 0 },
+	{ "destructibleParms", 94, 0, 0, 0 },
+	{ "particleCloudColor", 17, 0, 0, 0 },
+	{ "particleCloudMatrix", 55, 0, 0, 0 },
+	{ "worldMatrix", 105, 0, 0, 0 },
+	{ "inverseWorldMatrix", 106, 0, 0, 0 },
+	{ "transposeWorldMatrix", 107, 0, 0, 0 },
+	{ "inverseTransposeWorldMatrix", 108, 0, 0, 0 },
+	{ "viewMatrix", 109, 0, 0, 0 },
+	{ "inverseViewMatrix", 110, 0, 0, 0 },
+	{ "transposeViewMatrix", 111, 0, 0, 0 },
+	{ "inverseTransposeViewMatrix", 112, 0, 0, 0 },
+	{ "projectionMatrix", 113, 0, 0, 0 },
+	{ "inverseProjectionMatrix", 114, 0, 0, 0 },
+	{ "transposeProjectionMatrix", 115, 0, 0, 0 },
+	{ "inverseTransposeProjectionMatrix", 116, 0, 0, 0 },
+	{ "worldViewMatrix", 117, 0, 0, 0 },
+	{ "inverseWorldViewMatrix", 118, 0, 0, 0 },
+	{ "transposeWorldViewMatrix", 119, 0, 0, 0 },
+	{ "inverseTransposeWorldViewMatrix", 120, 0, 0, 0 },
+	{ "viewProjectionMatrix", 121, 0, 0, 0 },
+	{ "inverseViewProjectionMatrix", 122, 0, 0, 0 },
+	{ "transposeViewProjectionMatrix", 123, 0, 0, 0 },
+	{ "inverseTransposeViewProjectionMatrix", 124, 0, 0, 0 },
+	{ "worldViewProjectionMatrix", 125, 0, 0, 0 },
+	{ "inverseWorldViewProjectionMatrix", 126, 0, 0, 0 },
+	{ "transposeWorldViewProjectionMatrix", 127, 0, 0, 0 },
+	{ "inverseTransposeWorldViewProjectionMatrix", 128, 0, 0, 0 },
+	{ "shadowLookupMatrix", 129, 0, 0, 0 },
+	{ "inverseShadowLookupMatrix", 130, 0, 0, 0 },
+	{ "transposeShadowLookupMatrix", 131, 0, 0, 0 },
+	{ "inverseTransposeShadowLookupMatrix", 132, 0, 0, 0 },
+	{ "worldOutdoorLookupMatrix", 133, 0, 0, 0 },
+	{ "inverseWorldOutdoorLookupMatrix", 134, 0, 0, 0 },
+	{ "transposeWorldOutdoorLookupMatrix", 135, 0, 0, 0 },
+	{ "inverseTransposeWorldOutdoorLookupMatrix", 136, 0, 0, 0 },
+	{ "modelWorldToObjectMatrix", 137, 0, 0, 0 },
+	{ "inverseModelWorldToObjectMatrix", 138, 0, 0, 0 },
+	{ "transposeModelWorldToObjectMatrix", 139, 0, 0, 0 },
+	{ "inverseTransposeModelWorldToObjectMatrix", 140, 0, 0, 0 },
+	{ "windDirection", 60, 0, 0, 0 },
+	{ "variantWindSpring", 78, 0, 16, 1 },
+	{ "grassParms", 62, 0, 0, 0 },
+	{ "grassForce0", 63, 0, 0, 0 },
+	{ "grassForce1", 64, 0, 0, 0 },
+	{ "grassForce0Ex", 65, 0, 0, 0 },
+	{ "grassForce1Ex", 66, 0, 0, 0 },
+	{ "grassWindForce0", 67, 0, 0, 0 },
+	{ "cloudWorldArea", 95, 0, 0, 0 },
+	{ "waterScroll", 96, 0, 0, 0 },
+	{ "motionblurDirectionAndMagnitude", 68, 0, 0, 0 },
+	{ "flameDistortion", 69, 0, 0, 0 },
+	{ "bloomScale", 70, 0, 0, 0 },
+	{ "overlayTexCoord", 71, 0, 0, 0 },
+	{ "colorBias1", 72, 0, 0, 0 },
+	{ "colorTintBase1", 73, 0, 0, 0 },
+	{ "colorTintDelta1", 74, 0, 0, 0 },
+	{ "fadeEffect", 75, 0, 0, 0 },
+	{ "viewportDimensions", 76, 0, 0, 0 },
+	{ "framebufferRead", 77, 0, 0, 0 },
+	{ "crossFadeAlpha", 97, 0, 0, 0 },
+	{ "__characterCharredAmount", 98, 0, 0, 0 },
+	{ "treeCanopyParms", 99, 0, 0, 0 },
+	{ "marksHitNormal", 100, 0, 0, 0 },
+	{ "postFxControl0", 101, 0, 0, 0 },
+	{ "postFxControl1", 102, 0, 0, 0 },
+	{ "cinematicBlurBox", 103, 0, 0, 0 },
+	{ "cinematicBlurBox2", 104, 0, 0, 0 },
+
+	//
+	// Remapped from BO1
+	//
+	{ "u_customWindCenter", 60, 0, 0, 0 },
+	{ "u_customWindSpring", 78, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+CodeConstantSource s_defaultCodeConsts[] =
+{
+	{ "nearPlaneOrg", 5, 0, 0, 0 },
+	{ "nearPlaneDx", 6, 0, 0, 0 },
+	{ "nearPlaneDy", 7, 0, 0, 0 },
+	{ "sunPosition", 36, 0, 0, 0 },
+	{ "sunDiffuse", 37, 0, 0, 0 },
+	{ "sunSpecular", 38, 0, 0, 0 },
+	{ "lightPosition", 0, 0, 0, 0 },
+	{ "lightDiffuse", 1, 0, 0, 0 },
+	{ "lightSpecular", 2, 0, 0, 0 },
+	{ "lightSpotDir", 3, 0, 0, 0 },
+	{ "lightSpotFactors", 161, 0, 0, 0 },
+	{ "lightFalloffPlacement", 11, 0, 0, 0 },
+	{ "spotShadowmapPixelAdjust", 52, 0, 0, 0 },
+
+	//
+	// Remapped from BO1
+	//
+	{ "fogConsts2", 42, 0, 0, 0 },
+	{ "sunFog", 42, 0, 0, 0 },
+	{ "sunFogColor", 42, 0, 0, 0 },
+	{ "sunFogDir", 42, 0, 0, 0 },
+	{ "hdrControl0", 170, 0, 0, 0 },
+	{ "lightAttenuation", 150, 0, 0, 0 },
+	{ "lightConeControl1", 151, 0, 0, 0 },
+	{ "lightConeControl2", 152, 0, 0, 0 },
+	{ "lightFallOffA", 153, 0, 0, 0 },
+	{ "lightFallOffB", 154, 0, 0, 0 },
+	{ "lightSpotAABB", 155, 0, 0, 0 },
+	{ "lightSpotCookieSlideControl", 156, 0, 0, 0 },
+	{ "lightSpotMatrix0", 157, 0, 0, 0 },
+	{ "lightSpotMatrix1", 158, 0, 0, 0 },
+	{ "lightSpotMatrix2", 159, 0, 0, 0 },
+	{ "lightSpotMatrix3", 160, 0, 0, 0 },
+
+	{ "dlightAttenuation", 42, 0, 0, 0 },
+	{ "dlightAttenuationSampler", 42, 0, 0, 0 },
+	{ "dlightDiffuse", 42, 0, 0, 0 },
+	{ "dlightFallOff", 42, 0, 0, 0 },
+	{ "dlightPosition", 42, 0, 0, 0 },
+	{ "dlightShadowLookupMatrix0", 42, 0, 0, 0 },
+	{ "dlightShadowLookupMatrix1", 42, 0, 0, 0 },
+	{ "dlightShadowLookupMatrix2", 42, 0, 0, 0 },
+	{ "dlightShadowLookupMatrix3", 42, 0, 0, 0 },
+	{ "dlightSpecular", 42, 0, 0, 0 },
+	{ "dlightSpotDir", 42, 0, 0, 0 },
+	{ "dlightSpotFactors", 42, 0, 0, 0 },
+	{ "dlightSpotMatrix0", 42, 0, 0, 0 },
+	{ "dlightSpotMatrix1", 42, 0, 0, 0 },
+	{ "dlightSpotMatrix2", 42, 0, 0, 0 },
+	{ "dlightSpotMatrix3", 42, 0, 0, 0 },
+	{ "dlightSpotShadowmapPixelAdjust", 42, 0, 0, 0 },
+
+	{ "glightReds", 42, 0, 0, 0 },
+	{ "glightBlues", 42, 0, 0, 0 },
+	{ "glightFallOffs", 42, 0, 0, 0 },
+	{ "glightGreens", 42, 0, 0, 0 },
+	{ "glightPosXs", 42, 0, 0, 0 },
+	{ "glightPosYs", 42, 0, 0, 0 },
+	{ "glightPosZs", 42, 0, 0, 0 },
+
+	{ "heroLightingR", 42, 0, 0, 0 },
+	{ "heroLightingG", 42, 0, 0, 0 },
+	{ "heroLightingB", 42, 0, 0, 0 },
+	{ "lightHeroScale", 42, 0, 0, 0 },
+
+	{ "postFxControl2", 42, 0, 0, 0 },
+	{ "postFxControl3", 42, 0, 0, 0 },
+	{ "postFxControl4", 42, 0, 0, 0 },
+	{ "postFxControl5", 42, 0, 0, 0 },
+	{ "postFxControl6", 42, 0, 0, 0 },
+	{ "postFxControl7", 42, 0, 0, 0 },
+	{ "postFxControl8", 42, 0, 0, 0 },
+	{ "postFxControl9", 42, 0, 0, 0 },
+	{ "postFxControlA", 42, 0, 0, 0 },
+
+	{ "scriptVector0", 42, 0, 0, 0 },
+	{ "scriptVector1", 42, 0, 0, 0 },
+	{ "scriptVector2", 42, 0, 0, 0 },
+	{ "scriptVector3", 42, 0, 0, 0 },
+	{ "scriptVector4", 42, 0, 0, 0 },
+	{ "scriptVector5", 42, 0, 0, 0 },
+	{ "scriptVector6", 42, 0, 0, 0 },
+	{ "scriptVector7", 42, 0, 0, 0 },
+	{ "skyColorMultiplier", 171, 0, 0, 0 },
+
+	{ "ui3dUVSetup0", 42, 0, 0, 0 },
+	{ "ui3dUVSetup1", 42, 0, 0, 0 },
+	{ "ui3dUVSetup2", 42, 0, 0, 0 },
+	{ "ui3dUVSetup3", 42, 0, 0, 0 },
+	{ "ui3dUVSetup4", 42, 0, 0, 0 },
+	{ "ui3dUVSetup5", 42, 0, 0, 0 },
+
+	{ nullptr, 0, 0, 0, 0 },
+};
+
+#endif
 
 size_t g_MaterialFileSize = 0;
 void* rtn_MaterialLoad = (void*)0x00532AAE;
@@ -3246,29 +3726,7 @@ DWORD MapPointerToOffset(void* origin, void* offset)
 	return (DWORD)((char*)offset - (char*)origin);
 }
 
-struct blacklistEntry
-{
-	const char* key;
-	const char* replacement;
-};
-
-blacklistEntry blacklist[] =
-{
-	// Techset Key						//  Techset Replacement
-	{ "l_sm_r0c0n0s0x0",					"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0_wpn_clrdtl_hero",		"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0sc0x0_clrdtl",			"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0_wpn_clrdtl",			"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0sc0x0_clrdtl",			"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0d0n0s0_wpn_clrdtl_hero",	"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0sc0x0",					"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0s0sc0x0",					"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0n0s0_hero",					"l_sm_r0c0n0s0" },
-	{ "l_sm_b0c0n0_hero",					"l_sm_b0c0"		}, //Fix for Zombie_Wolf Fur
-	{ "l_sm_r0c0n0s0sc0x0_clrdtl_hero",		"l_sm_r0c0n0s0" },
-	{ "l_sm_r0c0d0n0s0sc0x0_clrdtl_hero",	"l_sm_r0c0n0s0" },
-	{ "sm_treecanopy_sway",					"l_sm_b0c0"		}, //Fix for Foliage (Currently has a blue tint)
-};
+std::vector<techsetOverride> techsetOverrideList;
 
 Material_LoadRaw_t* o_Material_LoadRaw = (Material_LoadRaw_t *)0x005325F0;
 int Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType, int imageTrack)
@@ -3277,11 +3735,12 @@ int Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType, int imageTr
 		return o_Material_LoadRaw(mtlRaw, materialType, imageTrack);
 
 	const char* techsetOverride = nullptr;
-	for (int i = 0; i < ARRAYSIZE(blacklist); i++)
+	for (unsigned int i = 0; i < techsetOverrideList.size(); i++)
 	{
-		if (strcmp((char*)MapOffsetToPointer(mtlRaw, mtlRaw->techSetNameOffset), blacklist[i].key) == 0)
+		if (strcmp((char*)MapOffsetToPointer(mtlRaw, mtlRaw->techSetNameOffset), techsetOverrideList[i].key.c_str()) == 0)
 		{
-			techsetOverride = blacklist[i].replacement;
+			_VERBOSE(printf("overriding technique %s\a\n", techsetOverrideList[i].replacement.c_str()));
+			techsetOverride = techsetOverrideList[i].replacement.c_str();
 			break;
 		}
 	}

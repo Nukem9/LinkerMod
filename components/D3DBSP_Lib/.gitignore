@@ -1,0 +1,13 @@
+*.sdf
+*.opensdf
+*.suo
+*.vcxproj.user
+*.vcxproj.filters
+/Debug
+/D3DBSP_Converter/Debug
+/D3DBSP_Lib/Debug
+/Release
+/D3DBSP_Converter/Release
+/D3DBSP_Lib/Release
+/ipch
+*.log
