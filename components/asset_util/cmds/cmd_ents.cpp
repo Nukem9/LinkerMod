@@ -1,6 +1,7 @@
 #include "../common/ff.h"
 #include "zlib\zlib.h"
 #include "../common/io.h"
+#include "cmd_common.h"
 
 char* FindEntsString(BYTE* start, BYTE* end)
 {
@@ -64,59 +65,66 @@ char* FindEntsString(BYTE* start, BYTE* end)
 //
 int Cmd_Ents_f(int argc, char** argv)
 {
-	//
-	// Temp arg handler
-	//
-	_ASSERT(argc > 1);
-	char* filepath = argv[1];
-
-	Con_Print("Extracting ents from \"%s\"...\n", filepath);
-
-	FILE* h = nullptr;
-	if (fopen_s(&h, filepath, "r+b") != 0)
+	for (int i = 1; i < argc; i++)
 	{
-		Con_Error("ERROR: Fastfile '%s' could not be found\n\n", filepath);
-		return FALSE;
+		char* filepath = argv[i];
+
+		Con_Print("Extracting ents from \"%s\"...\n", filepath);
+
+		FILE* h = nullptr;
+		if (fopen_s(&h, filepath, "r+b") != 0)
+		{
+			Con_Error("ERROR: Fastfile '%s' could not be found\n\n", filepath);
+			return FALSE;
+		}
+		rewind(h);
+
+		fseek(h, 0, SEEK_END);
+		size_t fileSize = ftell(h);
+
+		// Get Compressed FileSize and Allocate a Storage Buffer for Compressed Data
+		size_t cSize = fileSize - 12;
+		BYTE* cBuf = new BYTE[cSize | 0x8000];
+
+		fseek(h, 12, SEEK_SET);
+		fread(cBuf, 1, cSize, h);
+
+		XFile ffInfo;
+		unsigned long dSize = sizeof(XFile);
+		uncompress((BYTE*)&ffInfo, &dSize, cBuf, 0x8000);
+
+		dSize = ffInfo.size + 36;
+		if (dSize >= 1073741824)
+		{
+			//Any fastfiles that claim they decompress to a file >= 1GB
+			//are either corrupt or do not belong to the vanilla game
+			Con_Error("ERROR: Skipping %s\n", filepath);
+			return 1;
+		}
+
+		BYTE* dBuf = new BYTE[dSize];
+		uncompress(dBuf, &dSize, cBuf, cSize);
+		delete[] cBuf;
+
+		char* result = FindEntsString((BYTE*)dBuf, dBuf + ffInfo.size + 36);
+		if (result == NULL)
+		{
+			Con_Error("Error: Could not find entity string\n");
+		}
+		else
+		{
+			Con_Print("%s\n", result);
+		}
+
+		delete[] dBuf;
 	}
-	rewind(h);
 
-	fseek(h, 0, SEEK_END);
-	size_t fileSize = ftell(h);
-
-	// Get Compressed FileSize and Allocate a Storage Buffer for Compressed Data
-	size_t cSize = fileSize - 12;
-	BYTE* cBuf = new BYTE[cSize | 0x8000];
-
-	fseek(h, 12, SEEK_SET);
-	fread(cBuf, 1, cSize, h);
-
-	XFile ffInfo;
-	unsigned long dSize = sizeof(XFile);
-	uncompress((BYTE*)&ffInfo, &dSize, cBuf, 0x8000);
-
-	dSize = ffInfo.size + 36;
-	if (dSize >= 1073741824)
+	if (argc < 2)
 	{
-		//Any fastfiles that claim they decompress to a file >= 1GB
-		//are either corrupt or do not belong to the vanilla game
-		Con_Error("ERROR: Skipping %s\n", filepath);
-		return 1;
+		char* _argv[] = { NULL, "ents" };
+		Cmd_Help_f(ARRAYSIZE(_argv), _argv);
+		return -1;
 	}
 
-	BYTE* dBuf = new BYTE[dSize];
-	uncompress(dBuf, &dSize, cBuf, cSize);
-	delete[] cBuf;
-
-	char* result = FindEntsString((BYTE*)dBuf, dBuf + ffInfo.size + 36);
-	if (result == NULL)
-	{
-		Con_Error("Error: Could not find entity string\n");
-	}
-	else
-	{
-		Con_Print("%s\n", result);
-	}
-
-	delete[] dBuf;
 	return 0;
 }
