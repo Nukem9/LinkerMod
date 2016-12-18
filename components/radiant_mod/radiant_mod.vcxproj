@@ -95,6 +95,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="afx.cpp" />
+    <ClCompile Include="afx_resource.cpp" />
     <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
@@ -123,6 +124,7 @@
   <ItemGroup>
     <ClInclude Include="afx.h" />
     <ClInclude Include="afx_colors.h" />
+    <ClInclude Include="afx_resource.h" />
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
