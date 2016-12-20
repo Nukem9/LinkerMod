@@ -87,13 +87,13 @@ void __declspec(naked) mfh_R_StoreLightmapPixel()
 }
 #else
 
-void __cdecl GetInitialLightingHighlightDir(float* lighting, float* highlightDir)
+void __cdecl GetInitialLightingHighlightDir(float* highlightDir, float* lighting)
 {
 	_asm
 	{
 		pushad
-		push highlightDir
-		mov eax, lighting
+		push lighting
+		mov eax, highlightDir
 		mov ebx, 0x00431980
 		call ebx
 		add esp, 4
@@ -101,15 +101,15 @@ void __cdecl GetInitialLightingHighlightDir(float* lighting, float* highlightDir
 	}
 }
 
-void __cdecl GetColorsForHighlightDir(float* lighting, float* highlightDir, float* pel1, float* pel2)
+void __cdecl GetColorsForHighlightDir(float* highlightDir, float* lighting, float* pel1, float* pel2)
 {
 	_asm
 	{
 		pushad
 		push pel2
 		push pel1
-		mov ecx, highlightDir
-		mov eax, lighting
+		mov ecx, lighting
+		mov eax, highlightDir
 		mov ebx, 0x00430EF0
 		call ebx
 		add esp, 8
@@ -117,15 +117,15 @@ void __cdecl GetColorsForHighlightDir(float* lighting, float* highlightDir, floa
 	}
 }
 
-void __cdecl ImproveLightingApproximation(float* lighting, float* highlightDir, float* pel1, float* pel2)
+void __cdecl ImproveLightingApproximation(float* highlightDir, float* lighting, float* pel1, float* pel2)
 {
 	_asm
 	{
 		pushad
 		push pel2
 		push pel1
-		push highlightDir
-		mov edi, lighting
+		push lighting
+		mov edi, highlightDir
 		mov ebx, 0x004323E0
 		call ebx
 		add esp, 12
@@ -148,20 +148,17 @@ void __declspec(naked) hk_StoreLightBytes()
 	}
 }
 
-//
-// 'lighting' and 'highlightDir' might be mixed up atm (the names themselves) - but it appears to work correctly
-//
-void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, float* highlightDir, float* pFloats)
+void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, float* lighting, float* pFloats)
 {
 	int subOffset = 0x600 * lmapSet + lmapRow;
 
-	float lighting[3];
-	GetInitialLightingHighlightDir(lighting, highlightDir);
+	float highlightDir[3];
+	GetInitialLightingHighlightDir(highlightDir, lighting);
 
 	float pel1[4];
 	float pel2[4];
-	GetColorsForHighlightDir(lighting, highlightDir, pel1, pel2);
-	ImproveLightingApproximation(lighting, highlightDir, pel1, pel2);
+	GetColorsForHighlightDir(highlightDir, lighting, pel1, pel2);
+	ImproveLightingApproximation(highlightDir, lighting, pel1, pel2);
 
 	BYTE* lightBytes = (BYTE*)0x00471590;
 	WAW_LMAP_PEL* pel = (WAW_LMAP_PEL*)&lightBytes[4 * (pixelIndex + (subOffset << 9))];
@@ -194,7 +191,6 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, float* hi
 	}
 
 	BYTE* lightBytes_PrimaryImage = (BYTE*)0x00671590;
-
 	BYTE* sm_pel = &lightBytes_PrimaryImage[2 * (pixelIndex + (subOffset << 10))];
 	for (int i = 2; i != 0; i--)
 	{
