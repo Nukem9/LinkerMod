@@ -35,13 +35,8 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
-bool g_Initted = false;
-
 BOOL RadiantMod_Init()
 {
-	if (g_Initted)
-		return FALSE;
-
 	//
 	// Disable STDOUT buffering
 	//
@@ -67,7 +62,34 @@ BOOL RadiantMod_Init()
 #endif
 
 	//
-	// Hook any needed functions
+	// Redirect all resource (resx) loading to this dll first
+	//
+	void *ptr = hk_LoadResource;
+	PatchMemory(0x006414F0, (PBYTE)&ptr, 4);
+
+	ptr = hk_SizeofResource;
+	PatchMemory(0x006414F8, (PBYTE)&ptr, 4);
+
+	ptr = hk_FindResourceA;
+	PatchMemory(0x006414EC, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadMenuA;
+	PatchMemory(0x0064183C, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadCursorA;
+	PatchMemory(0x006418B4, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadAcceleratorsA;
+	PatchMemory(0x00641678, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadIconA;
+	PatchMemory(0x0064180C, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadBitmapA;
+	PatchMemory(0x00641828, (PBYTE)&ptr, 4);
+
+	//
+	// Enable com_printf again
 	//
 	FixupFunction(0x004683F0, (ULONG_PTR)&hk_Com_Printf);
 
@@ -119,16 +141,12 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0053519E, (PBYTE)&mfh_XModelReadSurface); // 4 byte xmodelsurfs file adjustment (MagicNumber)
 
 	//
-	// FixRegistryEntries to prevent collision with CoDWAWRadiant
+	// Re-brand CoDWAWRadiant to CoDBORadiant
 	//
 	strcpy_safe((char *)0x006F8688, "Software\\iw\\CoDBORadiantModTool\\CoDBORadiantModTool");
 	strcpy_safe((char *)0x006F0CD0, "Software\\iw\\CoDBORadiantModTool\\IniPrefs");
 	strcpy_safe((char *)0x006EC300, "Software\\iw\\CoDBORadiantModTool\\MRU");
 	strcpy_safe((char *)0x006F0D08, "iw\\CoDBORadiantModTool");
-
-	//
-	// More BO Radiant re-branding of names
-	//
 	strcpy_safe((char *)0x006F7984, "CoDBORadiantModTool");
 	strcpy_safe((char *)0x006ECA30, "You will need to restart CoDBORadiantModTool for the view changes to take place.");
 	strcpy_safe((char *)0x006EC5CC, "CoDBORadiantModTool Project files( *.prj )|*.prj||");
@@ -260,10 +278,8 @@ BOOL RadiantMod_Init()
 	PatchMemory(0x0042F882, (PBYTE)&ppfn, 4); // Main Window
 	//PatchMemory(0x004B36DF, (PBYTE)&ppfn, 4); // Entity Window (Doesn't work)
 	//PatchMemory(0x004018B0, (PBYTE)&ppfn, 4); // Advanced Curve Dialog (Doesn''t work)
-
 #endif
 
-	g_Initted = true;
 	return TRUE;
 }
 

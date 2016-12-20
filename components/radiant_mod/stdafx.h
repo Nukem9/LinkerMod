@@ -84,3 +84,4 @@
 
 #include "afx.h"
 #include "afx_colors.h"
+#include "afx_resource.h"
