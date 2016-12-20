@@ -24,6 +24,8 @@ static FS_FileRead_t FS_FileRead = (FS_FileRead_t)0x00403F10;
 typedef size_t(__cdecl* FS_FileWrite_t)(const void *DstBuf, size_t Size, size_t Count, FILE *File);
 static FS_FileWrite_t FS_FileWrite = (FS_FileWrite_t)0x0040408A;
 
+int __cdecl FS_ReadFile(const char *qpath, void **buffer);
+void __cdecl FS_FreeFile(void *buffer);
 
 size_t FS_FileGetFileSize(FILE* h);
 
