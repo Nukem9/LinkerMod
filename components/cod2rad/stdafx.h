@@ -7,6 +7,8 @@
 #include <windows.h>
 #include <stdio.h>
 
+#define USE_LEGACY_HDR 0
+
 //
 // Shared files
 //

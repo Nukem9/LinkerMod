@@ -94,6 +94,10 @@ BOOL cod2rad_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004413D0, (PBYTE)&hk_FS_FOpenFileRead);
 	Detours::X86::DetourFunction((PBYTE)0x00442E97, (PBYTE)&mfh_Com_SaveBsp);
 
+#if !USE_LEGACY_HDR
+	Detours::X86::DetourFunction((PBYTE)0x00432830, (PBYTE)&hk_StoreLightBytes);
+#endif
+
 	Detours::X86::DetourFunction((PBYTE)0x0042B450, (PBYTE)&RegisterLightDef);
 	g_initted = true;
 	return TRUE;

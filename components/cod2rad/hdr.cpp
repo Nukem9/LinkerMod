@@ -26,7 +26,7 @@ void R_Init_DiskLightgridHDR()
 void PatchHDR_Lightmaps()
 {
 	//
-	// Remove HDR Clamping when getting lightmap pixels
+	// Remove HDR Clamping when getting lightmap pixels (GetColorsForHighlightDir)
 	//
 	PatchMemory(0x00431186, (PBYTE)"\xEB", 1);
 	PatchMemory(0x004311AB, (PBYTE)"\xEB", 1);
@@ -38,8 +38,9 @@ void PatchHDR_Lightmaps()
 	PatchMemory(0x00431360, (PBYTE)"\xEB", 1);
 	PatchMemory(0x00431388, (PBYTE)"\xEB", 1);
 
+#if USE_LEGACY_HDR
 	//
-	// Remove HDR Pixel Clamping Before Converting to RGB8
+	// Remove HDR Pixel Clamping Before Converting to RGB8 (StoreLightBytes)
 	//
 	PatchMemory(0x004328AA, (PBYTE)"\xEB", 1);
 	PatchMemory(0x004328EC, (PBYTE)"\xEB", 1);
@@ -48,13 +49,17 @@ void PatchHDR_Lightmaps()
 	PatchMemory(0x004329C8, (PBYTE)"\xEB", 1);
 	PatchMemory(0x00432A0B, (PBYTE)"\xEB", 1);
 	PatchMemory(0x00432A86, (PBYTE)"\xEB", 1);
+#endif
 
 	//
 	// Enable HDR Lighmap Allocation and Storage
 	//
 	o_R_BuildFinalLightmaps = (R_BuildFinalLightmaps_t)Detours::X86::DetourFunction((PBYTE)0x00432D70, (PBYTE)&hk_R_BuildFinalLightmaps);
+
+#if USE_LEGACY_HDR
 	Detours::X86::DetourFunction((PBYTE)0x00432830, (PBYTE)&hk_R_StoreLightmapPixel);
 	Detours::X86::DetourFunction((PBYTE)0x00432885, (PBYTE)&mfh_R_StoreLightmapPixel);
+#endif
 }
 
 void PatchHDR_Lightgrid()
