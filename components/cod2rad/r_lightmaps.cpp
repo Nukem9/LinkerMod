@@ -166,14 +166,14 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, float* li
 	pel->B = EncodeFloatInByte(pel1[2]);
 	pel->G = EncodeFloatInByte(pel1[1]);
 	pel->R = EncodeFloatInByte(pel1[0]);
-	pel->A = EncodeFloatInByte(highlightDir[0] / highlightDir[2] * 0.25f + 0.5f);
+	pel->A = EncodeFloatInByte(lighting[0] / lighting[2] * 0.25f + 0.5f);
 
 	pel += 0x40000;
 
 	pel->B = EncodeFloatInByte(pel2[2]);
 	pel->G = EncodeFloatInByte(pel2[1]);
 	pel->R = EncodeFloatInByte(pel2[0]);
-	pel->A = EncodeFloatInByte(highlightDir[1] / highlightDir[2] * 0.25f + 0.5f);
+	pel->A = EncodeFloatInByte(lighting[1] / lighting[2] * 0.25f + 0.5f);
 
 	if (g_HDR)
 	{
@@ -181,13 +181,13 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, float* li
 		out1->r = pel1[0];
 		out1->g = pel1[1];
 		out1->b = pel1[2];
-		out1->a = highlightDir[0] / highlightDir[2] * 0.25f + 0.5f;
+		out1->a = lighting[0] / lighting[2] * 0.25f + 0.5f;
 
 		vec4* out2 = &Lightmap2Bytes_HDR[0x40000 * lmapSet + 512 * lmapRow + pixelIndex];
 		out2->r = pel2[0];
 		out2->g = pel2[1];
 		out2->b = pel2[2];
-		out2->a = highlightDir[1] / highlightDir[2] * 0.25f + 0.5f;
+		out2->a = lighting[1] / lighting[2] * 0.25f + 0.5f;
 	}
 
 	BYTE* lightBytes_PrimaryImage = (BYTE*)0x00671590;
