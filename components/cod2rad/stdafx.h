@@ -22,6 +22,8 @@
 #include "vector.h"
 #include "hdr.h"
 
+#include "lighting.h"
+
 #include "r_lightmaps.h"
 #include "r_lightgrid.h"
 #include "r_xmodel_load_obj.h"

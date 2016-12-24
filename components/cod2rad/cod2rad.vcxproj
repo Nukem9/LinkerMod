@@ -93,6 +93,7 @@
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="console.h" />
     <ClInclude Include="hdr.h" />
+    <ClInclude Include="lighting.h" />
     <ClInclude Include="PageGuard.h" />
     <ClInclude Include="r_imagedecode.h" />
     <ClInclude Include="r_lightgrid.h" />
@@ -119,6 +120,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="hdr.cpp" />
+    <ClCompile Include="lighting.cpp" />
     <ClCompile Include="PageGuard.cpp" />
     <ClCompile Include="r_imagedecode.cpp" />
     <ClCompile Include="r_lightgrid.cpp" />
