@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="assertive.h" />
     <ClInclude Include="cm_trace.h" />
     <ClInclude Include="com_bsp_load_obj.h" />
     <ClInclude Include="com_bsp_lump.h" />
@@ -100,6 +101,7 @@
     <ClInclude Include="T5.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="assertive.cpp" />
     <ClCompile Include="com_bsp_load_obj.cpp" />
     <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_memory.cpp" />
