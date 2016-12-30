@@ -11,9 +11,7 @@ void PatchUseFF()
 	// Only apply patch if 'useFastFile 0' was present at launch
 	//
 	if (!LaunchArg_NoFF())
-	{
 		return;
-	}
 
 	//
 	// Prevent overwriting the config file with launch args
@@ -72,9 +70,7 @@ bool LaunchArg_NoFF(void)
 	for (int i = 0; i < argc - 1; i++)
 	{
 		if (_wcsicmp(argv[i], L"useFastFile") == 0 && wcscmp(argv[i + 1], L"0") == 0)
-		{
 			return true;
-		}
 	}
 
 	return false;

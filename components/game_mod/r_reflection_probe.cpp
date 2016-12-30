@@ -176,6 +176,7 @@ void R_GenerateReflections(const char *mapname, GfxReflectionProbe *probes, cons
 			}
 			else
 			{
+				// See if we can copy old reflection data from the map
 				generateProbe[probeIndex] = !R_CopyReflectionsFromLumpData(&probeRawGeneratedData[probeIndex], probeRawLumpData, probeCount);
 			}
 		}

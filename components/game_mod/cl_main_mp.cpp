@@ -23,9 +23,7 @@ CL_GetServerIPAddress_t CL_GetServerIPAddress_o = 0x0;
 const char *__cdecl CL_GetServerIPAddress()
 {
 	if (cg_showServerInfo->current.enabled)
-	{
 		return CL_GetServerIPAddress_o();
-	}
 
 	return "";
 }
