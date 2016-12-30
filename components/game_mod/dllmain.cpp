@@ -377,7 +377,10 @@ BOOL GameMod_Init()
 	// Increase Asset Limits
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
-	DB_ReallocXAssetPool(ASSET_TYPE_XMODEL, 2048);
+
+	void *g_XModelPool_entries = (PBYTE)(DB_ReallocXAssetPool(ASSET_TYPE_XMODEL, 2048)) + 4;
+	PatchMemory(0x0047298B, (PBYTE)&g_XModelPool_entries, 4); // DB_GetXModelAtIndex
+	PatchMemory(0x004F3E36, (PBYTE)&g_XModelPool_entries, 4); // DB_GetXModelIndex
 
 	void* g_MaterialPool_entries = (PBYTE)(DB_ReallocXAssetPool(ASSET_TYPE_MATERIAL, 4096)) + 8;
 	PatchMemory(0x0052C28B, (PBYTE)&g_MaterialPool_entries, 4); // DB_GetMaterialAtIndex
