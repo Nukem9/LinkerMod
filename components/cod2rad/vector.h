@@ -2,6 +2,21 @@
 
 #include <wtypes.h>
 
+template <typename T>
+union tvec2
+{
+	struct
+	{
+		T r;
+		T g;
+	};
+
+	struct
+	{
+		T x;
+		T y;
+	};
+};
 
 template <typename T>
 union tvec3
@@ -41,8 +56,12 @@ union tvec4
 	};
 };
 
+typedef tvec2<float> vec2;
 typedef tvec3<float> vec3;
 typedef tvec4<float> vec4;
 
 void Vec3Normalize(vec3* v);
 void Vec3Normalize(float* v);
+
+float Vec3Dot(vec3* a, vec3* b);
+float Vec3Dot(float* a, float* b);

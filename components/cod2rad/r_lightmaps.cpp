@@ -283,6 +283,124 @@ void GetColorsForHighlightDir(vec3 *lighting, vec3 *highlightDir, vec3 *dstA, ve
 	}
 }
 
+float __cdecl GetLightingApproximationError_o(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec3 *highlightDir)
+{
+	void* fn = (void*)0x004313B0;
+
+	float oout = 0.0;
+	_asm
+	{
+		push pel1
+			push lighting
+			mov edx, pel2
+			mov eax, highlightDir
+			call fn
+			add esp, 8
+			movd oout, xmm0
+			xorps xmm0, xmm0
+			xorps xmm1, xmm1
+
+	}
+	return oout;
+}
+
+double GetLightingApproximationError(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec3 *highlightDir)
+{
+	double error = 0.0;
+
+	for (int i = 0; i < g_basisDirectionsCount; i++)
+	{
+		vec3* basis = &g_basisDirections[i];
+
+		float foo = basis->z * 0.5f + 0.5f;
+		float dotp = Vec3Dot(basis, highlightDir);
+		dotp = dotp < 0.0f ? 0.0f : dotp;
+
+		float thing[3];
+		thing[0] = pel1->r * foo + pel2->r * dotp;
+		thing[1] = pel1->g * foo + pel2->g * dotp;
+		thing[2] = pel1->b * foo + pel2->b * dotp;
+
+		float bar[3];
+		bar[0] = lighting[i].r - thing[0];
+		bar[1] = lighting[i].g - thing[1];
+		bar[2] = lighting[i].b - thing[2];
+
+		double old = error;
+
+		error += Vec3Dot(bar, bar);
+	}
+
+	return error;
+}
+
+//
+// I don't have a name for this function right now
+//
+void sub_431DD9(vec3* pel1, vec3* pel2, vec3* dir, vec3* highlightDir, vec3* out)
+{
+	float unk = dir->z * 0.5f + 0.5f;
+	float dotp = Vec3Dot(dir, highlightDir);
+	if (dotp < 0.0)
+		dotp = 0.0f;
+
+	out->x = pel1->x * unk + pel2->x * dotp;
+	out->y = pel1->y * unk + pel2->y * dotp;
+	out->z = pel1->z * unk + pel2->z * dotp;
+}
+
+void __cdecl GetGradientOfLightingErrorFunctionWithRespectToDir_o(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec3 *highlightDir, vec2 *gradient)
+{
+	void* fn = (void*)0x00431D50;
+	_asm
+	{
+		push gradient
+		push highlightDir
+		push pel1
+		mov ecx, lighting
+		mov eax, pel2
+		call fn
+		add esp, 12
+	}
+}
+
+//
+// Warning: DOES NOT WORK CORRECTLY
+//
+void GetGradientOfLightingErrorFunctionWithRespectToDir(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec3 *highlightDir, vec2 *gradient)
+{
+	float total[2];
+	total[0] = 0.0f;
+	total[1] = 0.0f;
+
+	for (int i = 0; i < g_basisDirectionsCount; i++)
+	{
+		vec3* basis = &g_basisDirections[i];
+
+		vec3 out;
+		sub_431DD9(pel1, pel2, basis, highlightDir, &out);
+
+		float yaa = Vec3Dot(basis, highlightDir);
+
+		float tmp[2];
+		tmp[0] = highlightDir->x * -yaa + basis->x;
+		tmp[1] = highlightDir->y * -yaa + basis->y;
+
+		float bar[3];
+		bar[0] = lighting[i].r - out.x;
+		bar[1] = lighting[i].g - out.y;
+		bar[2] = lighting[i].b - out.z;
+
+		float dotp = Vec3Dot(pel2, (vec3*)bar);
+		total[0] += tmp[0] * dotp;
+		total[1] += tmp[1] * dotp;
+	}
+
+	float unk = highlightDir->z + highlightDir->z;
+	gradient->x = total[0] * unk;
+	gradient->y = total[1] * unk;
+}
+
 void __cdecl ImproveLightingApproximation(float* highlightDir, float* lighting, float* pel1, float* pel2)
 {
 	_asm
