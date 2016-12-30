@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
-dvar_s* sm_quality;
+dvar_s* r_d3d9ex;
 dvar_s* r_noborder;
+dvar_s* sm_quality;
 dvar_s* con_extcon;
 dvar_s* con_inputMaxMatchesShown;
 dvar_s* cg_drawViewpos;
@@ -9,6 +10,9 @@ dvar_s* gm_build_date;
 
 void R_RegisterCustomDvars()
 {
+	// DirectX9 extensions
+	r_d3d9ex = Dvar_RegisterInt("r_d3d9ex", 0, 0, 1, 1, "Enable DirectX 9Ex improvements");
+
 	// Borderless window toggle
 	r_noborder = Dvar_RegisterInt("r_noborder", 0, 0, 1, 1, "Enable borderless windowed mode");
 

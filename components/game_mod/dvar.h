@@ -103,9 +103,13 @@ static dvar_s*& ragdoll_reactivation_cutoff = *(dvar_s **)0xBCAEB0;
 static dvar_s*& ragdoll_explode_upbias = *(dvar_s **)0x251CBCC;
 static dvar_s*& ragdoll_explode_force = *(dvar_s **)0x251CBC8;
 
-extern dvar_s* sm_quality;
+extern dvar_s* r_d3d9ex;
 extern dvar_s* r_noborder;
+extern dvar_s* sm_quality;
 extern dvar_s* con_extcon;
+extern dvar_s* con_inputMaxMatchesShown;
+extern dvar_s* cg_drawViewpos;
+extern dvar_s* gm_build_date;
 extern dvar_s* cg_showServerInfo;
 
 typedef const char* Dvar_GetString_t(const char* dvarName);

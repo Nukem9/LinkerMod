@@ -359,19 +359,14 @@ BOOL GameMod_Init()
 	//
 	// Utilize DirectX 9Ex when possible
 	//
-#if 0
-	ptr = (void *)&hk_Direct3DCreate9;
-	PatchMemory(0x009A34DC, (PBYTE)&ptr, 4);
-
+	Detours::X86::DetourFunction((PBYTE)0x006B7780, (PBYTE)&hk_Direct3DCreate9, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x006B7597, (PBYTE)&hk_CreateDevice, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x0071F387, (PBYTE)&hk_GetSwapChain, Detours::X86Option::USE_CALL);
+	PatchMemory(0x006EB4F1, (PBYTE)"\xEB", 1);
 
 	Detours::X86::DetourFunction((PBYTE)0x0070A050, (PBYTE)&hk_Image_Create2DTexture_PC);
 	Detours::X86::DetourFunction((PBYTE)0x0070A0F0, (PBYTE)&hk_Image_Create3DTexture_PC);
 	Detours::X86::DetourFunction((PBYTE)0x0070A140, (PBYTE)&hk_Image_CreateCubeTexture_PC);
-
-	PatchMemory(0x006EB4F1, (PBYTE)"\xEB", 1);
-#endif
 
 	//
 	// Increase the maximum number of ragdolls

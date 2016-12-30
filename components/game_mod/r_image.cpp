@@ -40,10 +40,10 @@ void Image_Create2DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned 
 	if (imageFlags & 0x40000 || imageFlags & 0x100)
 		memPool = D3DPOOL_SYSTEMMEM;
 	else
-		memPool = (usage == 0) ? D3DPOOL_MANAGED : D3DPOOL_SYSTEMMEM;
+		memPool = (usage == 0) ? D3DPOOL_MANAGED : D3DPOOL_DEFAULT;
 
 	// D3D9Ex does not allow D3DPOOL_MANAGED
-	if (EnableD3DEx)
+	if (r_d3d9ex->current.enabled)
 	{
 		usage	= (usage == 0) ? D3DUSAGE_DYNAMIC : usage;
 		memPool = (memPool == D3DPOOL_MANAGED) ? D3DPOOL_DEFAULT : memPool;
@@ -66,8 +66,8 @@ void Image_Create3DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned 
 	image->mapType	= 4;
 
 	// D3D9Ex does not allow D3DPOOL_MANAGED
-	DWORD usage		= (EnableD3DEx) ? D3DUSAGE_DYNAMIC : 0;
-	D3DPOOL memPool = (EnableD3DEx) ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+	DWORD usage		= (r_d3d9ex->current.enabled) ? D3DUSAGE_DYNAMIC : 0;
+	D3DPOOL memPool = (r_d3d9ex->current.enabled) ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 
 	HRESULT hr = dx_device->CreateVolumeTexture(width, height, depth, mipmapCount, usage, imageFormat, memPool, &image->texture.volmap, nullptr);
 
@@ -90,8 +90,8 @@ void Image_CreateCubeTexture_PC(GfxImage *image, unsigned __int16 edgeLen, int m
 		mipmapCount = 1;
 
 	// D3D9Ex does not allow D3DPOOL_MANAGED
-	DWORD usage		= (EnableD3DEx) ? D3DUSAGE_DYNAMIC : 0;
-	D3DPOOL memPool = (EnableD3DEx) ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+	DWORD usage		= (r_d3d9ex->current.enabled) ? D3DUSAGE_DYNAMIC : 0;
+	D3DPOOL memPool = (r_d3d9ex->current.enabled) ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 
 	HRESULT hr = dx_device->CreateCubeTexture(edgeLen, mipmapCount, usage, imageFormat, memPool, &image->texture.cubemap, nullptr);
 
