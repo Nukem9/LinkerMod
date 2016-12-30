@@ -19,8 +19,8 @@ struct Bone
 	float length;
 	float center[3];
 };
-static_assert(sizeof(Bone) == 0x1C, "Size check");
-static_assert(offsetof(Bone, rigidBody) == 0x8, "Offset check");
+STATIC_ASSERT_SIZE(Bone, 0x1C);
+STATIC_ASSERT_OFFSET(Bone, rigidBody, 0x8);
 
 struct RagdollBody
 {
@@ -40,10 +40,10 @@ struct RagdollBody
 	Bone bones[14];
 	/* omitted */
 };
-static_assert(offsetof(RagdollBody, state) == 0x24, "Offset check");
-static_assert(offsetof(RagdollBody, stateMsec) == 0x28, "Offset check");
-static_assert(offsetof(RagdollBody, numBones) == 0x38, "Offset check");
-static_assert(offsetof(RagdollBody, bones) == 0x3C, "Offset check");
+STATIC_ASSERT_OFFSET(RagdollBody, state, 0x24);
+STATIC_ASSERT_OFFSET(RagdollBody, stateMsec, 0x28);
+STATIC_ASSERT_OFFSET(RagdollBody, numBones, 0x38);
+STATIC_ASSERT_OFFSET(RagdollBody, bones, 0x3C);
 
 struct BoneOrientation
 {

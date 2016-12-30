@@ -17,6 +17,7 @@ struct RadiantCommand
 	int liveUpdateId;
 	char strCommand[512];
 };
+STATIC_ASSERT_SIZE(RadiantCommand, 0x208);
 
 struct RadaintToGameMapping
 {
@@ -25,9 +26,7 @@ struct RadaintToGameMapping
 	int gameId;
 	int cg_gameId;
 };
-
-static_assert(sizeof(RadiantCommand) == 520, "Size check");
-static_assert(sizeof(RadaintToGameMapping) == 16, "Size check");
+STATIC_ASSERT_SIZE(RadaintToGameMapping, 0x10);
 
 void RadiantRemoteInit();
 DWORD WINAPI RadiantRemoteThread(LPVOID Arg);

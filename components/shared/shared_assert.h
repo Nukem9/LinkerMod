@@ -6,6 +6,9 @@
 #define ASSERT(cond)			if(!(cond)) shared_assert(__FILE__, __LINE__, #cond);
 #define ASSERT_MSG(cond, msg)	if(!(cond)) shared_assert(__FILE__, __LINE__, "%s\n\n%s", #cond, msg);
 
+#define STATIC_ASSERT_SIZE(struct, size)				static_assert(sizeof(struct) == size, "Size check")
+#define STATIC_ASSERT_OFFSET(struct, member, offset)	static_assert(offsetof(struct, member) == offset, "Offset check")
+
 #if _DEBUG
 	#define DBG_ASSERT(cond)			ASSERT(cond)
 	#define DBG_ASSERT_MSG(cond, msg)	ASSERT_MSG(cond, msg)
