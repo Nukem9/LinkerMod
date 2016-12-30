@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#define THREAD_CONTEXT_COUNT 15
-
 auto threadFunc			= (void(__cdecl **)(unsigned int))0x0251CB44;
 HANDLE *threadHandle	= (HANDLE *)0x0251CADC;
 DWORD *threadId			= (DWORD *)0x0251CA98;

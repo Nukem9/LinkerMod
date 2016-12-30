@@ -80,26 +80,31 @@ struct dvar_s
 	dvar_s *hashNext;
 };
 
-static dvar_s **com_sv_running = (dvar_s **)0x0243FD3C;
+static dvar_s*& fs_gameDirVar = *(dvar_s **)0x025FADE8;
+static dvar_s*& fs_usermapDir = *(dvar_s **)0x025FADE4;
+static dvar_s*& fs_homepath = *(dvar_s **)0x025FBF0C;
 
-static dvar_s **developer = (dvar_s **)0x0243FCA0;
-static dvar_s **developer_script = (dvar_s **)0x02481714;
+static dvar_s*& com_sv_running = *(dvar_s **)0x0243FD3C;
 
-static dvar_s*& zombietron = *(dvar_s**)0x0247FDE8;
-static dvar_s*& zombiemode = *(dvar_s**)0x0243FDD4;
-static dvar_s*& blackopsmode = *(dvar_s**)0x0243FD24;
-static dvar_s*& useFastFile = *(dvar_s**)0x0247FEC8;
+static dvar_s*& developer = *(dvar_s **)0x0243FCA0;
+static dvar_s*& developer_script = *(dvar_s **)0x02481714;
+static dvar_s*& zombietron = *(dvar_s **)0x0247FDE8;
+static dvar_s*& zombiemode = *(dvar_s **)0x0243FDD4;
+static dvar_s*& blackopsmode = *(dvar_s **)0x0243FD24;
+static dvar_s*& useFastFile = *(dvar_s **)0x0247FEC8;
 
-static dvar_s*& r_reflectionProbeGenerate = *(dvar_s**)0x03B35038;
-static dvar_s*& r_reflectionProbeGenerateExit = *(dvar_s**)0x03B3503C;
-static dvar_s*& r_reflectionProbeRegenerateAll = *(dvar_s**)0x03B20030;
+static dvar_s*& r_reflectionProbeGenerate = *(dvar_s **)0x03B35038;
+static dvar_s*& r_reflectionProbeGenerateExit = *(dvar_s **)0x03B3503C;
+static dvar_s*& r_reflectionProbeRegenerateAll = *(dvar_s **)0x03B20030;
 
-extern bool com_cfg_readOnly_default;
-extern dvar_s* com_cfg_readOnly;
+static dvar_s*& ragdoll_reactivation_cutoff = *(dvar_s **)0xBCAEB0;
+static dvar_s*& ragdoll_explode_upbias = *(dvar_s **)0x251CBCC;
+static dvar_s*& ragdoll_explode_force = *(dvar_s **)0x251CBC8;
 
 extern dvar_s* sm_quality;
 extern dvar_s* r_noborder;
 extern dvar_s* con_extcon;
+extern dvar_s* cg_showServerInfo;
 
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;

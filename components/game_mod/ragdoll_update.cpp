@@ -1,9 +1,5 @@
 #include "stdafx.h"
 
-dvar_s*& ragdoll_reactivation_cutoff = *(dvar_s **)0xBCAEB0;
-dvar_s*& ragdoll_explode_upbias = *(dvar_s **)0x251CBCC;
-dvar_s*& ragdoll_explode_force = *(dvar_s **)0x251CBC8;
-
 bool R_CullPoint(int localClient, const float *p0, float cutoff)
 {
 	return ((bool(__cdecl *)(int, const float *, float))0x006B63D0)(localClient, p0, cutoff);
