@@ -345,6 +345,18 @@ BOOL GameMod_Init()
 	PatchCall(0x0070A4CD, (PBYTE)&Image_HandleMissingImage);
 
 	//
+	// Enable borderless windowed mode
+	//
+	ptr = &hk_CreateWindowExA;
+	PatchMemory(0x009A338C, (PBYTE)&ptr, 4);
+
+	ptr = &hk_AdjustWindowRectEx;
+	PatchMemory(0x009A33D4, (PBYTE)&ptr, 4);
+
+	ptr = &hk_SetWindowLongA;
+	PatchMemory(0x009A33C8, (PBYTE)&ptr, 4);
+
+	//
 	// Utilize DirectX 9Ex when possible
 	//
 #if 0
@@ -378,7 +390,7 @@ BOOL GameMod_Init()
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
 
-	void *g_XModelPool_entries = (PBYTE)(DB_ReallocXAssetPool(ASSET_TYPE_XMODEL, 2048)) + 4;
+	void* g_XModelPool_entries = (PBYTE)(DB_ReallocXAssetPool(ASSET_TYPE_XMODEL, 2048)) + 4;
 	PatchMemory(0x0047298B, (PBYTE)&g_XModelPool_entries, 4); // DB_GetXModelAtIndex
 	PatchMemory(0x004F3E36, (PBYTE)&g_XModelPool_entries, 4); // DB_GetXModelIndex
 

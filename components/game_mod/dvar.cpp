@@ -31,17 +31,6 @@ void R_RegisterCustomDvars()
 	PatchMemory(0x0071F976, (PBYTE)&sampleSize, 4);
 	PatchMemory(0x0073534F, (PBYTE)&sampleSize, 4);
 	PatchMemory(0x00735361, (PBYTE)&smResPower, 1);
-
-	//
-	// Patch CreateWindowExA style
-	//
-	DWORD style = WS_VISIBLE | WS_SYSMENU | WS_CAPTION;
-
-	if (r_noborder->current.enabled)
-		style = WS_VISIBLE | WS_POPUP;
-
-	PatchMemory(0x006B7A74, (PBYTE)&style, sizeof(DWORD));// R_CreateWindow
-	PatchMemory(0x006B7EC1, (PBYTE)&style, sizeof(DWORD));// R_ResizeWindow
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;

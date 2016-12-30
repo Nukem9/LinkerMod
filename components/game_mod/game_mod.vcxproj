@@ -113,6 +113,7 @@
     <ClCompile Include="r_cinematic.cpp" />
     <ClCompile Include="r_image.cpp" />
     <ClCompile Include="d3d9ex.cpp" />
+    <ClCompile Include="r_init.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_reflection_probe.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="reshade.h" />
     <ClInclude Include="r_cinematic.h" />
     <ClInclude Include="r_image.h" />
+    <ClInclude Include="r_init.h" />
     <ClInclude Include="r_material_load_obj.h" />
     <ClInclude Include="r_reflection_probe.h" />
     <ClInclude Include="r_rendercmds.h" />

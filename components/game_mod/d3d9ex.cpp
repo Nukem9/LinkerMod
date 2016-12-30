@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 bool EnableD3DEx = false;
-IDirect3DDevice9*& dx_device = *(IDirect3DDevice9 **)0x03963448;
 
 IDirect3D9 *D3DAPI hk_Direct3DCreate9(UINT SDKVersion)
 {
