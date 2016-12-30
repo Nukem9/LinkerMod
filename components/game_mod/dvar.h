@@ -79,10 +79,12 @@ struct dvar_s
 	DvarLimits domain;
 	dvar_s *hashNext;
 };
+STATIC_ASSERT_OFFSET(dvar_s, current, 0x18);
 
 static dvar_s*& fs_gameDirVar = *(dvar_s **)0x025FADE8;
 static dvar_s*& fs_usermapDir = *(dvar_s **)0x025FADE4;
 static dvar_s*& fs_homepath = *(dvar_s **)0x025FBF0C;
+static dvar_s*& fs_basepath = *(dvar_s **)0x025FBF04;
 
 static dvar_s*& com_sv_running = *(dvar_s **)0x0243FD3C;
 

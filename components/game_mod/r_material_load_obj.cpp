@@ -29,7 +29,7 @@ FILE *Material_OpenShader_BlackOps(const char *shaderTarget, const char *shaderN
 	// Load the shader directly from the name
 	char shaderPath[MAX_PATH];
 	sprintf_s(shaderPath, "%s\\raw\\shadercache_mods\\%s_%s_3_0_%s",
-		*(char **)(*(DWORD *)0x25FBF04 + 0x18),
+		fs_basepath->current.string,
 		shaderTarget,
 		shaderMain,
 		shaderName);
@@ -65,7 +65,10 @@ ID3DXBuffer *Material_CompileShader(const char *shaderName, int shaderType, cons
 
 	ID3DXBuffer *shader = nullptr;
 	if (!Material_CopyTextToDXBuffer(shaderMemory, shaderDataSize, &shader))
-		ASSERT_MSG(false, "SHADER UPLOAD FAILED\n");
+	{
+		// Error message was already printed in above function
+		ASSERT_MSG(false, "Shader upload failed");
+	}
 
 	fclose(shaderFile);
 	free(shaderMemory);
@@ -79,10 +82,10 @@ void __declspec(naked) hk_Material_CompileShader()
 		push ebp
 		mov ebp, esp
 
-		push[ebp + 0xC]	// target
-		push[ebp + 0x8]	// entryPoint
-		push[ebp + 0x4]	// shaderType
-		push ecx		// shaderName
+		push[ebp + 0xC]	// a4: target
+		push[ebp + 0x8]	// a3: entryPoint
+		push[ebp + 0x4]	// a2: shaderType
+		push ecx		// a1: shaderName
 		call Material_CompileShader
 		add esp, 0x10
 
