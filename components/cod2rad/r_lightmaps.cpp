@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 R_BuildFinalLightmaps_t o_R_BuildFinalLightmaps = (R_BuildFinalLightmaps_t)0x00432D70;
 
@@ -87,7 +87,7 @@ void __declspec(naked) mfh_R_StoreLightmapPixel()
 }
 #else
 
-void __cdecl GetInitialLightingHighlightDir(float* highlightDir, float* lighting)
+void __cdecl GetInitialLightingHighlightDir_o(float* highlightDir, float* lighting)
 {
 	_asm
 	{
@@ -101,7 +101,65 @@ void __cdecl GetInitialLightingHighlightDir(float* highlightDir, float* lighting
 	}
 }
 
-void __cdecl GetColorsForHighlightDir(float* highlightDir, float* lighting, float* pel1, float* pel2)
+void GetInitialLightingHighlightDir(vec3 *lighting, vec3 *out)
+{
+	float totals[256];
+
+	//
+	// Get the total R+G+B values for each sample and store it in 'totals'
+	//
+	if (g_basisDirectionsCount >= 4)
+	{
+		vec3* sampleColor = lighting;
+		for (int i = 0; i < g_basisDirectionsCount; i++)
+		{
+			totals[i] = sampleColor->g + sampleColor->r + sampleColor->b;
+			sampleColor++;
+		}
+	}
+
+	vec3 v25;
+	v25.x = 0;
+	v25.y = 0;
+	v25.z = 0;
+
+	if (g_basisDirectionsCount >= 4)
+	{
+		vec3* dir = g_basisDirections;
+		for (int i = 0; i < g_basisDirectionsCount; i++)
+		{
+			v25.z = dir->z * 0.5f + 0.5f;
+			v25.y = totals[i] * v25.z + v25.y;
+			v25.x = v25.z + v25.x;
+			dir++;
+		}
+	}
+
+	v25.y = v25.y / v25.x;
+
+	out->x = 0.0f;
+	out->y = 0.0f;
+	out->z = 0.0f;
+
+	if (g_basisDirectionsCount)
+	{
+		for (int i = 0; i < g_basisDirectionsCount; i++)
+		{
+			vec3* dir = &g_basisDirections[i];
+			v25.z = dir->z * 0.5f + 0.5f;
+			v25.z = totals[i] - v25.z * v25.y;
+			totals[i] = v25.z; 
+
+			out->x = dir->x * v25.z + out->x;
+			out->y = dir->y * v25.z + out->y;
+			out->z = dir->z * v25.z + out->z;
+		}
+	}
+
+	Vec3Normalize(out);
+}
+
+void __cdecl GetColorsForHighlightDir_o(float* highlightDir, float* lighting, float* pel1, float* pel2)
 {
 	_asm
 	{
@@ -114,6 +172,114 @@ void __cdecl GetColorsForHighlightDir(float* highlightDir, float* lighting, floa
 		call ebx
 		add esp, 8
 		popad
+	}
+}
+
+void GetColorsForHighlightDir(vec3 *lighting, vec3 *highlightDir, vec3 *dstA, vec3 *dstB)
+{
+	vec3 baz;
+	baz.x = 0;
+	baz.y = 0;
+	baz.z = 0;
+
+	vec3 total_gamma__lighting;
+	total_gamma__lighting.x = 0;
+	total_gamma__lighting.y = 0;
+	total_gamma__lighting.z = 0;
+
+	vec3 total_dotpr__lighting;
+	total_dotpr__lighting.x = 0;
+	total_dotpr__lighting.y = 0;
+	total_dotpr__lighting.z = 0;
+
+	vec3 total = { 0, 0, 0 };
+	for (int i = 0; i < g_basisDirectionsCount; i++)
+	{
+		total.r += lighting[i].r;
+		total.g += lighting[i].g;
+		total.b += lighting[i].b;
+	}
+
+	for (int i = 0; i < g_basisDirectionsCount; i++)
+	{
+		vec3* dir = &g_basisDirections[i];
+		float gamma_ = dir->z * 0.5f + 0.5f; // I guess this is the power - like how much power the light reflected at a 90* angle has
+
+		float dotpr_ = dir->x * highlightDir->x + dir->y * highlightDir->y + dir->z * highlightDir->z; // dotProduct(dir, highlightDir) // was named lensq_
+		if (dotpr_ < 0.0f)
+			dotpr_ = 0.0f;
+
+		baz.x = dotpr_ * dotpr_ + baz.x;
+		baz.y = gamma_ * gamma_ + baz.y;
+		baz.z = dotpr_ * gamma_ + baz.z;
+
+		/*
+		diffuseLightColor = lightmapColor[0] ∗ dot(bumpBasis[0],normal) + lightmapColor[1] ∗ dot(bumpBasis[1],normal) + lightmapColor[2] ∗ dot(bumpBasis[2],normal) ....
+		apparently highlightDir is really the normal and dotpr_ is dot(basisDir, normal)
+		*/
+
+		// these had lighting->r etc before but I think that was a bug
+		total_gamma__lighting.x = lighting[i].r * gamma_ + total_gamma__lighting.x;
+		total_gamma__lighting.y = lighting[i].g * gamma_ + total_gamma__lighting.y;
+		total_gamma__lighting.z = lighting[i].b * gamma_ + total_gamma__lighting.z;
+
+		// so this must be diffuse color
+		total_dotpr__lighting.x = lighting[i].r * dotpr_ + total_dotpr__lighting.x;
+		total_dotpr__lighting.y = lighting[i].g * dotpr_ + total_dotpr__lighting.y;
+		total_dotpr__lighting.z = lighting[i].b * dotpr_ + total_dotpr__lighting.z;
+	}
+
+	float unk2 = baz.x * baz.y - baz.z * baz.z;
+	if (unk2 == 0.0f) // this appears to be accurate at least
+	{
+		dstA->r = 0.0;
+		dstA->g = 0.0;
+		dstA->b = 0.0;
+		dstB->r = 0.0;
+		dstB->g = 0.0;
+		dstB->b = 0.0;
+	}
+	else
+	{
+		vec3 srcA;
+		vec3 srcB;
+
+		unk2 = 1.0f / unk2;
+		srcA.r = (total_gamma__lighting.x * baz.x - total_dotpr__lighting.x * baz.z) * unk2;
+		srcB.r = (total_dotpr__lighting.x * baz.y - total_gamma__lighting.x * baz.z) * unk2;
+		srcA.g = (total_gamma__lighting.y * baz.x - total_dotpr__lighting.y * baz.z) * unk2;
+		srcB.g = (total_dotpr__lighting.y * baz.y - total_gamma__lighting.y * baz.z) * unk2;
+		srcA.b = (total_gamma__lighting.z * baz.x - total_dotpr__lighting.z * baz.z) * unk2;
+		srcB.b = (total_dotpr__lighting.z * baz.y - total_gamma__lighting.z * baz.z) * unk2;
+
+		if (ClampColor(dstB, &srcB))
+		{
+			unk2 = -baz.z;
+			srcA.r = dstB->r * unk2 + total_gamma__lighting.x;
+			srcA.g = dstB->g * unk2 + total_gamma__lighting.y;
+			srcA.b = dstB->b * unk2 + total_gamma__lighting.z;
+
+			// srcA = srcA / baz.y;
+			unk2 = 1.0f / baz.y;
+			srcA.r = srcA.r * unk2;
+			srcA.g = srcA.g * unk2;
+			srcA.b = srcA.b * unk2;
+		}
+
+		if (ClampColor(dstA, &srcA))
+		{
+			unk2 = -baz.z;
+			srcB.r = dstA->r * unk2 + total_dotpr__lighting.x;
+			srcB.g = dstA->g * unk2 + total_dotpr__lighting.y;
+			srcB.b = dstA->b * unk2 + total_dotpr__lighting.z;
+
+			unk2 = 1.0f / baz.x;
+			srcB.r = srcB.r * unk2;
+			srcB.g = srcB.g * unk2;
+			srcB.b = srcB.b * unk2;
+
+			ClampColor(dstB, &srcB);
+		}
 	}
 }
 
@@ -153,11 +319,11 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, float* li
 	int subOffset = 0x600 * lmapSet + lmapRow;
 
 	float highlightDir[3];
-	GetInitialLightingHighlightDir(highlightDir, lighting);
+	GetInitialLightingHighlightDir((vec3*)highlightDir, (vec3*)lighting);
 
 	float pel1[4];
 	float pel2[4];
-	GetColorsForHighlightDir(highlightDir, lighting, pel1, pel2);
+	GetColorsForHighlightDir((vec3*)highlightDir, (vec3*)lighting, (vec3*)pel1, (vec3*)pel2);
 	ImproveLightingApproximation(highlightDir, lighting, pel1, pel2);
 
 	BYTE* lightBytes = (BYTE*)0x00471590;
