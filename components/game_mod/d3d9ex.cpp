@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-bool EnableD3DEx = false;
-
 IDirect3D9 *D3DAPI hk_Direct3DCreate9(UINT SDKVersion)
 {
 	HMODULE d3d9 = GetModuleHandleA("d3d9.dll");

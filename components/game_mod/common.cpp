@@ -52,8 +52,6 @@ void Com_ToolError(int channel, const char* fmt, ...)
 
 void __cdecl Com_LoadCommonFastFile()
 {
-	dvar_s** fs_gameDirVar = (dvar_s**)0x025FADE8;
-
 	XZoneInfo zoneInfo[4];
 	int zoneCount = 0;
 
@@ -77,14 +75,14 @@ void __cdecl Com_LoadCommonFastFile()
 	//
 	if (zombiemode->current.enabled || blackopsmode->current.enabled)
 	{
-		if ( DB_IsZoneLoaded("common_zombie") )
+		if (DB_IsZoneLoaded("common_zombie"))
 			return;
 
 		zoneInfo[zoneCount].name = "common_zombie";
 		zoneInfo[zoneCount].allocFlags = 0x100;
 		zoneInfo[zoneCount++].freeFlags = 0;
 
-		if ((*fs_gameDirVar) != NULL && (*fs_gameDirVar)->current.string[0] != NULL)
+		if (fs_gameDirVar && strlen(fs_gameDirVar->current.string) > 0)
 		{
 			if (DB_IsZoneLoaded("common_zombie_patch_override"))
 				return;
@@ -97,7 +95,7 @@ void __cdecl Com_LoadCommonFastFile()
 	
 	if (!zombiemode->current.enabled)
 	{
-		if ( DB_IsZoneLoaded("common") )
+		if (DB_IsZoneLoaded("common"))
 			return;
 		
 		zoneInfo[zoneCount].name = "common";
