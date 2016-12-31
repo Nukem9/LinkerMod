@@ -14,22 +14,6 @@ void __declspec(naked) hk_R_BuildFinalLightmaps()
 	}
 }
 
-BYTE __cdecl EncodeFloatInByte(float flt)
-{
-	double f = flt;
-	if (f < 0.0)
-	{
-		return 0;
-	}
-
-	if (f > 1.0)
-	{
-		return 255;
-	}
-
-	return (BYTE)(f * 255.0);
-}
-
 #if USE_LEGACY_HDR
 //
 // Store pixel information for later use by mfh_R_StoreLightmapPixel
@@ -401,7 +385,7 @@ void GetGradientOfLightingErrorFunctionWithRespectToDir(vec3 *lighting, vec3 *pe
 	gradient->y = total[1] * unk;
 }
 
-void __cdecl ImproveLightingApproximation(float* highlightDir, float* lighting, float* pel1, float* pel2)
+void __cdecl ImproveLightingApproximation_o(float* highlightDir, float* lighting, float* pel1, float* pel2)
 {
 	_asm
 	{
@@ -414,6 +398,87 @@ void __cdecl ImproveLightingApproximation(float* highlightDir, float* lighting, 
 		call ebx
 		add esp, 12
 		popad
+	}
+}
+
+//
+// Warning: DOES NOT WORK CORRECTLY
+//
+void __cdecl ImproveLightingApproximation(vec3 *lighting, vec3* pel1, vec3* pel2, vec3 *highlightDir)
+{
+	float err = (float)GetLightingApproximationError(lighting, pel1, pel2, highlightDir);
+	if (err == 0.0f)
+	{
+		return;
+	}
+
+	BYTE b_dir[2];
+	b_dir[0] = EncodeFloatInByte(highlightDir->x / highlightDir->z * 0.25f + 0.5f);
+	b_dir[1] = EncodeFloatInByte(highlightDir->y / highlightDir->z * 0.25f + 0.5f);
+
+	int magic = 4;
+
+	while (1)
+	{
+		vec2 gradient;
+		GetGradientOfLightingErrorFunctionWithRespectToDir(lighting, pel1, pel2, highlightDir, &gradient);
+
+		vec2 abs_grad;
+		abs_grad.x = fabs(gradient.x);
+		abs_grad.y = fabs(gradient.y);
+
+		if (abs_grad.x - abs_grad.y < 0.0f)
+			abs_grad.x = abs_grad.y;
+
+		//float dir[3]; // the new highlight dir
+		vec3 dir;
+		int baz[2]; // the new b_dir
+
+		vec3 new_pel1;
+		vec3 new_pel2;
+
+		float err2 = 0.0f;
+
+		while (1)
+		{
+			float oob = magic / abs_grad.x;
+
+			baz[0] = ClampByte(b_dir[0] + (int)(gradient.x * oob));
+			baz[1] = ClampByte(b_dir[1] + (int)(gradient.y * oob));
+
+
+			dir.x = baz[0] / 63.75f - 2.0f; // possibly 255 / max_magic - max_magic / 2 ?
+			dir.y = baz[1] / 63.75f - 2.0f; // possibly 255 / max_magic
+			dir.z = 1.0f;
+
+			Vec3Normalize(&dir);
+
+			GetColorsForHighlightDir(lighting, &dir, &new_pel1, &new_pel2);
+			err2 = (float)GetLightingApproximationError(lighting, &new_pel1, &new_pel2, &dir);
+			if (err > err2)
+				break;
+
+			magic /= 2;
+			if (!magic)
+				return;
+		}
+
+		pel1->r = new_pel1.r;
+		pel1->g = new_pel1.g;
+		pel1->b = new_pel1.b;
+
+		pel2->r = new_pel2.r;
+		pel2->g = new_pel2.g;
+		pel2->b = new_pel2.b;
+
+		b_dir[0] = baz[0];
+		b_dir[1] = baz[1];
+
+		highlightDir->x = dir.x;
+		highlightDir->y = dir.y;
+		highlightDir->z = dir.z;
+
+		err = err2;
 	}
 }
 
@@ -442,7 +507,7 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, float* li
 	float pel1[4];
 	float pel2[4];
 	GetColorsForHighlightDir((vec3*)highlightDir, (vec3*)lighting, (vec3*)pel1, (vec3*)pel2);
-	ImproveLightingApproximation(highlightDir, lighting, pel1, pel2);
+	ImproveLightingApproximation((vec3*)highlightDir, (vec3*)lighting, (vec3*)pel1, (vec3*)pel2);
 
 	BYTE* lightBytes = (BYTE*)0x00471590;
 	WAW_LMAP_PEL* pel = (WAW_LMAP_PEL*)&lightBytes[4 * (pixelIndex + (subOffset << 9))];

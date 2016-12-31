@@ -32,6 +32,7 @@
 #include "common.h"
 #include "com_memory.h"
 #include "com_files.h"
+#include "com_math.h"
 
 #include "com_bsp_load_obj.h"
 #include "r_light_load_obj.h"

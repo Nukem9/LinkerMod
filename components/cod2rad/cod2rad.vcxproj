@@ -90,6 +90,7 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="com_bsp_load_obj.h" />
     <ClInclude Include="com_files.h" />
+    <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="console.h" />
     <ClInclude Include="hdr.h" />
@@ -109,6 +110,7 @@
     <ClCompile Include="arguments.cpp" />
     <ClCompile Include="com_bsp_load_obj.cpp" />
     <ClCompile Include="com_files.cpp" />
+    <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="console.cpp" />
     <ClCompile Include="dllmain.cpp">
