@@ -72,7 +72,7 @@ public:
 	template <typename T2>
 	bool operator!=(tvec2<T2>& arg)
 	{
-		return !(this == arg);
+		return !(*this == arg);
 	}
 
 	//Addition
@@ -354,7 +354,7 @@ public:
 	template <typename T3>
 	bool operator!=(tvec3<T3>& arg)
 	{
-		return !(this == arg);
+		return !(*this == arg);
 	}
 
 	//Addition
@@ -645,7 +645,7 @@ public:
 	template <typename T4>
 	bool operator!=(tvec4<T4>& arg)
 	{
-		return !(this == arg);
+		return !(*this == arg);
 	}
 
 	//Addition
