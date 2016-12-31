@@ -25,6 +25,7 @@ void R_Init_DiskLightgridHDR()
 
 void PatchHDR_Lightmaps()
 {
+#if USE_LEGACY_HDR
 	//
 	// Remove HDR Clamping when getting lightmap pixels (GetColorsForHighlightDir)
 	//
@@ -38,7 +39,6 @@ void PatchHDR_Lightmaps()
 	PatchMemory(0x00431360, (PBYTE)"\xEB", 1);
 	PatchMemory(0x00431388, (PBYTE)"\xEB", 1);
 
-#if USE_LEGACY_HDR
 	//
 	// Remove HDR Pixel Clamping Before Converting to RGB8 (StoreLightBytes)
 	//
