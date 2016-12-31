@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 
+#define LOG_VEC_EQ(A,B) if (A != B) { printf("%f %f %f == %f %f %f\n", A.x, A.y, A.z, B.x, B.y, B.z); }
+
 R_BuildFinalLightmaps_t o_R_BuildFinalLightmaps = (R_BuildFinalLightmaps_t)0x00432D70;
 
 void __declspec(naked) hk_R_BuildFinalLightmaps()
@@ -148,35 +150,22 @@ void __cdecl GetColorsForHighlightDir_o(float* lighting, float* highlightDir, fl
 
 void GetColorsForHighlightDir(vec3 *lighting, vec3 *highlightDir, vec3 *dstA, vec3 *dstB)
 {
-	vec3 baz;
-	baz.x = 0;
-	baz.y = 0;
-	baz.z = 0;
-
-	vec3 total_gamma__lighting;
-	total_gamma__lighting.x = 0;
-	total_gamma__lighting.y = 0;
-	total_gamma__lighting.z = 0;
-
-	vec3 total_dotpr__lighting;
-	total_dotpr__lighting.x = 0;
-	total_dotpr__lighting.y = 0;
-	total_dotpr__lighting.z = 0;
-
-	vec3 total = { 0, 0, 0 };
+	vec3 total(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < g_basisDirectionsCount; i++)
 	{
-		total.r += lighting[i].r;
-		total.g += lighting[i].g;
-		total.b += lighting[i].b;
+		total += lighting[i];
 	}
+
+	vec3 baz(0.0f, 0.0f, 0.0f);
+	vec3 total_gamma__lighting(0.0f, 0.0f, 0.0f);
+	vec3 total_dotpr__lighting(0.0f, 0.0f, 0.0f);
 
 	for (int i = 0; i < g_basisDirectionsCount; i++)
 	{
 		vec3* dir = &g_basisDirections[i];
-		float gamma_ = dir->z * 0.5f + 0.5f; // I guess this is the power - like how much power the light reflected at a 90* angle has
+		float gamma_ = dir->z * 0.5f + 0.5f;
 
-		float dotpr_ = dir->x * highlightDir->x + dir->y * highlightDir->y + dir->z * highlightDir->z; // dotProduct(dir, highlightDir) // was named lensq_
+		float dotpr_ = Vec3Dot(dir, highlightDir);
 		if (dotpr_ < 0.0f)
 			dotpr_ = 0.0f;
 
@@ -184,24 +173,12 @@ void GetColorsForHighlightDir(vec3 *lighting, vec3 *highlightDir, vec3 *dstA, ve
 		baz.y = gamma_ * gamma_ + baz.y;
 		baz.z = dotpr_ * gamma_ + baz.z;
 
-		/*
-		diffuseLightColor = lightmapColor[0] ∗ dot(bumpBasis[0],normal) + lightmapColor[1] ∗ dot(bumpBasis[1],normal) + lightmapColor[2] ∗ dot(bumpBasis[2],normal) ....
-		apparently highlightDir is really the normal and dotpr_ is dot(basisDir, normal)
-		*/
-
-		// these had lighting->r etc before but I think that was a bug
-		total_gamma__lighting.x = lighting[i].r * gamma_ + total_gamma__lighting.x;
-		total_gamma__lighting.y = lighting[i].g * gamma_ + total_gamma__lighting.y;
-		total_gamma__lighting.z = lighting[i].b * gamma_ + total_gamma__lighting.z;
-
-		// so this must be diffuse color
-		total_dotpr__lighting.x = lighting[i].r * dotpr_ + total_dotpr__lighting.x;
-		total_dotpr__lighting.y = lighting[i].g * dotpr_ + total_dotpr__lighting.y;
-		total_dotpr__lighting.z = lighting[i].b * dotpr_ + total_dotpr__lighting.z;
+		total_gamma__lighting += lighting[i] * gamma_;
+		total_dotpr__lighting += lighting[i] * dotpr_;
 	}
 
 	float unk2 = baz.x * baz.y - baz.z * baz.z;
-	if (unk2 == 0.0f) // this appears to be accurate at least
+	if (unk2 == 0.0f)
 	{
 		dstA->r = 0.0;
 		dstA->g = 0.0;
@@ -225,36 +202,21 @@ void GetColorsForHighlightDir(vec3 *lighting, vec3 *highlightDir, vec3 *dstA, ve
 
 		if (ClampColor(dstB, &srcB))
 		{
-			unk2 = -baz.z;
-			srcA.r = dstB->r * unk2 + total_gamma__lighting.x;
-			srcA.g = dstB->g * unk2 + total_gamma__lighting.y;
-			srcA.b = dstB->b * unk2 + total_gamma__lighting.z;
-
-			// srcA = srcA / baz.y;
-			unk2 = 1.0f / baz.y;
-			srcA.r = srcA.r * unk2;
-			srcA.g = srcA.g * unk2;
-			srcA.b = srcA.b * unk2;
+			srcA = *dstB * -baz.z + total_gamma__lighting;
+			srcA /= baz.y;
 		}
 
 		if (ClampColor(dstA, &srcA))
 		{
-			unk2 = -baz.z;
-			srcB.r = dstA->r * unk2 + total_dotpr__lighting.x;
-			srcB.g = dstA->g * unk2 + total_dotpr__lighting.y;
-			srcB.b = dstA->b * unk2 + total_dotpr__lighting.z;
-
-			unk2 = 1.0f / baz.x;
-			srcB.r = srcB.r * unk2;
-			srcB.g = srcB.g * unk2;
-			srcB.b = srcB.b * unk2;
+			srcB = *dstA * -baz.z + total_dotpr__lighting;
+			srcB /= baz.x;
 
 			ClampColor(dstB, &srcB);
 		}
 	}
 }
 
-float GetLightingApproximationError_o(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec3 *highlightDir)
+float GetLightingApproximationError_o(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2)
 {
 	static DWORD dwCall = 0x004313B0;
 
@@ -276,7 +238,7 @@ float GetLightingApproximationError_o(vec3 *lighting, vec3 *pel1, vec3 *pel2, ve
 	return *(float *)&outFloat;
 }
 
-double GetLightingApproximationError(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec3 *highlightDir)
+double GetLightingApproximationError(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2)
 {
 	double error = 0.0;
 
@@ -288,17 +250,10 @@ double GetLightingApproximationError(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec
 		float dotp = Vec3Dot(basis, highlightDir);
 		dotp = dotp < 0.0f ? 0.0f : dotp;
 
-		float thing[3];
-		thing[0] = pel1->r * foo + pel2->r * dotp;
-		thing[1] = pel1->g * foo + pel2->g * dotp;
-		thing[2] = pel1->b * foo + pel2->b * dotp;
+		vec3 thing = *pel1 * foo + *pel2 * dotp;
 
-		float bar[3];
-		bar[0] = lighting[i].r - thing[0];
-		bar[1] = lighting[i].g - thing[1];
-		bar[2] = lighting[i].b - thing[2];
-
-		error += Vec3Dot(bar, bar);
+		vec3 bar = lighting[i] - thing;
+		error += Vec3Dot(&bar, &bar);
 	}
 
 	return error;
@@ -307,7 +262,7 @@ double GetLightingApproximationError(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec
 //
 // I don't have a name for this function right now
 //
-void sub_431DD9(vec3* pel1, vec3* pel2, vec3* dir, vec3* highlightDir, vec3* out)
+void sub_431DD9(vec3* dir, vec3* highlightDir, vec3* pel1, vec3* pel2, vec3* out)
 {
 	float unk = dir->z * 0.5f + 0.5f;
 	float dotp = Vec3Dot(dir, highlightDir);
@@ -319,7 +274,7 @@ void sub_431DD9(vec3* pel1, vec3* pel2, vec3* dir, vec3* highlightDir, vec3* out
 	out->z = pel1->z * unk + pel2->z * dotp;
 }
 
-void __cdecl GetGradientOfLightingErrorFunctionWithRespectToDir_o(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec3 *highlightDir, vec2 *gradient)
+void __cdecl GetGradientOfLightingErrorFunctionWithRespectToDir_o(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2, vec2 *gradient)
 {
 	void* fn = (void*)0x00431D50;
 	_asm
@@ -337,7 +292,7 @@ void __cdecl GetGradientOfLightingErrorFunctionWithRespectToDir_o(vec3 *lighting
 //
 // Warning: DOES NOT WORK CORRECTLY
 //
-void GetGradientOfLightingErrorFunctionWithRespectToDir(vec3 *lighting, vec3 *pel1, vec3 *pel2, vec3 *highlightDir, vec2 *gradient)
+void GetGradientOfLightingErrorFunctionWithRespectToDir(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2, vec2 *gradient)
 {
 	float total[2];
 	total[0] = 0.0f;
@@ -348,7 +303,7 @@ void GetGradientOfLightingErrorFunctionWithRespectToDir(vec3 *lighting, vec3 *pe
 		vec3* basis = &g_basisDirections[i];
 
 		vec3 out;
-		sub_431DD9(pel1, pel2, basis, highlightDir, &out);
+		sub_431DD9(basis, highlightDir, pel1, pel2, &out);
 
 		float yaa = Vec3Dot(basis, highlightDir);
 
@@ -371,7 +326,7 @@ void GetGradientOfLightingErrorFunctionWithRespectToDir(vec3 *lighting, vec3 *pe
 	gradient->y = total[1] * unk;
 }
 
-void __cdecl ImproveLightingApproximation_o(float* highlightDir, float* lighting, float* pel1, float* pel2)
+void __cdecl ImproveLightingApproximation_o(float* lighting, float* highlightDir, float* pel1, float* pel2)
 {
 	_asm
 	{
@@ -387,10 +342,10 @@ void __cdecl ImproveLightingApproximation_o(float* highlightDir, float* lighting
 	}
 }
 
-void ImproveLightingApproximation(vec3* lighting, vec3* pel1, vec3* pel2, vec3 *highlightDir)
+void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1, vec3* pel2)
 {
 	double curError = 0.0;
-	double maxError = GetLightingApproximationError(lighting, pel1, pel2, highlightDir);
+	double maxError = GetLightingApproximationError(lighting, highlightDir, pel1, pel2);
 
 	if (maxError == 0.0)
 		return;
@@ -404,7 +359,7 @@ void ImproveLightingApproximation(vec3* lighting, vec3* pel1, vec3* pel2, vec3 *
 	for(int magic = 4;;)
 	{
 		vec2 gradient;
-		GetGradientOfLightingErrorFunctionWithRespectToDir(lighting, pel1, pel2, highlightDir, &gradient);
+		GetGradientOfLightingErrorFunctionWithRespectToDir(lighting, highlightDir, pel1, pel2, &gradient);
 
 		vec2 absoluteGradient;
 		absoluteGradient.x = fabs(gradient.x);
@@ -430,7 +385,7 @@ void ImproveLightingApproximation(vec3* lighting, vec3* pel1, vec3* pel2, vec3 *
 			Vec3Normalize(&dir);
 
 			GetColorsForHighlightDir(lighting, &dir, &new_pel1, &new_pel2);
-			curError = GetLightingApproximationError(lighting, &new_pel1, &new_pel2, &dir);
+			curError = GetLightingApproximationError(lighting, &dir, &new_pel1, &new_pel2);
 
 			if (maxError > curError)
 				break;
@@ -490,7 +445,7 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lig
 	vec3 pel2;
 	GetColorsForHighlightDir(lighting, &highlightDir, &pel1, &pel2);
 
-	ImproveLightingApproximation(lighting, &pel1, &pel2, &highlightDir);
+	ImproveLightingApproximation(lighting, &highlightDir, &pel1, &pel2);
 
 	BYTE* lightBytes = (BYTE*)0x00471590;
 	WAW_LMAP_PEL* pel = (WAW_LMAP_PEL*)&lightBytes[4 * (pixelIndex + (subOffset << 9))];
