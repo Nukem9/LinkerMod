@@ -3,6 +3,11 @@
 void Vec3Normalize(vec3* v)
 {
 	float m = (float)sqrt(v->x * v->x + v->y * v->y + v->z * v->z);
+
+	// Avoid division by 0
+	if (-m >= 0.0f)
+		m = 1.0f;
+
 	v->x /= m;
 	v->y /= m;
 	v->z /= m;
