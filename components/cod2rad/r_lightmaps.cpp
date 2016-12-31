@@ -505,11 +505,11 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lig
 	int subOffset = 0x600 * lmapSet + lmapRow;
 
 	vec3 highlightDir;
-	GetInitialLightingHighlightDir(&highlightDir, lighting);
+	GetInitialLightingHighlightDir(lighting, &highlightDir);
 
 	vec3 pel1;
 	vec3 pel2;
-	GetColorsForHighlightDir(&highlightDir, lighting, &pel1, &pel2);
+	GetColorsForHighlightDir(lighting, &highlightDir, &pel1, &pel2);
 
 	//ImproveLightingApproximation((vec3*)highlightDir, (vec3*)lighting, (vec3*)pel1, (vec3*)pel2);
 	ImproveLightingApproximation_o((float*)&highlightDir, (float*)lighting, (float*)&pel1, (float*)&pel2);
