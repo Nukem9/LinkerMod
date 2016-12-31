@@ -430,7 +430,6 @@ void __cdecl ImproveLightingApproximation(vec3 *lighting, vec3* pel1, vec3* pel2
 		if (abs_grad.x - abs_grad.y < 0.0f)
 			abs_grad.x = abs_grad.y;
 
-		//float dir[3]; // the new highlight dir
 		vec3 dir;
 		int baz[2]; // the new b_dir
 
@@ -497,46 +496,52 @@ void __declspec(naked) hk_StoreLightBytes()
 	}
 }
 
-void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, float* lighting, float* pFloats)
+/*
+	lighting - a pointer to an array of [g_basisDirectionsCount] RGB vec3 values for the given pixel - these correspond to each basis direction in g_basisDirections for that point
+	pFloats - a pointer to the primary light values (1 float per pixel) that are used for baked shadowmaps
+*/
+void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lighting, float* pFloats)
 {
 	int subOffset = 0x600 * lmapSet + lmapRow;
 
-	float highlightDir[3];
-	GetInitialLightingHighlightDir((vec3*)highlightDir, (vec3*)lighting);
+	vec3 highlightDir;
+	GetInitialLightingHighlightDir(&highlightDir, lighting);
 
-	float pel1[4];
-	float pel2[4];
-	GetColorsForHighlightDir((vec3*)highlightDir, (vec3*)lighting, (vec3*)pel1, (vec3*)pel2);
-	ImproveLightingApproximation((vec3*)highlightDir, (vec3*)lighting, (vec3*)pel1, (vec3*)pel2);
+	vec3 pel1;
+	vec3 pel2;
+	GetColorsForHighlightDir(&highlightDir, lighting, &pel1, &pel2);
+
+	//ImproveLightingApproximation((vec3*)highlightDir, (vec3*)lighting, (vec3*)pel1, (vec3*)pel2);
+	ImproveLightingApproximation_o((float*)&highlightDir, (float*)lighting, (float*)&pel1, (float*)&pel2);
 
 	BYTE* lightBytes = (BYTE*)0x00471590;
 	WAW_LMAP_PEL* pel = (WAW_LMAP_PEL*)&lightBytes[4 * (pixelIndex + (subOffset << 9))];
 
-	pel->B = EncodeFloatInByte(pel1[2]);
-	pel->G = EncodeFloatInByte(pel1[1]);
-	pel->R = EncodeFloatInByte(pel1[0]);
-	pel->A = EncodeFloatInByte(lighting[0] / lighting[2] * 0.25f + 0.5f);
+	pel->B = EncodeFloatInByte(pel1.b);
+	pel->G = EncodeFloatInByte(pel1.g);
+	pel->R = EncodeFloatInByte(pel1.r);
+	pel->A = EncodeFloatInByte(highlightDir.x / highlightDir.z * 0.25f + 0.5f);
 
 	pel += 0x40000;
 
-	pel->B = EncodeFloatInByte(pel2[2]);
-	pel->G = EncodeFloatInByte(pel2[1]);
-	pel->R = EncodeFloatInByte(pel2[0]);
-	pel->A = EncodeFloatInByte(lighting[1] / lighting[2] * 0.25f + 0.5f);
+	pel->B = EncodeFloatInByte(pel2.b);
+	pel->G = EncodeFloatInByte(pel2.g);
+	pel->R = EncodeFloatInByte(pel2.r);
+	pel->A = EncodeFloatInByte(highlightDir.y/ highlightDir.z * 0.25f + 0.5f);
 
 	if (g_HDR)
 	{
 		vec4* out1 = &LightmapBytes_HDR[0x40000 * lmapSet + 512 * lmapRow + pixelIndex];
-		out1->r = pel1[0];
-		out1->g = pel1[1];
-		out1->b = pel1[2];
-		out1->a = lighting[0] / lighting[2] * 0.25f + 0.5f;
+		out1->r = pel1.r;
+		out1->g = pel1.g;
+		out1->b = pel1.b;
+		out1->a = highlightDir.x / highlightDir.z * 0.25f + 0.5f;
 
 		vec4* out2 = &Lightmap2Bytes_HDR[0x40000 * lmapSet + 512 * lmapRow + pixelIndex];
-		out2->r = pel2[0];
-		out2->g = pel2[1];
-		out2->b = pel2[2];
-		out2->a = lighting[1] / lighting[2] * 0.25f + 0.5f;
+		out2->r = pel2.r;
+		out2->g = pel2.g;
+		out2->b = pel2.b;
+		out2->a = highlightDir.y / highlightDir.z * 0.25f + 0.5f;
 	}
 
 	BYTE* lightBytes_PrimaryImage = (BYTE*)0x00671590;

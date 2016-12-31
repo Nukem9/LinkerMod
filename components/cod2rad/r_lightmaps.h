@@ -14,5 +14,5 @@ void hk_R_StoreLightmapPixel();
 void mfh_R_StoreLightmapPixel();
 #else
 void hk_StoreLightBytes();
-void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, float* highlightDir, float* pFloats);
+void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lighting, float* pFloats);
 #endif
