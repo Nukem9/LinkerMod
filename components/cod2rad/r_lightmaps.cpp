@@ -71,7 +71,7 @@ void __declspec(naked) mfh_R_StoreLightmapPixel()
 }
 #else
 
-void __cdecl GetInitialLightingHighlightDir_o(float* highlightDir, float* lighting)
+void __cdecl GetInitialLightingHighlightDir_o(float* lighting, float* highlightDir)
 {
 	_asm
 	{
@@ -92,14 +92,9 @@ void GetInitialLightingHighlightDir(vec3 *lighting, vec3 *out)
 	//
 	// Get the total R+G+B values for each sample and store it in 'totals'
 	//
-	if (g_basisDirectionsCount >= 4)
+	for (int i = 0; i < g_basisDirectionsCount; i++)
 	{
-		vec3* sampleColor = lighting;
-		for (int i = 0; i < g_basisDirectionsCount; i++)
-		{
-			totals[i] = sampleColor->g + sampleColor->r + sampleColor->b;
-			sampleColor++;
-		}
+		totals[i] = lighting[i].r + lighting[i].g + lighting[i].b;
 	}
 
 	vec3 v25;
@@ -107,16 +102,11 @@ void GetInitialLightingHighlightDir(vec3 *lighting, vec3 *out)
 	v25.y = 0;
 	v25.z = 0;
 
-	if (g_basisDirectionsCount >= 4)
+	for (int i = 0; i < g_basisDirectionsCount; i++)
 	{
-		vec3* dir = g_basisDirections;
-		for (int i = 0; i < g_basisDirectionsCount; i++)
-		{
-			v25.z = dir->z * 0.5f + 0.5f;
-			v25.y = totals[i] * v25.z + v25.y;
-			v25.x = v25.z + v25.x;
-			dir++;
-		}
+		v25.z = g_basisDirections[i].z * 0.5f + 0.5f;
+		v25.y = totals[i] * v25.z + v25.y;
+		v25.x = v25.z + v25.x;
 	}
 
 	v25.y = v25.y / v25.x;
@@ -125,19 +115,16 @@ void GetInitialLightingHighlightDir(vec3 *lighting, vec3 *out)
 	out->y = 0.0f;
 	out->z = 0.0f;
 
-	if (g_basisDirectionsCount)
+	for (int i = 0; i < g_basisDirectionsCount; i++)
 	{
-		for (int i = 0; i < g_basisDirectionsCount; i++)
-		{
-			vec3* dir = &g_basisDirections[i];
-			v25.z = dir->z * 0.5f + 0.5f;
-			v25.z = totals[i] - v25.z * v25.y;
-			totals[i] = v25.z; 
+		vec3* dir = &g_basisDirections[i];
+		v25.z = dir->z * 0.5f + 0.5f;
+		v25.z = totals[i] - v25.z * v25.y;
+		totals[i] = v25.z; 
 
-			out->x = dir->x * v25.z + out->x;
-			out->y = dir->y * v25.z + out->y;
-			out->z = dir->z * v25.z + out->z;
-		}
+		out->x = dir->x * v25.z + out->x;
+		out->y = dir->y * v25.z + out->y;
+		out->z = dir->z * v25.z + out->z;
 	}
 
 	Vec3Normalize(out);
