@@ -130,7 +130,7 @@ void GetInitialLightingHighlightDir(vec3 *lighting, vec3 *out)
 	Vec3Normalize(out);
 }
 
-void __cdecl GetColorsForHighlightDir_o(float* highlightDir, float* lighting, float* pel1, float* pel2)
+void __cdecl GetColorsForHighlightDir_o(float* lighting, float* highlightDir, float* pel1, float* pel2)
 {
 	_asm
 	{
