@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 
-#define LOG_VEC_EQ(A,B) if (A != B) { printf("%f %f %f == %f %f %f\n", A.x, A.y, A.z, B.x, B.y, B.z); }
+#define LOG_VEC_EQ(A,B) if (A != B) { printf("(%f) %f %f %f == %f %f %f\n", Vec3Variance(&A, &B), A.x, A.y, A.z, B.x, B.y, B.z); }
 
 R_BuildFinalLightmaps_t o_R_BuildFinalLightmaps = (R_BuildFinalLightmaps_t)0x00432D70;
 
@@ -87,6 +87,10 @@ void __cdecl GetInitialLightingHighlightDir_o(float* lighting, float* highlightD
 	}
 }
 
+//
+// Verified
+// Variance: 0.000000 0.000014
+//
 void GetInitialLightingHighlightDir(vec3 *lighting, vec3 *out)
 {
 	float totals[256];
@@ -148,6 +152,11 @@ void __cdecl GetColorsForHighlightDir_o(float* lighting, float* highlightDir, fl
 	}
 }
 
+//
+// Verified
+// Variance: 0.000000 0.000393 (pel1)
+// Variance: 0.000000 0.000372 (pel2)
+//
 void GetColorsForHighlightDir(vec3 *lighting, vec3 *highlightDir, vec3 *dstA, vec3 *dstB)
 {
 	vec3 total(0.0f, 0.0f, 0.0f);
@@ -238,6 +247,10 @@ float GetLightingApproximationError_o(vec3 *lighting, vec3 *highlightDir, vec3 *
 	return *(float *)&outFloat;
 }
 
+//
+// Verified
+// Variance: 0.000000 0.000001
+//
 double GetLightingApproximationError(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2)
 {
 	double error = 0.0;
@@ -290,7 +303,8 @@ void __cdecl GetGradientOfLightingErrorFunctionWithRespectToDir_o(vec3 *lighting
 }
 
 //
-// Warning: DOES NOT WORK CORRECTLY
+// Verified
+// Variance: 0.000000 0.000002
 //
 void GetGradientOfLightingErrorFunctionWithRespectToDir(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2, vec2 *gradient)
 {
@@ -342,13 +356,15 @@ void __cdecl ImproveLightingApproximation_o(float* lighting, float* highlightDir
 	}
 }
 
+//
+// Verified: Bad
+// Variance: 0.000000 0.813436 (pel1)
+// Variance: 0.000000 0.590278 (pel2)
+//
 void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1, vec3* pel2)
 {
 	double curError = 0.0;
-	double maxError = GetLightingApproximationError(lighting, highlightDir, pel1, pel2);
-
-	if (maxError == 0.0)
-		return;
+	double error = GetLightingApproximationError(lighting, highlightDir, pel1, pel2);
 
 	BYTE initialByteDir[2];
 	BYTE updatedByteDir[2];
@@ -360,6 +376,9 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 	{
 		vec2 gradient;
 		GetGradientOfLightingErrorFunctionWithRespectToDir(lighting, highlightDir, pel1, pel2, &gradient);
+
+		if (error == 0.0)
+			return;
 
 		vec2 absoluteGradient;
 		absoluteGradient.x = fabs(gradient.x);
@@ -387,11 +406,15 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 			GetColorsForHighlightDir(lighting, &dir, &new_pel1, &new_pel2);
 			curError = GetLightingApproximationError(lighting, &dir, &new_pel1, &new_pel2);
 
-			if (maxError > curError)
+			//
+			// If the adjusted approximation has a smaller error value - use the approximation
+			//
+			if (curError < error)
 				break;
 
 			magic /= 2;
 
+			// Abort if we were unable to find a better approximation within a reasonable amount of iterations
 			if (!magic)
 				return;
 		}
@@ -411,7 +434,7 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 		highlightDir->y = dir.y;
 		highlightDir->z = dir.z;
 
-		maxError = curError;
+		error = curError;
 	}
 }
 

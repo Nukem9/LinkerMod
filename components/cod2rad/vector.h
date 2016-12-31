@@ -905,6 +905,12 @@ void Vec3Normalize(float* v);
 float Vec3Dot(vec3* a, vec3* b);
 float Vec3Dot(float* a, float* b);
 
+//
+// Get the total of the absolute values of the diferences for each axis in two vectors
+//
+double Vec2Variance(vec2* a, vec2* b);
+double Vec3Variance(vec3* a, vec3* b);
+
 #endif
 
 

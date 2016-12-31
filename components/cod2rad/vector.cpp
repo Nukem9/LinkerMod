@@ -28,3 +28,13 @@ float Vec3Dot(float* a, float* b)
 {
 	return Vec3Dot((vec3*)a, (vec3*)b);
 }
+
+double Vec2Variance(vec2* a, vec2* b)
+{
+	return abs(a->x - b->x) + abs(a->y - b->y);
+}
+
+double Vec3Variance(vec3* a, vec3* b)
+{
+	return abs(a->x - b->x) + abs(a->y - b->y) + abs(a->z - b->z);
+}
