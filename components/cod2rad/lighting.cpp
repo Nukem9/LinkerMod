@@ -19,21 +19,21 @@ void __cdecl GammaCorrectColor(float *rgb)
 }
 
 //
-// Clamp src to 0.0 - 1.0 range, returns true if the value needed to be clamped
+// Clamp src to 0.0 - 'max' range, returns true if the value needed to be clamped
 //
-bool ClampColor(vec3 *dst, vec3 *src)
+bool ClampColor(vec3 *dst, vec3 *src, float max)
 {
 	bool clamped = false;
 
 	if (src->r >= 0.0f)
 	{
-		if (src->r <= 1.0f)
+		if (src->r <= max)
 		{
 			dst->r = src->r;
 		}
 		else
 		{
-			dst->r = 1.0f;
+			dst->r = max;
 			clamped = true;
 		}
 	}
@@ -45,13 +45,13 @@ bool ClampColor(vec3 *dst, vec3 *src)
 
 	if (src->g >= 0.0f)
 	{
-		if (src->g <= 1.0f)
+		if (src->g <= max)
 		{
 			dst->g = src->g;
 		}
 		else
 		{
-			dst->g = 1.0f;
+			dst->g = max;
 			clamped = true;
 		}
 	}
@@ -63,13 +63,13 @@ bool ClampColor(vec3 *dst, vec3 *src)
 
 	if (src->b >= 0.0f)
 	{
-		if (src->b <= 1.0f)
+		if (src->b <= max)
 		{
 			dst->b = src->b;
 		}
 		else
 		{
-			dst->b = 1.0f;
+			dst->b = max;
 			clamped = true;
 		}
 	}
