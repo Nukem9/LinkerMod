@@ -2,6 +2,40 @@
 
 #define LOG_VEC_EQ(A,B) if (A != B) { printf("(%f) %f %f %f == %f %f %f\n", Vec3Variance(&A, &B), A.x, A.y, A.z, B.x, B.y, B.z); }
 
+#if VARIANCE_TRACKER
+VarianceTracker vt_GetInitialLightingHighlightDir;
+VarianceTracker vt_GetColorsForHighlightDir_1;
+VarianceTracker vt_GetColorsForHighlightDir_2;
+VarianceTracker vt_GetLightingApproximationError;
+VarianceTracker vt_GetGradientOfLightingErrorFunctionWithRespectToDir;
+VarianceTracker vt_ImproveLightingApproximation_1;
+VarianceTracker vt_ImproveLightingApproximation_2;
+
+VarianceTracker::VarianceTracker() : _min(FLT_MAX), _max(DBL_MIN), _total(0.0), _count(0)
+{
+}
+
+void VarianceTracker::Track(double v)
+{
+	mtx.lock();
+	if (v < _min)
+		_min = v;
+
+	if (v > _max)
+		_max = v;
+
+	_total += v;
+	_count++;
+	mtx.unlock();
+}
+
+double VarianceTracker::Min(void) const { return _min; }
+double VarianceTracker::Max(void) const { return _max; }
+double VarianceTracker::Total(void) const { return _total; }
+double VarianceTracker::Average(void) const { return _total / _count; }
+
+#endif
+
 R_BuildFinalLightmaps_t o_R_BuildFinalLightmaps = (R_BuildFinalLightmaps_t)0x00432D70;
 
 void __declspec(naked) hk_R_BuildFinalLightmaps()
@@ -366,6 +400,11 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 	double curError = 0.0;
 	double error = GetLightingApproximationError(lighting, highlightDir, pel1, pel2);
 
+#if VARIANCE_TRACKER
+	double err2 = GetLightingApproximationError_o(lighting, highlightDir, pel1, pel2);
+	vt_GetLightingApproximationError.Track(abs(error - err2));
+#endif
+
 	BYTE initialByteDir[2];
 	BYTE updatedByteDir[2];
 
@@ -376,6 +415,12 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 	{
 		vec2 gradient;
 		GetGradientOfLightingErrorFunctionWithRespectToDir(lighting, highlightDir, pel1, pel2, &gradient);
+
+#if VARIANCE_TRACKER
+		vec2 gradient2;
+		GetGradientOfLightingErrorFunctionWithRespectToDir_o(lighting, highlightDir, pel1, pel2, &gradient2);
+		vt_GetGradientOfLightingErrorFunctionWithRespectToDir.Track(Vec2Variance(&gradient, &gradient2));
+#endif
 
 		if (error == 0.0)
 			return;
@@ -404,7 +449,18 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 			Vec3Normalize(&dir);
 
 			GetColorsForHighlightDir(lighting, &dir, &new_pel1, &new_pel2);
+#if VARIANCE_TRACKER
+			vec3 new_pel3;
+			vec3 new_pel4;
+			GetColorsForHighlightDir_o((float*)lighting, (float*)&dir, (float*)&new_pel3, (float*)&new_pel4);
+			vt_GetColorsForHighlightDir_1.Track(Vec3Variance(&new_pel1, &new_pel3));
+			vt_GetColorsForHighlightDir_2.Track(Vec3Variance(&new_pel2, &new_pel4));
+#endif
 			curError = GetLightingApproximationError(lighting, &dir, &new_pel1, &new_pel2);
+#if VARIANCE_TRACKER
+			err2 = GetLightingApproximationError_o(lighting, &dir, &new_pel1, &new_pel2);
+			vt_GetLightingApproximationError.Track(abs(curError - err2));
+#endif
 
 			//
 			// If the adjusted approximation has a smaller error value - use the approximation
@@ -464,11 +520,36 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lig
 	vec3 highlightDir;
 	GetInitialLightingHighlightDir(lighting, &highlightDir);
 
+#if VARIANCE_TRACKER
+	vec3 highlightDir2;
+	GetInitialLightingHighlightDir_o((float*)lighting, (float*)&highlightDir2);
+
+	vt_GetInitialLightingHighlightDir.Track(Vec3Variance(&highlightDir, &highlightDir2));
+#endif
+
 	vec3 pel1;
 	vec3 pel2;
 	GetColorsForHighlightDir(lighting, &highlightDir, &pel1, &pel2);
 
+#if VARIANCE_TRACKER
+	vec3 pel3;
+	vec3 pel4;
+	GetColorsForHighlightDir_o((float*)lighting, (float*)&highlightDir, (float*)&pel3, (float*)&pel4);
+
+	vt_GetColorsForHighlightDir_1.Track(Vec3Variance(&pel1, &pel3));
+	vt_GetColorsForHighlightDir_2.Track(Vec3Variance(&pel2, &pel4));
+#endif
+
 	ImproveLightingApproximation(lighting, &highlightDir, &pel1, &pel2);
+#if VARIANCE_TRACKER
+	// Ensure that the starting values are the same
+	pel3 = pel1;
+	pel4 = pel2;
+
+	ImproveLightingApproximation_o((float*)lighting, (float*)&highlightDir, (float*)&pel3, (float*)&pel4);
+	vt_ImproveLightingApproximation_1.Track(Vec3Variance(&pel1, &pel3));
+	vt_ImproveLightingApproximation_2.Track(Vec3Variance(&pel2, &pel4));
+#endif
 
 	BYTE* lightBytes = (BYTE*)0x00471590;
 	WAW_LMAP_PEL* pel = (WAW_LMAP_PEL*)&lightBytes[4 * (pixelIndex + (subOffset << 9))];

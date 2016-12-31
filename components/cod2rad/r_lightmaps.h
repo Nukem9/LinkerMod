@@ -1,4 +1,7 @@
 #pragma once
+#include <mutex>
+
+#define VARIANCE_TRACKER 1
 
 const static DWORD* g_LightmapCount = (DWORD*)0x16E99F58;
 
@@ -13,6 +16,47 @@ BYTE __cdecl EncodeFloatInByte(float flt);
 void hk_R_StoreLightmapPixel();
 void mfh_R_StoreLightmapPixel();
 #else
+
+#if VARIANCE_TRACKER
+struct VarianceTracker
+{
+private:
+	std::mutex mtx;
+
+	double _min;
+	double _max;
+	double _total;
+
+	unsigned int _count;
+
+public:
+	VarianceTracker();
+
+	void Track(double v);
+
+	double Min(void) const;
+	double Max(void) const;
+	double Total(void) const;
+	double Average(void) const;
+};
+
+//
+// Global variance trackers for the rewritten functions
+//
+extern VarianceTracker vt_GetInitialLightingHighlightDir;
+extern VarianceTracker vt_GetColorsForHighlightDir_1;
+extern VarianceTracker vt_GetColorsForHighlightDir_2;
+extern VarianceTracker vt_GetLightingApproximationError;
+extern VarianceTracker vt_GetGradientOfLightingErrorFunctionWithRespectToDir;
+extern VarianceTracker vt_ImproveLightingApproximation_1;
+extern VarianceTracker vt_ImproveLightingApproximation_2;
+
+#ifndef VARIANCE_LOG
+#define VARIANCE_LOG(TRACKER) Con_Printf("%s:\n\tMin: %f\n\tMax: %f\n\tAverage: %f\n\tTotal: %f\n\n", #TRACKER, TRACKER.Min(), TRACKER.Max(), TRACKER.Average(), TRACKER.Total());
+#endif
+
+#endif
+
 void hk_StoreLightBytes();
 void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lighting, float* pFloats);
 #endif
