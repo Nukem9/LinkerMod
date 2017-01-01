@@ -107,7 +107,7 @@ void __declspec(naked) mfh_R_StoreLightmapPixel()
 }
 #else
 
-void __cdecl GetInitialLightingHighlightDir_o(float* lighting, float* highlightDir)
+void __cdecl GetInitialLightingHighlightDir_o(vec3* lighting, vec3* highlightDir)
 {
 	_asm
 	{
@@ -170,7 +170,7 @@ void GetInitialLightingHighlightDir(vec3 *lighting, vec3 *out)
 	Vec3Normalize(out);
 }
 
-void __cdecl GetColorsForHighlightDir_o(float* lighting, float* highlightDir, float* pel1, float* pel2)
+void __cdecl GetColorsForHighlightDir_o(vec3* lighting, vec3* highlightDir, vec3* pel1, vec3* pel2)
 {
 	_asm
 	{
@@ -374,7 +374,7 @@ void GetGradientOfLightingErrorFunctionWithRespectToDir(vec3 *lighting, vec3 *hi
 	gradient->y = total[1] * unk;
 }
 
-void __cdecl ImproveLightingApproximation_o(float* lighting, float* highlightDir, float* pel1, float* pel2)
+void __cdecl ImproveLightingApproximation_o(vec3* lighting, vec3* highlightDir, vec3* pel1, vec3* pel2)
 {
 	_asm
 	{
@@ -452,7 +452,7 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 #if VARIANCE_TRACKER
 			vec3 new_pel3;
 			vec3 new_pel4;
-			GetColorsForHighlightDir_o((float*)lighting, (float*)&dir, (float*)&new_pel3, (float*)&new_pel4);
+			GetColorsForHighlightDir_o(lighting, &dir, &new_pel3, &new_pel4);
 			vt_GetColorsForHighlightDir_1.Track(Vec3Variance(&new_pel1, &new_pel3));
 			vt_GetColorsForHighlightDir_2.Track(Vec3Variance(&new_pel2, &new_pel4));
 #endif
@@ -522,7 +522,7 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lig
 
 #if VARIANCE_TRACKER
 	vec3 highlightDir2;
-	GetInitialLightingHighlightDir_o((float*)lighting, (float*)&highlightDir2);
+	GetInitialLightingHighlightDir_o(lighting, &highlightDir2);
 
 	vt_GetInitialLightingHighlightDir.Track(Vec3Variance(&highlightDir, &highlightDir2));
 #endif
@@ -534,7 +534,7 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lig
 #if VARIANCE_TRACKER
 	vec3 pel3;
 	vec3 pel4;
-	GetColorsForHighlightDir_o((float*)lighting, (float*)&highlightDir, (float*)&pel3, (float*)&pel4);
+	GetColorsForHighlightDir_o(lighting, &highlightDir, &pel3, &pel4);
 
 	vt_GetColorsForHighlightDir_1.Track(Vec3Variance(&pel1, &pel3));
 	vt_GetColorsForHighlightDir_2.Track(Vec3Variance(&pel2, &pel4));
@@ -546,7 +546,7 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lig
 	pel3 = pel1;
 	pel4 = pel2;
 
-	ImproveLightingApproximation_o((float*)lighting, (float*)&highlightDir, (float*)&pel3, (float*)&pel4);
+	ImproveLightingApproximation_o(lighting, &highlightDir, &pel3, &pel4);
 	vt_ImproveLightingApproximation_1.Track(Vec3Variance(&pel1, &pel3));
 	vt_ImproveLightingApproximation_2.Track(Vec3Variance(&pel2, &pel4));
 #endif
