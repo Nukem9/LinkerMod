@@ -52,7 +52,7 @@ extern VarianceTracker vt_ImproveLightingApproximation_1;
 extern VarianceTracker vt_ImproveLightingApproximation_2;
 
 #ifndef VARIANCE_LOG
-#define VARIANCE_LOG(TRACKER) Con_Printf("%s:\n\tMin: %f\n\tMax: %f\n\tAverage: %f\n\tTotal: %f\n\n", #TRACKER, TRACKER.Min(), TRACKER.Max(), TRACKER.Average(), TRACKER.Total());
+#define VARIANCE_LOG(TRACKER) Con_Printf("%s:\n\tMin: %f\n\tMax: %f\n\tAverage: %f\n", #TRACKER, TRACKER.Min(), TRACKER.Max(), TRACKER.Average());
 #endif
 
 #endif
