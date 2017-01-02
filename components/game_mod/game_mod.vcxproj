@@ -100,6 +100,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
     <ClCompile Include="live_win.cpp" />
+    <ClCompile Include="mod_frontend.cpp" />
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
     <ClCompile Include="patch_reflections.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
     <ClInclude Include="live_win.h" />
+    <ClInclude Include="mod_frontend.h" />
     <ClInclude Include="patch_common.h" />
     <ClInclude Include="patch_usefastfile.h" />
     <ClInclude Include="patch_reflections.h" />

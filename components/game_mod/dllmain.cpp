@@ -268,6 +268,14 @@ BOOL GameMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x006D98F0, (PBYTE)&hk_R_Cinematic_BinkOpen);
 
+	// Ray
+	// Add Support for Mod Specific Frontend
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00406B32, (PBYTE)&Com_RunFrontend, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x005A6C32, (PBYTE)&Com_RunFrontend, Detours::X86Option::USE_JUMP);
+	Detours::X86::DetourFunction((PBYTE)0x00679018, (PBYTE)&Com_RunFrontend, Detours::X86Option::USE_JUMP);
+	// 005A6C32 - jmp
+	// 00679018 - jmp
 	//
 	// Enable Custom Dvars
 	//
