@@ -112,6 +112,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		cod2rad_Init();
 		break;
 	case DLL_PROCESS_DETACH:
+#if VARIANCE_TRACKER
 		VARIANCE_LOG(vt_GetInitialLightingHighlightDir);
 		VARIANCE_LOG(vt_GetColorsForHighlightDir_1);
 		VARIANCE_LOG(vt_GetColorsForHighlightDir_2);
@@ -119,6 +120,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		VARIANCE_LOG(vt_GetGradientOfLightingErrorFunctionWithRespectToDir);
 		VARIANCE_LOG(vt_ImproveLightingApproximation_1);
 		VARIANCE_LOG(vt_ImproveLightingApproximation_2);
+#endif
 		Con_Restore();
 		break;
 	}
