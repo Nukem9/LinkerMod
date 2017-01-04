@@ -431,7 +431,7 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel_
 		//
 		while (true)
 		{
-			float scalar = weight / absoluteGradient.x;
+			float scalar = weight / tmp;
 
 			updatedByteDir[0] = ClampByte(initialByteDir[0] + (int)(gradient.x * scalar));
 			updatedByteDir[1] = ClampByte(initialByteDir[1] + (int)(gradient.y * scalar));
