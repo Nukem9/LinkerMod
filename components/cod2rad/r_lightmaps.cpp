@@ -413,9 +413,6 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel_
 		vt_GetGradientOfLightingErrorFunctionWithRespectToDir.Track(Vec2Variance(&gradient, &gradient2));
 #endif
 
-		if (error == 0.0)
-			return;
-
 		vec2 absoluteGradient;
 		absoluteGradient.x = fabs(gradient.x);
 		absoluteGradient.y = fabs(gradient.y);
