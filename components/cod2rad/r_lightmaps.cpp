@@ -405,6 +405,10 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 	vt_GetLightingApproximationError.Track(abs(error - err2));
 #endif
 
+	// Don't fix what isn't broken
+	if (error == 0.0)
+		return;
+
 	BYTE initialByteDir[2];
 	BYTE updatedByteDir[2];
 
