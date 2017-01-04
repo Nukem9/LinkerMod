@@ -81,3 +81,44 @@ bool ClampColor(vec3 *dst, vec3 *src, float max)
 
 	return clamped;
 }
+
+void EncodeNormalToFloats(vec3* normal, vec2* out)
+{
+	out->x = normal->x / normal->z * 0.25f + 0.5f;
+	out->y = normal->y / normal->z * 0.25f + 0.5f;
+}
+
+void EncodeNormalToBytes(vec3* normal, BYTE(&out)[2])
+{
+	out[0] = EncodeFloatInByte(normal->x / normal->z * 0.25f + 0.5f);
+	out[1] = EncodeFloatInByte(normal->y / normal->z * 0.25f + 0.5f);
+}
+
+void DecodeNormalFromBytes(int packed_x, int packed_y, vec3* out)
+{
+	/*
+		if a = b * 0.25 + 0.5
+		then b = 4*a-2
+		but since we're also converting from byte to float
+		we need b = (4*a)/255 + 0.5
+		which simplifies to the formula below
+	*/
+	out->x = (float)packed_x / 63.75f - 2.0f;
+	out->y = (float)packed_y / 63.75f - 2.0f;
+	out->z = 1.0f;
+
+	// This only works if the original normal's z axis was > 0.0f (which is how all normals should be)
+	Vec3Normalize(out);
+}
+
+void DecodeNormalFromFloats(vec2* packed, vec3* out)
+{
+	/*
+		if a = b * 0.25 + 0.5
+		then b = 4*a-2
+	*/
+	*out = vec3((*packed * 4.0f) - 2.0f, 1.0f);
+
+	// This only works if the original normal's z axis was > 0.0f (which is how all normals should be)
+	Vec3Normalize(out);
+}

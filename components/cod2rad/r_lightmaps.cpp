@@ -399,10 +399,11 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel_
 	BYTE initialByteDir[2];
 	BYTE updatedByteDir[2];
 
-	initialByteDir[0] = EncodeFloatInByte(highlightDir->x / highlightDir->z * 0.25f + 0.5f);
-	initialByteDir[1] = EncodeFloatInByte(highlightDir->y / highlightDir->z * 0.25f + 0.5f);
+	EncodeNormalToBytes(highlightDir, initialByteDir);
 
-	for(int magic = 4;;)
+	// the formula for weight is 2^(2-x) where x is the iteration number
+	float weight = 4.0;
+	for(int iterations = 16;;) // the original number of iterations was 4
 	{
 		vec2 gradient;
 		GetGradientOfLightingErrorFunctionWithRespectToDir(lighting, highlightDir, pel_amb, pel_dir, &gradient);
@@ -417,8 +418,9 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel_
 		absoluteGradient.x = fabs(gradient.x);
 		absoluteGradient.y = fabs(gradient.y);
 
+		float tmp = absoluteGradient.x;
 		if (absoluteGradient.x - absoluteGradient.y < 0.0f)
-			absoluteGradient.x = absoluteGradient.y;
+			tmp = absoluteGradient.y;
 
 		vec3 dir;
 		vec3 new_pel_amb;
@@ -429,15 +431,12 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel_
 		//
 		while (true)
 		{
-			float scalar = magic / absoluteGradient.x;
+			float scalar = weight / absoluteGradient.x;
 
 			updatedByteDir[0] = ClampByte(initialByteDir[0] + (int)(gradient.x * scalar));
 			updatedByteDir[1] = ClampByte(initialByteDir[1] + (int)(gradient.y * scalar));
 
-			dir.x = (float)updatedByteDir[0] / 63.75f - 2.0f; // possibly 255 / max_magic - max_magic / 2 ?
-			dir.y = (float)updatedByteDir[1] / 63.75f - 2.0f; // possibly 255 / max_magic
-			dir.z = 1.0f;
-			Vec3Normalize(&dir);
+			DecodeNormalFromBytes(updatedByteDir[0], updatedByteDir[1], &dir);
 
 			GetColorsForHighlightDir(lighting, &dir, &new_pel_amb, &new_pel_dir);
 #if VARIANCE_TRACKER
@@ -459,11 +458,13 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel_
 			if (curError < error)
 				break;
 
-			magic /= 2;
+			weight /= 2.0f;
 
 			// Abort if we were unable to find a better approximation within a reasonable amount of iterations
-			if (!magic)
+			if (!--iterations)
+			{
 				return;
+			}
 		}
 
 		*pel_amb = new_pel_amb;
