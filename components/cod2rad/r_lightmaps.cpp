@@ -540,36 +540,40 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lig
 	vt_ImproveLightingApproximation_2.Track(Vec3Variance(&pel2, &pel4));
 #endif
 
+	BYTE packed_normal[2];
+	EncodeNormalToBytes(&highlightDir, packed_normal);
+
 	BYTE* lightBytes = (BYTE*)0x00471590;
 	WAW_LMAP_PEL* pel = (WAW_LMAP_PEL*)&lightBytes[4 * (pixelIndex + (subOffset << 9))];
 
 	pel->B = EncodeFloatInByte(pel1.b);
 	pel->G = EncodeFloatInByte(pel1.g);
 	pel->R = EncodeFloatInByte(pel1.r);
-	pel->A = EncodeFloatInByte(highlightDir.x / highlightDir.z * 0.25f + 0.5f);
+	pel->A = packed_normal[0];
 
 	pel += 0x40000;
 
 	pel->B = EncodeFloatInByte(pel2.b);
 	pel->G = EncodeFloatInByte(pel2.g);
 	pel->R = EncodeFloatInByte(pel2.r);
-	pel->A = EncodeFloatInByte(highlightDir.y/ highlightDir.z * 0.25f + 0.5f);
+	pel->A = packed_normal[0];
 
 	if (g_HDR)
 	{
+		vec2 n;
+		EncodeNormalToFloats(&highlightDir, &n);
+
 		vec4* out1 = &LightmapBytes_HDR[0x40000 * lmapSet + 512 * lmapRow + pixelIndex];
-		out1->r = pel1.r;
-		out1->g = pel1.g;
-		out1->b = pel1.b;
-		out1->a = highlightDir.x / highlightDir.z * 0.25f + 0.5f;
+		*out1 = vec4(pel1, n.x);
 
 		vec4* out2 = &Lightmap2Bytes_HDR[0x40000 * lmapSet + 512 * lmapRow + pixelIndex];
-		out2->r = pel2.r;
-		out2->g = pel2.g;
-		out2->b = pel2.b;
-		out2->a = highlightDir.y / highlightDir.z * 0.25f + 0.5f;
+		*out2 = vec4(pel2, n.y);
 	}
 
+	//
+	// For each lightmap pixel copy a block of 4 pixels for the shadowmap
+	// since the colored images are 512x512 and the shadowmap is 1024x1024 this is necessary
+	//
 	BYTE* lightBytes_PrimaryImage = (BYTE*)0x00671590;
 	BYTE* sm_pel = &lightBytes_PrimaryImage[2 * (pixelIndex + (subOffset << 10))];
 
