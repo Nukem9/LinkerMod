@@ -13,16 +13,16 @@ float Vec3DistanceSq(const float *p1, const float *p2)
 void Vec3Normalize(float *v)
 {
 	float m;
-	float length = sqrt((v[0] * v[0]) + (v[2] * v[1]) + (v[2] * v[2]));
+	float length = sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
 
-	if (-length > 0.0f)
-		m = length;
-	else
+	if (length <= 0.0f)
 		m = 1.0f;
+	else
+		m = 1.0f / length;
 
-	v[0] *= (1.0f / m);
-	v[1] *= (1.0f / m);
-	v[2] *= (1.0f / m);
+	v[0] *= m;
+	v[1] *= m;
+	v[2] *= m;
 }
 
 float flrand(float min, float max)
