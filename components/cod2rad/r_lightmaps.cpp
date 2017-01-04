@@ -259,6 +259,21 @@ void GetColorsForHighlightDir(vec3 *lighting, vec3 *highlightDir, vec3 *dstA, ve
 	}
 }
 
+//
+// Regenerate the lighting sample from dir, highlightDir, and the two pels
+//
+void GetLightingSampleForDirFromLightmap(vec3* dir, vec3* highlightDir, vec3* pel_amb, vec3* pel_dir, vec3* out)
+{
+	// It would appear that half lambert is used for the ambient lighting
+	float weight_amb = dir->z * 0.5f + 0.5f; // weight_amb = Dot(dir, vec3(0, 0, 1)) * 0.5 + 0.5;
+	float weight_dir = Vec3Dot(dir, highlightDir);
+
+	if (weight_dir < 0.0)
+		weight_dir = 0.0f;
+
+	*out = (*pel_amb) * weight_amb + (*pel_dir) * weight_dir;
+}
+
 float GetLightingApproximationError_o(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2)
 {
 	static DWORD dwCall = 0x004313B0;
@@ -281,44 +296,24 @@ float GetLightingApproximationError_o(vec3 *lighting, vec3 *highlightDir, vec3 *
 	return *(float *)&outFloat;
 }
 
-//
-// Verified
-// Variance: 0.000000 0.000001
-//
-double GetLightingApproximationError(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2)
+/*
+	Get the total value of error^2 for each lighting sample and the current lightmap pixels
+	Variance: 0.000000 0.000001
+*/
+double GetLightingApproximationError(vec3 *lighting, vec3 *highlightDir, vec3 *pel_amb, vec3 *pel_dir)
 {
 	double error = 0.0;
 
 	for (int i = 0; i < g_basisDirectionsCount; i++)
 	{
-		vec3* basis = &g_basisDirections[i];
+		vec3 sample;
+		GetLightingSampleForDirFromLightmap(&g_basisDirections[i], highlightDir, pel_amb, pel_dir, &sample);
 
-		float foo = basis->z * 0.5f + 0.5f;
-		float dotp = Vec3Dot(basis, highlightDir);
-		dotp = dotp < 0.0f ? 0.0f : dotp;
-
-		vec3 thing = *pel1 * foo + *pel2 * dotp;
-
-		vec3 bar = lighting[i] - thing;
-		error += Vec3Dot(&bar, &bar);
+		vec3 dif = lighting[i] - sample;
+		error += Vec3Dot(&dif, &dif);
 	}
 
 	return error;
-}
-
-//
-// I don't have a name for this function right now
-//
-void sub_431DD9(vec3* dir, vec3* highlightDir, vec3* pel1, vec3* pel2, vec3* out)
-{
-	float unk = dir->z * 0.5f + 0.5f;
-	float dotp = Vec3Dot(dir, highlightDir);
-	if (dotp < 0.0)
-		dotp = 0.0f;
-
-	out->x = pel1->x * unk + pel2->x * dotp;
-	out->y = pel1->y * unk + pel2->y * dotp;
-	out->z = pel1->z * unk + pel2->z * dotp;
 }
 
 void __cdecl GetGradientOfLightingErrorFunctionWithRespectToDir_o(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2, vec2 *gradient)
@@ -342,36 +337,28 @@ void __cdecl GetGradientOfLightingErrorFunctionWithRespectToDir_o(vec3 *lighting
 //
 void GetGradientOfLightingErrorFunctionWithRespectToDir(vec3 *lighting, vec3 *highlightDir, vec3 *pel1, vec3 *pel2, vec2 *gradient)
 {
-	float total[2];
-	total[0] = 0.0f;
-	total[1] = 0.0f;
+	vec2 total(0.0f, 0.0f);
 
 	for (int i = 0; i < g_basisDirectionsCount; i++)
 	{
 		vec3* basis = &g_basisDirections[i];
 
-		vec3 out;
-		sub_431DD9(basis, highlightDir, pel1, pel2, &out);
+		vec3 sample;
+		GetLightingSampleForDirFromLightmap(basis, highlightDir, pel1, pel2, &sample);
 
 		float yaa = Vec3Dot(basis, highlightDir);
 
-		float tmp[2];
-		tmp[0] = highlightDir->x * -yaa + basis->x;
-		tmp[1] = highlightDir->y * -yaa + basis->y;
+		vec2 tmp;
+		tmp.x = highlightDir->x * -yaa + basis->x;
+		tmp.y = highlightDir->y * -yaa + basis->y;
 
-		float bar[3];
-		bar[0] = lighting[i].r - out.x;
-		bar[1] = lighting[i].g - out.y;
-		bar[2] = lighting[i].b - out.z;
-
-		float dotp = Vec3Dot(pel2, (vec3*)bar);
-		total[0] += tmp[0] * dotp;
-		total[1] += tmp[1] * dotp;
+		vec3 dif = lighting[i] - sample;
+		
+		float dotp = Vec3Dot(pel2, &dif);
+		total += tmp * dotp;
 	}
 
-	float unk = highlightDir->z + highlightDir->z;
-	gradient->x = total[0] * unk;
-	gradient->y = total[1] * unk;
+	*gradient = total * (highlightDir->z + highlightDir->z);
 }
 
 void __cdecl ImproveLightingApproximation_o(vec3* lighting, vec3* highlightDir, vec3* pel1, vec3* pel2)
@@ -395,13 +382,13 @@ void __cdecl ImproveLightingApproximation_o(vec3* lighting, vec3* highlightDir, 
 // Variance: 0.000000 0.813436 (pel1)
 // Variance: 0.000000 0.590278 (pel2)
 //
-void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1, vec3* pel2)
+void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel_amb, vec3* pel_dir)
 {
 	double curError = 0.0;
-	double error = GetLightingApproximationError(lighting, highlightDir, pel1, pel2);
+	double error = GetLightingApproximationError(lighting, highlightDir, pel_amb, pel_dir);
 
 #if VARIANCE_TRACKER
-	double err2 = GetLightingApproximationError_o(lighting, highlightDir, pel1, pel2);
+	double err2 = GetLightingApproximationError_o(lighting, highlightDir, pel_amb, pel_dir);
 	vt_GetLightingApproximationError.Track(abs(error - err2));
 #endif
 
@@ -418,11 +405,11 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 	for(int magic = 4;;)
 	{
 		vec2 gradient;
-		GetGradientOfLightingErrorFunctionWithRespectToDir(lighting, highlightDir, pel1, pel2, &gradient);
+		GetGradientOfLightingErrorFunctionWithRespectToDir(lighting, highlightDir, pel_amb, pel_dir, &gradient);
 
 #if VARIANCE_TRACKER
 		vec2 gradient2;
-		GetGradientOfLightingErrorFunctionWithRespectToDir_o(lighting, highlightDir, pel1, pel2, &gradient2);
+		GetGradientOfLightingErrorFunctionWithRespectToDir_o(lighting, highlightDir, pel_amb, pel_dir, &gradient2);
 		vt_GetGradientOfLightingErrorFunctionWithRespectToDir.Track(Vec2Variance(&gradient, &gradient2));
 #endif
 
@@ -437,32 +424,35 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 			absoluteGradient.x = absoluteGradient.y;
 
 		vec3 dir;
-		vec3 new_pel1;
-		vec3 new_pel2;
+		vec3 new_pel_amb;
+		vec3 new_pel_dir;
 
+		//
+		// Adjust using the gradient, keep adjustment if the new error is lower than the old one, otherwise try again
+		//
 		while (true)
 		{
-			float oob = magic / absoluteGradient.x;
+			float scalar = magic / absoluteGradient.x;
 
-			updatedByteDir[0] = ClampByte(initialByteDir[0] + (int)(gradient.x * oob));
-			updatedByteDir[1] = ClampByte(initialByteDir[1] + (int)(gradient.y * oob));
+			updatedByteDir[0] = ClampByte(initialByteDir[0] + (int)(gradient.x * scalar));
+			updatedByteDir[1] = ClampByte(initialByteDir[1] + (int)(gradient.y * scalar));
 
 			dir.x = (float)updatedByteDir[0] / 63.75f - 2.0f; // possibly 255 / max_magic - max_magic / 2 ?
 			dir.y = (float)updatedByteDir[1] / 63.75f - 2.0f; // possibly 255 / max_magic
 			dir.z = 1.0f;
 			Vec3Normalize(&dir);
 
-			GetColorsForHighlightDir(lighting, &dir, &new_pel1, &new_pel2);
+			GetColorsForHighlightDir(lighting, &dir, &new_pel_amb, &new_pel_dir);
 #if VARIANCE_TRACKER
 			vec3 new_pel3;
 			vec3 new_pel4;
 			GetColorsForHighlightDir_o(lighting, &dir, &new_pel3, &new_pel4);
-			vt_GetColorsForHighlightDir_1.Track(Vec3Variance(&new_pel1, &new_pel3));
-			vt_GetColorsForHighlightDir_2.Track(Vec3Variance(&new_pel2, &new_pel4));
+			vt_GetColorsForHighlightDir_1.Track(Vec3Variance(&new_pel_amb, &new_pel3));
+			vt_GetColorsForHighlightDir_2.Track(Vec3Variance(&new_pel_dir, &new_pel4));
 #endif
-			curError = GetLightingApproximationError(lighting, &dir, &new_pel1, &new_pel2);
+			curError = GetLightingApproximationError(lighting, &dir, &new_pel_amb, &new_pel_dir);
 #if VARIANCE_TRACKER
-			err2 = GetLightingApproximationError_o(lighting, &dir, &new_pel1, &new_pel2);
+			err2 = GetLightingApproximationError_o(lighting, &dir, &new_pel_amb, &new_pel_dir);
 			vt_GetLightingApproximationError.Track(abs(curError - err2));
 #endif
 
@@ -479,20 +469,13 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel1
 				return;
 		}
 
-		pel1->r = new_pel1.r;
-		pel1->g = new_pel1.g;
-		pel1->b = new_pel1.b;
-
-		pel2->r = new_pel2.r;
-		pel2->g = new_pel2.g;
-		pel2->b = new_pel2.b;
+		*pel_amb = new_pel_amb;
+		*pel_dir = new_pel_dir;
 
 		initialByteDir[0] = updatedByteDir[0];
 		initialByteDir[1] = updatedByteDir[1];
 
-		highlightDir->x = dir.x;
-		highlightDir->y = dir.y;
-		highlightDir->z = dir.z;
+		*highlightDir = dir;
 
 		error = curError;
 	}
@@ -516,6 +499,10 @@ void __declspec(naked) hk_StoreLightBytes()
 /*
 	lighting - a pointer to an array of [g_basisDirectionsCount] RGB vec3 values for the given pixel - these correspond to each basis direction in g_basisDirections for that point
 	pFloats - a pointer to the primary light values (1 float per pixel) that are used for baked shadowmaps
+
+	pel1 - amb
+	pel2 - dir
+	pFloats - sm
 */
 void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lighting, float* pFloats)
 {
