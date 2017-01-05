@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
-IDirect3DDevice9*& dx_device = *(IDirect3DDevice9 **)0x03963448;
+const char *R_ErrorDescription(HRESULT hr)
+{
+	return ((const char *(__cdecl *)(HRESULT))0x0098F062)(hr);
+}
 
 HWND WINAPI hk_CreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
 {

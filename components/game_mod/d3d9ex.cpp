@@ -1,5 +1,10 @@
 #include "stdafx.h"
 
+bool IsD3D9ExAvailable()
+{
+	return r_d3d9ex->current.enabled;
+}
+
 IDirect3D9 *D3DAPI hk_Direct3DCreate9(UINT SDKVersion)
 {
 	HMODULE d3d9 = GetModuleHandleA("d3d9.dll");
@@ -43,7 +48,7 @@ IDirect3D9 *D3DAPI hk_Direct3DCreate9(UINT SDKVersion)
 HRESULT D3DAPI hk_CreateDevice(IDirect3D9 *This, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DDevice9 **ppReturnedDeviceInterface)
 {
 	// Short-circuit to the original call
-	if (!r_d3d9ex->current.enabled)
+	if (!IsD3D9ExAvailable())
 		return This->CreateDevice(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
 
 	// D3D requires a specific structure when in windowed mode
@@ -55,12 +60,15 @@ HRESULT D3DAPI hk_CreateDevice(IDirect3D9 *This, UINT Adapter, D3DDEVTYPE Device
 	displayMode.Format = pPresentationParameters->BackBufferFormat;
 	displayMode.ScanLineOrdering = D3DSCANLINEORDERING_UNKNOWN;
 
-	HRESULT hr = ((IDirect3D9Ex *)This)->CreateDeviceEx(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, &displayMode, (IDirect3DDevice9Ex **)ppReturnedDeviceInterface);
+	// This must be null when in windowed mode
+	D3DDISPLAYMODEEX *realMode = (pPresentationParameters->Windowed) ? nullptr : &displayMode;
+
+	HRESULT hr = ((IDirect3D9Ex *)This)->CreateDeviceEx(Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, realMode, (IDirect3DDevice9Ex **)ppReturnedDeviceInterface);
 
 	if (FAILED(hr))
 		return hr;
 
-	Com_Printf(1, "Using CreateDeviceEx for device creation\n");
+	printf("Using CreateDeviceEx for device creation\n");
 	return D3D_OK;
 }
 
@@ -72,7 +80,7 @@ HRESULT D3DAPI hk_GetSwapChain(IDirect3DDevice9 *This, UINT iSwapChain, IDirect3
 	if (FAILED(hr))
 		return hr;
 
-	if (!r_d3d9ex->current.enabled)
+	if (!IsD3D9ExAvailable())
 		return D3D_OK;
 
 	// Get a handle to the IDirect3DSwapChain9Ex interface via COM GUID
@@ -81,6 +89,27 @@ HRESULT D3DAPI hk_GetSwapChain(IDirect3DDevice9 *This, UINT iSwapChain, IDirect3
 	if (FAILED(hr))
 		return hr;
 
-	Com_Printf(1, "Using IDirect3DSwapChain9Ex for swapchain %d\n", iSwapChain);
+	printf("Using IDirect3DSwapChain9Ex for swapchain %d\n", iSwapChain);
+	return D3D_OK;
+}
+
+HRESULT D3DAPI hk_CreateAdditionalSwapChain(IDirect3DDevice9 *This, D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DSwapChain9 **ppSwapChain)
+{
+	// Short-circuit to the original call
+	if (!IsD3D9ExAvailable())
+		return This->CreateAdditionalSwapChain(pPresentationParameters, ppSwapChain);
+
+	HRESULT hr = ((IDirect3DDevice9Ex *)This)->CreateAdditionalSwapChain(pPresentationParameters, ppSwapChain);
+
+	if (FAILED(hr))
+		return hr;
+
+	// Get a handle to the IDirect3DSwapChain9Ex interface via COM GUID
+	hr = (*ppSwapChain)->QueryInterface(__uuidof(IDirect3DSwapChain9Ex), (void **)ppSwapChain);
+
+	if (FAILED(hr))
+		return hr;
+
+	printf("Using IDirect3DSwapChain9Ex for newly created swapchain\n");
 	return D3D_OK;
 }
