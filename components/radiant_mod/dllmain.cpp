@@ -62,6 +62,17 @@ BOOL RadiantMod_Init()
 #endif
 
 	//
+	// Use D3D9Ex when available to prevent lost devices
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0051B75A, (PBYTE)&hk_Direct3DCreate9, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0051B5CC, (PBYTE)&hk_CreateDevice, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0054F34F, (PBYTE)&hk_GetSwapChain, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0051B891, (PBYTE)&hk_CreateAdditionalSwapChain, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0051C25E, (PBYTE)&hk_CreateAdditionalSwapChain, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0056AC60, (PBYTE)&Image_Setup);
+	//PatchMemory(0x00000000, (PBYTE)"\xEB", 1); (Present() patch only needed for fullscreen)
+
+	//
 	// Redirect all resource (resx) loading to this dll first
 	//
 	void *ptr = hk_LoadResource;
@@ -176,6 +187,9 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
 	DO_NOT_USE(0x0052FE70);// Material_SetPassShaderArguments_DX
 	DO_NOT_USE(0x00567450);// Image_LoadFromData
+	DO_NOT_USE(0x0052B160);// Image_CreateCubeTexture_PC
+	DO_NOT_USE(0x0052B040);// Image_Create3DTexture_PC
+	DO_NOT_USE(0x0052AF20);// Image_Create2DTexture_PC
 #undef DO_NOT_USE
 #endif
 

@@ -53,6 +53,7 @@
 #define SRCLINE(x)
 #define CHECK_SIZE(Type, Size) static_assert(sizeof(Type) == Size, "Invalid type size!");
 
+#include "d3d9ex.h"
 #include "CWinApp.h"
 #include "win_main.h"
 #include "win_splash.h"

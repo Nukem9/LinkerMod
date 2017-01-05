@@ -100,6 +100,7 @@
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="CWinApp.cpp" />
+    <ClCompile Include="d3d9ex.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ent_light.cpp" />
     <ClCompile Include="kvs.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="CWinApp.h" />
+    <ClInclude Include="d3d9ex.h" />
     <ClInclude Include="ent_light.h" />
     <ClInclude Include="kvs.h" />
     <ClInclude Include="nvidia.h" />
