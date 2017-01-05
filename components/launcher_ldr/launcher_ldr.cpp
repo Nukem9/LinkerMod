@@ -54,7 +54,7 @@ void FixCommandLine(int argc, char *argv[])
 	{
 		strcat_s(g_CommandLine, " ");
 
-		//Fix for arguments in quotes being split into multiple args
+		// Fix for arguments in quotes being split into multiple args
 		char buf[8192];
 		if(StrContainsChar(argv[i], ' ') != -1)
 		{
@@ -83,27 +83,21 @@ void FixCommandLine(int argc, char *argv[])
 
 void FixDirectory(int argc, char *argv[])
 {
-	//
 	// Get the current directory to resolve relative paths
-	//
 	char temp[MAX_PATH];
 	sprintf_s(temp, "%s\\%s", g_Directory, argv[2]);
 
 	char *filePart = nullptr;
 	GetFullPathNameA(temp, ARRAYSIZE(temp), g_ExeDirectory, &filePart);
 
-	//
-	// Trim off the file name
-	//
+	// Trim off the file name part
 	if (filePart)
 		*filePart = '\0';
 }
 
 int main(int argc, char *argv[])
 {
-	//
 	// Disable STDOUT buffering
-	//
 	setvbuf(stdout, nullptr, _IONBF, 0);
 
 	if (argc < 3)
@@ -115,23 +109,19 @@ int main(int argc, char *argv[])
 	//
 	// Redirect output to this console
 	//
+	PROCESS_INFORMATION processInfo;
+	memset(&processInfo, 0, sizeof(PROCESS_INFORMATION));
+
 	STARTUPINFOA startupInfo;
 	memset(&startupInfo, 0, sizeof(STARTUPINFOA));
 
 	startupInfo.cb			= sizeof(STARTUPINFOA);
+	startupInfo.dwFlags		= STARTF_USESTDHANDLES;
 	startupInfo.hStdError	= stderr;
 	startupInfo.hStdInput	= stdin;
 	startupInfo.hStdOutput	= stdout;
 
-	//
-	// Process/thread handles
-	//
-	PROCESS_INFORMATION processInfo;
-	memset(&processInfo, 0, sizeof(PROCESS_INFORMATION));
-
-	//
 	// Create a process job object to kill children on exit
-	//
 	HANDLE ghJob = CreateJobObject(nullptr, nullptr);
 
 	if (ghJob == nullptr)
@@ -144,9 +134,7 @@ int main(int argc, char *argv[])
 		JOBOBJECT_EXTENDED_LIMIT_INFORMATION info;
 		memset(&info, 0, sizeof(info));
 
-		//
-		// Query the information first
-		//
+		// Query original information first
 		if (!QueryInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &info, sizeof(info), nullptr))
 		{
 			printf("Could not QueryInformationJobObject\n");
@@ -166,9 +154,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	//
 	// Call the real process
-	//
 	FixCommandLine(argc, argv);
 	FixDirectory(argc, argv);
 
@@ -178,18 +164,14 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	//
 	// Assign the job object
-	//
 	if (!AssignProcessToJobObject(ghJob, processInfo.hProcess))
 	{
 		printf("Unable to assign child process job object (0x%X)\n", GetLastError());
 		return 1;
 	}
 
-	//
 	// Inject the DLL
-	//
 	HANDLE injectThread = InjectDll(processInfo.hProcess, g_Directory, argv[1]);
 
 	if (!injectThread)
@@ -198,39 +180,26 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	//
-	// Resume the process
-	//
+	// Resume injection thread, then the process
 	ResumeThread(injectThread);
 	WaitForSingleObject(injectThread, INFINITE);
 
 	ResumeThread(processInfo.hThread);
 
-	//
-	// Close thread handles
-	//
 	CloseHandle(processInfo.hThread);
 	CloseHandle(injectThread);
 
-	//
-	// Wait until the process exits
-	//
+	// Wait until it exits
 	WaitForSingleObject(processInfo.hProcess, INFINITE);
 
-	//
 	// Determine the real process exit code
-	//
 	DWORD exitCode = 0;
 	GetExitCodeProcess(processInfo.hProcess, &exitCode);
-
-	//printf("Exited with code: 0x%X\n",exitCode);
 
 	CloseHandle(processInfo.hProcess);
 	CloseHandle(ghJob);
 
-	//
 	// Send the exit code to the caller
-	//
 	ExitProcess(exitCode);
 	return exitCode;
 }
