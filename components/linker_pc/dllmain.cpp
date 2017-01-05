@@ -52,6 +52,11 @@ BOOL LinkerMod_Init()
 	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
 	PatchMemory(0x00480D10, (PBYTE)&msg_assertion, 4);
 
+	//
+	// Prevent "_acess" spam
+	//
+	PatchMemory_WithNOP(0x004C6F9B, 5);
+
 	g_initted = TRUE;
 	return TRUE;
 }
