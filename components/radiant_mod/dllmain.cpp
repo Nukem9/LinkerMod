@@ -70,7 +70,7 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0051B891, (PBYTE)&hk_CreateAdditionalSwapChain, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x0051C25E, (PBYTE)&hk_CreateAdditionalSwapChain, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x0056AC60, (PBYTE)&Image_Setup);
-	//PatchMemory(0x00000000, (PBYTE)"\xEB", 1); (Present() patch only needed for fullscreen)
+	PatchMemory(0x0053E492, (PBYTE)"\xEB", 1); // (Present() patch when focus is lost)
 
 	//
 	// Redirect all resource (resx) loading to this dll first
