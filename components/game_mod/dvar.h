@@ -116,6 +116,7 @@ extern dvar_s* con_inputMaxMatchesShown;
 extern dvar_s* cg_drawViewpos;
 extern dvar_s* gm_build_date;
 extern dvar_s* cg_showServerInfo;
+extern dvar_s* player_sustainAmmo;
 
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;

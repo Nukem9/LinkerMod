@@ -7,6 +7,7 @@ dvar_s* con_extcon;
 dvar_s* con_inputMaxMatchesShown;
 dvar_s* cg_drawViewpos;
 dvar_s* gm_build_date;
+dvar_s* player_sustainAmmo;
 
 void R_RegisterCustomDvars()
 {
@@ -56,6 +57,7 @@ void __cdecl CG_RegisterDvars()
 {
 	CG_RegisterDvars_o();
 
+	player_sustainAmmo = Dvar_RegisterInt("player_sustainAmmo", 0, 0, 1, 0x80, "Firing weapon will not decrease clip ammo.");
 	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 1, "Enable external console window");
 	con_inputMaxMatchesShown = Dvar_RegisterInt("con_inputMaxMatchesShown", 24, 1, 64, 1, "Maximum number of suggestions in the console autocomplete preview");
 	cg_drawViewpos = Dvar_RegisterInt("cg_drawViewpos", 0, 0, 1, 1, "Draw the current player origin and view angles");
