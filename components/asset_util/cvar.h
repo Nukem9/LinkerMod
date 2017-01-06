@@ -92,6 +92,7 @@ public:
 REGISTER_GLOBAL_CVAR(g_verbose);
 REGISTER_GLOBAL_CVAR(g_logfile);
 REGISTER_GLOBAL_CVAR(fs_overwrite);
+
 #if _DEBUG
 REGISTER_GLOBAL_CVAR(g_dumpCVars);
 #endif
@@ -104,6 +105,8 @@ REGISTER_CVAR(g_extractAll);
 REGISTER_CVAR(g_extractImages);
 REGISTER_CVAR(g_extractSounds);
 REGISTER_CVAR(g_useLocalized);
+
+REGISTER_CVAR(fs_outdir);
 
 #undef REGISTER_GLOBAL_CVAR
 #undef REGISTER_CVAR

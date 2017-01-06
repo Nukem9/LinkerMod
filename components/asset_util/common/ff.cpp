@@ -53,7 +53,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	Con_Print_v("Extracting file: \"%s\"...	", rawfilePath);
 
 	char qpath[1024] = "";
-	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
+	sprintf_s(qpath, "%s/%s", AppInfo_OutDir(), rawfilePath);
 
 	//
 	// If not in overwrite mode AND the file exists
@@ -114,7 +114,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 	Con_Print_v("Extracting file: \"%s\"...	", rawfilePath);
 
 	char qpath[1024] = "";
-	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
+	sprintf_s(qpath, "%s/%s", AppInfo_OutDir(), rawfilePath);
 
 	//
 	// If not in overwrite mode AND the file exists
@@ -171,7 +171,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 #if _DEBUG
 	sprintf_s(qpath, "%s", sndfilePath);
 #else
-	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), sndfilePath);
+	sprintf_s(qpath, "%s/%s", AppInfo_OutDir(), sndfilePath);
 #endif
 	
 	

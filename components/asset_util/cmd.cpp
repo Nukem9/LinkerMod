@@ -16,8 +16,8 @@ REGISTER_GLOBAL_COMMAND(g_cmd_test, "test", "An empty test command", Cmd_Test_f,
 #endif
 REGISTER_GLOBAL_COMMAND(g_cmd_help, "help", "Print usage information", Cmd_Help_f, CMD_GLOBALCVARS);
 REGISTER_GLOBAL_COMMAND(g_cmd_ents, "ents", "Extract the entity string from a fastfile", Cmd_Ents_f, CMD_GLOBALCVARS);
-REGISTER_GLOBAL_COMMAND(g_cmd_extract_ff, "extract-ff", "Extract assets from *.ff files", Cmd_Extract_FF_f, CMD_CVARS(&g_extractAll, &g_extractSounds,&g_useLocalized));
-REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd, "extract-iwd", "Extract assets from *.iwd files", Cmd_Extract_IWD_f, CMD_CVARS(&g_extractAll, &g_extractImages, &g_extractSounds));
+REGISTER_GLOBAL_COMMAND(g_cmd_extract_ff, "extract-ff", "Extract assets from *.ff files", Cmd_Extract_FF_f, CMD_CVARS(&g_extractAll, &g_extractSounds,&g_useLocalized, &fs_outdir));
+REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd, "extract-iwd", "Extract assets from *.iwd files", Cmd_Extract_IWD_f, CMD_CVARS(&g_extractAll, &g_extractImages, &g_extractSounds, &fs_outdir));
 
 #undef CMD_GLOBALCVARS
 #undef CMD_CVARS

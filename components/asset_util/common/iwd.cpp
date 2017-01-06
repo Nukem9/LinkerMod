@@ -44,7 +44,7 @@ int __cdecl IWD_IWDHandler(const char* iwdPath, const char* iwdName)
 int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 {
 	char outPath[MAX_PATH];
-	sprintf_s(outPath, "%s/%s", AppInfo_RawDir(), filepath);
+	sprintf_s(outPath, "%s/%s", AppInfo_OutDir(), filepath);
 
 	if (fs_overwrite.ValueBool())
 	{

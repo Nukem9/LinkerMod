@@ -3,6 +3,8 @@
 #include "AppInfo.h"
 #include "../common/io.h"
 
+#include "../cvar.h"
+
 char g_GameDirectory[MAX_PATH];
 
 bool AppInfo_Init()
@@ -65,4 +67,12 @@ const char* AppInfo_RawDir()
 
 	return rawDir;
 #endif
+}
+
+const char* AppInfo_OutDir()
+{
+	if (fs_outdir.ValueString() == NULL)
+		return AppInfo_RawDir();
+
+	return fs_outdir.ValueString();
 }
