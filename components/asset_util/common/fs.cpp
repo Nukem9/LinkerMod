@@ -172,8 +172,11 @@ int FS_DirectoryIterator(const char* path, int(__cdecl* FS_DirectoryHandlerCallb
 	return count;
 }
 
-int FS_CreatePath(const char* targetPath)
+int FS_CreatePath(const char* _targetPath)
 {
+	char targetPath[1024];
+	sprintf_s(targetPath, "%s/%s", AppInfo_OutDir(), _targetPath);
+
 	int len = strlen(targetPath);
 	for (int i = 0; i < len; i++)
 	{
@@ -182,8 +185,7 @@ int FS_CreatePath(const char* targetPath)
 			char buf[1024] = "";
 			strncpy(buf + strlen(buf), targetPath, i);
 
-			char qpath[1024] = "";
-			sprintf_s(qpath, "%s/%s/", AppInfo_OutDir(), buf);
+			char* qpath = buf;
 
 #if _DEBUG
 			if (!CreateDirectoryA(buf, 0) && GetLastError() != ERROR_ALREADY_EXISTS)

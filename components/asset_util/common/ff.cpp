@@ -116,6 +116,18 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 	char qpath[1024] = "";
 	sprintf_s(qpath, "%s/%s", AppInfo_OutDir(), rawfilePath);
 
+	int* pHeader = (int*)rawfilePath;
+	int len = pHeader[-2];
+
+	//
+	// Catch incorrect rawfile data to prevent massive allocations
+	//
+	if (len > 1024 * 1024 * 16)
+	{
+		Con_Print_v("IGNORED\n");
+		return 0;
+	}
+
 	//
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
@@ -133,26 +145,18 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
+		printf("%s\n", rawfilePath);
 		Con_Error_v("PATH ERROR\n");
 		return 0;
 	}
-
-	//
-	// Catch incorrect rawfile data to prevent massive allocations
-	//
-	if (strlen(rawfileData) > 1024 * 1024 * 16)
-	{
-		Con_Print_v("IGNORED\n");
-		return 0;
-	}
-
+	
 	if (FILE* h = fopen(qpath, "wb"))
 	{
-		fwrite(rawfileData, 1, strlen(rawfileData), h);
+		fwrite(rawfileData, 1, len, h);
 		fclose(h);
 
 		Con_Print_v("SUCCESS\n");
-		return strlen(rawfileData);
+		return len;
 	}
 
 	Con_Error_v("ERROR\n");
