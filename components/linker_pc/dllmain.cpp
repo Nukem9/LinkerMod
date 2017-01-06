@@ -57,6 +57,11 @@ BOOL LinkerMod_Init()
 	//
 	PatchMemory_WithNOP(0x004C6F9B, 5);
 
+	//
+	// Prevent dropping pathnodes if a custom ents file is loaded
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00420493, (PBYTE)&mfh_MapEnts_ParseEntities);
+
 	g_initted = TRUE;
 	return TRUE;
 }

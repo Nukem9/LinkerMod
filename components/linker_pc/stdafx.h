@@ -13,6 +13,8 @@
 //
 #include "../shared/shared_utility.h"
 
+#include "linker.h"
+
 #include "T5.h"
 #include "crc32.h"
 #include "assertive.h"
