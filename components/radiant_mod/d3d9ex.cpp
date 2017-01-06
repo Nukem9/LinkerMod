@@ -114,6 +114,8 @@ HRESULT D3DAPI hk_CreateAdditionalSwapChain(IDirect3DDevice9 *This, D3DPRESENT_P
 	if (FAILED(hr))
 		return hr;
 
-	printf("Using IDirect3DSwapChain9Ex for newly created swapchain\n");
+#if _DEBUG
+	printf("Using IDirect3DSwapChain9Ex for newly created swapchain (0x%X)\n", hr);
+#endif
 	return D3D_OK;
 }
