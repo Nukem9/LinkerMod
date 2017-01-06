@@ -115,12 +115,6 @@ int main(int argc, char *argv[])
 	STARTUPINFOA startupInfo;
 	memset(&startupInfo, 0, sizeof(STARTUPINFOA));
 
-	startupInfo.cb			= sizeof(STARTUPINFOA);
-	startupInfo.dwFlags		= STARTF_USESTDHANDLES;
-	startupInfo.hStdError	= stderr;
-	startupInfo.hStdInput	= stdin;
-	startupInfo.hStdOutput	= stdout;
-
 	// Create a process job object to kill children on exit
 	HANDLE ghJob = CreateJobObject(nullptr, nullptr);
 
