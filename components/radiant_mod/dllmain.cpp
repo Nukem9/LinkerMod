@@ -294,6 +294,12 @@ BOOL RadiantMod_Init()
 	//PatchMemory(0x004018B0, (PBYTE)&ppfn, 4); // Advanced Curve Dialog (Doesn''t work)
 #endif
 
+	//
+	// Fix the grid block coordinates
+	//
+	PatchMemory(0x004827E9, (PBYTE)"\x84", 1);
+	PatchMemory(0x004827D3, (PBYTE)"\x84", 1);
+
 	return TRUE;
 }
 
