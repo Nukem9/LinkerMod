@@ -381,6 +381,19 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x006CF200, (PBYTE)&hk_R_GenerateReflections);
 
 	//
+	// Improve bullets with various perks
+	//
+	Detours::X86::DetourFunction((PBYTE)0x004625C0, (PBYTE)&Bullet_Fire);
+	Detours::X86::DetourFunction((PBYTE)0x0079A4F1, (PBYTE)&mfh_CG_DrawBulletImpacts1);
+	Detours::X86::DetourFunction((PBYTE)0x0079A5B5, (PBYTE)&mfh_CG_DrawBulletImpacts2);
+
+	//
+	// PM (Player Movement) hooks for infinite ammo and weapon jamming
+	//
+	*(PBYTE *)&PM_WeaponUseAmmo = Detours::X86::DetourFunction((PBYTE)0x006979B0, (PBYTE)&hk_PM_WeaponUseAmmo);
+	Detours::X86::DetourFunction((PBYTE)0x00766CF0, (PBYTE)&PM_Weapon_Jam);
+
+	//
 	// Increase Asset Limits
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 256);
