@@ -14,7 +14,8 @@ char* FindRawfileString(BYTE* start, BYTE* end)
 		if (strncmp(".atr", (char*)start, 4) == 0 ||
 			strncmp(".gsc", (char*)start, 4) == 0 ||
 			strncmp(".csc", (char*)start, 4) == 0 ||
-			strncmp(".wav", (char*)start, 4) == 0)
+			strncmp(".wav", (char*)start, 4) == 0 ||
+			strncmp(".xpo", (char*)start, 4) == 0 )
 		{
 			return (char*)start;
 		}
@@ -305,7 +306,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 		}
 		*/
 
-		else if (Str_EndsWith(rawfileString, ".vision"))
+		else if (Str_EndsWith(rawfileString, ".vision") || Str_EndsWith(rawfileString, ".xpo"))
 		{
 			char* rawfileData = rawfileString + strlen(rawfileString) + 1;
 			int fileLen = FF_FFExtractUncompressedRawfile(rawfileData, rawfileString);

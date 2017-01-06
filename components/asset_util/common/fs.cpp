@@ -83,7 +83,6 @@ int FS_FileCount(const char* path, const char* pattern)
 
 	char spath[MAX_PATH];
 	sprintf_s(spath, "%s/%s", path, pattern);
-	Con_Print("%s\n", spath);
 
 	if ((dir = FindFirstFileA(spath, &file_data)) == INVALID_HANDLE_VALUE)
 	{

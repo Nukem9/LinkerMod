@@ -3,18 +3,30 @@
 
 #include "../sys/AppInfo.h"
 #include "../common/io.h"
+#include "../common/fs.h"
 
 #include "../cvar.h"
 
 int Cmd_Extract_FF_f(int argc, char** argv)
 {
-	if (g_useLocalized.ValueBool())
+	if (g_extractAll.ValueBool())
 	{
-		FS_FileIterator(AppInfo_ZoneDir(), FS_SEARCHPATTERN_FF, FF_FFExtract);
+		if (g_useLocalized.ValueBool())
+		{
+			FS_FileIterator(AppInfo_ZoneDir(), FS_SEARCHPATTERN_FF, FF_FFExtract);
+		}
+		else
+		{
+			FS_FileIterator(AppInfo_FFDir(), FS_SEARCHPATTERN_FF, FF_FFExtract);
+		}
 	}
 	else
 	{
-		FS_FileIterator(AppInfo_FFDir(), FS_SEARCHPATTERN_FF, FF_FFExtract);
+		for (int i = 1; i < argc; i++)
+		{
+			const char* filename = FS_GetFilenameSubString(argv[i]);
+			FF_FFExtract(argv[i], filename);
+		}
 	}
 	return 0;
 }
