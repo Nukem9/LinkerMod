@@ -52,6 +52,12 @@
 #include "ragdoll_update.h"
 #include "phys_main.h"
 #include "com_bsp_load_obj.h"
+#include "bg_weapons_def.h"
+#include "bullet.h"
+#include "cg_weapons.h"
+#include "bg_perks.h"
+#include "cl_debugdata.h"
+#include "bg_weapons.h"
 
 #include "win_localize.h"
 #include "win_exception.h"

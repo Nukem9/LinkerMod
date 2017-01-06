@@ -89,8 +89,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bg_weapons.cpp" />
+    <ClCompile Include="bg_weapons_def.cpp" />
+    <ClCompile Include="bullet.cpp" />
     <ClCompile Include="CEG.cpp" />
     <ClCompile Include="cg_scoreboard.cpp" />
+    <ClCompile Include="cg_weapons.cpp" />
+    <ClCompile Include="cl_debugdata.cpp" />
     <ClCompile Include="cl_main_mp.cpp" />
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="common.cpp" />
@@ -125,8 +130,14 @@
     <ClCompile Include="win_main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bg_perks.h" />
+    <ClInclude Include="bg_weapons.h" />
+    <ClInclude Include="bg_weapons_def.h" />
+    <ClInclude Include="bullet.h" />
     <ClInclude Include="CEG.h" />
     <ClInclude Include="cg_scoreboard.h" />
+    <ClInclude Include="cg_weapons.h" />
+    <ClInclude Include="cl_debugdata.h" />
     <ClInclude Include="cl_main_mp.h" />
     <ClInclude Include="cmd.h" />
     <ClInclude Include="common.h" />

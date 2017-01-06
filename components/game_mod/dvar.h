@@ -103,6 +103,11 @@ static dvar_s*& ragdoll_reactivation_cutoff = *(dvar_s **)0xBCAEB0;
 static dvar_s*& ragdoll_explode_upbias = *(dvar_s **)0x251CBCC;
 static dvar_s*& ragdoll_explode_force = *(dvar_s **)0x251CBC8;
 
+static dvar_s*& g_debugBullets = *(dvar_s **)0x01BD9B48;
+static dvar_s*& sv_bullet_range = *(dvar_s **)0x02899D64;
+static dvar_s*& bg_forceExplosiveBullets = *(dvar_s **)0x00BCD1E8;
+static dvar_s*& vehicle_selfCollision = *(dvar_s **)0x00BCAFCC;
+
 extern dvar_s* r_d3d9ex;
 extern dvar_s* r_noborder;
 extern dvar_s* sm_quality;
