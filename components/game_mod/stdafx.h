@@ -58,6 +58,7 @@
 #include "bg_perks.h"
 #include "cl_debugdata.h"
 #include "bg_weapons.h"
+#include "cl_keys.h"
 
 #include "win_localize.h"
 #include "win_exception.h"

@@ -96,6 +96,7 @@
     <ClCompile Include="cg_scoreboard.cpp" />
     <ClCompile Include="cg_weapons.cpp" />
     <ClCompile Include="cl_debugdata.cpp" />
+    <ClCompile Include="cl_keys.cpp" />
     <ClCompile Include="cl_main_mp.cpp" />
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="common.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="cg_scoreboard.h" />
     <ClInclude Include="cg_weapons.h" />
     <ClInclude Include="cl_debugdata.h" />
+    <ClInclude Include="cl_keys.h" />
     <ClInclude Include="cl_main_mp.h" />
     <ClInclude Include="cmd.h" />
     <ClInclude Include="common.h" />

@@ -103,19 +103,24 @@ BOOL GameMod_Init()
 	//
 	// Enable the in-game console
 	//
-	Detours::X86::DetourFunction((PBYTE)0x00587DC8, (PBYTE)&Con_ToggleConsole);
-	Detours::X86::DetourFunction((PBYTE)0x00587633, (PBYTE)&Con_ToggleConsole);
-	PatchMemory(0x00587DC8, (PBYTE)"\xE8", 1);
-	PatchMemory(0x00587633, (PBYTE)"\xE8", 1);
+	Detours::X86::DetourFunction((PBYTE)0x00587DC8, (PBYTE)&Con_ToggleConsole, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x00587633, (PBYTE)&Con_ToggleConsole, Detours::X86Option::USE_CALL);
 	PatchMemory(0x0058761C, (PBYTE)"\xEB", 1);
 
 	//
-	// Don't automatically close the console when loading a map
+	// Run console/packet events even during map load
 	//
-	PatchMemory_WithNOP(0x0057011A, 5);
-	PatchMemory_WithNOP(0x0051B0BD, 5);
-	PatchMemory_WithNOP(0x00445AA1, 5);
-	PatchMemory_WithNOP(0x00570130, 10);
+	Detours::X86::DetourFunction((PBYTE)0x00699565, (PBYTE)&Com_RunEventHack, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x00589430, (PBYTE)&Com_EventLoop);
+	PatchMemory_WithNOP(0x007A283C, 5);
+
+	//
+	// Allow the console to be opened during loadscreens
+	//
+	//PatchMemory_WithNOP(0x0057011A, 5);	// CL_MapLoading
+	PatchMemory_WithNOP(0x00570130, 10);	// CL_MapLoading
+	PatchMemory_WithNOP(0x0051B0BD, 5);		// CL_InitCGame
+	PatchMemory_WithNOP(0x00445AA1, 5);		// CL_ParseGamestate
 
 	//
 	// Disable error message boxes with developer_script

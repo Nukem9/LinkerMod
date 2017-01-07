@@ -1,5 +1,10 @@
 #include "stdafx.h"
 
+void Sys_GetEvent(sysEvent_t *event)
+{
+	((void(__cdecl *)(sysEvent_t *))0x0068BB40)(event);
+}
+
 void Sys_NormalExit()
 {
 	((void(__cdecl *)())0x00553790)();

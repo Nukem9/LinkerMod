@@ -67,8 +67,6 @@ typedef ParseThreadInfo *(__cdecl* Com_EndParseSession_t)();
 static Com_EndParseSession_t Com_EndParseSession = (Com_EndParseSession_t)0x005C11C0;
 
 
-void __cdecl Com_LoadCommonFastFile();
-
 typedef int (__cdecl* I_strcmp_t)(const char *s0, const char *s1);
 static I_strcmp_t I_strcmp = (I_strcmp_t)0x0063E630;
 
@@ -84,5 +82,9 @@ static I_stristr_t I_stristr = (I_stristr_t)0x0062F110;
 typedef void (__cdecl* I_strncpyz_t)(char *dest, const char *src, int destsize);
 static I_strncpyz_t I_strncpyz = (I_strncpyz_t)0x005D4D60;
 
+bool Com_RunEventHack();
+void Com_EventLoop();
+
+void __cdecl Com_LoadCommonFastFile();
 char *__cdecl Com_GetLevelSharedFastFile(const char *mapName);
 void __cdecl Com_LoadLevelFastFiles(const char *mapName);

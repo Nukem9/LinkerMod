@@ -40,3 +40,8 @@ void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex
 
 	Cmd_ExecuteSingleCommandInternal(localClientNum, controllerIndex, item, text, false);
 }
+
+void Cbuf_AddText(int localClientNum, const char *text)
+{
+	((void(__cdecl *)(int, const char *))0x0049B930)(localClientNum, text);
+}
