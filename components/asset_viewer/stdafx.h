@@ -28,9 +28,11 @@
 #define SRCLINE(x)
 #define CHECK_SIZE(Type, Size) static_assert(sizeof(Type) == Size, "Invalid type size!");
 
+#include "common.h"
+
 //
 // Asset Viewer Mod Options
 // Can be used to easily toggle certain tweaks
 //
 #define ASSET_VIEWER_DISABLE_MATERIAL_ASSERT 1
-
+#define ASSET_VIEWER_DISABLE_NO_MODEL_SPAM 1

@@ -72,6 +72,13 @@ BOOL AssetViewerMod_Init()
 	PatchMemory_WithNOP(0x0080481B, 1);
 #endif
 
+	//
+	// Prevent "ERROR: xmodel '' not found" from being shown when theres no model loaded
+	//
+#if ASSET_VIEWER_DISABLE_NO_MODEL_SPAM
+	PatchCall(0x00433FA2, (PBYTE)&Com_SuppressNoModelSpam);
+#endif
+
 	g_Initted = true;
 
 	return TRUE;
