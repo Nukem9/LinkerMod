@@ -214,7 +214,7 @@ void Bullet_Fire(gentity_s attacker, float spread, weaponParms *wp, gentity_s we
 	{
 		DWORD client = *(DWORD *)(attacker + 0x13C);
 
-		if (BG_HasPerk((unsigned int *)(client + 0x4FC), 10))
+		if (BG_HasPerk((unsigned int *)(client + 0x4FC), PERK_DOUBLETAP))
 			shotCount *= 2;
 	}
 

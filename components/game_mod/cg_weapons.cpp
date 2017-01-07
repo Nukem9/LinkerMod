@@ -65,6 +65,10 @@ void __declspec(naked) mfh_CG_DrawBulletImpacts1()
 {
 	static DWORD dwJmp = 0x0079A4F7;
 
+	unsigned int playerState;
+	unsigned int *randSeed;
+	unsigned int *shotCount;
+
 	__asm
 	{
 		// [shotCount,    SP - 0x114]
@@ -73,26 +77,26 @@ void __declspec(naked) mfh_CG_DrawBulletImpacts1()
 		pushad
 		lea edi, [esp + 0x150 + 0x20]
 
+		mov ebp, esp
+		sub esp, __LOCAL_SIZE
+
+		mov eax, dword ptr [edi + 0x10]	// playerState *ps
+		mov playerState, eax			//
 		lea eax, [edi - 0xE0]			// secondBarrel [See mfh_CG_DrawBulletImpacts2 comment]
+		mov randSeed, eax				//
+		lea eax, [edi - 0x114]			// shotCount
+		mov shotCount, eax				//
+	}
 
-		mov ebp, dword ptr [edi + 0x10]	// playerState *ps
-		mov edx, dword ptr [ebp]		//
-		mov dword ptr [eax], edx		// *randSeed = ps->commandTime
-		push eax						//
-		call BG_seedRandWithGameTime	// BG_seedRandWithGameTime(randSeed) as in BO2
-		add esp, 0x4					//
+	*randSeed = *(DWORD *)playerState;	// ps->commandTime
+	BG_seedRandWithGameTime(randSeed);
 
-		push PERK_DOUBLETAP				// PERK_DOUBLETAP index
-		lea ebp, [ebp + 0x4FC]			//
-		push ebp						// ps->perks
-		call BG_HasPerk					//
-		add esp, 0x8					//
+	if (BG_HasPerk((unsigned int *)(playerState + 0x4FC), PERK_DOUBLETAP))
+		*shotCount *= 2;
 
-		test al, al						// Check if player had perk
-		je __noperk						//
-		shl dword ptr [edi - 0x114], 1	// shotCount *= 2
-
-__noperk:
+	__asm
+	{
+		mov esp, ebp					//
 		popad							// Restore stack
 		xor ebx, ebx					// Original instructions
 		cmp dword ptr [esp + 0x3C], ebx	//
