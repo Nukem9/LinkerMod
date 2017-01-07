@@ -107,6 +107,7 @@ static dvar_s*& g_debugBullets = *(dvar_s **)0x01BD9B48;
 static dvar_s*& sv_bullet_range = *(dvar_s **)0x02899D64;
 static dvar_s*& bg_forceExplosiveBullets = *(dvar_s **)0x00BCD1E8;
 static dvar_s*& vehicle_selfCollision = *(dvar_s **)0x00BCAFCC;
+static dvar_s*& player_sustainAmmo = *(dvar_s **)0x00BCD250;
 
 extern dvar_s* r_d3d9ex;
 extern dvar_s* r_noborder;
@@ -116,7 +117,6 @@ extern dvar_s* con_inputMaxMatchesShown;
 extern dvar_s* cg_drawViewpos;
 extern dvar_s* gm_build_date;
 extern dvar_s* cg_showServerInfo;
-extern dvar_s* player_sustainAmmo;
 extern dvar_s* perk_weapRateEnhanced;
 
 typedef const char* Dvar_GetString_t(const char* dvarName);
