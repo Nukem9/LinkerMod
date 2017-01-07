@@ -84,32 +84,20 @@ HRESULT D3DAPI hk_GetSwapChain(IDirect3DDevice9 *This, UINT iSwapChain, IDirect3
 		return D3D_OK;
 
 	// Get a handle to the IDirect3DSwapChain9Ex interface via COM GUID
-	hr = (*ppSwapChain)->QueryInterface(__uuidof(IDirect3DSwapChain9Ex), (void **)ppSwapChain);
-
-	if (FAILED(hr))
-		return hr;
-
-	printf("Using IDirect3DSwapChain9Ex for swapchain %d\n", iSwapChain);
-	return D3D_OK;
+	return (*ppSwapChain)->QueryInterface(__uuidof(IDirect3DSwapChain9Ex), (void **)ppSwapChain);
 }
 
 HRESULT D3DAPI hk_CreateAdditionalSwapChain(IDirect3DDevice9 *This, D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DSwapChain9 **ppSwapChain)
 {
 	// Short-circuit to the original call
-	if (!IsD3D9ExAvailable())
-		return This->CreateAdditionalSwapChain(pPresentationParameters, ppSwapChain);
-
-	HRESULT hr = ((IDirect3DDevice9Ex *)This)->CreateAdditionalSwapChain(pPresentationParameters, ppSwapChain);
+	HRESULT hr = This->CreateAdditionalSwapChain(pPresentationParameters, ppSwapChain);
 
 	if (FAILED(hr))
 		return hr;
+
+	if (!IsD3D9ExAvailable())
+		return D3D_OK;
 
 	// Get a handle to the IDirect3DSwapChain9Ex interface via COM GUID
-	hr = (*ppSwapChain)->QueryInterface(__uuidof(IDirect3DSwapChain9Ex), (void **)ppSwapChain);
-
-	if (FAILED(hr))
-		return hr;
-
-	printf("Using IDirect3DSwapChain9Ex for newly created swapchain\n");
-	return D3D_OK;
+	return (*ppSwapChain)->QueryInterface(__uuidof(IDirect3DSwapChain9Ex), (void **)ppSwapChain);
 }
