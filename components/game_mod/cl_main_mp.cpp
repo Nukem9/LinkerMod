@@ -33,5 +33,5 @@ char *CG_GetLocalClientGlobals(int localClientNum)
 	ASSERT(localClientNum == 0);
 
 	// cgArray
-	return (char *)0x02FF5354;
+	return *(char **)0x02FF5354;
 }
