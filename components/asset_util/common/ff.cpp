@@ -7,28 +7,51 @@
 #include "../sys/AppInfo.h"
 #include "zlib\zlib.h"
 
-char* FindRawfileString(BYTE* start, BYTE* end)
+enum class RAWFILE_TYPE
 {
+	COMPRESSED,
+	UNCOMPRESSED,
+	SOUND,
+
+	NONE = -1,
+};
+
+RAWFILE_TYPE FindRawfileString(BYTE* start, BYTE* end, char** result)
+{
+	RAWFILE_TYPE type = RAWFILE_TYPE::NONE;
+
 	while (start < end - 5)
 	{
-		if (strncmp(".atr", (char*)start, 4) == 0 ||
-			strncmp(".gsc", (char*)start, 4) == 0 ||
-			strncmp(".csc", (char*)start, 4) == 0 ||
-			strncmp(".wav", (char*)start, 4) == 0 ||
-			strncmp(".xpo", (char*)start, 4) == 0 )
+		if (strncmp(".gsc", (char*)start, 4) == 0 ||
+			strncmp(".csc", (char*)start, 4) == 0)
 		{
-			return (char*)start;
+			type = RAWFILE_TYPE::COMPRESSED;
+		}
+		else if (strncmp(".atr", (char*)start, 4) == 0 ||
+				strncmp(".xpo", (char*)start, 4) == 0 )
+		{
+			type = RAWFILE_TYPE::UNCOMPRESSED;
+		}
+		else if (strncmp(".wav", (char*)start, 4) == 0)
+		{
+			type = RAWFILE_TYPE::SOUND;
+		}
+		else if (start < end - 8 && strncmp(".vision", (char*)start, 7) == 0)
+		{
+			type = RAWFILE_TYPE::UNCOMPRESSED;
 		}
 
-		if (start < end - 8 && strncmp(".vision", (char*)start, 7) == 0)
+		if (type != RAWFILE_TYPE::NONE)
 		{
-			return (char*)start;
+			*result = (char*)start;
+			return type;
 		}
 
 		start++;
 	}
 
-	return nullptr;
+	*result = nullptr;
+	return RAWFILE_TYPE::NONE;
 }
 
 char* FindRawfileStringReverseLookup(BYTE* start)
@@ -260,9 +283,10 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 	BYTE* lastSearchLoc = 0;
 	while (searchData < searchData + searchSize)
 	{
-		char* rawfileString = FindRawfileString(searchData, endofBuffer);
+		char* rawfileString = nullptr;
+		RAWFILE_TYPE type = FindRawfileString(searchData, endofBuffer, &rawfileString);
 
-		if (!rawfileString)
+		if (type == RAWFILE_TYPE::NONE || !rawfileString)
 		{
 			return extractedFileCount;
 		}
@@ -282,7 +306,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 		rawfileString = tmpString;
 
-		if (Str_EndsWith(rawfileString, ".wav"))
+		if (type == RAWFILE_TYPE::SOUND)
 		{
 			if (!g_extractSounds.ValueBool())
 			{
@@ -306,7 +330,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 		}
 		*/
 
-		else if (Str_EndsWith(rawfileString, ".vision") || Str_EndsWith(rawfileString, ".xpo"))
+		else if (type == RAWFILE_TYPE::UNCOMPRESSED)
 		{
 			char* rawfileData = rawfileString + strlen(rawfileString) + 1;
 			int fileLen = FF_FFExtractUncompressedRawfile(rawfileData, rawfileString);
@@ -319,7 +343,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 			
 			searchData = (BYTE*)rawfileData + fileLen + 1;
 		}
-		else
+		else if (type == RAWFILE_TYPE::COMPRESSED)
 		{
 			XAssetRawfileHeader* rawfileHeader = (XAssetRawfileHeader*)(rawfileString + strlen(rawfileString) + 1);
 			if (!FF_FFExtractCompressedRawfile(rawfileHeader, rawfileString))
@@ -327,7 +351,6 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 				searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
 				continue;
 			}
-
 			
 			searchData = (BYTE*)rawfileHeader + rawfileHeader->compressedSize;
 		}
