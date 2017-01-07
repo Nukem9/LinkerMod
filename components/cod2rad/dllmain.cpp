@@ -15,6 +15,19 @@ LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	//return PageGuard_Check(ExceptionInfo);
 }
 
+#if MINIMAL_MATERIALS
+int __cdecl MaterialRedirect(char* dst, const char* fmt, const char* name)
+{
+	printf("MTL: %s\n", name);
+
+	std::string n = name;
+	if (n == "$default" || n.find("sky") != std::string::npos)
+		return sprintf(dst, fmt, name);
+	else
+		return sprintf(dst, fmt, "blockout_test_asphalt");
+}
+#endif
+
 const int MAX_MAP_COLLISIONVERTS = 65536 * 2;
 const int MAX_MAP_COLLISIONVERTS_SIZE = MAX_MAP_COLLISIONVERTS * 12;
 BYTE collVertData[MAX_MAP_COLLISIONVERTS_SIZE];
@@ -99,6 +112,11 @@ BOOL cod2rad_Init()
 #endif
 
 	Detours::X86::DetourFunction((PBYTE)0x0042B450, (PBYTE)&RegisterLightDef);
+	
+#if MINIMAL_MATERIALS
+	PatchCall(0x0042CD4A, (PBYTE)&MaterialRedirect);
+#endif
+
 	g_initted = true;
 	return TRUE;
 }
