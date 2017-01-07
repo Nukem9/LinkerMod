@@ -69,3 +69,23 @@ void __cdecl CG_RegisterDvars()
 	// Remap "debug_show_viewpos" to "cg_drawViewpos"
 	PatchMemory(0x005BF103, (PBYTE)&cg_drawViewpos->name, 4);
 }
+
+dvar_s *Dvar_SetFromStringByNameFromSource(const char *dvarName, const char *string, DvarSetSource source, unsigned int flags)
+{
+	return ((dvar_s *(__cdecl *)(const char *, const char *, DvarSetSource, unsigned int))0x00426820)(dvarName, string, source, flags);
+}
+
+void Dvar_SetFromStringByName(const char *dvarName, const char *string)
+{
+	// Do not allow the default FOV to be set. Generally sent with CG_DeployServerCommand.
+	if (dvarName && string)
+	{
+		if (!_stricmp(dvarName, "cg_fov") && !_stricmp(string, "65"))
+			return;
+
+		if (!_stricmp(dvarName, "cg_default_fov") && !_stricmp(string, "65"))
+			return;
+	}
+
+	Dvar_SetFromStringByNameFromSource(dvarName, string, DVAR_SOURCE_INTERNAL, 0);
+}

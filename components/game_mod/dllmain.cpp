@@ -52,6 +52,7 @@ BOOL GameMod_Init()
 	// "com_introPlayed"
 	// "com_startupIntroPlayed"
 	// "cg_fov_default"  (max 165.0)
+	// "r_enablePlayerShadow" remove cheat
 	//
 	PatchMemory(0x0082C0F9, (PBYTE)"\x01", 1);
 	PatchMemory(0x0082C111, (PBYTE)"\x01", 1);
@@ -65,6 +66,11 @@ BOOL GameMod_Init()
 	PatchMemory(0x006CA53A, (PBYTE)&flags, 4); // r_lodScaleSkinned
 	PatchMemory(0x006CA568, (PBYTE)&flags, 4); // r_lodBiasSkinned
 	PatchMemory(0x006CBE29, (PBYTE)&flags, 4); // r_enablePlayerShadow
+
+	//
+	// Stop vanilla scripts from resetting the user's fov
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0062A0B0, (PBYTE)&Dvar_SetFromStringByName);
 
 	//
 	// Always force the cursor to be shown

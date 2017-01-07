@@ -17,6 +17,14 @@ enum dvarType_t
 	DVAR_TYPE_COUNT = 0xC,
 };
 
+enum DvarSetSource
+{
+	DVAR_SOURCE_INTERNAL = 0x0,
+	DVAR_SOURCE_EXTERNAL = 0x1,
+	DVAR_SOURCE_SCRIPT = 0x2,
+	DVAR_SOURCE_DEVGUI = 0x3,
+};
+
 union DvarValue
 {
 	bool enabled;
@@ -143,3 +151,6 @@ typedef void (__cdecl* CG_RegisterDvars_t)();
 extern CG_RegisterDvars_t CG_RegisterDvars_o;
 
 void __cdecl CG_RegisterDvars();
+
+dvar_s *Dvar_SetFromStringByNameFromSource(const char *dvarName, const char *string, DvarSetSource source, unsigned int flags);
+void Dvar_SetFromStringByName(const char *dvarName, const char *string);
