@@ -14,6 +14,7 @@
 
 /build
 /ipch
+/.vs
 
 components/sdk
 components/game_mod/steam
