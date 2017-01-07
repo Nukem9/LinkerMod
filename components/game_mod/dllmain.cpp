@@ -131,8 +131,7 @@ BOOL GameMod_Init()
 	//
 	// Disable error message boxes with developer_script
 	//
-	PatchMemory(0x005A16F7, (PBYTE)"\x90\x90", 2);
-	PatchMemory(0x005A1700, (PBYTE)"\x90\x90", 2);
+	PatchMemory(0x005A1732, (PBYTE)"\xE9\xB2\x00\x00\x00", 5);
 
 #if _DEBUG || _USE_COM_DPRINTF
 	//
