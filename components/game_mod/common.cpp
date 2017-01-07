@@ -124,8 +124,11 @@ void __cdecl Com_LoadCommonFastFile()
 		if (DB_IsZoneLoaded("common_zombie"))
 			return;
 
+		// common_zombie must be unloaded after common/en_common
+		int zoneAllocFlags = (blackopsmode->current.enabled) ? 0x400 : 0x100;
+
 		zoneInfo[zoneCount].name = "common_zombie";
-		zoneInfo[zoneCount].allocFlags = 0x100;
+		zoneInfo[zoneCount].allocFlags = zoneAllocFlags;
 		zoneInfo[zoneCount++].freeFlags = 0;
 
 		if (fs_gameDirVar && strlen(fs_gameDirVar->current.string) > 0)
@@ -134,11 +137,11 @@ void __cdecl Com_LoadCommonFastFile()
 				return;
 
 			zoneInfo[zoneCount].name = "common_zombie_patch_override";
-			zoneInfo[zoneCount].allocFlags = 0x100;
+			zoneInfo[zoneCount].allocFlags = zoneAllocFlags;
 			zoneInfo[zoneCount++].freeFlags = 0;
 		}
 	}
-	
+
 	if (!zombiemode->current.enabled)
 	{
 		if (DB_IsZoneLoaded("common"))
