@@ -6,7 +6,7 @@ bool Material_CopyTextToDXBuffer(void *cachedShader, unsigned int shaderLen, LPD
 
 	if (!SUCCEEDED(hr))
 	{
-		Com_PrintError(8, "ERROR: Material_CopyTextToDXBuffer: D3DXCreateBuffer(%d) failed: %s (0x%08x)\n", shaderLen, /*R_ErrorDescription(hr)*/"HRESULT", hr);
+		Com_PrintError(8, "ERROR: Material_CopyTextToDXBuffer: D3DXCreateBuffer(%d) failed: %s (0x%08x)\n", shaderLen, R_ErrorDescription(hr), hr);
 
 		free(cachedShader);
 		return false;
