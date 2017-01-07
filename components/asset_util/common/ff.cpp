@@ -28,6 +28,7 @@ RAWFILE_TYPE FindRawfileString(BYTE* start, BYTE* end, char** result)
 			type = RAWFILE_TYPE::COMPRESSED;
 		}
 		else if (strncmp(".atr", (char*)start, 4) == 0 ||
+				strncmp(".sun", (char*)start, 4) == 0 ||
 				strncmp(".xpo", (char*)start, 4) == 0 )
 		{
 			type = RAWFILE_TYPE::UNCOMPRESSED;
