@@ -91,8 +91,11 @@ void __declspec(naked) mfh_CG_DrawBulletImpacts1()
 	*randSeed = *(DWORD *)playerState;	// ps->commandTime
 	BG_seedRandWithGameTime(randSeed);
 
-	if (BG_HasPerk((unsigned int *)(playerState + 0x4FC), PERK_DOUBLETAP))
-		*shotCount *= 2;
+	if (Com_SessionMode_IsZombiesGame() && perk_weapRateEnhanced->current.enabled)
+	{
+		if (BG_HasPerk((unsigned int *)(playerState + 0x4FC), PERK_DOUBLETAP))
+			*shotCount *= 2;
+	}
 
 	__asm
 	{

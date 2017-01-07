@@ -210,7 +210,7 @@ void Bullet_Fire(gentity_s attacker, float spread, weaponParms *wp, gentity_s we
 		BG_SetWeaponUsed(*(BYTE *)(*(DWORD *)(attacker + 0x13C) + 0x130), BG_GetWeaponIndex(wp->weapVariantDef));
 
 	// BO2 double-tap modification
-	if (Com_SessionMode_IsZombiesGame() /*&& ent->s.eType == 1*/)
+	if (Com_SessionMode_IsZombiesGame() && perk_weapRateEnhanced->current.enabled /*&& ent->s.eType == 1*/)
 	{
 		DWORD client = *(DWORD *)(attacker + 0x13C);
 
