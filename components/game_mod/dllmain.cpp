@@ -190,13 +190,6 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
 
 	//
-	// Enable the use of level_dependencies.csv
-	//
-#if _UNSTABLE && _USE_LEVEL_DEPENDENCIES
-	PatchMemory_WithNOP(0x0082CA3B, 6);
-#endif
-
-	//
 	// Enable legacy mod (patch override) support
 	// (This detour is used for both level_dependencies AND patch overrides)
 	//

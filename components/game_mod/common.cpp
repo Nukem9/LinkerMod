@@ -252,7 +252,7 @@ void __cdecl Com_LoadLevelFastFiles(const char *mapName)
 	//
 	// Enable the use of level_dependencies.csv
 	//
-#if _UNSTABLE && _USE_LEVEL_DEPENDENCIES
+#if _USE_LEVEL_DEPENDENCIES
 	char* levelSharedFastFile = Com_GetLevelSharedFastFile(mapName);
 	if (levelSharedFastFile)
 	{
