@@ -9,4 +9,5 @@ bool Assert_MyHandler(const char *filename, int line, int type, const char *fmt,
 	_vsnprintf_s(buffer, _TRUNCATE, fmt, ap);
 
 	shared_assert(filename, line, buffer);
+	return true;
 }
