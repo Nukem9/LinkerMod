@@ -256,8 +256,9 @@ void __cdecl Com_LoadLevelFastFiles(const char *mapName)
 	char* levelSharedFastFile = Com_GetLevelSharedFastFile(mapName);
 	if (levelSharedFastFile)
 	{
+		// The allocFlags were originally 0x800 - but would cause a free error (these new flags appear to load / unload correctly)
 		zoneInfo[zoneCount].name = levelSharedFastFile;
-		zoneInfo[zoneCount].allocFlags = 0x800;
+		zoneInfo[zoneCount].allocFlags = 0x4000000;
 		zoneInfo[zoneCount++].freeFlags = 0;
 	}
 #endif

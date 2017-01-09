@@ -73,3 +73,5 @@
 
 #define GM_NET_VERSION 0x01
 #define _USE_COM_DPRINTF 0
+
+#define _USE_LEVEL_DEPENDENCIES 1
