@@ -15,8 +15,8 @@ void DB_LoadGraphicsAssetsForPC()
 	
 	XZoneInfo zoneInfo[6];
 	zoneInfo[0].name = "code_post_gfx";
-	zoneInfo[0].allocFlags = 1;
-	zoneInfo[0].freeFlags = 0x80000000;
+	zoneInfo[0].allocFlags = DB_ZONE_CODE;
+	zoneInfo[0].freeFlags = DB_FLAG_STRICTFREE;
 
 	DB_LoadXAssets(zoneInfo, zoneCount, 0);
 	DB_SyncXAssets();

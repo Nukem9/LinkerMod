@@ -215,7 +215,7 @@ void Com_LoadCommonFastFile()
 			return;
 
 		// common_zombie must be unloaded after common/en_common
-		int zoneAllocFlags = (blackopsmode->current.enabled) ? 0x400 : 0x100;
+		int zoneAllocFlags = (blackopsmode->current.enabled) ? 0x400 : DB_ZONE_COMMON;
 
 		zoneInfo[zoneCount].name = "common_zombie";
 		zoneInfo[zoneCount].allocFlags = zoneAllocFlags;
@@ -238,7 +238,7 @@ void Com_LoadCommonFastFile()
 			return;
 
 		zoneInfo[zoneCount].name = "common";
-		zoneInfo[zoneCount].allocFlags = 0x100;
+		zoneInfo[zoneCount].allocFlags = DB_ZONE_COMMON;
 		zoneInfo[zoneCount++].freeFlags = 0;
 
 		//
@@ -250,7 +250,7 @@ void Com_LoadCommonFastFile()
 		return;
 
 		zoneInfo[zoneCount].name = "common_patch_override";
-		zoneInfo[zoneCount].allocFlags = 0x100;
+		zoneInfo[zoneCount].allocFlags = DB_ZONE_COMMON;
 		zoneInfo[zoneCount++].freeFlags = 0;
 		}*/
 	}
@@ -283,7 +283,7 @@ void Com_LoadLevelFastFiles(const char *mapName)
 	if (Com_IsMenuLevel(mapName))
 	{
 		zoneInfo[zoneCount].name = "patch_ui";
-		zoneInfo[zoneCount].allocFlags = 0x4000000;
+		zoneInfo[zoneCount].allocFlags = DB_ZONE_FRONTEND;
 		zoneInfo[zoneCount++].freeFlags = 0;
 	}
 	else
@@ -326,7 +326,7 @@ void Com_LoadLevelFastFiles(const char *mapName)
 	int allocFlags = 0x2000000;
 
 	if (!Com_IsMenuLevel(mapName))
-		allocFlags = I_strncmp("so_", mapName, 3) != 0 ? 0x800 : 0x4000;
+		allocFlags = I_strncmp("so_", mapName, 3) != 0 ? 0x800 : DB_ZONE_LEVEL;
 
 	zoneInfo[zoneCount].allocFlags = allocFlags;
 	zoneInfo[zoneCount].name = mapName;

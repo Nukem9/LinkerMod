@@ -77,6 +77,7 @@ enum XAssetType
 	ASSET_TYPE_COUNT
 };
 
+// NOTE: These are NOT accurate for singleplayer
 enum
 {
 	DB_ZONE_CODE = 0x1,
