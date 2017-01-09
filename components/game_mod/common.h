@@ -85,6 +85,15 @@ static I_strncpyz_t I_strncpyz = (I_strncpyz_t)0x005D4D60;
 bool Com_RunEventHack();
 void Com_EventLoop();
 
-void __cdecl Com_LoadCommonFastFile();
-char *__cdecl Com_GetLevelSharedFastFile(const char *mapName);
-void __cdecl Com_LoadLevelFastFiles(const char *mapName);
+struct LevelDependency
+{
+	char base[64];		// Base map
+	char required[64];	// FF required for loading the map
+};
+
+bool Com_IsMenuLevel(const char *name);
+void Com_GetLevelSharedFastFiles(const char *mapName);
+void DB_RemoveLevelDependency(const char *dependency);
+bool DB_IsZoneLoaded(const char *name);
+void Com_LoadCommonFastFile();
+void Com_LoadLevelFastFiles(const char *mapName);

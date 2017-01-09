@@ -1,11 +1,25 @@
 #pragma once
-#include <WTypes.h>
 
 enum FF_DIR : DWORD
 {
 	FFD_DEFAULT,
 	FFD_MOD_DIR,
 	FFD_USER_MAP
+};
+
+struct XZoneName
+{
+	char name[64];
+	int flags;
+	int fileSize;
+	FF_DIR dir;
+	bool loaded;
+};
+
+struct XZoneInfoInternal
+{
+	char name[64];
+	int flags;
 };
 
 struct XZoneInfo
@@ -63,9 +77,46 @@ enum XAssetType
 	ASSET_TYPE_COUNT
 };
 
+enum
+{
+	DB_ZONE_CODE = 0x1,
+	DB_ZONE_CODE_LOC = 0x2,
+	DB_ZONE_DEV = 0x4,
+	DB_ZONE_DEV_LOC = 0x8,
+	DB_ZONE_PATCH = 0x10,
+	DB_ZONE_PATCH_LOC = 0x20,
+	DB_ZONE_MOD = 0x40,
+	DB_ZONE_MOD_LOC = 0x80,
+	DB_ZONE_COMMON = 0x100,
+	DB_ZONE_COMMON_LOC = 0x200,
+	DB_ZONE_FFOTD = 0x400,
+	DB_ZONE_FFOTD_LOC = 0x800,
+	DB_ZONE_LEVELCOMMON = 0x1000,
+	DB_ZONE_LEVELCOMMON_LOC = 0x2000,
+	DB_ZONE_LEVEL = 0x4000,
+	DB_ZONE_LEVEL_LOC = 0x8000,
+	DB_ZONE_LEVELOVERLAY = 0x10000,
+	DB_ZONE_LEVELOVERLAY_LOC = 0x20000,
+	DB_ZONE_GUMP = 0x40000,
+	DB_ZONE_GUMP_LOC = 0x80000,
+	DB_ZONE_LOW_MARKER = 0x100000,
+	DB_ZONE_MYCHANGES_LOC = 0x200000,
+	DB_ZONE_MYCHANGES = 0x400000,
+	DB_ZONE_UI_VIEWER_LOC = 0x800000,
+	DB_ZONE_UI_VIEWER = 0x1000000,
+	DB_ZONE_FRONTEND_LOC = 0x2000000,
+	DB_ZONE_FRONTEND = 0x4000000,
+	DB_ZONE_HIGH_MARKER = 0x8000000,
+	DB_ZONE_LOAD = 0x10000000,
+	DB_FLAG_RSTREAM = 0x40000000,
+	DB_FLAG_STRICTFREE = 0x80000000,
+};
 
-extern void** DB_XAssetPool;
-extern DWORD* g_poolSize;
+static volatile unsigned int& g_zoneInfoCount = *(volatile unsigned int *)0x00E72984;
+static XZoneInfoInternal *g_zoneInfo = (XZoneInfoInternal *)0x00C84308;
+static XZoneName *g_zoneNames = (XZoneName *)0x010C6648;
+static void **DB_XAssetPool = (void **)0x00B741B8;
+static DWORD *g_poolSize = (DWORD *)0x00B73EF8;
 
 typedef void (__cdecl* DB_LoadXAssets_t)(XZoneInfo *zoneInfo, unsigned int zoneCount, int sync);
 static DB_LoadXAssets_t DB_LoadXAssets = (DB_LoadXAssets_t)0x00631B10;
@@ -91,9 +142,6 @@ static R_EndRemoteScreenUpdate_t R_EndRemoteScreenUpdate = (R_EndRemoteScreenUpd
 typedef void (__cdecl* SocketRouter_EmergencyFrame_t)(const char *from);
 static SocketRouter_EmergencyFrame_t SocketRouter_EmergencyFrame = (SocketRouter_EmergencyFrame_t)0x004F11D0;
 
-typedef bool (__cdecl* DB_IsZoneLoaded_t)(const char *name);
-static DB_IsZoneLoaded_t DB_IsZoneLoaded = (DB_IsZoneLoaded_t)0x00528A20;
-
 typedef void (__cdecl* DB_PostLoadXZone_t)();
 static DB_PostLoadXZone_t DB_PostLoadXZone = (DB_PostLoadXZone_t)0x007A48D0;
 
@@ -102,6 +150,9 @@ static DB_GetXAssetTypeSize_t DB_GetXAssetTypeSize = (DB_GetXAssetTypeSize_t)0x0
 
 typedef void(__cdecl* DB_LogMissingAsset_t)(XAssetType type, const char *name);
 static DB_LogMissingAsset_t DB_LogMissingAsset = (DB_LogMissingAsset_t)0x004AEC20;
+
+bool DB_IsZonePending(const char *name);
+bool DB_IsZoneLoaded(const char *name);
 
 void DB_SyncXAssets();
 void DB_LoadGraphicsAssetsForPC();

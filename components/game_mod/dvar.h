@@ -95,6 +95,7 @@ static dvar_s*& fs_homepath = *(dvar_s **)0x025FBF0C;
 static dvar_s*& fs_basepath = *(dvar_s **)0x025FBF04;
 
 static dvar_s*& com_sv_running = *(dvar_s **)0x0243FD3C;
+static dvar_s*& sv_mapname = *(dvar_s **)0x02899CEC;
 
 static dvar_s*& developer = *(dvar_s **)0x0243FCA0;
 static dvar_s*& developer_script = *(dvar_s **)0x02481714;

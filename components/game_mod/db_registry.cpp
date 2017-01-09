@@ -1,8 +1,5 @@
 #include "stdafx.h"
 
-void** DB_XAssetPool = (void**)0x00B741B8;
-DWORD* g_poolSize = (DWORD*)0x00B73EF8;
-
 void DB_SyncXAssets()
 {
 	R_BeginRemoteScreenUpdate();

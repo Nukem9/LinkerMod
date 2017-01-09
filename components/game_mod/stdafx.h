@@ -11,6 +11,7 @@
 #include <shellapi.h>
 #include <winsock.h>
 #include <time.h>
+#include <vector>
 
 #pragma comment(lib, "ws2_32.lib")
 
