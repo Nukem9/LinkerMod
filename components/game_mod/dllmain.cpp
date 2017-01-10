@@ -372,6 +372,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0070A140, (PBYTE)&hk_Image_CreateCubeTexture_PC);
 
 	//
+	// Restore imageList Command
+	//
+	ptr = R_ImageList_f;
+	PatchMemory(0x0072451E, (PBYTE)&ptr, 4);
+
+	//
 	// Increase the maximum number of ragdolls
 	//
 	PatchMemory(0x00830076, (PBYTE)"\x40", 1); // Ragdoll_GetUnusedBody
