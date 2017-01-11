@@ -236,7 +236,7 @@ void __cdecl R_GetImageList(ImageList *imageList)
 {
 	ASSERT(imageList);
 	imageList->count = 0;
-	DB_EnumXAssets(ASSET_TYPE_IMAGE, (void(__cdecl *)(void*, void *))R_AddImageToList, imageList, 1);
+	DB_EnumXAssets(ASSET_TYPE_IMAGE, (void(__cdecl *)(XAssetHeader, void *))R_AddImageToList, imageList, 1);
 }
 
 void __cdecl R_ImageList_f()
@@ -372,4 +372,6 @@ void __cdecl R_ImageList_f()
 			Com_Printf(8, "  MB\n");
 		}
 	}
+
+	Com_Printf(8, "Related commands: imagelist, gfx_world, cg_drawfps\n");
 }

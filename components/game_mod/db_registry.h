@@ -1,4 +1,5 @@
 #pragma once
+#include "bg_weapons_def.h"
 
 enum FF_DIR : DWORD
 {
@@ -77,6 +78,21 @@ enum XAssetType
 	ASSET_TYPE_COUNT
 };
 
+union XAssetHeader
+{
+	struct Material *material;
+	struct MaterialPixelShader *pixelShader;
+	struct MaterialVertexShader *vertexShader;
+	struct MaterialTechniqueSet *techniqueSet;
+	struct GfxImage *image;
+	
+	struct GfxLightDef *lightDef;
+	
+	WeaponVariantDef *weapon;
+
+	void *data;
+};
+
 // NOTE: These are NOT accurate for singleplayer
 enum
 {
@@ -152,7 +168,7 @@ static DB_GetXAssetTypeSize_t DB_GetXAssetTypeSize = (DB_GetXAssetTypeSize_t)0x0
 typedef void(__cdecl* DB_LogMissingAsset_t)(XAssetType type, const char *name);
 static DB_LogMissingAsset_t DB_LogMissingAsset = (DB_LogMissingAsset_t)0x004AEC20;
 
-typedef void (__cdecl* DB_EnumXAssets_t)(XAssetType type, void(__cdecl *func)(void*, void *), void *inData, bool includeOverride);
+typedef void(__cdecl* DB_EnumXAssets_t)(XAssetType type, void(__cdecl *func)(XAssetHeader, void *), void *inData, bool includeOverride);
 static DB_EnumXAssets_t DB_EnumXAssets = (DB_EnumXAssets_t)0x0054C1C0;
 
 bool DB_IsZonePending(const char *name);

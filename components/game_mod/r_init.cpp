@@ -1,5 +1,17 @@
 #include "stdafx.h"
 
+cmd_function_s& R_Cmd_Screenshot_VAR = *(cmd_function_s*)0x046461F0;
+cmd_function_s& R_Cmd_ScreenshotJpeg_VAR = *(cmd_function_s*)0x046461D8;
+cmd_function_s& R_ImageList_f_VAR = *(cmd_function_s*)0x046461C0;
+cmd_function_s& R_Cmd_ApplyPicmip_VAR = *(cmd_function_s*)0x046461A8;
+cmd_function_s& R_Cmd_ReloadMaterialTextures_VAR = *(cmd_function_s*)0x04646190;
+cmd_function_s& R_Cmd_LoadSun_VAR = *(cmd_function_s*)0x04646178;
+cmd_function_s& R_Cmd_SaveSun_VAR = *(cmd_function_s*)0x04646160;
+cmd_function_s& R_StaticModelCacheStats_f_VAR = *(cmd_function_s*)0x04646148;
+cmd_function_s& R_StaticModelCacheFlush_f_VAR = *(cmd_function_s*)0x04646130;
+
+cmd_function_s R_MaterialList_f_VAR;
+
 const char *R_ErrorDescription(HRESULT hr)
 {
 	return ((const char *(__cdecl *)(HRESULT))0x0098F062)(hr);
@@ -39,4 +51,34 @@ LONG WINAPI hk_SetWindowLongA(HWND hWnd, int nIndex, LONG dwNewLong)
 	}
 
 	return SetWindowLongA(hWnd, nIndex, dwNewLong);
+}
+
+void __cdecl R_RegisterCmds()
+{
+	Cmd_AddCommandInternal("screenshot", R_Cmd_Screenshot, &R_Cmd_Screenshot_VAR);
+	Cmd_AddCommandInternal("screenshotJpeg", R_Cmd_ScreenshotJpeg, &R_Cmd_ScreenshotJpeg_VAR);
+	Cmd_AddCommandInternal("imagelist", R_ImageList_f, &R_ImageList_f_VAR); // custom
+	Cmd_AddCommandInternal("r_applyPicmip", R_Cmd_ApplyPicmip, &R_Cmd_ApplyPicmip_VAR);
+	Cmd_AddCommandInternal("reloadmaterialtextures", R_Cmd_ReloadMaterialTextures, &R_Cmd_ReloadMaterialTextures_VAR);
+	Cmd_AddCommandInternal("r_loadsun", R_Cmd_LoadSun, &R_Cmd_LoadSun_VAR);
+	Cmd_AddCommandInternal("r_savesun", R_Cmd_SaveSun, &R_Cmd_SaveSun_VAR);
+	Cmd_AddCommandInternal("r_smc_stats", R_StaticModelCacheStats_f, &R_StaticModelCacheStats_f_VAR);
+	Cmd_AddCommandInternal("r_smc_flush", R_StaticModelCacheFlush_f, &R_StaticModelCacheFlush_f_VAR);
+
+	Cmd_AddCommandInternal("gfx_world", R_MaterialList_f, &R_MaterialList_f_VAR); // custom
+}
+
+void __cdecl R_UnregisterCmds()
+{
+	Cmd_RemoveCommand("screenshot");
+	Cmd_RemoveCommand("screenshotJpeg");
+	Cmd_RemoveCommand("imagelist");
+	Cmd_RemoveCommand("r_applyPicmip");
+	Cmd_RemoveCommand("reloadmaterialtextures");
+	Cmd_RemoveCommand("r_loadsun");
+	Cmd_RemoveCommand("r_savesun");
+	Cmd_RemoveCommand("r_smc_stats");
+	Cmd_RemoveCommand("r_smc_flush");
+
+	Cmd_RemoveCommand("gfx_world");
 }

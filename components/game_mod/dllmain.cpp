@@ -73,6 +73,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0062A0B0, (PBYTE)&Dvar_SetFromStringByName);
 
 	//
+	// R_RegisterCmds / R_UnregisterCmds replacement
+	//
+	PatchCall(0x006B8300, (PBYTE)&R_RegisterCmds);
+	PatchJump(0x006B8549, (PBYTE)&R_UnregisterCmds);
+
+	//
 	// Always force the cursor to be shown
 	//
 	//PatchMemory(0x00683C50, (PBYTE)"\xC3", 1); // sub_683C50
@@ -370,12 +376,6 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0070A050, (PBYTE)&hk_Image_Create2DTexture_PC);
 	Detours::X86::DetourFunction((PBYTE)0x0070A0F0, (PBYTE)&hk_Image_Create3DTexture_PC);
 	Detours::X86::DetourFunction((PBYTE)0x0070A140, (PBYTE)&hk_Image_CreateCubeTexture_PC);
-
-	//
-	// Restore imageList Command
-	//
-	ptr = R_ImageList_f;
-	PatchMemory(0x0072451E, (PBYTE)&ptr, 4);
 
 	//
 	// Increase the maximum number of ragdolls
