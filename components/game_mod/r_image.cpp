@@ -197,19 +197,6 @@ struct ImageList
 	GfxImage *image[4096*2]; // make sure there are enough pointers for the modified image limit
 };
 
-int __cdecl imagecompare(GfxImage *image1, GfxImage *image2)
-{
-	if (image1->track <= image2->track)
-	{
-		if (image1->track >= image2->track)
-			return image1->cardMemory.platform[0] < image2->cardMemory.platform[0];
-		else
-			return 1;
-	}
-	
-	return 0;
-}
-
 _D3DFORMAT __cdecl R_ImagePixelFormat(GfxImage *image)
 {
 	_D3DSURFACE_DESC surfaceDesc;
@@ -264,7 +251,19 @@ void __cdecl R_ImageList_f()
 	ImageList imageList;
 	R_GetImageList(&imageList);
 	
-	//std::sort<GfxImage**, int, int(__cdecl *)(GfxImage *, GfxImage *)>(imageList.image, &imageList.image[imageList.count], 4 * imageList.count >> 2, imagecompare);
+	std::sort<GfxImage**, int(__cdecl *)(GfxImage *, GfxImage *)>(imageList.image, &imageList.image[imageList.count],
+		[](GfxImage* image1, GfxImage* image2) -> int
+		{
+			if (image1->track <= image2->track)
+			{
+				if (image1->track >= image2->track)
+					return image1->cardMemory.platform[0] < image2->cardMemory.platform[0];
+				else
+					return 1;
+			}
+
+			return 0;
+		});
 
 	Com_Printf(8, "\n-reqrd w*h-");
 	Com_Printf(8, "-fmt-  ");
