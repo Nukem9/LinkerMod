@@ -271,7 +271,7 @@ void __cdecl R_ImageList_f()
 
 	for (int platform = 0; platform < 2; ++platform)
 	{
-		Com_Printf(8, "%s", (&g_platform_name)[platform]);
+		Com_Printf(8, "%s", g_platform_name[platform]);
 	}
 
 	Com_Printf(8, "  --name-------\n");
@@ -340,7 +340,7 @@ void __cdecl R_ImageList_f()
 			}
 			total.platform[platform] += cardMemory;
 		}
-		Com_Printf(8, "  %s\t\t%x\n", image->name, image);
+		Com_Printf(8, "  %-48s  0x%x\n", image->name, image);
 	}
 
 	Com_Printf(8, " ---------\n");
