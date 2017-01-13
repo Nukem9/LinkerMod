@@ -124,6 +124,7 @@
     <ClCompile Include="r_reflection_probe.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
+    <ClCompile Include="sv_main_mp.cpp" />
     <ClCompile Include="threads.cpp" />
     <ClCompile Include="ui_main_pc.cpp" />
     <ClCompile Include="win_common.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="r_screenshot.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv_ccmds_mp.h" />
+    <ClInclude Include="sv_main_mp.h" />
     <ClInclude Include="sys_cmds.h" />
     <ClInclude Include="threads.h" />
     <ClInclude Include="ui_main_pc.h" />

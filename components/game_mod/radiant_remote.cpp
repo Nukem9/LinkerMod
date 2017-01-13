@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
-HANDLE liveUpdateThread;
+SOCKET g_ServerSocket = INVALID_SOCKET;
+SOCKET g_ClientSocket = INVALID_SOCKET;
 
 int& savedCommandCount		= *(int *)0x0251AE58;
 auto savedCommands			= (RadiantCommand *)0x02507990;
@@ -20,75 +21,142 @@ void RadiantRemoteInit()
 	gObjectMappingCount = 0;
 	memset(gObjectMapping, 0, sizeof(RadaintToGameMapping) * 128);
 
-	if (!liveUpdateThread)
-		liveUpdateThread = CreateThread(nullptr, 0, RadiantRemoteThread, nullptr, 0, nullptr);
-}
+	// Initialize network and server socket (only if it hasn't been set up)
+	if (g_ServerSocket != INVALID_SOCKET)
+		return;
 
-DWORD WINAPI RadiantRemoteThread(LPVOID Arg)
-{
-	// Initialize winsock if the game hasn't yet
 	WSADATA wsaData;
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR)
-	{
-		Com_PrintError(1, "LiveRadiant: WSAStartup failed\n");
-		return 0;
-	}
+		Com_Error(ERR_FATAL, "LiveRadiant: Socket startup failed\n");
 
-	// Create a UDP socket
-	SOCKET udpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	// Create a TCP server socket
+	g_ServerSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (udpSocket == INVALID_SOCKET)
-	{
-		Com_PrintError(1, "LiveRadiant: Socket creation failed\n");
-		return 0;
-	}
+	if (g_ServerSocket == INVALID_SOCKET)
+		Com_Error(ERR_FATAL, "LiveRadiant: Socket creation failed\n");
 
-	// Bind socket to any incoming address on port 3700
-	sockaddr_in addrSender;
+	// Bind socket to any local address on port 3700
 	sockaddr_in addrIn;
-	addrIn.sin_family		= AF_INET;
-	addrIn.sin_port			= htons(3700);
-	addrIn.sin_addr.s_addr	= htonl(INADDR_ANY);
+	addrIn.sin_family = AF_INET;
+	addrIn.sin_port = htons(3700);
+	addrIn.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-	if (bind(udpSocket, (SOCKADDR *)&addrIn, sizeof(addrIn)) == SOCKET_ERROR)
+	Com_Printf(1, "LiveRadiant: Attempting to bind on port %d... ", (int)ntohs(addrIn.sin_port));
+
+	if (bind(g_ServerSocket, (SOCKADDR *)&addrIn, sizeof(addrIn)) == SOCKET_ERROR)
 	{
-		Com_PrintError(1, "LiveRadiant: Failed to bind socket\n");
-		closesocket(udpSocket);
-		return 0;
+		Com_PrintError(1, "Failed to bind socket. Port in use?\n");
+
+		RadiantRemoteShutdown();
+		return;
 	}
 
-	Com_Printf(1, "LiveRadiant: Socket bound on port 3700\n");
-
-	while (true)
+	// Listen for any number of incoming connections
+	if (listen(g_ServerSocket, SOMAXCONN) == SOCKET_ERROR)
 	{
-		char recvBuf[2048];
-		memset(recvBuf, 0, sizeof(recvBuf));
+		Com_PrintError(1, "Failed to listen for incoming connections\n");
 
-		int fromSize = sizeof(sockaddr_in);
-		int recvSize = recvfrom(udpSocket, recvBuf, sizeof(recvBuf), 0, (SOCKADDR *)&addrSender, &fromSize);
-
-		if (recvSize == SOCKET_ERROR)
-		{
-			Com_PrintError(1, "LiveRadiant: Socket receive from failed\n");
-			break;
-		}
-
-		// Data received from network, now tell the game
-		Sys_EnterCriticalSection((CriticalSection)61);
-		{
-			RadiantCommand *c = (RadiantCommand *)&recvBuf;
-
-			if (c->type != RADIANT_COMMAND_CAMERA)
-				Com_Printf(1, "Command %d %d:\n%s\n", c->type, c->liveUpdateId, c->strCommand);
-
-			// Insert in global array
-			memcpy(&gCommands[gCommandCount++], c, sizeof(RadiantCommand));
-		}
-		Sys_LeaveCriticalSection((CriticalSection)61);
+		RadiantRemoteShutdown();
+		return;
 	}
 
-	shutdown(udpSocket, 2 /*SD_BOTH*/);
-	closesocket(udpSocket);
-	return 0;
+	Com_Printf(1, "Succeeded\n");
+}
+
+void RadiantRemoteShutdown()
+{
+	shutdown(g_ServerSocket, 2 /*SD_BOTH*/);
+	closesocket(g_ServerSocket);
+
+	shutdown(g_ClientSocket, 2 /*SD_BOTH*/);
+	closesocket(g_ClientSocket);
+}
+
+void RadiantRemoteUpdate()
+{
+	if (!RadiantRemoteUpdateSocket())
+		return;
+
+	// Non-blocking read
+	RadiantCommand recvCommands[16];
+	memset(recvCommands, 0, sizeof(recvCommands));
+
+	int recvSize = recv(g_ClientSocket, (char *)&recvCommands, sizeof(recvCommands), 0);
+
+	// Skip everything if there's no data
+	if (recvSize == SOCKET_ERROR)
+	{
+		if (WSAGetLastError() == WSAEWOULDBLOCK)
+			return;
+
+		// Some other problem occurred and now the socket is bad
+		shutdown(g_ClientSocket, 2 /*SD_BOTH*/);
+		closesocket(g_ClientSocket);
+
+		g_ClientSocket = INVALID_SOCKET;
+		return;
+	}
+
+	// Determine the number of commands sent, then tell the game
+	size_t commandCount = recvSize / sizeof(RadiantCommand);
+
+	Sys_EnterCriticalSection((CriticalSection)61);
+	{
+		for (size_t i = 0; i < commandCount; i++)
+		{
+			//
+			// This must be enforced on the server side:
+			// Classname must be supplied or the game will crash
+			//
+			if (recvCommands[i].type == RADIANT_COMMAND_SELECT)
+			{
+				if (!strstr(recvCommands[i].strCommand, "\"classname\""))
+					continue;
+			}
+
+			if (recvCommands[i].type != RADIANT_COMMAND_CAMERA)
+				Com_Printf(1, "Command %d [ID %d]:\n%s\n", recvCommands[i].type, recvCommands[i].liveUpdateId, recvCommands[i].strCommand);
+
+			memcpy(&gCommands[gCommandCount++], &recvCommands[i], sizeof(RadiantCommand));
+		}
+	}
+	Sys_LeaveCriticalSection((CriticalSection)61);
+}
+
+bool RadiantRemoteUpdateSocket()
+{
+	if (g_ClientSocket != INVALID_SOCKET)
+		return true;
+
+	// Check if there's a pending client connection request
+	fd_set readSet;
+	FD_ZERO(&readSet);
+	FD_SET(g_ServerSocket, &readSet);
+
+	// Zero timeout (poll)
+	timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 0;
+
+	int status = select(g_ServerSocket, &readSet, nullptr, nullptr, &timeout);
+
+	if (status == SOCKET_ERROR)
+		Com_Error(ERR_FATAL, "LiveRadiant: Failed to query socket status\n");
+
+	// Must be 1 (handle) if there is a pending connection
+	if (status != 1)
+		return false;
+
+	g_ClientSocket = accept(g_ServerSocket, nullptr, nullptr);
+
+	if (g_ClientSocket == INVALID_SOCKET)
+		Com_Error(ERR_FATAL, "LiveRadiant: Failed to accept a connection?\n");
+
+	// Set non-blocking flag
+	u_long socketMode = 1;
+	ioctlsocket(g_ClientSocket, FIONBIO, &socketMode);
+
+	Com_Printf(1, "LiveRadiant: Client connected\n");
+	return true;
 }

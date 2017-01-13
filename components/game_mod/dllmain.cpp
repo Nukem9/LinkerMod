@@ -116,9 +116,9 @@ BOOL GameMod_Init()
 	//
 	// Run console/packet events even during map load
 	//
-	Detours::X86::DetourFunction((PBYTE)0x00699565, (PBYTE)&Com_RunEventHack, Detours::X86Option::USE_CALL);
-	Detours::X86::DetourFunction((PBYTE)0x00589430, (PBYTE)&Com_EventLoop);
-	PatchMemory_WithNOP(0x007A283C, 5);
+	//Detours::X86::DetourFunction((PBYTE)0x00699565, (PBYTE)&Com_RunEventHack, Detours::X86Option::USE_CALL);
+	//Detours::X86::DetourFunction((PBYTE)0x00589430, (PBYTE)&Com_EventLoop);
+	//PatchMemory_WithNOP(0x007A283C, 5);
 
 	//
 	// Allow the console to be opened during loadscreens
@@ -194,11 +194,6 @@ BOOL GameMod_Init()
 	// (This detour is used for both level_dependencies AND patch overrides)
 	//
 	Detours::X86::DetourFunction((PBYTE)0x004C8890, (PBYTE)&Com_LoadLevelFastFiles);
-
-	//
-	// Enable loading of common fastfiles in blackopsmode
-	//
-	Detours::X86::DetourFunction((PBYTE)0x0082CB50, (PBYTE)&Com_LoadCommonFastFile);
 
 	//
 	// DB_LoadGraphicsAssetsForPC hook to automatically attempt to load frontend_patch.ff
@@ -303,11 +298,12 @@ BOOL GameMod_Init()
 	PatchMemory(0x00700492, (PBYTE)&msg_assertion, 4);
 
 	//
-	// Live radiant initialization hook
+	// Live radiant initialization hooks
 	//
-#if _UNSTABLE
 	Detours::X86::DetourFunction((PBYTE)0x004B7870, (PBYTE)&RadiantRemoteInit);
-#endif
+	Detours::X86::DetourFunction((PBYTE)0x0087E4E5, (PBYTE)&SV_PostFrame, Detours::X86Option::USE_CALL);
+	PatchMemory_WithNOP(0x0087E4D7, 10);// Functions moved into SV_PostFrame
+	PatchMemory_WithNOP(0x0087E4ED, 5);	// Functions moved into SV_PostFrame
 
 	//
 	// Increase PMem size

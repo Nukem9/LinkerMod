@@ -29,4 +29,6 @@ struct RadaintToGameMapping
 STATIC_ASSERT_SIZE(RadaintToGameMapping, 0x10);
 
 void RadiantRemoteInit();
-DWORD WINAPI RadiantRemoteThread(LPVOID Arg);
+void RadiantRemoteShutdown();
+void RadiantRemoteUpdate();
+bool RadiantRemoteUpdateSocket();
