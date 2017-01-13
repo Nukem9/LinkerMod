@@ -22,7 +22,7 @@ void RadiantRemoteInit()
 	memset(gObjectMapping, 0, sizeof(RadaintToGameMapping) * 128);
 
 	// Initialize network and server socket (only if it hasn't been set up)
-	if (g_ServerSocket != INVALID_SOCKET)
+	if (!radiant_live->current.enabled || g_ServerSocket != INVALID_SOCKET)
 		return;
 
 	WSADATA wsaData;
@@ -36,10 +36,10 @@ void RadiantRemoteInit()
 	if (g_ServerSocket == INVALID_SOCKET)
 		Com_Error(ERR_FATAL, "LiveRadiant: Socket creation failed\n");
 
-	// Bind socket to any local address on port 3700
+	// Bind socket to any local address on port X
 	sockaddr_in addrIn;
 	addrIn.sin_family = AF_INET;
-	addrIn.sin_port = htons(3700);
+	addrIn.sin_port = htons(radiant_livePort->current.integer);
 	addrIn.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	Com_Printf(1, "LiveRadiant: Attempting to bind on port %d... ", (int)ntohs(addrIn.sin_port));
@@ -66,6 +66,9 @@ void RadiantRemoteInit()
 
 void RadiantRemoteShutdown()
 {
+	if (!radiant_live->current.enabled)
+		return;
+
 	shutdown(g_ServerSocket, 2 /*SD_BOTH*/);
 	closesocket(g_ServerSocket);
 
@@ -75,7 +78,7 @@ void RadiantRemoteShutdown()
 
 void RadiantRemoteUpdate()
 {
-	if (!RadiantRemoteUpdateSocket())
+	if (!radiant_live->current.enabled || !RadiantRemoteUpdateSocket())
 		return;
 
 	// Non-blocking read
@@ -115,8 +118,12 @@ void RadiantRemoteUpdate()
 					continue;
 			}
 
-			if (recvCommands[i].type != RADIANT_COMMAND_CAMERA)
-				Com_Printf(1, "Command %d [ID %d]:\n%s\n", recvCommands[i].type, recvCommands[i].liveUpdateId, recvCommands[i].strCommand);
+			// Print each network message to the console if enabled
+			if (radiant_liveDebug->current.enabled)
+			{
+				if (recvCommands[i].type != RADIANT_COMMAND_CAMERA)
+					Com_Printf(1, "Command %d [ID %d]:\n%s\n", recvCommands[i].type, recvCommands[i].liveUpdateId, recvCommands[i].strCommand);
+			}
 
 			memcpy(&gCommands[gCommandCount++], &recvCommands[i], sizeof(RadiantCommand));
 		}

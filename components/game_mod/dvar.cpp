@@ -9,6 +9,10 @@ dvar_s* cg_drawViewpos;
 dvar_s* gm_build_date;
 dvar_s* perk_weapRateEnhanced;
 
+dvar_s* radiant_live;
+dvar_s* radiant_livePort;
+dvar_s* radiant_liveDebug;
+
 void R_RegisterCustomDvars()
 {
 	// DirectX9 extensions
@@ -62,6 +66,10 @@ void __cdecl CG_RegisterDvars()
 	con_inputMaxMatchesShown = Dvar_RegisterInt("con_inputMaxMatchesShown", 24, 1, 64, 1, "Maximum number of suggestions in the console autocomplete preview");
 	cg_drawViewpos = Dvar_RegisterInt("cg_drawViewpos", 0, 0, 1, 1, "Draw the current player origin and view angles");
 	gm_build_date = Dvar_RegisterString("gm_build_date", __TIMESTAMP__, 0x10 | 0x8, "Compile time for game_mod");
+
+	radiant_live = Dvar_RegisterInt("radiant_live", 0, 0, 1, 0x0, "Enable live Radiant updates in the game");
+	radiant_livePort = Dvar_RegisterInt("radiant_livePort", 3700, 0, 65535, 0x0, "Network port for Radiant");
+	radiant_liveDebug = Dvar_RegisterInt("radiant_liveDebug", 0, 0, 1, 0x0, "Debugging prints for Radiant commands");
 
 	// Set the max number of suggestions to show in the console autocomplete preview
 	PatchMemory(0x00B72F7C, (PBYTE)&con_inputMaxMatchesShown->current.value, 4);
