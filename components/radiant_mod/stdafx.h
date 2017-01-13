@@ -1,14 +1,15 @@
 #pragma once
 
-#pragma comment(lib, "detours.lib")
-#include "../shared/detours/Detours.h"
-
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <intrin.h>
 #include <shellapi.h>
+#include <unordered_map>
+#include <WinSock.h>
+#pragma comment(lib, "ws2_32.lib")
+
 
 #define RADIANT_MOD 1
 #define BO1_SEMI_NATIVE_BUILD 1
@@ -36,6 +37,9 @@
 #include "../shared/shared_utility.h"
 #include "../shared/minidx9/Include/d3dx9.h"
 #pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
+
+#include "../shared/detours/Detours.h"
+#pragma comment(lib, "detours.lib")
 
 //
 // Nvidia Nsight patches
@@ -82,7 +86,16 @@
 
 #include "kvs.h"
 #include "ent_light.h"
+#include "brush.h"
+#include "entity.h"
+#include "undo.h"
+#include "map.h"
+#include "drag.h"
+#include "remote.h"
+#include "remote_net.h"
 
 #include "afx.h"
 #include "afx_colors.h"
 #include "afx_resource.h"
+
+#include "CCamWnd.h"

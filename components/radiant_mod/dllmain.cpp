@@ -300,6 +300,27 @@ BOOL RadiantMod_Init()
 	PatchMemory(0x004827E9, (PBYTE)"\x84", 1);
 	PatchMemory(0x004827D3, (PBYTE)"\x84", 1);
 
+	//
+	// Live game update hooks
+	//
+	*(PBYTE *)&CCamWnd::ctor_o = Detours::X86::DetourFunction((PBYTE)0x00402B90, (PBYTE)&CCamWnd::ctor);
+
+	*(PBYTE *)&Entity_Clone_o = Detours::X86::DetourFunction((PBYTE)0x0049E7C0, (PBYTE)&hk_Entity_Clone);
+	*(PBYTE *)&Entity_Free_o = Detours::X86::DetourFunction((PBYTE)0x0049D3D0, (PBYTE)&hk_Entity_Free);
+
+	*(PBYTE *)&Undo_Start_o = Detours::X86::DetourFunction((PBYTE)0x004769D0, (PBYTE)&hk_Undo_Start);
+	*(PBYTE *)&Undo_End_o = Detours::X86::DetourFunction((PBYTE)0x00476E30, (PBYTE)&hk_Undo_End);
+
+	*(PBYTE *)&SetEntityKeyValue_o = Detours::X86::DetourFunction((PBYTE)0x0049CE00, (PBYTE)&hk_SetEntityKeyValue);
+	*(PBYTE *)&SetKeyValue_o = Detours::X86::DetourFunction((PBYTE)0x0049CD20, (PBYTE)&hk_SetKeyValue);
+
+	*(PBYTE *)&Map_LoadFile_o = Detours::X86::DetourFunction((PBYTE)0x0049FF90, (PBYTE)&hk_Map_LoadFile);
+	*(PBYTE *)&Map_SaveFile_o = Detours::X86::DetourFunction((PBYTE)0x004A07E0, (PBYTE)&hk_Map_SaveFile);
+
+	*(PBYTE *)&MoveSelection_o = Detours::X86::DetourFunction((PBYTE)0x00498AE0, (PBYTE)&hk_MoveSelection);
+
+	CreateThread(nullptr, 0, RemoteNet_Thread, nullptr, 0, nullptr);
+
 	return TRUE;
 }
 
