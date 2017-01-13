@@ -228,9 +228,15 @@ struct DebugGlobals
 	char data[0x6C];
 };
 
-struct GfxDrawSurf
+struct GfxDrawSurfFields
 {
-	char data[0x8];
+	__int64 _bf0;
+};
+
+union GfxDrawSurf
+{
+	GfxDrawSurfFields fields;
+	unsigned __int64 packed;
 };
 
 struct GfxSunShadow

@@ -46,6 +46,7 @@
 #include "r_screenshot.h"
 #include "r_scene.h"
 #include "r_reflection_probe.h"
+#include "r_material.h"
 #include "r_material_load_obj.h"
 #include "threads.h"
 #include "radiant_remote.h"

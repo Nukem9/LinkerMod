@@ -43,6 +43,17 @@ struct GfxImage
 	unsigned int hash;
 };
 
+enum
+{
+	MAPTYPE_NONE = 0x0,
+	MAPTYPE_INVALID1 = 0x1,
+	MAPTYPE_INVALID2 = 0x2,
+	MAPTYPE_2D = 0x3,
+	MAPTYPE_3D = 0x4,
+	MAPTYPE_CUBE = 0x5,
+	MAPTYPE_COUNT = 0x6,
+};
+
 void Image_HandleMissingImage(int code, const char *fmt, const char* image);
 unsigned int Image_GetUsage(int imageFlags, D3DFORMAT imageFormat);
 void Image_Create2DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned __int16 height, int mipmapCount, int imageFlags, D3DFORMAT imageFormat);
@@ -52,3 +63,8 @@ void Image_CreateCubeTexture_PC(GfxImage *image, unsigned __int16 edgeLen, int m
 void hk_Image_Create2DTexture_PC(unsigned __int16 width, int mipmapCount, int imageFormat);
 void hk_Image_Create3DTexture_PC(int image, int mipmapCount, int imageFormat);
 void hk_Image_CreateCubeTexture_PC(signed int mipmapCount, int imageFormat);
+
+bool __cdecl Image_IsCodeImage(int track);
+_D3DFORMAT __cdecl R_ImagePixelFormat(GfxImage *image);
+
+void __cdecl R_ImageList_f();

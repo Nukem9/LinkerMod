@@ -73,6 +73,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0062A0B0, (PBYTE)&Dvar_SetFromStringByName);
 
 	//
+	// R_RegisterCmds / R_UnregisterCmds replacement
+	//
+	PatchCall(0x006B8300, (PBYTE)&R_RegisterCmds);
+	PatchJump(0x006B8549, (PBYTE)&R_UnregisterCmds);
+
+	//
 	// Always force the cursor to be shown
 	//
 	//PatchMemory(0x00683C50, (PBYTE)"\xC3", 1); // sub_683C50

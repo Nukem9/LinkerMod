@@ -42,6 +42,25 @@ static void PatchCall(ULONG_PTR instr, PBYTE dest)
 	FlushInstructionCache(GetCurrentProcess(), (LPVOID)instr, 5);
 }
 
+//
+// Only supports the 0xE9 opcode
+//
+static void PatchJump(ULONG_PTR instr, PBYTE dest)
+{
+	BYTE* opcode = (BYTE*)instr;
+	ASSERT(*opcode == 0xE9);
+
+	DWORD d = 0;
+	VirtualProtect((LPVOID)instr, 5, PAGE_EXECUTE_READWRITE, &d);
+
+	DWORD newOperand = reinterpret_cast<DWORD>(dest)-reinterpret_cast<DWORD>(opcode + 5);
+	((DWORD*)(opcode + 1))[0] = newOperand;
+
+	VirtualProtect((LPVOID)instr, 5, d, &d);
+
+	FlushInstructionCache(GetCurrentProcess(), (LPVOID)instr, 5);
+}
+
 static void PatchMemory_WithNOP(ULONG_PTR Address, SIZE_T Size)
 {
 	DWORD d = 0;
