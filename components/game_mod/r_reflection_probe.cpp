@@ -136,7 +136,7 @@ void R_GenerateReflections(const char *mapname, GfxReflectionProbe *probes, cons
 	if (version != 45)
 	{
 		Com_Error(
-			1,
+			ERR_DROP,
 			"You can only generate reflections for BSP version %i, but the BSP is version %i. You need to recompile the map.",
 			45,
 			version);

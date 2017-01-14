@@ -119,7 +119,7 @@ LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	sprintf_s(g_ExceptionStr, "%s", localizedErr);
 #endif
 
-	Com_Error(0, g_ExceptionStr);
+	Com_Error(ERR_FATAL, g_ExceptionStr);
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
