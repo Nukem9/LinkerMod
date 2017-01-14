@@ -189,6 +189,7 @@ void Path_InitLinkCounts();
 void Path_InitLinkInfoArray();
 void Path_InitPaths();
 void Path_CheckSpawnExitNodesConnectivity();
+void Path_ValidateNode(pathnode_t *node);
 void Path_ValidateAllNodes();
 
 typedef struct

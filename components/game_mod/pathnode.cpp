@@ -134,11 +134,32 @@ void Path_InitPaths()
 // /game/pathnode.cpp:2471
 void Path_CheckSpawnExitNodesConnectivity()
 {
-	// TODO: Not implemented in the game itself
+	// This function only applies to multiplayer (dog actors must have map exit nodes)
+}
+
+// /game/pathnode.cpp:5034
+void Path_ValidateNode(pathnode_t *node)
+{
+	int j = j = node->constant.totalLinkCount - 1;
+
+	for (; j >= node->dynamic.wLinkCount; --j)
+	{
+		pathlink_s *link = &node->constant.Links[j];
+		ASSERT(link->disconnectCount > 0);
+	}
+
+	ASSERT(j == node->dynamic.wLinkCount - 1);
+
+	for (; j >= 0; --j)
+	{
+		pathlink_s *link = &node->constant.Links[j];
+		ASSERT_MSG(!link->disconnectCount, va("%d, %d, %d", Path_ConvertNodeToIndex(node), j, link->nodeNum));
+	}
 }
 
 // /game/pathnode.cpp:5054
 void Path_ValidateAllNodes()
 {
-	// TODO: Not implemented in the game itself
+	// for (int i = 0; i < g_path_actualNodeCount; ++i)
+	//	Path_ValidateNode(&gameWorldCurrent->path.nodes[i]);
 }
