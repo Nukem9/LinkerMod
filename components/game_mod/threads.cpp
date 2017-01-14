@@ -48,3 +48,13 @@ DWORD WINAPI Sys_ThreadMain(LPVOID Arg)
 {
 	return ((LPTHREAD_START_ROUTINE)0x0082FDE0)(Arg);
 }
+
+bool Sys_IsMainThread()
+{
+	return true;
+}
+
+bool Sys_IsRenderThread()
+{
+	return true;
+}
