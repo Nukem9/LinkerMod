@@ -310,6 +310,10 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0087E4E5, (PBYTE)&SV_PostFrame, Detours::X86Option::USE_CALL);
 	PatchMemory_WithNOP(0x0087E4D7, 10);// Functions moved into SV_PostFrame
 	PatchMemory_WithNOP(0x0087E4ED, 5);	// Functions moved into SV_PostFrame
+	ptr = &G_ProcessPathnodeCommand;
+	PatchMemory(0x00A56758, (PBYTE)&ptr, 4);
+	ptr = &G_ClearSelectedPathNode;
+	PatchMemory(0x00A5675C, (PBYTE)&ptr, 4);
 
 	//
 	// Increase PMem size

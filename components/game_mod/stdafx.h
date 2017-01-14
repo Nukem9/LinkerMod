@@ -49,7 +49,6 @@
 #include "r_material.h"
 #include "r_material_load_obj.h"
 #include "threads.h"
-#include "radiant_remote.h"
 #include "ragdoll.h"
 #include "ragdoll_update.h"
 #include "phys_main.h"
@@ -63,6 +62,8 @@
 #include "cl_keys.h"
 #include "sv_main_mp.h"
 #include "pathnode.h"
+#include "pathnode_load_obj.h"
+#include "radiant_remote.h"
 
 #include "win_localize.h"
 #include "win_exception.h"

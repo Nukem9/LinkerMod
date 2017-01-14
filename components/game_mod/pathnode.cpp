@@ -1,5 +1,54 @@
 #include "stdafx.h"
 
+// /game/pathnode.cpp:1332
+void node_droptofloor(pathnode_t *node)
+{
+	static DWORD dwCall = 0x00815190;
+
+	__asm
+	{
+		mov eax, node
+		call [dwCall]
+	}
+}
+
+// /game/pathnode.cpp:1447
+void G_InitPathBaseNode(pathbasenode_t *pbnode, pathnode_t *pnode)
+{
+	pbnode->vOrigin[0] = pnode->constant.vOrigin[0];
+	pbnode->vOrigin[1] = pnode->constant.vOrigin[1];
+	pbnode->vOrigin[2] = pnode->constant.vOrigin[2];
+	pbnode->type = 1 << pnode->constant.type;
+
+	if (pnode->constant.spawnflags & 1)
+		pbnode->type |= 0x200000;
+}
+
+// /game/pathnode.cpp:1461
+void G_DropPathNodeToFloor(unsigned int nodeIndex)
+{
+	node_droptofloor(&gameWorldCurrent->path.nodes[nodeIndex]);
+	G_InitPathBaseNode(&gameWorldCurrent->path.basenodes[nodeIndex], &gameWorldCurrent->path.nodes[nodeIndex]);
+}
+
+// /game/pathnode.cpp:1505
+void G_SpawnPathnodeDynamic(SpawnVar *spawnVar)
+{
+	((void(__cdecl *)(SpawnVar *))0x004B08E0)(spawnVar);
+}
+
+// /game/pathnode.cpp:1948
+unsigned int Path_ConvertNodeToIndex(pathnode_t *node)
+{
+	unsigned int nodeIndex = node - gameWorldCurrent->path.nodes;
+
+	ASSERT(node);
+	// ASSERT(nodeIndex < g_path_actualNodeCount);
+
+	return nodeIndex;
+}
+
+// /game/pathnode.cpp:1973
 void Path_Init(int restart)
 {
 	if (true || !useFastFile->current.enabled)
@@ -21,82 +70,24 @@ void Path_Init(int restart)
 	Path_InitBadPlaces();
 }
 
-void Path_CreateNodes()
-{
-	pathstatic->pathLinks		= nullptr;
-	pathstatic->indirectNodes	= nullptr;
-	pathstatic->pathbuf			= nullptr;
-
-	gameWorldCurrent->path.nodes = (pathnode_t *)Hunk_Alloc(PATH_MAX_NODES * sizeof(pathnode_t), "Path_CreateNodes", 6);
-	gameWorldCurrent->path.basenodes = (pathbasenode_t *)Hunk_Alloc(PATH_MAX_NODES * sizeof(pathbasenode_t), "Path_CreateNodes", 6);
-}
-
-void Path_InitStatic(int restart)
-{
-	if (restart)
-	{
-		// The game keeps existing node data when restarting a map
-		gameWorldCurrent->path.nodeCount = 0;
-	}
-	else
-	{
-		// New map load. Initialize everything to zero.
-		memset(&gameWorldCurrent->path, 0, sizeof(PathData));
-	}
-
-	g_pathsError = nullptr;
-}
-
 void Path_InitBadPlaces()
 {
 	memset(g_badplaces, 0, MAX_BADPLACES * sizeof(badplace_t));
 }
 
-void Path_BuildChains()
-{
-	((void(__cdecl *)())0x0047CA10)();
-}
-
-void Path_ConnectPaths()
-{
-	((void(__cdecl *)())0x004C4780)();
-}
-
-void Path_LoadPaths()
-{
-	((void(__cdecl *)())0x00653D40)();
-}
-
+// /game/pathnode.cpp:2289
 void Path_InitLinkCounts()
 {
 	((void(__cdecl *)())0x00814190)();
 }
 
+// /game/pathnode.cpp:2327
 void Path_InitLinkInfoArray()
 {
 	((void(__cdecl *)())0x00814260)();
 }
 
-bool Path_FindOverlappingNodes()
-{
-	return ((bool(__cdecl *)())0x0048E0E0)();
-}
-
-void Path_ValidateAllNodes()
-{
-	// TODO: Not implemented in the game itself
-}
-
-void Path_CheckSpawnExitNodesConnectivity()
-{
-	// TODO: Not implemented in the game itself
-}
-
-void Path_SavePaths()
-{
-	((void(__cdecl *)())0x00462950)();
-}
-
+// /game/pathnode.cpp:2387
 void Path_InitPaths()
 {
 	if (true || !useFastFile->current.enabled)
@@ -138,4 +129,16 @@ void Path_InitPaths()
 		g_connectpaths->current.integer = 0;
 		//Dvar_SetInt(g_connectpaths, 0);
 	}
+}
+
+// /game/pathnode.cpp:2471
+void Path_CheckSpawnExitNodesConnectivity()
+{
+	// TODO: Not implemented in the game itself
+}
+
+// /game/pathnode.cpp:5054
+void Path_ValidateAllNodes()
+{
+	// TODO: Not implemented in the game itself
 }
