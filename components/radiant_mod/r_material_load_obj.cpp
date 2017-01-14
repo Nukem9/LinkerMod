@@ -718,7 +718,7 @@ bool Material_DefaultSamplerSourceFromTable(const char *constantName, ShaderInde
 			&& Material_DefaultIndexRange(indexRange, sourceTable[sourceIndex].arrayCount, &argSource->indexRange))
 		{
 			argSource->type			= MTL_ARG_CODE_PIXEL_SAMPLER;
-			argSource->u.codeIndex	= LOWORD(sourceTable[sourceIndex].source);
+			argSource->u.codeIndex	= (unsigned short)sourceTable[sourceIndex].source;
 			return true;
 		}
 	}
@@ -902,9 +902,6 @@ bool Material_ParseConstantSource(MaterialShaderType shaderType, const char **te
 SRCLINE(3758)
 bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, const char *constantName, ShaderIndexRange *indexRange, CodeConstantSource *sourceTable, ShaderArgumentSource *argSource)
 {
-	_VERBOSE( printf("CONST: %s\n", constantName) );
-
-
 	int sourceIndex = 0;
 	for (;; sourceIndex++)
 	{
@@ -915,8 +912,6 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 		{
 			unsigned int arrayCount;
 
-			_VERBOSE( printf("MATCH: %s\n", constantName) );
-
 			if (sourceTable[sourceIndex].source < R_MAX_CODE_INDEX)
 			{
 				int count	= (sourceTable[sourceIndex].arrayCount > 1) ? sourceTable[sourceIndex].arrayCount : 1;
@@ -925,7 +920,6 @@ bool Material_DefaultConstantSourceFromTable(MaterialShaderType shaderType, cons
 			else
 			{
 				ASSERT(sourceTable[sourceIndex].arrayCount == 0);
-
 				arrayCount = 4;
 			}
 
@@ -1595,8 +1589,6 @@ bool Material_ParseShaderArguments(const char **text, const char *shaderName, Ma
 			&argDest.indexRange,
 			&argSource))
 		{
-			_VERBOSE(printf("success\n"));
-
 			if (argSource.type == MTL_ARG_CODE_PIXEL_CONST)
 			{
 				if (argSource.u.codeIndex == 4)
