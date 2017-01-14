@@ -345,6 +345,15 @@ BOOL GameMod_Init()
 	PatchMemory(0x008172D3, (PBYTE)&msg_nodeVisUpdate, 4);
 
 	//
+	// Map load-time path linking
+	//
+#if _UNSTABLE
+	Detours::X86::DetourFunction((PBYTE)0x0060C4E0, (PBYTE)&Path_Init);
+	Detours::X86::DetourFunction((PBYTE)0x005DEA60, (PBYTE)&Path_InitPaths);
+	PatchMemory_WithNOP(0x00517600, 2);
+#endif
+
+	//
 	// Replace "Missing Image" assertion with silent warning (and add image to missingasset.csv)
 	//
 	PatchCall(0x0070A4CD, (PBYTE)&Image_HandleMissingImage);

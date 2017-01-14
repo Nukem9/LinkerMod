@@ -62,6 +62,7 @@
 #include "bg_weapons.h"
 #include "cl_keys.h"
 #include "sv_main_mp.h"
+#include "pathnode.h"
 
 #include "win_localize.h"
 #include "win_exception.h"

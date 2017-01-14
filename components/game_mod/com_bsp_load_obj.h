@@ -92,3 +92,4 @@ const void *Com_GetBspLump(LumpType type, unsigned int elemSize, unsigned int *c
 unsigned int Com_GetBspVersion();
 void Com_LoadBsp(const char *filename);
 void Com_SaveLump(LumpType type, const void *newLump, unsigned int size, ComSaveLumpBehavior behavior);
+const char *Com_GetHunkStringCopy(const char *string);

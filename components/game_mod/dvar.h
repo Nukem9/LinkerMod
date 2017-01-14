@@ -103,6 +103,7 @@ static dvar_s*& zombietron = *(dvar_s **)0x0247FDE8;
 static dvar_s*& zombiemode = *(dvar_s **)0x0243FDD4;
 static dvar_s*& blackopsmode = *(dvar_s **)0x0243FD24;
 static dvar_s*& useFastFile = *(dvar_s **)0x0247FEC8;
+static dvar_s*& g_connectpaths = *(dvar_s **)0x01C01850;
 
 static dvar_s*& r_reflectionProbeGenerate = *(dvar_s **)0x03B35038;
 static dvar_s*& r_reflectionProbeGenerateExit = *(dvar_s **)0x03B3503C;

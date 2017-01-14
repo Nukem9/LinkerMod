@@ -111,6 +111,7 @@
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
     <ClCompile Include="patch_reflections.cpp" />
+    <ClCompile Include="pathnode.cpp" />
     <ClCompile Include="phys_main.cpp" />
     <ClCompile Include="radiant_remote.cpp" />
     <ClCompile Include="ragdoll.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="patch_common.h" />
     <ClInclude Include="patch_usefastfile.h" />
     <ClInclude Include="patch_reflections.h" />
+    <ClInclude Include="pathnode.h" />
     <ClInclude Include="phys_main.h" />
     <ClInclude Include="radiant_remote.h" />
     <ClInclude Include="ragdoll.h" />

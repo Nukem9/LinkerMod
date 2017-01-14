@@ -19,3 +19,11 @@ void Com_SaveLump(LumpType type, const void *newLump, unsigned int size, ComSave
 {
 	((void(__cdecl *)(LumpType, const void *, unsigned int, ComSaveLumpBehavior))0x004E1250)(type, newLump, size, behavior);
 }
+
+const char *Com_GetHunkStringCopy(const char *string)
+{
+	size_t len = strlen(string);
+	void *hunkCopy = Hunk_AllocAlign(len + 1, 1, "Com_GetHunkStringCopy", 14);
+
+	return (const char *)memcpy(hunkCopy, string, len + 1);
+}
