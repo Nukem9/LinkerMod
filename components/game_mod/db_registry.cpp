@@ -57,39 +57,46 @@ void __declspec(naked) DB_ModXFileHandle_hk()
 
 void DB_ModXFileHandle(HANDLE *zoneFile, char* zoneName, FF_DIR *zoneDir)
 {
-	char* str_mod = (char*)0x00A18DE8;
-
-	HANDLE h = 0;
 	char filename[MAX_PATH];
-	
-	if(fs_gameDirVar && fs_gameDirVar->current.string && !strcmp(zoneName,str_mod)) //Loads mods/fs_game/mod.ff
-	{
-		sprintf_s(filename, "%s\\%s\\%s.ff", fs_homepath->current.string, fs_gameDirVar->current.string, zoneName);
-		HANDLE h = CreateFileA(filename, 0x80000000, 1u, 0, 3u, 0x60000000u, 0);
-		*zoneFile = h;
-		if ( h != (HANDLE)-1 )
-			*zoneDir = FFD_MOD_DIR;
-	}
-	else if(strcmp(fs_gameDirVar->current.string, "raw") != 0 && strlen(fs_gameDirVar->current.string) > 0) //Load custom maps associated with mods
-	{
-		sprintf_s(filename,"%s\\%s\\%s.ff", fs_homepath->current.string, fs_gameDirVar->current.string, zoneName);
-	
-		h = CreateFileA(filename, 0x80000000, 1u, 0, 3u, 0x60000000u, 0);
-		*zoneFile = h;
-		if(h != (HANDLE)-1)
-			*zoneDir = FFD_MOD_DIR;
-	}
-	else //Load usermaps/map
-	{
-		if(fs_usermapDir && fs_usermapDir->current.string)
-		{
-			const char* usermapDir = fs_usermapDir->current.string;
-			sprintf_s(filename, "%s\\usermaps\\%s\\%s.ff", fs_homepath->current.string, usermapDir, zoneName);
+	const char *gameModDir = (fs_gameDirVar) ? fs_gameDirVar->current.string : "";
 
-			h = CreateFileA(filename, 0x80000000, 1u, 0, 3u, 0x60000000u, 0);
-			*zoneFile = h;
-			if(h != (HANDLE)-1)
-				*zoneDir = FFD_USER_MAP;
+	// Try loading /mods/fs_game/mod.ff
+	if(strlen(gameModDir) > 0 && !strcmp(zoneName, "mod"))
+	{
+		sprintf_s(filename, "%s\\%s\\%s.ff", fs_homepath->current.string, gameModDir, zoneName);
+		*zoneFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_OVERLAPPED, nullptr);
+
+		if (*zoneFile != INVALID_HANDLE_VALUE)
+		{
+			*zoneDir = FFD_MOD_DIR;
+			return;
+		}
+	}
+
+	// Load custom maps associated with mods
+	if(strlen(gameModDir) > 0 && strcmp(gameModDir, "raw") != 0)
+	{
+		sprintf_s(filename,"%s\\%s\\%s.ff", fs_homepath->current.string, gameModDir, zoneName);
+		*zoneFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_OVERLAPPED, nullptr);
+
+		if (*zoneFile != INVALID_HANDLE_VALUE)
+		{
+			*zoneDir = FFD_MOD_DIR;
+			return;
+		}
+	}
+
+	// Try /usermaps/map
+	if (fs_usermapDir && fs_usermapDir->current.string)
+	{
+		const char* usermapDir = fs_usermapDir->current.string;
+		sprintf_s(filename, "%s\\usermaps\\%s\\%s.ff", fs_homepath->current.string, usermapDir, zoneName);
+		*zoneFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_OVERLAPPED, nullptr);
+
+		if (*zoneFile != INVALID_HANDLE_VALUE)
+		{
+			*zoneDir = FFD_USER_MAP;
+			return;
 		}
 	}
 }
