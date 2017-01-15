@@ -196,6 +196,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
 
 	//
+	// Allow the OS to cache fastfiles when loading
+	//
+	ptr = (void *)(FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_OVERLAPPED);
+	PatchMemory(0x007A37BB, (PBYTE)&ptr, 4);
+
+	//
 	// Enable legacy mod (patch override) support
 	// (This detour is used for both level_dependencies AND patch overrides)
 	//
