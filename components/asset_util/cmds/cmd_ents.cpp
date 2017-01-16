@@ -69,7 +69,7 @@ int Cmd_Ents_f(int argc, char** argv)
 	{
 		char* filepath = argv[i];
 
-		Con_Print("Extracting ents from \"%s\"...\n", filepath);
+		Con_Print_v("Extracting ents from \"%s\"...\n", filepath);
 
 		FILE* h = nullptr;
 		if (fopen_s(&h, filepath, "r+b") != 0)
@@ -113,6 +113,12 @@ int Cmd_Ents_f(int argc, char** argv)
 		}
 		else
 		{
+			//
+			// Only Add the iwmap header if we arent in verbose mode
+			//
+			Con_Print_nv(	"iwmap 4\n" 
+							"\"000_Global\" flags  active\n"
+							"\"The Map\" flags\n" );
 			Con_Print("%s\n", result);
 		}
 
