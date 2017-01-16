@@ -74,7 +74,7 @@ int Cmd_Ents_f(int argc, char** argv)
 		FILE* h = nullptr;
 		if (fopen_s(&h, filepath, "r+b") != 0)
 		{
-			Con_Error("ERROR: Fastfile '%s' could not be found\n\n", filepath);
+			Con_Error("ERROR: Fastfile '%s' could not be found\n", filepath);
 			return FALSE;
 		}
 		rewind(h);
