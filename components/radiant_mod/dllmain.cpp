@@ -301,6 +301,12 @@ BOOL RadiantMod_Init()
 	PatchMemory(0x004827D3, (PBYTE)"\x84", 1);
 
 	//
+	// Fix Crash when opening maps that don't have a valid skybox
+	//	(Prevent attempting to use the default model as a skybox)
+	//
+	PatchCall(0x0040309F, (PBYTE)&R_RegisterSkyboxModel);
+
+	//
 	// Live game update hooks
 	//
 	*(PBYTE *)&CCamWnd::ctor_o = Detours::X86::DetourFunction((PBYTE)0x00402B90, (PBYTE)&CCamWnd::ctor);

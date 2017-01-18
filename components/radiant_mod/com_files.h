@@ -18,3 +18,5 @@ static FS_FreeFile_t FS_FreeFile = (FS_FreeFile_t)0x004BC910;
 int __cdecl FS_ReadFile(const char *qpath, void **buffer);
 
 void FS_Init_TechsetOverride(void);
+
+int __cdecl FS_HashFileName(const char *fname, int hashSize);

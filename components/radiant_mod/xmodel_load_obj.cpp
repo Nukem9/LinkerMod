@@ -115,3 +115,49 @@ bool __declspec(naked) hk_XModelLoadConfigFile()
 		retn
 	}
 }
+
+XModel *__cdecl XModelLoad(const char *name, void *(__cdecl *Alloc)(int), void *(__cdecl *AllocColl)(int))
+{
+	XModel* result = NULL;
+
+	_asm
+	{
+		push Alloc
+		mov edx, AllocColl
+		mov ecx, name
+		mov ebx, 0x004E0210
+		call ebx
+		add esp, 4
+		mov result, eax
+	}
+
+	return result;
+}
+
+XModel *__cdecl R_RegisterSkyboxModel(const char *name)
+{
+	return XModelPrecache_Skybox(name, Hunk_AllocXModelPrecache, Hunk_AllocXModelPrecacheColl);
+}
+
+XModel *__cdecl XModelPrecache_Skybox(const char *name, void *(__cdecl *Alloc)(int), void *(__cdecl *AllocColl)(int))
+{
+	return XModelPrecache_Skybox_LoadObj(name, Alloc, AllocColl);
+}
+
+XModel *__cdecl XModelPrecache_Skybox_LoadObj(const char *name, void *(__cdecl *Alloc)(int), void *(__cdecl *AllocColl)(int))
+{
+	XModel* model = (XModel*)Hunk_FindDataForFile(5, name);
+	
+	if (model)
+		return model;
+
+	model = XModelLoad(name, Alloc, AllocColl);
+	if (model)
+	{
+		model->name = Hunk_SetDataForFile(5, name, model, Alloc);
+		return model;
+	}
+
+	Com_PrintError(19, "ERROR: Cannot find xmodel '%s'.\n", name);
+	return NULL;
+}
