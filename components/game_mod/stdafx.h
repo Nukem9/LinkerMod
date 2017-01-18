@@ -48,6 +48,7 @@
 #include "r_reflection_probe.h"
 #include "r_material.h"
 #include "r_material_load_obj.h"
+#include "cscr_parser.h"
 #include "threads.h"
 #include "ragdoll.h"
 #include "ragdoll_update.h"

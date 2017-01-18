@@ -104,6 +104,7 @@
     <ClCompile Include="com_bsp_load_obj.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
+    <ClCompile Include="cscr_parser.cpp" />
     <ClCompile Include="db_registry.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
+    <ClInclude Include="cscr_parser.h" />
     <ClInclude Include="d3d9ex.h" />
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />

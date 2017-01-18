@@ -79,6 +79,11 @@ BOOL GameMod_Init()
 	PatchJump(0x006B8549, (PBYTE)&R_UnregisterCmds);
 
 	//
+	// Add ?? dvar to enable/disable reading of raw script files
+	//
+	Detours::X86::DetourFunction((PBYTE)0x008A5980, (PBYTE)&hk_Scr_ReadFile);
+
+	//
 	// Always force the cursor to be shown
 	//
 	//PatchMemory(0x00683C50, (PBYTE)"\xC3", 1); // sub_683C50
