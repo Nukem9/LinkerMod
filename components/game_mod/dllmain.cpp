@@ -125,11 +125,10 @@ BOOL GameMod_Init()
 	PatchMemory(0x0058761C, (PBYTE)"\xEB", 1);
 
 	//
-	// Run console/packet events even during map load
+	// Run console/packet events even during map load (Com_EventLoop() during DB wait)
 	//
-	//Detours::X86::DetourFunction((PBYTE)0x00699565, (PBYTE)&Com_RunEventHack, Detours::X86Option::USE_CALL);
-	//Detours::X86::DetourFunction((PBYTE)0x00589430, (PBYTE)&Com_EventLoop);
-	//PatchMemory_WithNOP(0x007A283C, 5);
+	Detours::X86::DetourFunction((PBYTE)0x00699565, (PBYTE)0x00589430, Detours::X86Option::USE_CALL);
+	PatchMemory_WithNOP(0x007A283C, 5);
 
 	//
 	// Allow the console to be opened during loadscreens
