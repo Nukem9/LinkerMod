@@ -106,6 +106,9 @@ REGISTER_CVAR(g_extractImages);
 REGISTER_CVAR(g_extractSounds);
 REGISTER_CVAR(g_useLocalized);
 
+REGISTER_CVAR(ents_useLabels);
+REGISTER_CVAR(ents_genBrushes);
+
 REGISTER_CVAR(fs_outdir);
 
 #undef REGISTER_GLOBAL_CVAR

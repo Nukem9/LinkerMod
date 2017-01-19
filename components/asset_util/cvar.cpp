@@ -46,6 +46,9 @@ REGISTER_CVAR(g_extractImages, "images", NULL, "Extract image files", false);
 REGISTER_CVAR(g_extractSounds, "sounds", NULL, "Extract audio files", false);
 REGISTER_CVAR(g_useLocalized, "includeLocalized", NULL, "Extract from localized files as well", false);
 
+REGISTER_CVAR(ents_useLabels, "labels", NULL, "Write entity number in a comment above each entity", false);
+REGISTER_CVAR(ents_genBrushes, "dummyBrushes", NULL, "Generate dummy brushes for script/trigger brush models", true);
+
 REGISTER_CVAR(fs_outdir, "outdir", NULL, "Target directory for file output (default is the game's raw directory)", NULL);
 
 #undef REGISTER_GLOBAL_CVAR
