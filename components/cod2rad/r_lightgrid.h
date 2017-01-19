@@ -11,6 +11,7 @@ struct GfxLightGridColors
 		BYTE all[56 * 3];
 	};
 };
+STATIC_ASSERT_SIZE(GfxLightGridColors, 56 * 3);
 
 struct GridColorsCluster
 {
@@ -20,21 +21,32 @@ struct GridColorsCluster
 	float unknown2;			// 0x0C
 	float unknown3;			// 0x10
 };
+STATIC_ASSERT_SIZE(GridColorsCluster, 0x14);
+
+struct GfxLightGridEntry
+{
+	unsigned __int16 colorsIndex;
+	char primaryLightIndex;
+	char needsTrace;
+};
+STATIC_ASSERT_SIZE(GfxLightGridEntry, 0x04);
 
 struct GridSamplePoint
 {
 	WORD pos[3];	// 0x00
-	BYTE unknown4;	// 0x06 ???
-	WORD unknown5;	// 0x08 ColorsIndex?
-	BYTE unknown6;	// 0x0A	PrimaryLightIndex?
-	BYTE unknown7;	// 0x0C NeedsTrace?
+	WORD unknown4;	// 0x06 ???
+	//WORD unknown5;	// 0x08 ColorsIndex?
+	//BYTE unknown6;	// 0x0A	PrimaryLightIndex?
+	//BYTE unknown7;	// 0x0C NeedsTrace?
+	GfxLightGridEntry entry;
 };
+STATIC_ASSERT_SIZE(GridSamplePoint, 0xC);
 
 struct LightGridGlob
 {
 	unsigned int pointCount;		// 0x00 0x153C91D0
 	unsigned int maxPoints;			// 0x04 0x153C91D4
-	unsigned int points;			// 0x08 0x153C91D8
+	GridSamplePoint* points;			// 0x08 0x153C91D8
 	unsigned int dword_153C91DC;	// 0x0C 0x153C91DC
 	unsigned int clusterCount;		// 0x10 0x153C91E0
 	GridColorsCluster *clusters;	// 0x14 0x153C91E4
@@ -52,7 +64,12 @@ struct LightGridGlob
 static LightGridGlob *lightGridGlob = (LightGridGlob *)0x153C91D0;
 
 static unsigned int& lightGridColorCount = *(unsigned int *)0x153C9028;
+
 static bool& options_ImproveLights = *(bool *)0x153C9005;
+static float& options_clusterThreshold = *(float*)0x153C902C;
+
+typedef WORD DiskSampleColorHDR[56][3];
+typedef BYTE DiskSampleColor[56][3];
 
 #if USE_LEGACY_HDR
 typedef float SampleColorHDR[56][3];
@@ -69,4 +86,9 @@ void mfh_R_Init_Lightgrid();
 void mfh_R_Store_LightgridSample();
 void mfh_R_Alloc_DiskLightGridColors();
 void hk_R_Store_QuantizedLightGridSample();
+#else
+
+void mfh_R_Init_Lightgrid();
+void __cdecl StoreLightingForDir(vec3* lighting, BYTE* dst);
+void __cdecl ClusterLightGridValues(int ThreadCount);
 #endif

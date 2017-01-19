@@ -13,6 +13,7 @@ struct GfxLightGridColor_Internal
 	float f0;
 	float f1;
 };
+#endif
 
 void* rtn_R_Init_Lightgrid = (void*)0x0043684C;
 void __declspec(naked) mfh_R_Init_Lightgrid()
@@ -31,6 +32,7 @@ void __declspec(naked) mfh_R_Init_Lightgrid()
 	}
 }
 
+#if USE_LEGACY_HDR
 void __cdecl R_Store_LightGridSample_HDR(DWORD entryOffset, DWORD pixelIndex, float value)
 {
 	float* LightGridEntry = (float*)LightGridSampleColors_HDR;
@@ -195,7 +197,7 @@ void CalculateClusterMeanAndVariance(GridColorsCluster *Cluster)
 	__asm
 	{
 		mov edi, Cluster
-			call[dwCall]
+		call dwCall
 	}
 }
 
@@ -205,7 +207,7 @@ GridColorsCluster *ChooseClusterToSplit()
 
 	__asm
 	{
-		call[dwCall]
+		call dwCall
 	}
 }
 
@@ -219,7 +221,7 @@ void SplitCluster(GridColorsCluster *Cluster)
 	__asm
 	{
 		mov esi, Cluster
-			call[dwCall]
+		call dwCall
 	}
 }
 
@@ -243,7 +245,7 @@ int GetClusterDefaultScore(GridColorsCluster *Cluster)
 	__asm
 	{
 		mov ecx, Cluster
-			call[dwCall]
+		call dwCall
 	}
 }
 
@@ -255,7 +257,7 @@ void CalculateClusterMean(GridColorsCluster *Cluster, float *Means)
 	{
 		mov ecx, Cluster
 		mov eax, Means
-		call[dwCall]
+		call dwCall
 	}
 }
 
@@ -264,14 +266,10 @@ void SetLightGridColorsForCluster(GridColorsCluster *Cluster, GfxLightGridColors
 	float means[168];
 	CalculateClusterMean(Cluster, means);
 
-	int v2 = 0;
-	do
+	for (int i = 0; i < 168; i++)
 	{
-		float v3 = means[v2++];
-		int v6 = (int)(v3 + 0.5);
-
-		Colors->all[v2 - 1] = v6;
-	} while (v2 < 168);
+		Colors->all[i] = EncodeFloatInByte(means[i] + 0.5f);
+	}
 }
 
 void __cdecl ImproveLightGridValues(int threadCount)
@@ -284,20 +282,20 @@ void __cdecl ImproveLightGridValues(int threadCount)
 	}
 }
 
-void ClusterLightGridValues(int ThreadCount)
+void __cdecl ClusterLightGridValues(int ThreadCount)
 {
 	lightGridGlob->mapping = new unsigned int[lightGridGlob->pointCount];
-
 	if (!lightGridGlob->mapping)
 		Com_FatalError("Couldn't allocate %i bytes for light grid color mapping", sizeof(int) * lightGridGlob->pointCount);
 
 	lightGridGlob->clusters = new GridColorsCluster[lightGridColorCount];
-
 	if (!lightGridGlob->clusters)
 		Com_FatalError("Couldn't allocate %i bytes for light grid colors", sizeof(GridColorsCluster) * lightGridColorCount);
 
-	for (unsigned int i = 0; i < lightGridGlob->pointCount; ++i)
+	for (unsigned int i = 0; i < lightGridGlob->pointCount; i++)
+	{
 		lightGridGlob->mapping[i] = i;
+	}
 
 	lightGridGlob->clusterCount = 1;
 	lightGridGlob->clusters[0].first = 0;
@@ -309,7 +307,7 @@ void ClusterLightGridValues(int ThreadCount)
 	{
 		GridColorsCluster *cluster = ChooseClusterToSplit();
 
-		if (*(float *)0x153C902C >= cluster->unknown3 && j >= 2)
+		if (cluster->unknown3 < options_clusterThreshold && j >= 2)
 			break;
 
 		SplitCluster(cluster);
@@ -329,31 +327,30 @@ void ClusterLightGridValues(int ThreadCount)
 
 			if (firstIndex < (firstIndex + cluster->count))
 			{
-				do
-					*(WORD *)(lightGridGlob->points + 12 * lightGridGlob->mapping[firstIndex++] + 8) = i;
-				while (firstIndex < (firstIndex + cluster->count));
+				do {
+					lightGridGlob->points[lightGridGlob->mapping[firstIndex++]].entry.colorsIndex = i;
+				} while (firstIndex < (cluster->first + cluster->count));
 			}
-
-			SetLightGridColorsForCluster(cluster, lightGridColors);
-
+			
+			SetLightGridColorsForCluster(cluster, &lightGridColors[i]);
+			
 			unsigned int score = GetClusterDefaultScore(cluster);
 			if (score > maxScore)
 			{
 				maxScore = score;
 				maxScoreIndex = i;
 			}
-
-			lightGridColors++;
 		}
 	}
 
 	SwapClusters(0, maxScoreIndex);
-	SwapClusters(1, *(WORD *)(lightGridGlob->points + 12 * lightGridGlob->pointCount - 4));
+	SwapClusters(1, lightGridGlob->points[lightGridGlob->pointCount - 1].entry.colorsIndex);
+	
 	lightGridColorCount = lightGridGlob->clusterCount;
-
+	
 	if (options_ImproveLights)
 		ImproveLightGridValues(ThreadCount);
-
+	
 	delete[] lightGridGlob->clusters;
 	delete[] lightGridGlob->mapping;
 	lightGridGlob->clusters = nullptr;

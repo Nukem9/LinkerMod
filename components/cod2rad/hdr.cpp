@@ -6,6 +6,8 @@ vec4* Lightmap2Bytes_HDR = nullptr;
 #if USE_LEGACY_HDR
 SampleColorHDR* LightGridSampleColors_HDR = nullptr;
 DiskSampleColorHDR* DiskLightGridSampleColors_HDR = nullptr;
+#else
+DiskSampleColorHDR* g_lightGridColorsHDR = nullptr;
 #endif
 
 void R_Init_LightmapsHDR()
@@ -20,7 +22,14 @@ void R_Init_LightgridHDR()
 	LightGridSampleColors_HDR = new SampleColorHDR[*g_lightgridSampleCount + 1];
 	memset(LightGridSampleColors_HDR, 0, sizeof(SampleColorHDR) * (*g_lightgridSampleCount + 1));
 }
-
+#else
+void R_Init_LightgridHDR()
+{
+	g_lightGridColorsHDR = new DiskSampleColorHDR[*g_lightgridSampleCount + 1];
+	memset(g_lightGridColorsHDR, 0, sizeof(DiskSampleColorHDR) * (*g_lightgridSampleCount + 1));
+}
+#endif
+#if USE_LEGACY_HDR
 void R_Init_DiskLightgridHDR()
 {
 	DiskLightGridSampleColors_HDR = new DiskSampleColorHDR[*g_diskLightgridSampleCount];
@@ -80,4 +89,12 @@ void PatchHDR_Lightgrid()
 	Detours::X86::DetourFunction((PBYTE)0x00435C8E, (PBYTE)&mfh_R_Alloc_DiskLightGridColors); // ClusterLightGridValues
 	o_R_Store_QuantizedLightGridSample = (R_Store_QuantizedLightGridSample_t)Detours::X86::DetourFunction((PBYTE)0x00433890, (PBYTE)&hk_R_Store_QuantizedLightGridSample); // SetLightGridColorsForCluster
 #endif
+
+	//
+	// Allocates the HDR sample color buffer, runs just before SetupLightRegions()
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00436847, (PBYTE)&mfh_R_Init_Lightgrid);
+
+	Detours::X86::DetourFunction((PBYTE)0x00434E20, (PBYTE)&StoreLightingForDir);
+	Detours::X86::DetourFunction((PBYTE)0x00435B70, (PBYTE)&ClusterLightGridValues);
 }
