@@ -6,6 +6,7 @@ dvar_s* sm_quality;
 dvar_s* con_extcon;
 dvar_s* con_inputMaxMatchesShown;
 dvar_s* cg_drawViewpos;
+dvar_s* scr_useFastFileOnly;
 dvar_s* gm_build_date;
 dvar_s* perk_weapRateEnhanced;
 
@@ -61,11 +62,15 @@ void __cdecl CG_RegisterDvars()
 {
 	CG_RegisterDvars_o();
 
-	perk_weapRateEnhanced = Dvar_RegisterInt("perk_weapRateEnhanced", 0, 0, 1, 0x80, "Double tap will shoot 2x the bullets for every shot");
+	gm_build_date = Dvar_RegisterString("gm_build_date", __TIMESTAMP__, 0x10 | 0x8, "Compile time for game_mod");
+	
 	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 1, "Enable external console window");
 	con_inputMaxMatchesShown = Dvar_RegisterInt("con_inputMaxMatchesShown", 24, 1, 64, 1, "Maximum number of suggestions in the console autocomplete preview");
+	
 	cg_drawViewpos = Dvar_RegisterInt("cg_drawViewpos", 0, 0, 1, 1, "Draw the current player origin and view angles");
-	gm_build_date = Dvar_RegisterString("gm_build_date", __TIMESTAMP__, 0x10 | 0x8, "Compile time for game_mod");
+	scr_useFastFileOnly = Dvar_RegisterInt("scr_useFastFileOnly", 0, 0, 1, 0x2, "Disable the loading of raw script files from the current mod's directory");
+
+	perk_weapRateEnhanced = Dvar_RegisterInt("perk_weapRateEnhanced", 0, 0, 1, 0x80, "Double tap will shoot 2x the bullets for every shot");
 
 	radiant_live = Dvar_RegisterInt("radiant_live", 0, 0, 1, 0x0, "Enable live Radiant updates in the game");
 	radiant_livePort = Dvar_RegisterInt("radiant_livePort", 3700, 0, 65535, 0x0, "Network port for Radiant");

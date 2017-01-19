@@ -131,6 +131,7 @@ extern dvar_s* sm_quality;
 extern dvar_s* con_extcon;
 extern dvar_s* con_inputMaxMatchesShown;
 extern dvar_s* cg_drawViewpos;
+extern dvar_s* scr_useFastFileOnly;
 extern dvar_s* gm_build_date;
 extern dvar_s* cg_showServerInfo;
 
