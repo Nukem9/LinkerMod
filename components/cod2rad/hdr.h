@@ -5,8 +5,10 @@
 extern vec4* LightmapBytes_HDR;
 extern vec4* Lightmap2Bytes_HDR;
 
+#if USE_LEGACY_HDR
 extern SampleColorHDR* LightGridSampleColors_HDR;
 extern DiskSampleColorHDR* DiskLightGridSampleColors_HDR;
+#endif
 
 void PatchHDR_Lightmaps();
 void PatchHDR_Lightgrid();

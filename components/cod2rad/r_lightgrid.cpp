@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#if USE_LEGACY_HDR
+
 R_Init_Lightgrid_t o_R_Init_Lightgrid = (R_Init_Lightgrid_t)0x00433440;
 R_Store_QuantizedLightGridSample_t o_R_Store_QuantizedLightGridSample = (R_Store_QuantizedLightGridSample_t)0x00433890;
 
@@ -148,3 +150,5 @@ void __declspec(naked) hk_R_Store_QuantizedLightGridSample()
 		retn
 	}
 }
+
+#endif

@@ -64,12 +64,15 @@ void Com_SaveLightgrid_HDR(Lump* lump)
 		{
 			for (int x = 0; x < 3; x++)
 			{
+#if USE_LEGACY_HDR
 				lightgridColors[i].rgb[y][x] = DiskLightGridSampleColors_HDR[i][y][x];
+#endif
 			}
 		}
 	}
-
+#if USE_LEGACY_HDR
 	delete[] DiskLightGridSampleColors_HDR;
+#endif
 }
 
 int __cdecl Com_SaveBsp_EnforceVersion(FILE* h)
@@ -93,7 +96,9 @@ int __cdecl Com_SaveBsp_EnforceVersion(FILE* h)
 
 	if (g_HDR)
 	{
+#if USE_LEGACY_HDR
 		delete[] LightGridSampleColors_HDR;
+#endif
 
 		Com_SaveLightmaps_HDR(&iBSP->lumps[LUMP_LIGHTBYTES]);
 		Com_SaveLightgrid_HDR(&iBSP->lumps[LUMP_LIGHTGRIDCOLORS]);

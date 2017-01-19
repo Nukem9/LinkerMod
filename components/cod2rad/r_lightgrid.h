@@ -3,6 +3,7 @@
 const static DWORD* g_lightgridSampleCount = (DWORD*)0x153C91D0;
 const static DWORD* g_diskLightgridSampleCount = (DWORD*)0x153C91E0;
 
+#if USE_LEGACY_HDR
 typedef float SampleColorHDR[56][3];
 typedef WORD DiskSampleColorHDR[56][3];
 typedef BYTE DiskSampleColor[56][3];
@@ -17,3 +18,4 @@ void mfh_R_Init_Lightgrid();
 void mfh_R_Store_LightgridSample();
 void mfh_R_Alloc_DiskLightGridColors();
 void hk_R_Store_QuantizedLightGridSample();
+#endif
