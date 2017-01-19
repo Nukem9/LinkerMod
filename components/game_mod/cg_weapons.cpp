@@ -1,5 +1,152 @@
 #include "stdafx.h"
 
+void XAnimSetTime(XAnimTree_s *tree, unsigned int animIndex, float time, int cmdIndex)
+{
+	((void(__cdecl *)(XAnimTree_s *, unsigned int, float, int))0x005E79C0)(tree, animIndex, time, cmdIndex);
+}
+
+void XAnimSetGoalWeight(DObj *obj, unsigned int animIndex, float goalWeight, float goalTime, float rate, unsigned int notifyName, unsigned int notifyType, int bRestart, int cmdIndex)
+{
+	((void(__cdecl *)(DObj *, unsigned int, float, float, float, unsigned int, unsigned int, int, int))0x004076C0)
+		(obj, animIndex, goalWeight, goalTime, rate, notifyName, notifyType, bRestart, cmdIndex);
+}
+
+// /cgame/cg_weapons.cpp:264
+float GetWeaponAnimRate(int localClientNum, WeaponVariantDef *weapVariantDef, XAnim_s *anims, int animIndex)
+{
+	static DWORD dwCall = 0x00795040;
+
+	ASSERT(weapVariantDef);
+	ASSERT(anims);
+
+	DWORD temp;
+
+	__asm
+	{
+		push anims
+		push weapVariantDef
+		mov esi, animIndex
+		mov eax, localClientNum
+		call[dwCall]
+		add esp, 0x8
+
+		movd dword ptr[temp], xmm0
+		xorps xmm0, xmm0
+		xorps xmm1, xmm1
+	}
+
+	return *(float *)&temp;
+}
+
+// /cgame/cg_weapons.cpp:298
+float GetWeaponAnimTimeFrac(int localClientNum, WeaponVariantDef *weapVariantDef, XAnim_s *anims, int animIndex)
+{
+	static DWORD dwCall = 0x007950F0;
+
+	ASSERT(weapVariantDef);
+	ASSERT(anims);
+
+	DWORD temp;
+
+	__asm
+	{
+		mov edx, weapVariantDef
+		mov eax, animIndex
+		call[dwCall]
+
+		movd dword ptr[temp], xmm0
+		xorps xmm0, xmm0
+		xorps xmm1, xmm1
+	}
+
+	return *(float *)&temp;
+}
+
+// /cgame/cg_weapons.cpp:373
+void StartWeaponAnim(int localClientNum, int weaponNum, DObj *obj, int animIndex, float transitionTime, int newPlayerstate)
+{
+	ASSERT((animIndex > WEAP_ANIM_VIEWMODEL_START) && (animIndex < WEAP_ANIM_VIEWMODEL_END));
+
+	ViewModelInfo *viewModelInfo = CG_GetLocalClientViewModelInfo(localClientNum);
+	XAnim_s *anims = viewModelInfo->anims;
+
+	ASSERT(anims);
+
+	WeaponDef *weapDef = BG_GetWeaponDef(weaponNum);
+	WeaponVariantDef *weapVariantDef = BG_GetWeaponVariantDef(weaponNum);
+
+	float rate = GetWeaponAnimRate(localClientNum, weapVariantDef, anims, animIndex);
+	float timeFrac = 0.0f;
+
+	if (newPlayerstate)
+		timeFrac = GetWeaponAnimTimeFrac(localClientNum, weapVariantDef, anims, animIndex);
+
+	char *cgameGlob = CG_GetLocalClientGlobals(localClientNum);
+
+	unsigned int *ps_perks	= (unsigned int *)(cgameGlob + 0x8A860);// perks
+	int weaponstate			= *(int *)(cgameGlob + 0x8A4BC);		// cg->predictedPlayerState.weaponstate
+	int weaponstateLeft		= *(int *)(cgameGlob + 0x8A4C0);		// cg->predictedPlayerState.weaponstateLeft
+
+	if ((IS_WEAPONSTATE_RELOAD(weaponstate) || IS_WEAPONSTATE_RELOAD(weaponstateLeft)) && BG_HasPerk(ps_perks, PERK_FASTRELOAD))
+	{
+		// Fast weapon reload perk
+		if (perk_weapReloadMultiplier->current.value != 0.0f)
+			rate /= perk_weapReloadMultiplier->current.value;
+		else
+			rate = 1000.0f;
+	}
+	else if ((weaponstate == 7 || weaponstate == 8) && BG_HasPerk(ps_perks, PERK_RATEOFFIRE))
+	{
+		// Doubletap (rate of fire) perk
+		if (perk_weapRateMultiplier->current.value != 0.0f)
+			rate /= perk_weapRateMultiplier->current.value;
+		else
+			rate = 1000.0f;
+	}
+	else if (BG_CanFastSwitch(weapDef, weaponstate) && BG_HasPerk(ps_perks, PERK_FASTSWITCH))
+	{
+		// Fast weapon switch perk
+		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
+		rate /= perk_weapSwitchMultiplier->current.value;
+	}
+
+	for (int i = 1; i < WEAP_ANIM_VIEWMODEL_END; ++i)
+	{
+		if (animIndex == i)
+		{
+			XAnimSetGoalWeight(obj, i, 1.0f, transitionTime, rate, 0, 1, 1, -1);
+
+			if (newPlayerstate)
+				XAnimSetTime(viewModelInfo->tree, i, timeFrac, -1);
+		}
+		else if (weapDef->bDualWield
+			&& viewModelInfo->hand[0].iHandAnimIndex != i
+			&& viewModelInfo->hand[1].iHandAnimIndex != i)
+		{
+			XAnimSetGoalWeight(obj, i, 0.0f, transitionTime, 1.0f, 0, 0, 0, -1);
+		}
+		else if (!weapDef->bDualWield)
+		{
+			XAnimSetGoalWeight(obj, i, 0.0f, transitionTime, 1.0f, 0, 0, 0, -1);
+		}
+	}
+}
+
+void hk_StartWeaponAnim(int localClientNum, DObj *obj, int animIndex, float transitionTime, int newPlayerstate)
+{
+	__asm
+	{
+		push newPlayerstate
+		push transitionTime
+		push animIndex
+		push obj
+		push eax
+		push localClientNum
+		call StartWeaponAnim
+		add esp, 0x18
+	}
+}
+
 // /cgame/cg_weapons.cpp:3329
 void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *start, float *end, float *dir, const float *forwardDir, const float *rightDir, const float *upDir, const float maxRange, int shotIndex, int maxShotIndex)
 {
@@ -93,7 +240,7 @@ void __declspec(naked) mfh_CG_DrawBulletImpacts1()
 
 	if (Com_SessionMode_IsZombiesGame() && perk_weapRateEnhanced->current.enabled)
 	{
-		if (BG_HasPerk((unsigned int *)(playerState + 0x4FC), PERK_DOUBLETAP))
+		if (BG_HasPerk((unsigned int *)(playerState + 0x4FC), PERK_RATEOFFIRE))
 			*shotCount *= 2;
 	}
 

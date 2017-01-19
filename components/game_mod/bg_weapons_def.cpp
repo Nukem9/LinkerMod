@@ -1,5 +1,17 @@
 #include "stdafx.h"
 
+// /bgame/bg_weapons_def.cpp:62
+WeaponVariantDef *BG_GetWeaponVariantDef(unsigned int weaponIndex)
+{
+	return ((WeaponVariantDef *(__cdecl *)(unsigned int))0x00444740)(weaponIndex);
+}
+
+// /bgame/bg_weapons_def.cpp:70
+WeaponDef *BG_GetWeaponDef(unsigned int weaponIndex)
+{
+	return ((WeaponDef *(__cdecl *)(unsigned int))0x00425770)(weaponIndex);
+}
+
 // /bgame/bg_weapons_def.cpp:83
 unsigned int BG_GetWeaponIndex(WeaponVariantDef *weapVariantDef)
 {

@@ -1,7 +1,14 @@
 #pragma once
 
-#define PERK_DOUBLETAP 10
-#define PERK_COUNT 15
+enum
+{
+	PERK_FASTRELOAD = 3,
+	PERK_RATEOFFIRE = 10,
+	PERK_FASTSWITCH = 15,
+
+	PERK_COUNT = 16,			// Game original: 15
+	PERK_UNKNOWN = PERK_COUNT,	//
+};
 
 // /game/bg_perks.h:135
 static bool BG_HasPerk(const unsigned int *perks, unsigned int perkIndex)

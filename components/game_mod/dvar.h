@@ -118,6 +118,12 @@ static dvar_s*& sv_bullet_range = *(dvar_s **)0x02899D64;
 static dvar_s*& bg_forceExplosiveBullets = *(dvar_s **)0x00BCD1E8;
 static dvar_s*& vehicle_selfCollision = *(dvar_s **)0x00BCAFCC;
 static dvar_s*& player_sustainAmmo = *(dvar_s **)0x00BCD250;
+static dvar_s*& player_burstFireCooldown = *(dvar_s **)0x00BCD110;
+
+static dvar_s*& perk_weapRateMultiplier = *(dvar_s **)0x00BDF35C;
+static dvar_s*& perk_weapReloadMultiplier = *(dvar_s **)0x00BDF358;
+static dvar_s*& perk_weapSwitchMultiplier = *(dvar_s **)0x00BDF2C0;
+extern dvar_s* perk_weapRateEnhanced;
 
 extern dvar_s* r_d3d9ex;
 extern dvar_s* r_noborder;
@@ -127,7 +133,6 @@ extern dvar_s* con_inputMaxMatchesShown;
 extern dvar_s* cg_drawViewpos;
 extern dvar_s* gm_build_date;
 extern dvar_s* cg_showServerInfo;
-extern dvar_s* perk_weapRateEnhanced;
 
 extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;

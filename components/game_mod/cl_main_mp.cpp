@@ -35,3 +35,11 @@ char *CG_GetLocalClientGlobals(int localClientNum)
 	// cgArray
 	return *(char **)0x02FF5354;
 }
+
+ViewModelInfo *CG_GetLocalClientViewModelInfo(int localClientNum)
+{
+	ASSERT(localClientNum == 0);
+
+	// cg_viewModelArray
+	return *(ViewModelInfo **)0x00C1C6D8;
+}
