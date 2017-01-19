@@ -44,3 +44,6 @@ static void BG_ClearPerks(unsigned int *perks)
 
 	perks[0] = 0;
 }
+
+unsigned int BG_GetPerkIndexForName(const char *perkName);
+const char *BG_GetPerkNameForIndex(unsigned int perkIndex);

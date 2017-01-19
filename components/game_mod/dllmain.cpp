@@ -326,6 +326,18 @@ BOOL GameMod_Init()
 	PatchMemory(0x00A5675C, (PBYTE)&ptr, 4);
 
 	//
+	// Additional perk logic
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00584480, (PBYTE)&BG_GetPerkIndexForName);
+
+	ptr = (BYTE *)(PERK_COUNT);
+	PatchMemory(0x007D9066, (PBYTE)&ptr, 1);
+	PatchMemory(0x007D911C, (PBYTE)&ptr, 1);
+	PatchMemory(0x007D91E1, (PBYTE)&ptr, 1);
+	ptr = (BYTE *)(PERK_COUNT - 1);
+	PatchMemory(0x0087CFBF, (PBYTE)&ptr, 1);
+
+	//
 	// Increase PMem size
 	//
 	unsigned int pmemSize = 0x12C00000 * 2;

@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bg_perks.cpp" />
     <ClCompile Include="bg_weapons.cpp" />
     <ClCompile Include="bg_weapons_def.cpp" />
     <ClCompile Include="bullet.cpp" />
