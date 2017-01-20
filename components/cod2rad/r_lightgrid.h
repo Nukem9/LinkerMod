@@ -91,6 +91,10 @@ void hk_R_Store_QuantizedLightGridSample();
 #else
 
 void mfh_R_Init_Lightgrid();
+
+typedef void(__cdecl* SwapClusters_t)(int fromIndex, int toIndex);
+static SwapClusters_t SwapClusters = (SwapClusters_t)0x00432EF0;
+
 void __cdecl StoreLightingForDir(vec3* lighting, BYTE* dst);
 void __cdecl ClusterLightGridValues(int ThreadCount);
 void __cdecl ImproveLightGridValues(int threadCount);

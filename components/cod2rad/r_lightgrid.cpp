@@ -225,19 +225,6 @@ void SplitCluster(GridColorsCluster *Cluster)
 	}
 }
 
-void SwapClusters(int FromIndex, int ToIndex)
-{
-	static DWORD dwCall = 0x00432EF0;
-
-	__asm
-	{
-		push FromIndex
-			push ToIndex
-			call[dwCall]
-			add esp, 0x8
-	}
-}
-
 int GetClusterDefaultScore(GridColorsCluster *Cluster)
 {
 	static DWORD dwCall = 0x00432E90;
@@ -289,62 +276,59 @@ void __cdecl ClusterLightGridValues(int ThreadCount)
 	lightGridGlob->mapping = new unsigned int[lightGridGlob->pointCount];
 	if (!lightGridGlob->mapping)
 		Com_FatalError("Couldn't allocate %i bytes for light grid color mapping", sizeof(int) * lightGridGlob->pointCount);
-
+	
 	lightGridGlob->clusters = new GridColorsCluster[lightGridColorCount];
 	if (!lightGridGlob->clusters)
 		Com_FatalError("Couldn't allocate %i bytes for light grid colors", sizeof(GridColorsCluster) * lightGridColorCount);
-
+	
 	for (unsigned int i = 0; i < lightGridGlob->pointCount; i++)
 	{
 		lightGridGlob->mapping[i] = i;
 	}
-
+	
 	lightGridGlob->clusterCount = 1;
 	lightGridGlob->clusters[0].first = 0;
 	lightGridGlob->clusters[0].count = lightGridGlob->pointCount;
+	
 	CalculateClusterMeanAndVariance(&lightGridGlob->clusters[0]);
-
+	
 	unsigned int j = lightGridGlob->clusterCount;
 	for (; lightGridGlob->clusterCount < lightGridColorCount; j = lightGridGlob->clusterCount)
 	{
 		GridColorsCluster *cluster = ChooseClusterToSplit();
-
+	
 		if (cluster->unknown3 < options_clusterThreshold && j >= 2)
 			break;
-
+	
 		SplitCluster(cluster);
 	}
-
+	
 	unsigned int maxScore = 0;
 	unsigned int maxScoreIndex = 0;
-
+	
 	if (j > 0)
 	{
 		GfxLightGridColors *lightGridColors = (GfxLightGridColors *)0x96CAE08;
-
-		for (unsigned int i = 0; i < lightGridGlob->clusterCount; i++)
+	
+		for (unsigned int colorIndex = 0; colorIndex < lightGridGlob->clusterCount; colorIndex++)
 		{
-			GridColorsCluster *cluster = &lightGridGlob->clusters[i];
-			unsigned int firstIndex = cluster->first;
-
-			if (firstIndex < (firstIndex + cluster->count))
+			GridColorsCluster *cluster = &lightGridGlob->clusters[colorIndex];
+			for (unsigned int firstIndex = cluster->first; firstIndex < (cluster->first + cluster->count); firstIndex++)
 			{
-				do {
-					lightGridGlob->points[lightGridGlob->mapping[firstIndex++]].entry.colorsIndex = i;
-				} while (firstIndex < (cluster->first + cluster->count));
+				lightGridGlob->points[lightGridGlob->mapping[firstIndex]].entry.colorsIndex = colorIndex;
 			}
 			
-			SetLightGridColorsForCluster(cluster, &lightGridColors[i]);
+			SetLightGridColorsForCluster(cluster, &lightGridColors[colorIndex]);
 			
 			unsigned int score = GetClusterDefaultScore(cluster);
 			if (score > maxScore)
 			{
 				maxScore = score;
-				maxScoreIndex = i;
+				maxScoreIndex = colorIndex;
 			}
 		}
 	}
-
+	
 	SwapClusters(0, maxScoreIndex);
 	SwapClusters(1, lightGridGlob->points[lightGridGlob->pointCount - 1].entry.colorsIndex);
 	
@@ -357,7 +341,7 @@ void __cdecl ClusterLightGridValues(int ThreadCount)
 	delete[] lightGridGlob->mapping;
 	lightGridGlob->clusters = nullptr;
 	lightGridGlob->mapping = nullptr;
-
+	
 	--lightGridGlob->pointCount;
 }
 
