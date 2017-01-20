@@ -54,11 +54,9 @@ void Com_SaveLightmaps_HDR(Lump* lump)
 
 void Com_SaveLightgrid_HDR(Lump* lump)
 {
-	DWORD* lightgridColorCount = (DWORD*)0x112BAAB4;
-
 	DiskGfxLightGridColors_BO* lightgridColors = (DiskGfxLightGridColors_BO*)lump->content;
 
-	for (DWORD i = 0; i < *lightgridColorCount; i++)
+	for (DWORD i = 0; i < lightGridColorCount; i++)
 	{
 		for (int y = 0; y < 56; y++)
 		{

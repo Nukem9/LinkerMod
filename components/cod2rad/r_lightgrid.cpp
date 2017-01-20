@@ -277,9 +277,9 @@ void __cdecl ClusterLightGridValues(int ThreadCount)
 	if (!lightGridGlob->mapping)
 		Com_FatalError("Couldn't allocate %i bytes for light grid color mapping", sizeof(int) * lightGridGlob->pointCount);
 	
-	lightGridGlob->clusters = new GridColorsCluster[lightGridColorCount];
+	lightGridGlob->clusters = new GridColorsCluster[LIGHTGRID_MAX_COLORCOUNT];
 	if (!lightGridGlob->clusters)
-		Com_FatalError("Couldn't allocate %i bytes for light grid colors", sizeof(GridColorsCluster) * lightGridColorCount);
+		Com_FatalError("Couldn't allocate %i bytes for light grid colors", sizeof(GridColorsCluster) * LIGHTGRID_MAX_COLORCOUNT);
 	
 	for (unsigned int i = 0; i < lightGridGlob->pointCount; i++)
 	{
@@ -293,7 +293,7 @@ void __cdecl ClusterLightGridValues(int ThreadCount)
 	CalculateClusterMeanAndVariance(&lightGridGlob->clusters[0]);
 	
 	unsigned int j = lightGridGlob->clusterCount;
-	for (; lightGridGlob->clusterCount < lightGridColorCount; j = lightGridGlob->clusterCount)
+	for (; lightGridGlob->clusterCount < LIGHTGRID_MAX_COLORCOUNT; j = lightGridGlob->clusterCount)
 	{
 		GridColorsCluster *cluster = ChooseClusterToSplit();
 	
@@ -358,9 +358,9 @@ void __cdecl ImproveLightGridValues(int threadCount)
 		Com_FatalError("Couldn't allocate %i bytes for light grid color sums", sizeof(GfxLightGridColorSums) * lightGridGlob->clusterCount);
 	memset(sums, 0, sizeof(GfxLightGridColorSums) * lightGridGlob->clusterCount);
 
-	int* counts = new int[lightGridGlob->clusterCount];
+	int* counts = new int[LIGHTGRID_MAX_COLORCOUNT];
 	if (!counts)
-		Com_FatalError("Couldn't allocate %i bytes for light grid color counts", sizeof(int) * lightGridGlob->clusterCount);
+		Com_FatalError("Couldn't allocate %i bytes for light grid color counts", sizeof(int) * LIGHTGRID_MAX_COLORCOUNT);
 	memset(counts, 0, sizeof(int) * lightGridGlob->clusterCount);
 
 	BeginProgress("Improving quantization...");

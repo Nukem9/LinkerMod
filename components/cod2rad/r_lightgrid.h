@@ -1,5 +1,7 @@
 #pragma once
 
+#define LIGHTGRID_MAX_COLORCOUNT 0xFFFF
+
 const static DWORD* g_lightgridSampleCount = (DWORD*)0x153C91D0;
 const static DWORD* g_diskLightgridSampleCount = (DWORD*)0x153C91E0;
 
@@ -63,7 +65,7 @@ struct LightGridGlob
 
 static LightGridGlob *lightGridGlob = (LightGridGlob *)0x153C91D0;
 
-static unsigned int& lightGridColorCount = *(unsigned int *)0x153C9028;
+static unsigned int& lightGridColorCount = *(unsigned int *)0x112BAAB4;
 
 static bool& options_ImproveLights = *(bool *)0x153C9005;
 static float& options_clusterThreshold = *(float*)0x153C902C;
