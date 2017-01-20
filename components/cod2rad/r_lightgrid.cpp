@@ -187,16 +187,16 @@ void __cdecl StoreLightingForDir(vec3* lighting, BYTE* dst)
 	}
 }
 
-void CalculateClusterMeanAndVariance(GridColorsCluster *Cluster)
+void CalculateClusterMeanAndVariance(GridColorsCluster *cluster)
 {
-	ASSERT(Cluster);
-	ASSERT(Cluster->count);
+	ASSERT(cluster);
+	ASSERT(cluster->count);
 
 	static DWORD dwCall = 0x00434320;
 
 	__asm
 	{
-		mov edi, Cluster
+		mov edi, cluster
 		call dwCall
 	}
 }
@@ -211,7 +211,7 @@ GridColorsCluster *ChooseClusterToSplit()
 	}
 }
 
-void SplitCluster(GridColorsCluster *Cluster)
+void SplitCluster(GridColorsCluster *cluster)
 {
 	ASSERT(Cluster);
 	ASSERT(Cluster->count >= 2);
@@ -220,42 +220,42 @@ void SplitCluster(GridColorsCluster *Cluster)
 
 	__asm
 	{
-		mov esi, Cluster
+		mov esi, cluster
 		call dwCall
 	}
 }
 
-int GetClusterDefaultScore(GridColorsCluster *Cluster)
+int GetClusterDefaultScore(GridColorsCluster *cluster)
 {
 	static DWORD dwCall = 0x00432E90;
 
 	__asm
 	{
-		mov ecx, Cluster
+		mov ecx, cluster
 		call dwCall
 	}
 }
 
-void CalculateClusterMean(GridColorsCluster *Cluster, float *Means)
+void CalculateClusterMean(GridColorsCluster *cluster, float *means)
 {
 	static DWORD dwCall = 0x004331A0;
 
 	__asm
 	{
-		mov ecx, Cluster
-		mov eax, Means
+		mov ecx, cluster
+		mov eax, means
 		call dwCall
 	}
 }
 
-void SetLightGridColorsForCluster(GridColorsCluster *Cluster, GfxLightGridColors *Colors)
+void SetLightGridColorsForCluster(GridColorsCluster *cluster, GfxLightGridColors *colors)
 {
 	float means[168];
-	CalculateClusterMean(Cluster, means);
+	CalculateClusterMean(cluster, means);
 
 	for (int i = 0; i < 168; i++)
 	{
-		Colors->all[i] = EncodeFloatInByte(means[i] + 0.5f);
+		colors->all[i] = (BYTE)means[i];
 	}
 }
 
@@ -271,7 +271,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 }
 */
 
-void __cdecl ClusterLightGridValues(int ThreadCount)
+void __cdecl ClusterLightGridValues(int threadCount)
 {
 	lightGridGlob->mapping = new unsigned int[lightGridGlob->pointCount];
 	if (!lightGridGlob->mapping)
@@ -335,7 +335,7 @@ void __cdecl ClusterLightGridValues(int ThreadCount)
 	lightGridColorCount = lightGridGlob->clusterCount;
 	
 	if (options_ImproveLights)
-		ImproveLightGridValues(ThreadCount);
+		ImproveLightGridValues(threadCount);
 	
 	delete[] lightGridGlob->clusters;
 	delete[] lightGridGlob->mapping;
