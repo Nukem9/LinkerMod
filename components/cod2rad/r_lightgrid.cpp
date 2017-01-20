@@ -272,6 +272,7 @@ void SetLightGridColorsForCluster(GridColorsCluster *Cluster, GfxLightGridColors
 	}
 }
 
+/*
 void __cdecl ImproveLightGridValues(int threadCount)
 {
 	_asm
@@ -281,6 +282,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 		call ebx
 	}
 }
+*/
 
 void __cdecl ClusterLightGridValues(int ThreadCount)
 {
@@ -357,4 +359,90 @@ void __cdecl ClusterLightGridValues(int ThreadCount)
 	lightGridGlob->mapping = nullptr;
 
 	--lightGridGlob->pointCount;
+}
+
+union GfxLightGridColorSums
+{
+	int rgb[56][3];
+	int all[56 * 3];
+};
+
+void __cdecl ImproveLightGridValues(int threadCount)
+{
+	GfxLightGridColorSums* sums = new GfxLightGridColorSums[lightGridGlob->clusterCount];
+	if (!sums)
+		Com_FatalError("Couldn't allocate %i bytes for light grid color sums", sizeof(GfxLightGridColorSums) * lightGridGlob->clusterCount);
+	memset(sums, 0, sizeof(GfxLightGridColorSums) * lightGridGlob->clusterCount);
+
+	int* counts = new int[lightGridGlob->clusterCount];
+	if (!counts)
+		Com_FatalError("Couldn't allocate %i bytes for light grid color counts", sizeof(int) * lightGridGlob->clusterCount);
+	memset(counts, 0, sizeof(int) * lightGridGlob->clusterCount);
+
+	BeginProgress("Improving quantization...");
+	ForEachQuantum(lightGridGlob->pointCount, GuessLightGridColors, threadCount);
+
+	//if (lightGridGlob->pointCount)
+	//{
+	//
+	//
+	//	// ???
+	//	//int i = 0;
+	//	//do
+	//	//{
+	//	//	counts[lightGridGlob->points[i].entry.colorsIndex]++;
+	//	//	GfxLightGridColors* colors = *(GfxLightGridColors**)0x184C3104; // Clean this up later
+	//	//	for (int sampleIndex = 0; sampleIndex < 56; sampleIndex++)
+	//	//	{
+	//	//		sums[lightGridGlob->points[i].entry.colorsIndex].rgb[sampleIndex][0] += colors[i].rgb[sampleIndex][0];
+	//	//		sums[lightGridGlob->points[i].entry.colorsIndex].rgb[sampleIndex][1] += colors[i].rgb[sampleIndex][1];
+	//	//		sums[lightGridGlob->points[i].entry.colorsIndex].rgb[sampleIndex][2] += colors[i].rgb[sampleIndex][2];
+	//	//		sums[lightGridGlob->points[i].entry.colorsIndex].rgb[sampleIndex][3] += colors[i].rgb[sampleIndex][3];
+	//	//	}
+	//	//}
+	//	//while ()
+	//}
+
+	for (unsigned int pointIndex = 0; pointIndex < lightGridGlob->pointCount; pointIndex++)
+	{
+		counts[lightGridGlob->points[pointIndex].entry.colorsIndex]++;
+		GfxLightGridColors* colors = *(GfxLightGridColors**)0x184C3104; // Clean this up later
+		for (int i = 0; i < 56; i++)
+		{
+			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][0];
+			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][1];
+			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][2];
+			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][3];
+		}
+	}
+
+	for (unsigned int colorIndex = 0; colorIndex < lightGridColorCount; )
+	{
+		if (counts[colorIndex])
+		{
+			GfxLightGridColors* colors = (GfxLightGridColors *)0x96CAE08;
+			for (int i = 0; i < 56; i++)
+			{
+				colors[colorIndex].rgb[i][0] = (sums[colorIndex].rgb[i][0] + (counts[colorIndex] >> 1)) / counts[colorIndex];
+				colors[colorIndex].rgb[i][1] = (sums[colorIndex].rgb[i][1] + (counts[colorIndex] >> 1)) / counts[colorIndex];
+				colors[colorIndex].rgb[i][2] = (sums[colorIndex].rgb[i][2] + (counts[colorIndex] >> 1)) / counts[colorIndex];
+			}
+
+			colorIndex++;
+		}
+		else
+		{
+			counts[colorIndex] = counts[--lightGridColorCount];
+			memcpy(&sums[colorIndex], &sums[lightGridColorCount], sizeof(GfxLightGridColorSums));
+			
+			for (unsigned int i = 0; i < lightGridGlob->pointCount; i++)
+			{
+				if (lightGridGlob->points[i].entry.colorsIndex == lightGridColorCount)
+					lightGridGlob->points[i].entry.colorsIndex = colorIndex;
+			}
+		}
+	}
+
+	delete[] counts;
+	delete[] sums;
 }

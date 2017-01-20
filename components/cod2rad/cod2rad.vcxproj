@@ -95,10 +95,10 @@
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
-    <ClInclude Include="console.h" />
     <ClInclude Include="hdr.h" />
     <ClInclude Include="lighting.h" />
     <ClInclude Include="PageGuard.h" />
+    <ClInclude Include="print.h" />
     <ClInclude Include="r_imagedecode.h" />
     <ClInclude Include="r_lightgrid.h" />
     <ClInclude Include="r_lightmaps.h" />
@@ -115,7 +115,6 @@
     <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
-    <ClCompile Include="console.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -127,6 +126,7 @@
     <ClCompile Include="hdr.cpp" />
     <ClCompile Include="lighting.cpp" />
     <ClCompile Include="PageGuard.cpp" />
+    <ClCompile Include="print.cpp" />
     <ClCompile Include="r_imagedecode.cpp" />
     <ClCompile Include="r_lightgrid.cpp" />
     <ClCompile Include="r_lightmaps.cpp" />

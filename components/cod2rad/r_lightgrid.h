@@ -71,6 +71,8 @@ static float& options_clusterThreshold = *(float*)0x153C902C;
 typedef WORD DiskSampleColorHDR[56][3];
 typedef BYTE DiskSampleColor[56][3];
 
+static QuantumFunc_t GuessLightGridColors = (QuantumFunc_t)0x004342F0;
+
 #if USE_LEGACY_HDR
 typedef float SampleColorHDR[56][3];
 typedef WORD DiskSampleColorHDR[56][3];
@@ -91,4 +93,5 @@ void hk_R_Store_QuantizedLightGridSample();
 void mfh_R_Init_Lightgrid();
 void __cdecl StoreLightingForDir(vec3* lighting, BYTE* dst);
 void __cdecl ClusterLightGridValues(int ThreadCount);
+void __cdecl ImproveLightGridValues(int threadCount);
 #endif
