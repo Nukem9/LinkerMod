@@ -19,8 +19,6 @@ float GetWeaponAnimRate(int localClientNum, WeaponVariantDef *weapVariantDef, XA
 	ASSERT(weapVariantDef);
 	ASSERT(anims);
 
-	DWORD temp;
-
 	__asm
 	{
 		push anims
@@ -29,13 +27,7 @@ float GetWeaponAnimRate(int localClientNum, WeaponVariantDef *weapVariantDef, XA
 		mov eax, localClientNum
 		call[dwCall]
 		add esp, 0x8
-
-		movd dword ptr[temp], xmm0
-		xorps xmm0, xmm0
-		xorps xmm1, xmm1
 	}
-
-	return *(float *)&temp;
 }
 
 // /cgame/cg_weapons.cpp:298
@@ -46,20 +38,12 @@ float GetWeaponAnimTimeFrac(int localClientNum, WeaponVariantDef *weapVariantDef
 	ASSERT(weapVariantDef);
 	ASSERT(anims);
 
-	DWORD temp;
-
 	__asm
 	{
 		mov edx, weapVariantDef
 		mov eax, animIndex
 		call[dwCall]
-
-		movd dword ptr[temp], xmm0
-		xorps xmm0, xmm0
-		xorps xmm1, xmm1
 	}
-
-	return *(float *)&temp;
 }
 
 // /cgame/cg_weapons.cpp:373
