@@ -25,6 +25,7 @@
 
 #include "CEG.h"
 
+#include "bitarray.h"
 #include "d3d9ex.h"
 #include "common.h"
 #include "com_files.h"

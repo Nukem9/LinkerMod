@@ -126,26 +126,6 @@ STATIC_ASSERT_OFFSET(playerState_s, perks, 0x4FC);
 STATIC_ASSERT_OFFSET(playerState_s, weapAnim, 0x524);
 STATIC_ASSERT_OFFSET(playerState_s, weapAnimLeft, 0x528);
 
-template<size_t BIT_COUNT>
-class bitarray
-{
-public:
-	enum
-	{
-		BITS_PER_WORD = 0,
-		WORD_COUNT = 0,
-	};
-
-	int array[2];
-
-	bool testBit(unsigned int pos)
-	{
-		ASSERT(pos < BIT_COUNT);
-
-		return (this->array[pos >> 5] & (0x80000000 >> (pos & 0x1F))) != 0;
-	}
-};
-
 struct usercmd_s
 {
 	int serverTime;
