@@ -213,8 +213,8 @@ GridColorsCluster *ChooseClusterToSplit()
 
 void SplitCluster(GridColorsCluster *cluster)
 {
-	ASSERT(Cluster);
-	ASSERT(Cluster->count >= 2);
+	ASSERT(cluster);
+	ASSERT(cluster->count >= 2);
 
 	static DWORD dwCall = 0x00434B50;
 
@@ -308,8 +308,6 @@ void __cdecl ClusterLightGridValues(int threadCount)
 	
 	if (j > 0)
 	{
-		GfxLightGridColors *lightGridColors = (GfxLightGridColors *)0x96CAE08;
-	
 		for (unsigned int colorIndex = 0; colorIndex < lightGridGlob->clusterCount; colorIndex++)
 		{
 			GridColorsCluster *cluster = &lightGridGlob->clusters[colorIndex];
@@ -318,7 +316,7 @@ void __cdecl ClusterLightGridValues(int threadCount)
 				lightGridGlob->points[lightGridGlob->mapping[firstIndex]].entry.colorsIndex = colorIndex;
 			}
 			
-			SetLightGridColorsForCluster(cluster, &lightGridColors[colorIndex]);
+			SetLightGridColorsForCluster(cluster, &g_lightGridColors[colorIndex]);
 			
 			unsigned int score = GetClusterDefaultScore(cluster);
 			if (score > maxScore)
@@ -366,31 +364,10 @@ void __cdecl ImproveLightGridValues(int threadCount)
 	BeginProgress("Improving quantization...");
 	ForEachQuantum(lightGridGlob->pointCount, GuessLightGridColors, threadCount);
 
-	//if (lightGridGlob->pointCount)
-	//{
-	//
-	//
-	//	// ???
-	//	//int i = 0;
-	//	//do
-	//	//{
-	//	//	counts[lightGridGlob->points[i].entry.colorsIndex]++;
-	//	//	GfxLightGridColors* colors = *(GfxLightGridColors**)0x184C3104; // Clean this up later
-	//	//	for (int sampleIndex = 0; sampleIndex < 56; sampleIndex++)
-	//	//	{
-	//	//		sums[lightGridGlob->points[i].entry.colorsIndex].rgb[sampleIndex][0] += colors[i].rgb[sampleIndex][0];
-	//	//		sums[lightGridGlob->points[i].entry.colorsIndex].rgb[sampleIndex][1] += colors[i].rgb[sampleIndex][1];
-	//	//		sums[lightGridGlob->points[i].entry.colorsIndex].rgb[sampleIndex][2] += colors[i].rgb[sampleIndex][2];
-	//	//		sums[lightGridGlob->points[i].entry.colorsIndex].rgb[sampleIndex][3] += colors[i].rgb[sampleIndex][3];
-	//	//	}
-	//	//}
-	//	//while ()
-	//}
-
 	for (unsigned int pointIndex = 0; pointIndex < lightGridGlob->pointCount; pointIndex++)
 	{
 		counts[lightGridGlob->points[pointIndex].entry.colorsIndex]++;
-		GfxLightGridColors* colors = *(GfxLightGridColors**)0x184C3104; // Clean this up later
+		GfxLightGridColors* colors = (GfxLightGridColors*)lightGridGlob->dword_153C91DC;
 		for (int i = 0; i < 56; i++)
 		{
 			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][0];
@@ -404,7 +381,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 	{
 		if (counts[colorIndex])
 		{
-			GfxLightGridColors* colors = (GfxLightGridColors *)0x96CAE08;
+			GfxLightGridColors* colors = g_lightGridColors; // 0x096CAE08
 			for (int i = 0; i < 56; i++)
 			{
 				colors[colorIndex].rgb[i][0] = (sums[colorIndex].rgb[i][0] + (counts[colorIndex] >> 1)) / counts[colorIndex];

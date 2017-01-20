@@ -66,6 +66,7 @@ struct LightGridGlob
 static LightGridGlob *lightGridGlob = (LightGridGlob *)0x153C91D0;
 
 static unsigned int& lightGridColorCount = *(unsigned int *)0x112BAAB4;
+static GfxLightGridColors *g_lightGridColors = (GfxLightGridColors *)0x96CAE08;
 
 static bool& options_ImproveLights = *(bool *)0x153C9005;
 static float& options_clusterThreshold = *(float*)0x153C902C;
