@@ -65,6 +65,7 @@ void Com_SaveLightgrid_HDR(Lump* lump)
 #if USE_LEGACY_HDR
 				lightgridColors[i].rgb[y][x] = DiskLightGridSampleColors_HDR[i][y][x];
 #endif
+				lightgridColors[i].rgb[y][x] = disk_lightGridColorsHDR[i].rgb[y][x];
 			}
 		}
 	}
