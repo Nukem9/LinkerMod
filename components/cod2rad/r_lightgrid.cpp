@@ -196,8 +196,8 @@ void CalculateClusterMean_o(GridColorsCluster *cluster, float *means)
 	__asm
 	{
 		mov ecx, cluster
-			mov eax, means
-			call dwCall
+		mov eax, means
+		call dwCall
 	}
 }
 
@@ -351,11 +351,13 @@ void SplitCluster(GridColorsCluster *cluster)
 LABEL_18:
 	ASSERT(head == tail + 1);
 	ASSERT(head != 0);
-	ASSERT(head == cluster->first + cluster->count);
+	ASSERT(head != cluster->first + cluster->count);
 
 	GridColorsCluster* newCluster = &lightGridGlob->clusters[lightGridGlob->clusterCount++];
 	newCluster->first = head;
 	newCluster->count = cluster->first + cluster->count - head;
+
+	cluster->count = head - cluster->first;
 
 	CalculateClusterMeanAndVariance(newCluster);
 	CalculateClusterMeanAndVariance(cluster);
@@ -396,7 +398,6 @@ void __cdecl SwapClusters(int fromIndex, int toIndex)
 
 	for (unsigned int i = 0; i < lightGridGlob->pointCount; i++)
 	{
-		//int index = ? ;//lightGridGlob->points[0].entry.colorsIndex + dstCluster->first;
 		int index = lightGridGlob->points[i].entry.colorsIndex;
 		if (index == fromIndex)
 			lightGridGlob->points[i].entry.colorsIndex = toIndex;
