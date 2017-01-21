@@ -246,13 +246,13 @@ void CalculateClusterMeanAndVariance(GridColorsCluster *cluster)
 	float totals[168];
 	memset(totals, 0, sizeof(float) * 168);
 
-	int firstIndex = lightGridGlob->mapping[cluster->first];
 	for (unsigned int clusterIndex = 0; clusterIndex < cluster->count; clusterIndex++)
 	{
+		GfxLightGridColorsHDR* colors = &lightGridGlob->colors[lightGridGlob->mapping[cluster->first + clusterIndex]];
 		for (int i = 0; i < 168; i++)
 		{
-			double v = lightGridGlob->colors[firstIndex + clusterIndex].all[i] - means[i];
-			totals[i] = (float)(v * v + totals[i]);
+			double v = colors->all[i] - means[i];
+			totals[i] += (float)(v * v);
 		}
 	}
 
@@ -474,12 +474,12 @@ void __cdecl ClusterLightGridValues(int threadCount)
 	
 	CalculateClusterMeanAndVariance(&lightGridGlob->clusters[0]);
 	
-	unsigned int j = lightGridGlob->clusterCount;
-	for (; lightGridGlob->clusterCount < LIGHTGRID_MAX_COLORCOUNT; j = lightGridGlob->clusterCount)
+	unsigned int clusterCount = lightGridGlob->clusterCount;
+	for (; lightGridGlob->clusterCount < LIGHTGRID_MAX_COLORCOUNT; clusterCount = lightGridGlob->clusterCount)
 	{
 		GridColorsCluster *cluster = ChooseClusterToSplit();
 	
-		if (cluster->unknown3 < options_clusterThreshold && j >= 2)
+		if (cluster->unknown3 < options_clusterThreshold && clusterCount >= 2)
 			break;
 	
 		SplitCluster(cluster);
@@ -488,7 +488,7 @@ void __cdecl ClusterLightGridValues(int threadCount)
 	unsigned int maxScore = 0;
 	unsigned int maxScoreIndex = 0;
 	
-	if (j > 0)
+	if (clusterCount > 0)
 	{
 		for (unsigned int colorIndex = 0; colorIndex < lightGridGlob->clusterCount; colorIndex++)
 		{
