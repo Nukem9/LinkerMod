@@ -343,6 +343,54 @@ void __cdecl ClusterLightGridValues(int threadCount)
 	--lightGridGlob->pointCount;
 }
 
+bool CompareLightGridColors(GfxLightGridColors* a, GfxLightGridColors* b, unsigned int* out)
+{
+	unsigned int totalDifference = 0;
+
+	for (int i = 0; i < 56; i++)
+	{
+		for (int c = 0; c < 3; c++)
+		{
+			totalDifference += a->rgb[i][c] - a->rgb[i][c];
+			if (totalDifference >= *out)
+				return false;
+		}
+	}
+
+	*out = totalDifference;
+	return true;
+}
+
+unsigned short AssignLightGridColors(unsigned short colorIndex, GfxLightGridColors* colors)
+{
+	unsigned int unk = 0x7FFFFFFF;
+	CompareLightGridColors(&g_lightGridColors[colorIndex], colors, &unk);
+	if (!unk)
+	{
+		return colorIndex;
+	}
+
+	for (unsigned int i = 0; i < lightGridGlob->clusterCount; i++)
+	{
+		if (CompareLightGridColors(&g_lightGridColors[i], colors, &unk))
+		{
+			if (!unk)
+			{
+				colorIndex = i;
+				break;
+			}
+		}
+	}
+
+	return colorIndex;
+}
+
+void __cdecl GuessLightGridColors(int index, int unk)
+{
+	GfxLightGridEntry *entry = &lightGridGlob->points[index].entry;
+	entry->colorsIndex = AssignLightGridColors(entry->colorsIndex, &g_lightGridColors[index]);
+}
+
 union GfxLightGridColorSums
 {
 	int rgb[56][3];
@@ -355,7 +403,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 	if (!sums)
 		Com_FatalError("Couldn't allocate %i bytes for light grid color sums", sizeof(GfxLightGridColorSums) * lightGridGlob->clusterCount);
 	memset(sums, 0, sizeof(GfxLightGridColorSums) * lightGridGlob->clusterCount);
-
+	
 	int* counts = new int[LIGHTGRID_MAX_COLORCOUNT];
 	if (!counts)
 		Com_FatalError("Couldn't allocate %i bytes for light grid color counts", sizeof(int) * LIGHTGRID_MAX_COLORCOUNT);
@@ -363,6 +411,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 
 	BeginProgress("Improving quantization...");
 	ForEachQuantum(lightGridGlob->pointCount, GuessLightGridColors, threadCount);
+	EndProgress();
 
 	for (unsigned int pointIndex = 0; pointIndex < lightGridGlob->pointCount; pointIndex++)
 	{
@@ -371,12 +420,11 @@ void __cdecl ImproveLightGridValues(int threadCount)
 		for (int i = 0; i < 56; i++)
 		{
 			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][0];
-			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][1];
-			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][2];
-			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][3];
+			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][1] += colors[pointIndex].rgb[i][1];
+			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][2] += colors[pointIndex].rgb[i][2];
 		}
 	}
-
+	
 	for (unsigned int colorIndex = 0; colorIndex < lightGridColorCount; )
 	{
 		if (counts[colorIndex])
@@ -388,7 +436,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 				colors[colorIndex].rgb[i][1] = (sums[colorIndex].rgb[i][1] + (counts[colorIndex] >> 1)) / counts[colorIndex];
 				colors[colorIndex].rgb[i][2] = (sums[colorIndex].rgb[i][2] + (counts[colorIndex] >> 1)) / counts[colorIndex];
 			}
-
+	
 			colorIndex++;
 		}
 		else
@@ -403,7 +451,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 			}
 		}
 	}
-
+	
 	delete[] counts;
 	delete[] sums;
 }

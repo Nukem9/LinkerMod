@@ -5,13 +5,10 @@
 const static DWORD* g_lightgridSampleCount = (DWORD*)0x153C91D0;
 const static DWORD* g_diskLightgridSampleCount = (DWORD*)0x153C91E0;
 
-struct GfxLightGridColors
+union GfxLightGridColors
 {
-	union
-	{
-		BYTE rgb[56][3];
-		BYTE all[56 * 3];
-	};
+	BYTE rgb[56][3];
+	BYTE all[56 * 3];
 };
 STATIC_ASSERT_SIZE(GfxLightGridColors, 56 * 3);
 
@@ -74,7 +71,7 @@ static float& options_clusterThreshold = *(float*)0x153C902C;
 typedef WORD DiskSampleColorHDR[56][3];
 typedef BYTE DiskSampleColor[56][3];
 
-static QuantumFunc_t GuessLightGridColors = (QuantumFunc_t)0x004342F0;
+//static QuantumFunc_t GuessLightGridColors = (QuantumFunc_t)0x004342F0;
 
 #if USE_LEGACY_HDR
 typedef float SampleColorHDR[56][3];
