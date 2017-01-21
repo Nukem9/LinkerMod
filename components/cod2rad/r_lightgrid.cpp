@@ -15,9 +15,9 @@ struct GfxLightGridColor_Internal
 };
 #endif
 
-GfxLightGridColorsHDR* g_lightGridColorsHDR = nullptr; // The HDR version of lightGridGlob->colors
 GfxLightGridColorsHDR disk_lightGridColorsHDR[0xFFFF];
 
+#if USE_LEGACY_HDR
 void* rtn_R_Init_Lightgrid = (void*)0x0043684C;
 void __declspec(naked) mfh_R_Init_Lightgrid()
 {
@@ -35,7 +35,6 @@ void __declspec(naked) mfh_R_Init_Lightgrid()
 	}
 }
 
-#if USE_LEGACY_HDR
 void __cdecl R_Store_LightGridSample_HDR(DWORD entryOffset, DWORD pixelIndex, float value)
 {
 	float* LightGridEntry = (float*)LightGridSampleColors_HDR;
@@ -174,8 +173,6 @@ void __cdecl AdjustLightingContrast(int sampleCount, int baseIndex, vec3* colors
 // 0x00434E20
 void __cdecl StoreLightingForDir(vec3* lighting, GfxLightGridColors* dst)
 {
-	const int colorIndex = dst - (GfxLightGridColors*)lightGridGlob->colors;
-
 	for (int i = 0; i < 56; i++)
 	{
 		GammaCorrectColor(&lighting[i]);
@@ -189,10 +186,6 @@ void __cdecl StoreLightingForDir(vec3* lighting, GfxLightGridColors* dst)
 		dst->rgb[sampleIndex][0] = EncodeFloatInByte(v.r);
 		dst->rgb[sampleIndex][1] = EncodeFloatInByte(v.g);
 		dst->rgb[sampleIndex][2] = EncodeFloatInByte(v.b);
-
-		g_lightGridColorsHDR[colorIndex].rgb[sampleIndex][0] = EncodeFloatInWord(v.r);
-		g_lightGridColorsHDR[colorIndex].rgb[sampleIndex][1] = EncodeFloatInWord(v.g);
-		g_lightGridColorsHDR[colorIndex].rgb[sampleIndex][2] = EncodeFloatInWord(v.b);
 	}
 }
 
@@ -215,27 +208,7 @@ void CalculateClusterMean(GridColorsCluster *cluster, float *means)
 
 	for (unsigned int clusterIndex = 0; clusterIndex < cluster->count; clusterIndex++)
 	{
-		GfxLightGridColors* colors = &lightGridGlob->colors[lightGridGlob->mapping[cluster->first + clusterIndex]];
-		for (int i = 0; i < 168; i++)
-		{
-			sums[i] += colors->all[i];
-		}
-	}
-
-	for (int i = 0; i < 168; i++)
-	{
-		means[i] = sums[i] / cluster->count;
-	}
-}
-
-void CalculateClusterMeanHDR(GridColorsCluster *cluster, float *means)
-{
-	float sums[168];
-	memset(sums, 0, sizeof(float) * 168);
-
-	for (unsigned int clusterIndex = 0; clusterIndex < cluster->count; clusterIndex++)
-	{
-		GfxLightGridColorsHDR* colors = &g_lightGridColorsHDR[lightGridGlob->mapping[cluster->first + clusterIndex]];
+		GfxLightGridColorsHDR* colors = &lightGridGlob->colors[lightGridGlob->mapping[cluster->first + clusterIndex]];
 		for (int i = 0; i < 168; i++)
 		{
 			sums[i] += colors->all[i];
@@ -306,7 +279,7 @@ GridColorsCluster *ChooseClusterToSplit()
 	}
 }
 
-void SplitCluster(GridColorsCluster *cluster)
+void SplitCluster_o(GridColorsCluster *cluster)
 {
 	ASSERT(cluster);
 	ASSERT(cluster->count >= 2);
@@ -317,6 +290,118 @@ void SplitCluster(GridColorsCluster *cluster)
 	{
 		mov esi, cluster
 		call dwCall
+	}
+}
+
+void SplitCluster(GridColorsCluster *cluster)
+{
+	unsigned int head = 0;
+	unsigned int tail = 0;
+
+	unsigned int* mapping = lightGridGlob->mapping;
+
+	ASSERT(cluster);
+	ASSERT(cluster->count >= 2);
+
+	if (cluster->unknown3 <= 0.0)
+	{
+		head = cluster->first + ((cluster->count + 1) >> 1);
+		tail = head - 1;
+	}
+	else
+	{
+		head = cluster->first;
+		tail = cluster->first + cluster->count - 1;
+
+		while (1)
+		{
+			if (lightGridGlob->colors[mapping[head]].all[cluster->unknown1] <= cluster->unknown2)
+				break;
+
+		LABEL_10:
+			if (lightGridGlob->colors[mapping[tail]].all[cluster->unknown1] <= cluster->unknown2)
+			{
+				while (head <= --tail)
+				{
+					if (lightGridGlob->colors[mapping[tail]].all[cluster->unknown1] <= cluster->unknown2)
+						goto LABEL_13;
+				}
+
+				goto LABEL_18;
+			}
+
+		LABEL_13:
+			ASSERT(head < tail);
+
+			int oldHead = mapping[head];
+			mapping[head] = mapping[tail];
+			mapping[tail] = oldHead;
+
+			if (++head > --tail)
+				goto LABEL_18;
+		}
+
+		while (++head <= tail)
+		{
+			if (lightGridGlob->colors[mapping[head]].all[cluster->unknown1] > cluster->unknown2)
+				goto LABEL_10;
+		}
+	}
+
+LABEL_18:
+	ASSERT(head == tail + 1);
+	ASSERT(head != 0);
+	ASSERT(head == cluster->first + cluster->count);
+
+	GridColorsCluster* newCluster = &lightGridGlob->clusters[lightGridGlob->clusterCount++];
+	newCluster->first = head;
+	newCluster->count = cluster->first + cluster->count - head;
+
+	CalculateClusterMeanAndVariance(newCluster);
+	CalculateClusterMeanAndVariance(cluster);
+}
+
+void __cdecl SwapClusters(int fromIndex, int toIndex)
+{
+
+	GfxLightGridColorsHDR* src = &disk_lightGridColorsHDR[toIndex]; //&disk_lightGridColors[toIndex];
+	GfxLightGridColorsHDR* dst = &disk_lightGridColorsHDR[fromIndex]; //&disk_lightGridColors[fromIndex];
+	
+	GfxLightGridColorsHDR tmp;
+	memcpy(&tmp, &dst, sizeof(GfxLightGridColorsHDR));
+	memcpy(dst, src, sizeof(GfxLightGridColorsHDR));
+	memcpy(src, &tmp, sizeof(GfxLightGridColorsHDR));
+
+	GridColorsCluster* srcCluster = &lightGridGlob->clusters[fromIndex];
+	GridColorsCluster* dstCluster = &lightGridGlob->clusters[toIndex];
+	
+	GridColorsCluster tmpCluster;
+	tmpCluster.first = srcCluster->first;
+	tmpCluster.count = srcCluster->count;
+	tmpCluster.unknown1 = srcCluster->unknown1;
+	tmpCluster.unknown2 = srcCluster->unknown2;
+	tmpCluster.unknown3 = srcCluster->unknown3;
+
+	srcCluster->first = dstCluster->first;
+	srcCluster->count = dstCluster->count;
+	srcCluster->unknown1 = dstCluster->unknown1;
+	srcCluster->unknown2 = dstCluster->unknown2;
+	srcCluster->unknown3 = dstCluster->unknown3;
+
+	dstCluster->first = tmpCluster.first;
+	dstCluster->count = tmpCluster.count;
+	dstCluster->unknown1 = tmpCluster.unknown1;
+	dstCluster->unknown2 = tmpCluster.unknown2;
+	dstCluster->unknown3 = tmpCluster.unknown3;
+
+	for (unsigned int i = 0; i < lightGridGlob->pointCount; i++)
+	{
+		//int index = ? ;//lightGridGlob->points[0].entry.colorsIndex + dstCluster->first;
+		int index = lightGridGlob->points[i].entry.colorsIndex;
+		if (index == fromIndex)
+			lightGridGlob->points[i].entry.colorsIndex = toIndex;
+		else if (index == toIndex)
+			lightGridGlob->points[i].entry.colorsIndex = fromIndex;
 	}
 }
 
@@ -331,16 +416,27 @@ int GetClusterDefaultScore(GridColorsCluster *cluster)
 	}
 }
 
-void SetLightGridColorsForCluster(GridColorsCluster *cluster, GfxLightGridColors *colors, GfxLightGridColorsHDR* colorsHDR=NULL)
+void SetLightGridColorsForCluster2(GridColorsCluster *cluster, GfxLightGridColors *colors, GfxLightGridColorsHDR* colorsHDR=NULL)
 {
 	float means[168];
-	CalculateClusterMeanHDR(cluster, means);
+	CalculateClusterMean(cluster, means);
 
 	for (int i = 0; i < 168; i++)
 	{
 		colors->all[i] = (BYTE)means[i];
 		if (colorsHDR)
 			colorsHDR->all[i] = (short)means[i];
+	}
+}
+
+void SetLightGridColorsForCluster(GridColorsCluster *cluster, GfxLightGridColorsHDR* colorsHDR)
+{
+	float means[168];
+	CalculateClusterMean(cluster, means);
+
+	for (int i = 0; i < 168; i++)
+	{
+		colorsHDR->all[i] = (short)means[i];
 	}
 }
 
@@ -401,8 +497,9 @@ void __cdecl ClusterLightGridValues(int threadCount)
 				lightGridGlob->points[lightGridGlob->mapping[firstIndex]].entry.colorsIndex = colorIndex;
 			}
 			
-			SetLightGridColorsForCluster(cluster, &disk_lightGridColors[colorIndex], &disk_lightGridColorsHDR[colorIndex]);
-			
+			//SetLightGridColorsForCluster2(cluster, &disk_lightGridColors[colorIndex], &disk_lightGridColorsHDR[colorIndex]);
+			SetLightGridColorsForCluster(cluster, &disk_lightGridColorsHDR[colorIndex]);
+
 			unsigned int score = GetClusterDefaultScore(cluster);
 			if (score > maxScore)
 			{
@@ -428,7 +525,7 @@ void __cdecl ClusterLightGridValues(int threadCount)
 	--lightGridGlob->pointCount;
 }
 
-bool CompareLightGridColors(GfxLightGridColors* a, GfxLightGridColors* b, unsigned int* out)
+bool CompareLightGridColors(GfxLightGridColorsHDR* a, GfxLightGridColorsHDR* b, unsigned int* out)
 {
 	unsigned int totalDifference = 0;
 
@@ -446,7 +543,7 @@ bool CompareLightGridColors(GfxLightGridColors* a, GfxLightGridColors* b, unsign
 	return true;
 }
 
-unsigned short AssignLightGridColors(unsigned short colorIndex, GfxLightGridColors* colors)
+unsigned short AssignLightGridColors(unsigned short colorIndex, GfxLightGridColorsHDR* colors)
 {
 	unsigned int unk = 0x7FFFFFFF;
 	CompareLightGridColors(&lightGridGlob->colors[colorIndex], colors, &unk);
@@ -516,6 +613,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 		{
 			for (int i = 0; i < 56; i++)
 			{
+				// Add HDR Later
 				disk_lightGridColors[colorIndex].rgb[i][0] = (sums[colorIndex].rgb[i][0] + (counts[colorIndex] >> 1)) / counts[colorIndex];
 				disk_lightGridColors[colorIndex].rgb[i][1] = (sums[colorIndex].rgb[i][1] + (counts[colorIndex] >> 1)) / counts[colorIndex];
 				disk_lightGridColors[colorIndex].rgb[i][2] = (sums[colorIndex].rgb[i][2] + (counts[colorIndex] >> 1)) / counts[colorIndex];

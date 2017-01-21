@@ -52,7 +52,7 @@ struct LightGridGlob
 	unsigned int pointCount;		// 0x00 0x153C91D0
 	unsigned int maxPoints;			// 0x04 0x153C91D4
 	GridSamplePoint* points;			// 0x08 0x153C91D8
-	GfxLightGridColors* colors;	// 0x0C 0x153C91DC
+	GfxLightGridColorsHDR* colors;		// 0x0C 0x153C91DC (In vanilla this is a GfxLightGridColors* which is allocated and freed in CalculateLightGrid)
 	unsigned int clusterCount;		// 0x10 0x153C91E0
 	GridColorsCluster *clusters;	// 0x14 0x153C91E4
 	unsigned int *mapping;			// 0x18 0x153C91E8
@@ -97,10 +97,8 @@ void mfh_R_Alloc_DiskLightGridColors();
 void hk_R_Store_QuantizedLightGridSample();
 #else
 
-void mfh_R_Init_Lightgrid();
-
 typedef void(__cdecl* SwapClusters_t)(int fromIndex, int toIndex);
-static SwapClusters_t SwapClusters = (SwapClusters_t)0x00432EF0;
+static SwapClusters_t SwapClusters_o = (SwapClusters_t)0x00432EF0;
 
 void __cdecl StoreLightingForDir(vec3* lighting, GfxLightGridColors* dst);
 void __cdecl ClusterLightGridValues(int ThreadCount);
