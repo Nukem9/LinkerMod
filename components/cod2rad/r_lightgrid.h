@@ -12,6 +12,12 @@ union GfxLightGridColors
 };
 STATIC_ASSERT_SIZE(GfxLightGridColors, 56 * 3);
 
+union GfxLightGridColorsHDR
+{
+	short rgb[56][3];
+	short all[56 * 3];
+};
+
 struct GridColorsCluster
 {
 	unsigned int first;		// 0x00
@@ -46,7 +52,7 @@ struct LightGridGlob
 	unsigned int pointCount;		// 0x00 0x153C91D0
 	unsigned int maxPoints;			// 0x04 0x153C91D4
 	GridSamplePoint* points;			// 0x08 0x153C91D8
-	unsigned int dword_153C91DC;	// 0x0C 0x153C91DC
+	GfxLightGridColors* colors;	// 0x0C 0x153C91DC
 	unsigned int clusterCount;		// 0x10 0x153C91E0
 	GridColorsCluster *clusters;	// 0x14 0x153C91E4
 	unsigned int *mapping;			// 0x18 0x153C91E8
@@ -63,7 +69,7 @@ struct LightGridGlob
 static LightGridGlob *lightGridGlob = (LightGridGlob *)0x153C91D0;
 
 static unsigned int& lightGridColorCount = *(unsigned int *)0x112BAAB4;
-static GfxLightGridColors *g_lightGridColors = (GfxLightGridColors *)0x96CAE08;
+static GfxLightGridColors *disk_lightGridColors = (GfxLightGridColors *)0x96CAE08;
 
 static bool& options_ImproveLights = *(bool *)0x153C9005;
 static float& options_clusterThreshold = *(float*)0x153C902C;
@@ -95,7 +101,7 @@ void mfh_R_Init_Lightgrid();
 typedef void(__cdecl* SwapClusters_t)(int fromIndex, int toIndex);
 static SwapClusters_t SwapClusters = (SwapClusters_t)0x00432EF0;
 
-void __cdecl StoreLightingForDir(vec3* lighting, BYTE* dst);
+void __cdecl StoreLightingForDir(vec3* lighting, GfxLightGridColors* dst);
 void __cdecl ClusterLightGridValues(int ThreadCount);
 void __cdecl ImproveLightGridValues(int threadCount);
 #endif

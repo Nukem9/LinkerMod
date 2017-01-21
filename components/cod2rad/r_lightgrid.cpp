@@ -15,6 +15,9 @@ struct GfxLightGridColor_Internal
 };
 #endif
 
+GfxLightGridColorsHDR* g_lightGridColorsHDR = nullptr;
+GfxLightGridColorsHDR disk_lightGridColorsHDR[0xFFFF];
+
 void* rtn_R_Init_Lightgrid = (void*)0x0043684C;
 void __declspec(naked) mfh_R_Init_Lightgrid()
 {
@@ -169,11 +172,13 @@ void __cdecl AdjustLightingContrast(int sampleCount, int baseIndex, vec3* colors
 }
 
 // 0x00434E20
-void __cdecl StoreLightingForDir(vec3* lighting, BYTE* dst)
+void __cdecl StoreLightingForDir(vec3* lighting, GfxLightGridColors* dst)
 {
+	const int colorIndex = dst - (GfxLightGridColors*)lightGridGlob->colors;
+
 	for (int i = 0; i < 56; i++)
 	{
-		GammaCorrectColor((float*)&lighting[i]);
+		GammaCorrectColor(&lighting[i]);
 	}
 
 	AdjustLightingContrast(56, -1, lighting);
@@ -181,9 +186,13 @@ void __cdecl StoreLightingForDir(vec3* lighting, BYTE* dst)
 	for (int sampleIndex = 0; sampleIndex < 56; sampleIndex++)
 	{
 		vec3 v = lighting[sampleIndex] * 0.5;
-		dst[sampleIndex * 3 + 0] = EncodeFloatInByte(v.r);
-		dst[sampleIndex * 3 + 1] = EncodeFloatInByte(v.g);
-		dst[sampleIndex * 3 + 2] = EncodeFloatInByte(v.b);
+		dst->rgb[sampleIndex][0] = EncodeFloatInByte(v.r);
+		dst->rgb[sampleIndex][1] = EncodeFloatInByte(v.g);
+		dst->rgb[sampleIndex][2] = EncodeFloatInByte(v.b);
+
+		g_lightGridColorsHDR[colorIndex].rgb[sampleIndex][0] = EncodeFloatInWord(v.r);
+		g_lightGridColorsHDR[colorIndex].rgb[sampleIndex][1] = EncodeFloatInWord(v.g);
+		g_lightGridColorsHDR[colorIndex].rgb[sampleIndex][2] = EncodeFloatInWord(v.b);
 	}
 }
 
@@ -316,7 +325,7 @@ void __cdecl ClusterLightGridValues(int threadCount)
 				lightGridGlob->points[lightGridGlob->mapping[firstIndex]].entry.colorsIndex = colorIndex;
 			}
 			
-			SetLightGridColorsForCluster(cluster, &g_lightGridColors[colorIndex]);
+			SetLightGridColorsForCluster(cluster, &disk_lightGridColors[colorIndex]);
 			
 			unsigned int score = GetClusterDefaultScore(cluster);
 			if (score > maxScore)
@@ -364,7 +373,7 @@ bool CompareLightGridColors(GfxLightGridColors* a, GfxLightGridColors* b, unsign
 unsigned short AssignLightGridColors(unsigned short colorIndex, GfxLightGridColors* colors)
 {
 	unsigned int unk = 0x7FFFFFFF;
-	CompareLightGridColors(&g_lightGridColors[colorIndex], colors, &unk);
+	CompareLightGridColors(&lightGridGlob->colors[colorIndex], colors, &unk);
 	if (!unk)
 	{
 		return colorIndex;
@@ -372,7 +381,7 @@ unsigned short AssignLightGridColors(unsigned short colorIndex, GfxLightGridColo
 
 	for (unsigned int i = 0; i < lightGridGlob->clusterCount; i++)
 	{
-		if (CompareLightGridColors(&g_lightGridColors[i], colors, &unk))
+		if (CompareLightGridColors(&lightGridGlob->colors[i], colors, &unk))
 		{
 			if (!unk)
 			{
@@ -388,7 +397,7 @@ unsigned short AssignLightGridColors(unsigned short colorIndex, GfxLightGridColo
 void __cdecl GuessLightGridColors(int index, int unk)
 {
 	GfxLightGridEntry *entry = &lightGridGlob->points[index].entry;
-	entry->colorsIndex = AssignLightGridColors(entry->colorsIndex, &g_lightGridColors[index]);
+	entry->colorsIndex = AssignLightGridColors(entry->colorsIndex, &lightGridGlob->colors[index]);
 }
 
 union GfxLightGridColorSums
@@ -416,7 +425,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 	for (unsigned int pointIndex = 0; pointIndex < lightGridGlob->pointCount; pointIndex++)
 	{
 		counts[lightGridGlob->points[pointIndex].entry.colorsIndex]++;
-		GfxLightGridColors* colors = (GfxLightGridColors*)lightGridGlob->dword_153C91DC;
+		GfxLightGridColors* colors = (GfxLightGridColors*)lightGridGlob->colors;
 		for (int i = 0; i < 56; i++)
 		{
 			sums[lightGridGlob->points[pointIndex].entry.colorsIndex].rgb[i][0] += colors[pointIndex].rgb[i][0];
@@ -429,7 +438,7 @@ void __cdecl ImproveLightGridValues(int threadCount)
 	{
 		if (counts[colorIndex])
 		{
-			GfxLightGridColors* colors = g_lightGridColors; // 0x096CAE08
+			GfxLightGridColors* colors = disk_lightGridColors; // 0x096CAE08
 			for (int i = 0; i < 56; i++)
 			{
 				colors[colorIndex].rgb[i][0] = (sums[colorIndex].rgb[i][0] + (counts[colorIndex] >> 1)) / counts[colorIndex];

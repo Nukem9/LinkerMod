@@ -18,6 +18,13 @@ void __cdecl GammaCorrectColor(float *rgb)
 	rgb[2] = (float)GammaCorrect(rgb[2]);
 }
 
+void __cdecl GammaCorrectColor(vec3* rgb)
+{
+	rgb->r = (float)GammaCorrect(rgb->r);
+	rgb->g = (float)GammaCorrect(rgb->g);
+	rgb->b = (float)GammaCorrect(rgb->b);
+}
+
 //
 // Clamp src to 0.0 - 'max' range, returns true if the value needed to be clamped
 //

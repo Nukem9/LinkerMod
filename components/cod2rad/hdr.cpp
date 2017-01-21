@@ -7,7 +7,7 @@ vec4* Lightmap2Bytes_HDR = nullptr;
 SampleColorHDR* LightGridSampleColors_HDR = nullptr;
 DiskSampleColorHDR* DiskLightGridSampleColors_HDR = nullptr;
 #else
-DiskSampleColorHDR* g_lightGridColorsHDR = nullptr;
+extern GfxLightGridColorsHDR* g_lightGridColorsHDR;
 #endif
 
 void R_Init_LightmapsHDR()
@@ -25,8 +25,8 @@ void R_Init_LightgridHDR()
 #else
 void R_Init_LightgridHDR()
 {
-	g_lightGridColorsHDR = new DiskSampleColorHDR[*g_lightgridSampleCount + 1];
-	memset(g_lightGridColorsHDR, 0, sizeof(DiskSampleColorHDR) * (*g_lightgridSampleCount + 1));
+	g_lightGridColorsHDR = new GfxLightGridColorsHDR[*g_lightgridSampleCount + 1];
+	memset(g_lightGridColorsHDR, 0, sizeof(GfxLightGridColorsHDR) * (*g_lightgridSampleCount + 1));
 }
 #endif
 #if USE_LEGACY_HDR
