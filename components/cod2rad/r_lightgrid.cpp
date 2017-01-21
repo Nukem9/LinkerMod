@@ -171,7 +171,7 @@ void __cdecl AdjustLightingContrast(int sampleCount, int baseIndex, vec3* colors
 }
 
 // 0x00434E20
-void __cdecl StoreLightingForDir(vec3* lighting, GfxLightGridColors* dst)
+void __cdecl StoreLightingForDir(vec3* lighting, GfxLightGridColorsHDR* dst)
 {
 	for (int i = 0; i < 56; i++)
 	{
@@ -365,36 +365,9 @@ LABEL_18:
 
 void __cdecl SwapClusters(int fromIndex, int toIndex)
 {
-
-	GfxLightGridColorsHDR* src = &disk_lightGridColorsHDR[toIndex]; //&disk_lightGridColors[toIndex];
-	GfxLightGridColorsHDR* dst = &disk_lightGridColorsHDR[fromIndex]; //&disk_lightGridColors[fromIndex];
-	
-	GfxLightGridColorsHDR tmp;
-	memcpy(&tmp, &dst, sizeof(GfxLightGridColorsHDR));
-	memcpy(dst, src, sizeof(GfxLightGridColorsHDR));
-	memcpy(src, &tmp, sizeof(GfxLightGridColorsHDR));
-
-	GridColorsCluster* srcCluster = &lightGridGlob->clusters[fromIndex];
-	GridColorsCluster* dstCluster = &lightGridGlob->clusters[toIndex];
-	
-	GridColorsCluster tmpCluster;
-	tmpCluster.first = srcCluster->first;
-	tmpCluster.count = srcCluster->count;
-	tmpCluster.unknown1 = srcCluster->unknown1;
-	tmpCluster.unknown2 = srcCluster->unknown2;
-	tmpCluster.unknown3 = srcCluster->unknown3;
-
-	srcCluster->first = dstCluster->first;
-	srcCluster->count = dstCluster->count;
-	srcCluster->unknown1 = dstCluster->unknown1;
-	srcCluster->unknown2 = dstCluster->unknown2;
-	srcCluster->unknown3 = dstCluster->unknown3;
-
-	dstCluster->first = tmpCluster.first;
-	dstCluster->count = tmpCluster.count;
-	dstCluster->unknown1 = tmpCluster.unknown1;
-	dstCluster->unknown2 = tmpCluster.unknown2;
-	dstCluster->unknown3 = tmpCluster.unknown3;
+	// Vanilla: std::swap(disk_lightGridColors[toIndex], disk_lightGridColors[fromIndex]);
+	std::swap(disk_lightGridColorsHDR[toIndex], disk_lightGridColorsHDR[fromIndex]);
+	std::swap(lightGridGlob->clusters[fromIndex], lightGridGlob->clusters[toIndex]);
 
 	for (unsigned int i = 0; i < lightGridGlob->pointCount; i++)
 	{
@@ -498,7 +471,6 @@ void __cdecl ClusterLightGridValues(int threadCount)
 				lightGridGlob->points[lightGridGlob->mapping[firstIndex]].entry.colorsIndex = colorIndex;
 			}
 			
-			//SetLightGridColorsForCluster2(cluster, &disk_lightGridColors[colorIndex], &disk_lightGridColorsHDR[colorIndex]);
 			SetLightGridColorsForCluster(cluster, &disk_lightGridColorsHDR[colorIndex]);
 
 			unsigned int score = GetClusterDefaultScore(cluster);
