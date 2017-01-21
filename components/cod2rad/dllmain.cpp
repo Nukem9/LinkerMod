@@ -63,6 +63,11 @@ BOOL cod2rad_Init()
 	PatchArguments();
 
 	//
+	// Reenable Improved Quantization in Extra Mode
+	//
+	PatchMemory(0x00440870, (PBYTE)"\x01", 1);
+
+	//
 	// Increase limits for LUMP_COLLISIONVERTS
 	//
 	PatchMemory(0x00442486, (PBYTE)&MAX_MAP_COLLISIONVERTS_SIZE, 4);
