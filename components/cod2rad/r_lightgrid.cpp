@@ -319,11 +319,11 @@ void SplitCluster(GridColorsCluster *cluster)
 				break;
 
 		LABEL_10:
-			if (lightGridGlob->colors[mapping[tail]].all[cluster->unknown1] <= cluster->unknown2)
+			if (lightGridGlob->colors[mapping[tail]].all[cluster->unknown1] >= cluster->unknown2)
 			{
 				while (head <= --tail)
 				{
-					if (lightGridGlob->colors[mapping[tail]].all[cluster->unknown1] <= cluster->unknown2)
+					if (lightGridGlob->colors[mapping[tail]].all[cluster->unknown1] < cluster->unknown2)
 						goto LABEL_13;
 				}
 
@@ -533,7 +533,7 @@ bool CompareLightGridColors(GfxLightGridColorsHDR* a, GfxLightGridColorsHDR* b, 
 	{
 		for (int c = 0; c < 3; c++)
 		{
-			totalDifference += a->rgb[i][c] - a->rgb[i][c];
+			totalDifference += b->rgb[i][c] - a->rgb[i][c];
 			if (totalDifference >= *out)
 				return false;
 		}
@@ -545,7 +545,7 @@ bool CompareLightGridColors(GfxLightGridColorsHDR* a, GfxLightGridColorsHDR* b, 
 
 unsigned short AssignLightGridColors(unsigned short colorIndex, GfxLightGridColorsHDR* colors)
 {
-	unsigned int unk = 0x7FFFFFFF;
+	unsigned int unk = INT_MAX;
 	CompareLightGridColors(&lightGridGlob->colors[colorIndex], colors, &unk);
 	if (!unk)
 	{
