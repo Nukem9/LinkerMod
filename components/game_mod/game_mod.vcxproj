@@ -140,6 +140,7 @@
     <ClInclude Include="bg_perks.h" />
     <ClInclude Include="bg_weapons.h" />
     <ClInclude Include="bg_weapons_def.h" />
+    <ClInclude Include="bitarray.h" />
     <ClInclude Include="bullet.h" />
     <ClInclude Include="CEG.h" />
     <ClInclude Include="cg_scoreboard.h" />

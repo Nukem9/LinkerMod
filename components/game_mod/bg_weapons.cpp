@@ -93,8 +93,15 @@ unsigned int PM_GetWeaponIndexForHand(playerState_s *ps)
 // /bgame/bg_weapons.cpp:1518
 bool BG_CanFastSwitch(WeaponDef *weapDef, int weaponState)
 {
-	if (weaponState == 1 || weaponState == 2 || weaponState == 3 || weaponState == 4 || weaponState == 5)
+	switch (weaponState)
+	{
+	case WEAPON_RAISING:
+	case WEAPON_RAISING_ALTSWITCH:
+	case WEAPON_DROPPING:
+	case WEAPON_DROPPING_QUICK:
+	case WEAPON_DROPPING_ALTSWITCH:
 		return weapDef->offhandSlot != 4;
+	}
 
 	return false;
 }
@@ -109,30 +116,11 @@ bool ShotLimitReached(playerState_s *ps, WeaponDef *weapDef)
 
 	switch (weapDef->fireType)
 	{
-	case WEAPON_FIRETYPE_SINGLESHOT:
-		if (*weaponShotCount < 1)
-			return false;
-		return true;
-
-	case WEAPON_FIRETYPE_BURSTFIRE2:
-		if (*weaponShotCount < 2)
-			return false;
-		return true;
-
-	case WEAPON_FIRETYPE_BURSTFIRE3:
-		if (*weaponShotCount < 3)
-			return false;
-		return true;
-
-	case WEAPON_FIRETYPE_BURSTFIRE4:
-		if (*weaponShotCount < 4)
-			return false;
-		return true;
-
-	case WEAPON_FIRETYPE_STACKED:
-		if (*weaponShotCount < ps->stackFireCount)
-			return false;
-		return true;
+	case WEAPON_FIRETYPE_SINGLESHOT:return *weaponShotCount >= 1;
+	case WEAPON_FIRETYPE_BURSTFIRE2:return *weaponShotCount >= 2;
+	case WEAPON_FIRETYPE_BURSTFIRE3:return *weaponShotCount >= 3;
+	case WEAPON_FIRETYPE_BURSTFIRE4:return *weaponShotCount >= 4;
+	case WEAPON_FIRETYPE_STACKED:	return *weaponShotCount >= ps->stackFireCount;
 	}
 
 	return false;
@@ -225,7 +213,8 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 
 		if (*weaponTime <= 0)
 		{
-			if ((*weaponState == 6 || *weaponState == 32) && WeaponUsesBurstCooldown(weaponIndex) && !BurstFirePending(ps))
+			if ((*weaponState == WEAPON_FIRING || *weaponState == 32) &&
+				WeaponUsesBurstCooldown(weaponIndex) && !BurstFirePending(ps))
 			{
 				float scalar = player_burstFireCooldown->current.value;
 
