@@ -20,3 +20,5 @@ int __cdecl FS_ReadFile(const char *qpath, void **buffer);
 void FS_Init_TechsetOverride(void);
 
 int __cdecl FS_HashFileName(const char *fname, int hashSize);
+
+const char* FS_GetExtensionSubString(const char* filename);

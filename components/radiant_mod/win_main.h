@@ -14,3 +14,5 @@ void mfh_WinMain();
 //
 BOOL __stdcall SetWindowPlacement_Hidden(HWND hWnd, WINDOWPLACEMENT *lpwndpl);
 static const void* pfn_SetWindowPlacement_Hidden = &SetWindowPlacement_Hidden;
+
+void hk_HandleLaunchArgs(void);

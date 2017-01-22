@@ -307,6 +307,11 @@ BOOL RadiantMod_Init()
 	PatchCall(0x0040309F, (PBYTE)&R_RegisterSkyboxModel);
 
 	//
+	// Add Maps Loaded via Launcher (Args) to the MRU
+	//
+	PatchCall(0x0042DD2E, (PBYTE)&hk_HandleLaunchArgs);
+
+	//
 	// Live game update hooks
 	//
 	*(PBYTE *)&CCamWnd::ctor_o = Detours::X86::DetourFunction((PBYTE)0x00402B90, (PBYTE)&CCamWnd::ctor);

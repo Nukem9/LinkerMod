@@ -74,3 +74,25 @@ int __cdecl FS_HashFileName(const char *fname, int hashSize)
 
 	return ((hash >> 20) ^ hash ^ (hash >> 10)) & (hashSize - 1);
 }
+
+const char* FS_GetExtensionSubString(const char* filename)
+{
+	if (filename == '\0')
+		return NULL;
+
+	const char* substr = 0;
+	while (*filename)
+	{
+		if (*filename == '.')
+			substr = filename;
+		else if (*filename == '/' || *filename == '\\')
+			substr = 0;
+
+		++filename;
+	}
+
+	if (!substr)
+		substr = filename;
+
+	return substr;
+}
