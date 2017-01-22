@@ -89,6 +89,21 @@ bool ClampColor(vec3 *dst, vec3 *src, float max)
 	return clamped;
 }
 
+vec3 ColorSRGBtoLinear(vec3* color)
+{
+	vec3 tmp = ((*color + 0.055f) / 1.055f);
+	tmp.r = pow(color->r, 2.4f);
+	tmp.g = pow(color->g, 2.4f);
+	tmp.b = pow(color->b, 2.4f);
+
+	vec3 linear;
+	linear.r = (color->r > 0.040449999) ? tmp.r : color->r / 12.92;
+	linear.g = (color->g > 0.040449999) ? tmp.g : color->g / 12.92;
+	linear.b = (color->b > 0.040449999) ? tmp.b : color->b / 12.92;
+
+	return linear;
+}
+
 void EncodeNormalToFloats(vec3* normal, vec2* out)
 {
 	out->x = normal->x / normal->z * 0.25f + 0.5f;

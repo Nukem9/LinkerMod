@@ -11,6 +11,7 @@ void __cdecl GammaCorrectColor(vec3* rgb);
 
 bool ClampColor(vec3 *dst, vec3 *src, float max = 1.0f);
 
+vec3 ColorSRGBtoLinear(vec3* color);
 
 void EncodeNormalToFloats(vec3* normal, vec2* out);
 void EncodeNormalToBytes(vec3* normal, BYTE(&out)[2]);
