@@ -24,3 +24,14 @@ BYTE __cdecl EncodeFloatInByte(float flt)
 
 	return (BYTE)(f * 255.0);
 }
+
+WORD __cdecl EncodeFloatInWord(float flt)
+{
+	double f = flt;
+	if (f < 0.0)
+	{
+		return 0;
+	}
+
+	return (WORD)(f * 255.0);
+}

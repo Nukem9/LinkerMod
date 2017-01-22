@@ -21,6 +21,20 @@ void(__cdecl *g_QuantumWorkerCallback)(int, int);
 volatile DWORD *g_ThreadLocks = (DWORD *)0x17302434;
 volatile DWORD g_ThreadCounter;
 
+void __cdecl ForEachQuantum(int stepCount, QuantumFunc_t func, int threadCount)
+{
+	*(LONG *)0x17303430 = stepCount;
+	SetProgress(0, stepCount);
+	if (threadCount == 1)
+		for (int i = 0; i < *(LONG *)0x17303430; i++)
+		{
+			func(i, 0);
+			UpdateProgress(1);
+		}
+	else
+		ForEachQuantumMultiThreaded(threadCount, func);
+}
+
 DWORD WINAPI ForEachQuantumWorkerThread(LPVOID ThreadParameter)
 {
 	for (LONG i = InterlockedExchangeAdd(&g_ThreadCounter, 1); i < *(LONG *)0x17303430; i = InterlockedExchangeAdd(&g_ThreadCounter, 1))

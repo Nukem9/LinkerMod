@@ -54,22 +54,24 @@ void Com_SaveLightmaps_HDR(Lump* lump)
 
 void Com_SaveLightgrid_HDR(Lump* lump)
 {
-	DWORD* lightgridColorCount = (DWORD*)0x112BAAB4;
-
 	DiskGfxLightGridColors_BO* lightgridColors = (DiskGfxLightGridColors_BO*)lump->content;
 
-	for (DWORD i = 0; i < *lightgridColorCount; i++)
+	for (DWORD i = 0; i < lightGridColorCount; i++)
 	{
 		for (int y = 0; y < 56; y++)
 		{
 			for (int x = 0; x < 3; x++)
 			{
+#if USE_LEGACY_HDR
 				lightgridColors[i].rgb[y][x] = DiskLightGridSampleColors_HDR[i][y][x];
+#endif
+				lightgridColors[i].rgb[y][x] = disk_lightGridColorsHDR[i].rgb[y][x] * 4; // Multiplying the lighting by 4 (so its 0 - 1024 range) seems to look ok
 			}
 		}
 	}
-
+#if USE_LEGACY_HDR
 	delete[] DiskLightGridSampleColors_HDR;
+#endif
 }
 
 int __cdecl Com_SaveBsp_EnforceVersion(FILE* h)
@@ -93,7 +95,9 @@ int __cdecl Com_SaveBsp_EnforceVersion(FILE* h)
 
 	if (g_HDR)
 	{
+#if USE_LEGACY_HDR
 		delete[] LightGridSampleColors_HDR;
+#endif
 
 		Com_SaveLightmaps_HDR(&iBSP->lumps[LUMP_LIGHTBYTES]);
 		Com_SaveLightgrid_HDR(&iBSP->lumps[LUMP_LIGHTGRIDCOLORS]);

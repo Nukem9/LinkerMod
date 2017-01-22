@@ -15,7 +15,7 @@
 #include "../shared/shared_utility.h"
 
 #include "PageGuard.h"
-#include "console.h"
+#include "print.h"
 #include "threading.h"
 
 #include "arguments.h"

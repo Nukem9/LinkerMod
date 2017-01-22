@@ -1,7 +1,7 @@
 #pragma once
 #include <mutex>
 
-#define VARIANCE_TRACKER 1
+#define VARIANCE_TRACKER _DEBUG
 
 const static DWORD* g_LightmapCount = (DWORD*)0x16E99F58;
 
