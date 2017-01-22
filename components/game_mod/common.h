@@ -82,9 +82,6 @@ static I_stristr_t I_stristr = (I_stristr_t)0x0062F110;
 typedef void (__cdecl* I_strncpyz_t)(char *dest, const char *src, int destsize);
 static I_strncpyz_t I_strncpyz = (I_strncpyz_t)0x005D4D60;
 
-bool Com_RunEventHack();
-void Com_EventLoop();
-
 struct LevelDependency
 {
 	char base[64];		// Base map

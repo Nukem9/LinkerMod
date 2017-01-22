@@ -4,52 +4,6 @@ std::vector<LevelDependency> g_LevelDependencies;
 
 void (__cdecl * Com_Init)(char *commandLine);
 
-void Com_ClientPacketEvent()
-{
-	((void(__cdecl *)())0x0082B290)();
-}
-
-void Com_FreeEvent(void *ptr)
-{
-	Z_Free(ptr, 11);
-}
-
-bool Com_RunEventHack()
-{
-	sysEvent_t event;
-	Sys_GetEvent(&event);
-
-	switch (event.evType)
-	{
-	case SE_NONE:
-		Com_ClientPacketEvent();
-		return false;
-	case SE_KEY:
-		CL_KeyEvent(0, event.evValue, event.evValue2, event.evTime);
-		return true;
-	case SE_CHAR:
-		CL_CharEvent(0, event.evValue);
-		return true;
-	case SE_CONSOLE:
-		Cbuf_AddText(0, (char *)event.evPtr);
-		Cbuf_AddText(0, "\n");
-		Com_FreeEvent(event.evPtr);
-		return true;
-	}
-
-	Com_Error(ERR_FATAL, "Com_RunEventHack: bad event type %i", event.evType);
-	return false;
-}
-
-void Com_EventLoop()
-{
-	// This function might as well be hooked since it's all implemented
-	do
-	{
-		/* Nothing */
-	} while (Com_RunEventHack());
-}
-
 void hk_Com_Init(char *commandLine)
 {
 	// Fix up the command line because devs removed it
