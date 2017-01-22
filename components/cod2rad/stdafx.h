@@ -47,3 +47,5 @@
 #else
 #pragma comment(lib, "../../build/Release/D3DBSP_Lib.lib")
 #endif
+
+using namespace D3DBSP_Lib;
