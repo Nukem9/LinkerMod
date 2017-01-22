@@ -54,6 +54,9 @@
     <ClCompile Include="cmds\cmd_extract.cpp">
       <Filter>cmds</Filter>
     </ClCompile>
+    <ClCompile Include="cmds\cmd_bsp.cpp">
+      <Filter>cmds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cmd.h" />

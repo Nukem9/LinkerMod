@@ -19,6 +19,8 @@ REGISTER_GLOBAL_COMMAND(g_cmd_ents, "ents", "Extract the entity string from a fa
 REGISTER_GLOBAL_COMMAND(g_cmd_extract_ff, "extract-ff", "Extract assets from *.ff files", Cmd_Extract_FF_f, CMD_CVARS(&g_extractAll, &g_extractSounds,&g_useLocalized, &fs_outdir));
 REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd, "extract-iwd", "Extract assets from *.iwd files", Cmd_Extract_IWD_f, CMD_CVARS(&g_extractAll, &g_extractImages, &g_extractSounds, &fs_outdir));
 
+REGISTER_GLOBAL_COMMAND(g_cmd_bsp_info, "bsp_info", "Print lump offsets and sizes for a given bsp", Cmd_BspInfo_f, CMD_GLOBALCVARS);
+
 #undef CMD_GLOBALCVARS
 #undef CMD_CVARS
 #undef REGISTER_GLOBAL_COMMAND

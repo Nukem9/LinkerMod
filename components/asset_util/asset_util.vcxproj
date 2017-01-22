@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="arg.cpp" />
     <ClCompile Include="cmd.cpp" />
+    <ClCompile Include="cmds\cmd_bsp.cpp" />
     <ClCompile Include="cmds\cmd_ents.cpp" />
     <ClCompile Include="cmds\cmd_extract.cpp" />
     <ClCompile Include="cmds\cmd_help.cpp" />

@@ -35,4 +35,6 @@ REGISTER_GLOBAL_COMMAND(g_cmd_ents);
 REGISTER_GLOBAL_COMMAND(g_cmd_extract_ff);
 REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd);
 
+REGISTER_GLOBAL_COMMAND(g_cmd_bsp_info);
+
 #undef REGISTER_GLOBAL_COMMAND
