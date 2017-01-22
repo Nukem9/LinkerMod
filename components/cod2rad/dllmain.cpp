@@ -64,8 +64,15 @@ BOOL cod2rad_Init()
 
 	//
 	// Reenable Improved Quantization in Extra Mode
+	// Disabled - Currently Corrupts LightGrid Colors
 	//
-	PatchMemory(0x00440870, (PBYTE)"\x01", 1);
+	// PatchMemory(0x00440870, (PBYTE)"\x01", 1);
+
+	//
+	// Patch Default Gamma 2.2 -> 2.0
+	//
+	float gamma_default = 2.0f;
+	PatchMemory(0x00462ABC, (PBYTE)&gamma_default, 4);
 
 	//
 	// Increase limits for LUMP_COLLISIONVERTS
