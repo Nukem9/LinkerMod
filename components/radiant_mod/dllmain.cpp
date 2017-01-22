@@ -107,7 +107,7 @@ BOOL RadiantMod_Init()
 	//
 	// Hook CWinApp::Run to allow for automatic map loading via command line arguments
 	//
-	//Detours::X86::DetourClassFunction((PBYTE)0x005BF26E, &CWinApp::Run);
+	//Detours::X86::DetourFunctionClass((PBYTE)0x005BF26E, &CWinApp::Run);
 
 	//
 	// FS_ReadFile Hook - Set Up Fallback Location for Techsets and Techniques
@@ -262,7 +262,7 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004A814E, (PBYTE)&mfh_Ent_Connect); // Generate the new default spotLight KVs when creating a spotLight
 
 #if RADIANT_USE_AFX_OVERRIDES
-	CWnd::OnCtlColor_o = (OnCtlColor_t)Detours::X86::DetourClassFunction((PBYTE)0x0059B96E, &CWnd::OnCtlColor);
+	CWnd::OnCtlColor_o = (OnCtlColor_t)Detours::X86::DetourFunctionClass((PBYTE)0x0059B96E, &CWnd::OnCtlColor);
 #endif
 
 #if RADIANT_USE_SPLASH
