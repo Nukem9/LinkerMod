@@ -159,8 +159,8 @@ int D3DBSP::Write(const char* filepath)
 		if(!pLump->isEmpty)
 		{
 #if _DEBUG
-			Log_Printf("Writing Lump [0x%X] %s\n", this->diskLumpOrder[i], LUMP_NAMES[this->diskLumpOrder[i]]);
-			Log_Printf("	Start: 0x%X (Size: 0x%X)\n", (DWORD)ofile.tellp(), pLump->size);
+			D3DBSP_Lib::Log_Printf("Writing Lump [0x%X] %s\n", this->diskLumpOrder[i], LUMP_NAMES[this->diskLumpOrder[i]]);
+			D3DBSP_Lib::Log_Printf("	Start: 0x%X (Size: 0x%X)\n", (DWORD)ofile.tellp(), pLump->size);
 #endif
 			ofile.write((char*)pLump->content, pLump->size);
 			if(padding_size(pLump->size))
@@ -169,7 +169,7 @@ int D3DBSP::Write(const char* filepath)
 				ofile.write((char*)&pad, padding_size(pLump->size));
 			}
 #if _DEBUG
-			Log_Printf("	End: 0x%X\n", (DWORD)ofile.tellp());
+			D3DBSP_Lib::Log_Printf("	End: 0x%X\n", (DWORD)ofile.tellp());
 #endif
 		}
 	}
