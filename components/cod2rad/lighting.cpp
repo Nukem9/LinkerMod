@@ -97,9 +97,9 @@ vec3 ColorSRGBtoLinear(vec3* color)
 	tmp.b = pow(color->b, 2.4f);
 
 	vec3 linear;
-	linear.r = (color->r > 0.040449999) ? tmp.r : color->r / 12.92;
-	linear.g = (color->g > 0.040449999) ? tmp.g : color->g / 12.92;
-	linear.b = (color->b > 0.040449999) ? tmp.b : color->b / 12.92;
+	linear.r = (color->r > 0.04045f) ? tmp.r : color->r / 12.92f;
+	linear.g = (color->g > 0.04045f) ? tmp.g : color->g / 12.92f;
+	linear.b = (color->b > 0.04045f) ? tmp.b : color->b / 12.92f;
 
 	return linear;
 }
