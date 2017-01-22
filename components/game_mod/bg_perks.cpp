@@ -41,4 +41,6 @@ const char *BG_GetPerkNameForIndex(unsigned int perkIndex)
 		if (entry.second == perkIndex)
 			return entry.first.c_str();
 	}
+
+	return "<error>";
 }
