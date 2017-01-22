@@ -1,10 +1,79 @@
 #include "stdafx.h"
 
+XAssetEntry *DB_LinkXAssetEntry(XAssetEntry *newEntry, int allowOverride)
+{
+	// If yes, skip loading certain assets in this FF
+	if (DB_IsLevelDependency(g_load_filename))
+	{
+		const char *assetName = DB_GetXAssetName(&newEntry->asset);
+		XAssetType assetType = newEntry->asset.type;
+
+		// Com_Printf(1, "Asset: [%01d] %s\n", assetType, assetName);
+
+		switch (assetType)
+		{
+		case ASSET_TYPE_CLIPMAP:
+		case ASSET_TYPE_CLIPMAP_PVS:
+		case ASSET_TYPE_COMWORLD:
+		case ASSET_TYPE_GAMEWORLD_SP:
+		case ASSET_TYPE_GAMEWORLD_MP:
+		case ASSET_TYPE_GFXWORLD:
+		case ASSET_TYPE_GLASSES:
+		case ASSET_TYPE_MATERIAL:
+		case ASSET_TYPE_DESTRUCTIBLEDEF:
+		case ASSET_TYPE_XMODEL:
+		case ASSET_TYPE_WEAPON:
+		case ASSET_TYPE_WEAPONDEF:
+		case ASSET_TYPE_WEAPON_VARIANT:
+			// Never load certain types (maps), regardless of what the user says
+			return newEntry;
+
+		// case ASSET_TYPE_SOUND:
+		// case ASSET_TYPE_SOUND_PATCH:
+		//	// NOTE: If excluded, SND_AddPatch/SND_AddBank must be fixed 
+		//	break;
+
+		default:
+			// TODO: Allow certain asset types from the CSV. For now allow asset overrides.
+			allowOverride = 1;
+			break;
+		}
+	}
+
+	return ((XAssetEntry *(__cdecl *)(XAssetEntry *, int))0x007A2F10)(newEntry, allowOverride);
+}
+
+const char *DB_GetXAssetName(XAsset *asset)
+{
+	ASSERT(asset);
+
+	return DB_GetXAssetHeaderName(asset->type, &asset->header);
+}
+
+const char *DB_GetXAssetHeaderName(XAssetType type, XAssetHeader *header)
+{
+	ASSERT(header);
+	ASSERT(DB_XAssetGetNameHandler[type]);
+	ASSERT(header->data);
+
+	const char *name = DB_XAssetGetNameHandler[type](header);
+	ASSERT_MSG(name, va("Name not found for asset type %s\n", DB_GetXAssetTypeName(type)));
+
+	return name;
+}
+
+const char *DB_GetXAssetTypeName(int type)
+{
+	ASSERT(type >= 0 && type < ASSET_TYPE_COUNT);
+
+	return g_assetNames[type];
+}
+
 void DB_SyncXAssets()
 {
 	R_BeginRemoteScreenUpdate();
 	Sys_SyncDatabase();
-	R_EndRemoteScreenUpdate(0);
+	R_EndRemoteScreenUpdate(nullptr);
 	SocketRouter_EmergencyFrame("DB_SyncXAssets");
 	DB_PostLoadXZone();
 }

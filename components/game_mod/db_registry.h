@@ -16,6 +16,7 @@ struct XZoneName
 	FF_DIR dir;
 	bool loaded;
 };
+STATIC_ASSERT_SIZE(XZoneName, 0x50);
 
 struct XZoneInfoInternal
 {
@@ -93,6 +94,23 @@ union XAssetHeader
 	void *data;
 };
 
+struct XAsset
+{
+	XAssetType type;
+	XAssetHeader header;
+};
+STATIC_ASSERT_SIZE(XAsset, 0x8);
+
+struct XAssetEntry
+{
+	XAsset asset;
+	char zoneIndex;
+	bool inuse;
+	unsigned __int16 nextHash;
+	unsigned __int16 nextOverride;
+	unsigned __int16 usageFrame;
+};
+
 // NOTE: These are NOT accurate for singleplayer
 enum
 {
@@ -131,9 +149,13 @@ enum
 
 static volatile unsigned int& g_zoneInfoCount = *(volatile unsigned int *)0x00E72984;
 static XZoneInfoInternal *g_zoneInfo = (XZoneInfoInternal *)0x00C84308;
-static XZoneName *g_zoneNames = (XZoneName *)0x010C6648;
+static XZoneName *g_zoneNames = (XZoneName *)0x010C6608;
 static void **DB_XAssetPool = (void **)0x00B741B8;
 static DWORD *g_poolSize = (DWORD *)0x00B73EF8;
+static char **g_assetNames = (char **)0x00B73BB0;
+static char*& g_load_filename = *(char **)0x00C7934C;
+
+static auto DB_XAssetGetNameHandler = (const char *(__cdecl **)(XAssetHeader *))0x00B73C60;
 
 typedef void (__cdecl* DB_LoadXAssets_t)(XZoneInfo *zoneInfo, unsigned int zoneCount, int sync);
 static DB_LoadXAssets_t DB_LoadXAssets = (DB_LoadXAssets_t)0x00631B10;
@@ -171,9 +193,10 @@ static DB_LogMissingAsset_t DB_LogMissingAsset = (DB_LogMissingAsset_t)0x004AEC2
 typedef void(__cdecl* DB_EnumXAssets_t)(XAssetType type, void(__cdecl *func)(XAssetHeader, void *), void *inData, bool includeOverride);
 static DB_EnumXAssets_t DB_EnumXAssets = (DB_EnumXAssets_t)0x0054C1C0;
 
-bool DB_IsZonePending(const char *name);
-bool DB_IsZoneLoaded(const char *name);
-
+XAssetEntry *DB_LinkXAssetEntry(XAssetEntry *newEntry, int allowOverride);
+const char *DB_GetXAssetName(XAsset *asset);
+const char *DB_GetXAssetHeaderName(XAssetType type, XAssetHeader *header);
+const char *DB_GetXAssetTypeName(int type);
 void DB_SyncXAssets();
 void DB_LoadGraphicsAssetsForPC();
 void DB_ModXFileHandle_hk();

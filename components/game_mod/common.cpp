@@ -175,6 +175,17 @@ void DB_RemoveLevelDependency(const char *dependency)
 	}
 }
 
+bool DB_IsLevelDependency(const char *name)
+{
+	for (const LevelDependency& dep : g_LevelDependencies)
+	{
+		if (!_stricmp(dep.required, name))
+			return true;
+	}
+
+	return false;
+}
+
 bool DB_IsZoneLoaded(const char *name)
 {
 	for (int i = 1; i < 33; ++i)
