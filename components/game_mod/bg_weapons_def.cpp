@@ -3,19 +3,30 @@
 // /bgame/bg_weapons_def.cpp:62
 WeaponVariantDef *BG_GetWeaponVariantDef(unsigned int weaponIndex)
 {
-	return ((WeaponVariantDef *(__cdecl *)(unsigned int))0x00444740)(weaponIndex);
+	ASSERT_MSG(weaponIndex >= 0 && weaponIndex <= bg_lastParsedWeaponIndex, "weaponIndex not in [0, bg_lastParsedWeaponIndex]");
+
+	return bg_weaponVariantDefs[weaponIndex];
 }
 
 // /bgame/bg_weapons_def.cpp:70
 WeaponDef *BG_GetWeaponDef(unsigned int weaponIndex)
 {
-	return ((WeaponDef *(__cdecl *)(unsigned int))0x00425770)(weaponIndex);
+	return BG_GetWeaponVariantDef(weaponIndex)->weapDef;
 }
 
 // /bgame/bg_weapons_def.cpp:83
 unsigned int BG_GetWeaponIndex(WeaponVariantDef *weapVariantDef)
 {
-	return ((unsigned int(__cdecl *)(WeaponVariantDef *))0x00553DF0)(weapVariantDef);
+	ASSERT(weapVariantDef);
+
+	for (unsigned int weapIndex = 0; weapIndex <= bg_lastParsedWeaponIndex; ++weapIndex)
+	{
+		if (weapVariantDef == bg_weaponVariantDefs[weapIndex])
+			return weapIndex;
+	}
+
+	ASSERT_MSG(false, "Weapon variant not in table, unknown weapon index?!");
+	return 0;
 }
 
 // /bgame/bg_weapons_def.cpp:???

@@ -52,8 +52,6 @@ enum weapFireType_t
 	WEAPON_FIRETYPECOUNT = 0x7,
 };
 
-typedef int WeaponVariantDef;
-
 struct WeaponDef
 {
 	char _pad1[0x1C];
@@ -95,6 +93,13 @@ STATIC_ASSERT_OFFSET(WeaponDef, bBulletImpactExplode, 0x62D);
 STATIC_ASSERT_OFFSET(WeaponDef, holdButtonToThrow, 0x63E);
 STATIC_ASSERT_OFFSET(WeaponDef, fMinDamageRange, 0x7AC);
 
+struct WeaponVariantDef
+{
+	char _pad1[0x8];
+	WeaponDef *weapDef;
+};
+STATIC_ASSERT_OFFSET(WeaponVariantDef, weapDef, 0x8);
+
 struct weaponParms
 {
 	float forward[3];
@@ -109,6 +114,9 @@ STATIC_ASSERT_OFFSET(weaponParms, forward, 0x0);
 STATIC_ASSERT_OFFSET(weaponParms, muzzleTrace, 0x24);
 STATIC_ASSERT_OFFSET(weaponParms, weapVariantDef, 0x3C);
 STATIC_ASSERT_OFFSET(weaponParms, weapDef, 0x40);
+
+static WeaponVariantDef **bg_weaponVariantDefs = (WeaponVariantDef **)0x00BE19A8;
+static unsigned int& bg_lastParsedWeaponIndex = *(unsigned int *)0x00BE1FB0;
 
 WeaponVariantDef *BG_GetWeaponVariantDef(unsigned int weaponIndex);
 WeaponDef *BG_GetWeaponDef(unsigned int weaponIndex);
