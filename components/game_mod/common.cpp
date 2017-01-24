@@ -277,7 +277,8 @@ void Com_LoadLevelFastFiles(const char *mapName)
 	if (!I_strncmp("so_", mapName, strlen("so_")))
 	{
 		const char* basename = nullptr;
-		for (basename = &mapName[strlen("so_")]; *basename && *basename != '_'; ++basename) {};
+		for (basename = &mapName[strlen("so_")]; *basename && *basename != '_'; ++basename)
+			/* Do nothing */;
 
 		if (!*basename)
 			Com_PrintError(1, "Bad specop level name\n");

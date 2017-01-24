@@ -36,10 +36,12 @@ bool __cdecl PartyClient_CheckMapExists(const char *map)
 	if (!I_strncmp("so_", map, strlen("so_")))
 	{
 		const char* basename = nullptr;
+
+		// Loop through each char until a '_' char is found.
 		for (basename = &map[strlen("so_")]; *basename && *basename != '_'; ++basename)
-			// Loop through each char until a '_' char is found.
+			/* Do nothing */;
 		
-		if (*basename == NULL)
+		if (*basename == '\0')
 			Com_PrintError(1, "Bad specop level name\n");
 
 		map = basename + 1;
