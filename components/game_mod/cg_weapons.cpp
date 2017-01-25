@@ -196,7 +196,7 @@ void __declspec(naked) mfh_CG_DrawBulletImpacts1()
 {
 	static DWORD dwJmp = 0x0079A4F7;
 
-	unsigned int playerState;
+	playerState_s *ps;
 	unsigned int *randSeed;
 	unsigned int *shotCount;
 
@@ -212,19 +212,19 @@ void __declspec(naked) mfh_CG_DrawBulletImpacts1()
 		sub esp, __LOCAL_SIZE
 
 		mov eax, dword ptr [edi + 0x10]	// playerState *ps
-		mov playerState, eax			//
+		mov ps, eax						//
 		lea eax, [edi - 0xE0]			// secondBarrel [See mfh_CG_DrawBulletImpacts2 comment]
 		mov randSeed, eax				//
 		lea eax, [edi - 0x114]			// shotCount
 		mov shotCount, eax				//
 	}
 
-	*randSeed = *(DWORD *)playerState;	// ps->commandTime
+	*randSeed = ps->commandTime;
 	BG_seedRandWithGameTime(randSeed);
 
 	if (Com_SessionMode_IsZombiesGame() && perk_weapRateEnhanced->current.enabled)
 	{
-		if (BG_HasPerk((unsigned int *)(playerState + 0x4FC), PERK_RATEOFFIRE))
+		if (BG_HasPerk(ps->perks, PERK_RATEOFFIRE))
 			*shotCount *= 2;
 	}
 
