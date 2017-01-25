@@ -89,6 +89,7 @@ struct LevelDependency
 };
 
 bool Com_IsMenuLevel(const char *name);
+bool Com_IsSpecopLevel(const char *name);
 void Com_GetLevelSharedFastFiles(const char *mapName);
 void DB_RemoveLevelDependency(const char *dependency);
 bool DB_IsLevelDependency(const char *name);

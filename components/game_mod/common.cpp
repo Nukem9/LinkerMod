@@ -60,6 +60,14 @@ bool Com_IsMenuLevel(const char *name)
 	return !I_strnicmp(name, "menu_", 5) || !I_strcmp(name, "frontend");
 }
 
+bool Com_IsSpecopLevel(const char *name)
+{
+	if (!name)
+		name = sv_mapname->current.string;
+
+	return !I_strnicmp(name, "so_", 3);
+}
+
 void Com_GetLevelSharedFastFiles(const char *mapName)
 {
 	static bool allDependenciesInit = false;
@@ -274,7 +282,7 @@ void Com_LoadLevelFastFiles(const char *mapName)
 #endif
 
 	char specOpsZoneName[64];
-	if (!I_strncmp("so_", mapName, strlen("so_")))
+	if (Com_IsSpecopLevel(mapName))
 	{
 		const char* basename = nullptr;
 		for (basename = &mapName[strlen("so_")]; *basename && *basename != '_'; ++basename)
@@ -289,10 +297,12 @@ void Com_LoadLevelFastFiles(const char *mapName)
 		zoneInfo[zoneCount++].freeFlags = 0;
 	}
 
-	int allocFlags = 0x2000000;
+	int allocFlags = 0;
 
 	if (!Com_IsMenuLevel(mapName))
-		allocFlags = I_strncmp("so_", mapName, 3) != 0 ? 0x800 : DB_ZONE_LEVEL;
+		allocFlags = Com_IsSpecopLevel(mapName) ? 0x4000 : 0x800;
+	else
+		allocFlags = 0x2000000;
 
 	zoneInfo[zoneCount].allocFlags = allocFlags;
 	zoneInfo[zoneCount].name = mapName;
@@ -309,5 +319,5 @@ void Com_LoadLevelFastFiles(const char *mapName)
 
 	R_BeginRemoteScreenUpdate();
 	DB_LoadXAssets(zoneInfo, zoneCount, 0);
-	R_EndRemoteScreenUpdate(NULL);
+	R_EndRemoteScreenUpdate(nullptr);
 }

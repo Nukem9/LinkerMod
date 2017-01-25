@@ -33,7 +33,7 @@ DEFAULT:
 PartyClient_CheckMapExists_t PartyClient_CheckMapExists_o = (PartyClient_CheckMapExists_t)0x0;
 bool __cdecl PartyClient_CheckMapExists(const char *map)
 {
-	if (!I_strncmp("so_", map, strlen("so_")))
+	if (Com_IsSpecopLevel(map))
 	{
 		const char* basename = nullptr;
 
@@ -41,7 +41,7 @@ bool __cdecl PartyClient_CheckMapExists(const char *map)
 		for (basename = &map[strlen("so_")]; *basename && *basename != '_'; ++basename)
 			/* Do nothing */;
 		
-		if (*basename == '\0')
+		if (!*basename)
 			Com_PrintError(1, "Bad specop level name\n");
 
 		map = basename + 1;
