@@ -261,6 +261,14 @@ void Bullet_Fire(gentity_s *attacker, float spread, weaponParms *wp, gentity_s *
 		else
 			Bullet_FireExtended(&fireParams, wp->weapVariantDef, attacker, gameTime);
 	}
+
+	if (attacker->client)
+	{
+		DWORD v20 = *(DWORD *)((DWORD)attacker->client + 0x1C84);
+
+		if (v20)
+			*(DWORD *)(v20 + 0x100) = v22;
+	}
 }
 
 void BG_seedRandWithGameTime(unsigned int *pHoldrand)
