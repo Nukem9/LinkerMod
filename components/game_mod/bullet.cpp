@@ -130,7 +130,7 @@ void Bullet_Endpos(unsigned int *randSeed, float spread, float *end, float *dir,
 }
 
 // /game/bullet.cpp:655
-void Bullet_FireExtended(BulletFireParams *params, WeaponVariantDef *weapVariantDef, gentity_s attacker, int gameTime)
+void Bullet_FireExtended(BulletFireParams *params, WeaponVariantDef *weapVariantDef, gentity_s *attacker, int gameTime)
 {
 	static DWORD dwCall = 0x007D42F0;
 
@@ -146,7 +146,7 @@ void Bullet_FireExtended(BulletFireParams *params, WeaponVariantDef *weapVariant
 }
 
 // /game/bullet.cpp:721
-void Bullet_FirePenetrate(BulletFireParams *params, WeaponVariantDef *weapVariantDef, gentity_s attacker, int gameTime)
+void Bullet_FirePenetrate(BulletFireParams *params, WeaponVariantDef *weapVariantDef, gentity_s *attacker, int gameTime)
 {
 	static DWORD dwCall = 0x007D3CD0;
 
@@ -183,13 +183,14 @@ bool BG_WeaponBulletFire_ShouldPenetrate(WeaponDef *weapDef)
 }
 
 // /game/bullet.cpp:897
-void Bullet_Fire(gentity_s attacker, float spread, weaponParms *wp, gentity_s weaponEnt, int gameTime)
+void Bullet_Fire(gentity_s *attacker, float spread, weaponParms *wp, gentity_s *weaponEnt, int gameTime)
 {
 	ASSERT(attacker);
 	ASSERT(wp);
 	ASSERT(wp->weapDef);
 	ASSERT(wp->weapDef->weapType == WEAPTYPE_BULLET);
 
+	DWORD v22 = 0;
 	int shotCount = 1;
 	float range = sv_bullet_range->current.value;
 
@@ -199,22 +200,24 @@ void Bullet_Fire(gentity_s attacker, float spread, weaponParms *wp, gentity_s we
 		range = wp->weapDef->fMinDamageRange;
 	}
 
-	if (*(DWORD *)(attacker + 316) && *(DWORD *)(*(DWORD *)(attacker + 316) + 0x1C84))
+	if (attacker->client)
 	{
-		DWORD v11 = *(DWORD *)(*(DWORD *)(attacker + 316) + 0x1C84);
-		DWORD v22 = *(DWORD *)(v11 + 256);
-		*(DWORD *)(v11 + 256) = 0;
+		DWORD v11 = *(DWORD *)((DWORD)attacker->client + 0x1C84);
+
+		if (v11)
+		{
+			v22 = *(DWORD *)(v11 + 0x100);
+			*(DWORD *)(v11 + 0x100) = 0;
+		}
+
+		// Used for various stat tracking (GSC/mystery box)
+		BG_SetWeaponUsed(attacker->client->ps.clientNum, BG_GetWeaponIndex(wp->weapVariantDef));
 	}
 
-	if (*(DWORD *)(attacker + 0x13C))
-		BG_SetWeaponUsed(*(BYTE *)(*(DWORD *)(attacker + 0x13C) + 0x130), BG_GetWeaponIndex(wp->weapVariantDef));
-
 	// BO2 double-tap modification
-	if (Com_SessionMode_IsZombiesGame() && perk_weapRateEnhanced->current.enabled /*&& ent->s.eType == 1*/)
+	if (Com_SessionMode_IsZombiesGame() && perk_weapRateEnhanced->current.enabled && attacker->s.eType == 1)
 	{
-		DWORD client = *(DWORD *)(attacker + 0x13C);
-
-		if (BG_HasPerk((unsigned int *)(client + 0x4FC), PERK_RATEOFFIRE))
+		if (BG_HasPerk(attacker->client->ps.perks, PERK_RATEOFFIRE))
 			shotCount *= 2;
 	}
 
@@ -228,8 +231,8 @@ void Bullet_Fire(gentity_s attacker, float spread, weaponParms *wp, gentity_s we
 
 		if (weaponEnt)
 		{
-			fireParams.weaponEntIndex = *(DWORD *)weaponEnt;
-			fireParams.ignoreEntIndex = *(DWORD *)weaponEnt;
+			fireParams.weaponEntIndex = weaponEnt->s.number;
+			fireParams.ignoreEntIndex = weaponEnt->s.number;
 		}
 		else
 		{
@@ -237,7 +240,7 @@ void Bullet_Fire(gentity_s attacker, float spread, weaponParms *wp, gentity_s we
 			fireParams.ignoreEntIndex = 1022;
 		}
 
-		if (vehicle_selfCollision->current.enabled && weaponEnt && *(DWORD *)(weaponEnt + 0x148))
+		if (vehicle_selfCollision->current.enabled && weaponEnt && weaponEnt->vehicle)
 			fireParams.ignoreEntIndex = 1022;
 
 		fireParams.damageMultiplier = 1.0f;

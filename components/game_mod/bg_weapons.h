@@ -77,55 +77,6 @@ enum weaponstate_t
 								(x) == 0x20 || \
 								IS_WEAPONSTATE_MELEE(x))
 
-struct playerState_s
-{
-	int commandTime;
-	int pm_type;
-	char _pad1[0x8];
-	int weapFlags;
-	char _pad2[0x28];
-	int weaponTime;
-	int weaponDelay;
-	int weaponTimeLeft;
-	int weaponDelayLeft;
-	char _pad3[0x10];
-	int weaponRestrictKickTime;
-	char _pad4[0x1];
-	bool bRunLeftGun;
-	char _pad5[0xE2];
-	unsigned __int16 weapon;
-	char _pad6[0x11];
-	int weaponstate;
-	int weaponstateLeft;
-	unsigned int weaponShotCount;
-	unsigned int weaponShotCountLeft;
-	char _pad7[0x48];
-	unsigned int stackFireCount;
-	char _pad8[0x348];
-	unsigned int perks[1];
-	char _pad9[0x24];
-	int weapAnim;
-	int weapAnimLeft;
-};
-STATIC_ASSERT_OFFSET(playerState_s, commandTime, 0x0);
-STATIC_ASSERT_OFFSET(playerState_s, pm_type, 0x4);
-STATIC_ASSERT_OFFSET(playerState_s, weapFlags, 0x10);
-STATIC_ASSERT_OFFSET(playerState_s, weaponTime, 0x3C);
-STATIC_ASSERT_OFFSET(playerState_s, weaponDelay, 0x40);
-STATIC_ASSERT_OFFSET(playerState_s, weaponTimeLeft, 0x44);
-STATIC_ASSERT_OFFSET(playerState_s, weaponDelayLeft, 0x48);
-STATIC_ASSERT_OFFSET(playerState_s, weaponRestrictKickTime, 0x5C);
-STATIC_ASSERT_OFFSET(playerState_s, bRunLeftGun, 0x61);
-STATIC_ASSERT_OFFSET(playerState_s, weapon, 0x144);
-STATIC_ASSERT_OFFSET(playerState_s, weaponstate, 0x158);
-STATIC_ASSERT_OFFSET(playerState_s, weaponstateLeft, 0x15C);
-STATIC_ASSERT_OFFSET(playerState_s, weaponShotCount, 0x160);
-STATIC_ASSERT_OFFSET(playerState_s, weaponShotCountLeft, 0x164);
-STATIC_ASSERT_OFFSET(playerState_s, stackFireCount, 0x1B0);
-STATIC_ASSERT_OFFSET(playerState_s, perks, 0x4FC);
-STATIC_ASSERT_OFFSET(playerState_s, weapAnim, 0x524);
-STATIC_ASSERT_OFFSET(playerState_s, weapAnimLeft, 0x528);
-
 struct usercmd_s
 {
 	int serverTime;

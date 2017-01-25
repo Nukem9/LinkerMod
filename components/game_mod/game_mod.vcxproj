@@ -159,6 +159,7 @@
     <ClInclude Include="d3d9ex.h" />
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
+    <ClInclude Include="g_main_mp.h" />
     <ClInclude Include="live_win.h" />
     <ClInclude Include="patch_common.h" />
     <ClInclude Include="patch_usefastfile.h" />

@@ -1,7 +1,5 @@
 #pragma once
 
-typedef int gentity_s;
-
 struct BulletFireParams
 {
 	int weaponEntIndex;
@@ -25,11 +23,11 @@ STATIC_ASSERT_OFFSET(BulletFireParams, dir, 0x34);
 float G_GoodRandomFloat(int *idum);
 void Bullet_RandomDir(unsigned int *randSeed, float *x, float *y);
 void Bullet_Endpos(unsigned int *randSeed, float spread, float *end, float *dir, weaponParms *wp, float maxRange, int shotIndex, int maxShotIndex);
-void Bullet_FireExtended(BulletFireParams *params, WeaponVariantDef *weapVariantDef, gentity_s attacker, int gameTime);
-void Bullet_FirePenetrate(BulletFireParams *params, WeaponVariantDef *weapVariantDef, gentity_s attacker, int gameTime);
+void Bullet_FireExtended(BulletFireParams *params, WeaponVariantDef *weapVariantDef, gentity_s *attacker, int gameTime);
+void Bullet_FirePenetrate(BulletFireParams *params, WeaponVariantDef *weapVariantDef, gentity_s *attacker, int gameTime);
 bool BG_WeaponBulletFire_ExplodeOnImpact(WeaponDef *weapDef);
 bool BG_WeaponBulletFire_ShouldPenetrate(WeaponDef *weapDef);
-void Bullet_Fire(gentity_s attacker, float spread, weaponParms *wp, gentity_s weaponEnt, int gameTime);
+void Bullet_Fire(gentity_s *attacker, float spread, weaponParms *wp, gentity_s *weaponEnt, int gameTime);
 
 void BG_seedRandWithGameTime(unsigned int *pHoldrand);
 void BG_srand(unsigned int *pHoldrand);
