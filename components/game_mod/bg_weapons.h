@@ -9,8 +9,8 @@ enum weaponstate_t
 	WEAPON_DROPPING_QUICK = 0x4,
 	WEAPON_DROPPING_ALTSWITCH = 0x5,
 	WEAPON_FIRING = 0x6,
-	WEAPON_RECHAMBERING = 0x7,
-	WEAPON_RECHAMBER_START = 0x8,
+	WEAPON_RECHAMBER_START = 0x7,
+	WEAPON_RECHAMBERING = 0x8,
 	WEAPON_RELOADING_RIGHT = 0x9,
 	WEAPON_RELOADING_LEFT = 0xA,
 	WEAPON_RELOADING = 0xB,
@@ -72,9 +72,9 @@ enum weaponstate_t
 
 #define IS_WEAPONSTATE_FIRE(x) (\
 								(x) == WEAPON_FIRING || \
+								(x) == WEAPON_RECHAMBER_START || \
 								(x) == WEAPON_RECHAMBERING || \
-								(x) == 8 || \
-								(x) == 0x20 || \
+								(x) == WEAPON_CONT_FIRE_LOOP || \
 								IS_WEAPONSTATE_MELEE(x))
 
 struct usercmd_s

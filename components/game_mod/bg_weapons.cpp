@@ -60,7 +60,7 @@ int *BG_GetWeaponTime(playerState_s *ps, bool leftGun)
 	if (leftGun)
 		return &ps->weaponTimeLeft;
 
-	return&ps->weaponTime;
+	return &ps->weaponTime;
 }
 
 // /bgame/bg_weapons.cpp:448
@@ -213,7 +213,7 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 
 		if (*weaponTime <= 0)
 		{
-			if ((*weaponState == WEAPON_FIRING || *weaponState == 32) &&
+			if ((*weaponState == WEAPON_FIRING || *weaponState == WEAPON_CONT_FIRE_LOOP) &&
 				WeaponUsesBurstCooldown(weaponIndex) && !BurstFirePending(ps))
 			{
 				float scalar = player_burstFireCooldown->current.value;
@@ -238,7 +238,7 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			else
 				holdingFireBtn = pm->cmd.buttons.testBit(0) != 0;
 
-			if (*weaponState >= 21 && *weaponState <= 26 || !pausedAfterFiring && !holdingGrenadeBtn)
+			if (*weaponState >= WEAPON_OFFHAND_INIT && *weaponState <= WEAPON_OFFHAND_END || !pausedAfterFiring && !holdingGrenadeBtn)
 				goto LABEL_105;
 			if (!holdingFireBtn)
 				goto LABEL_97;
@@ -265,7 +265,7 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 				*weaponTime = 0;
 				*weaponShotCount = 0;
 			}
-			else if (*weaponState == 8)
+			else if (*weaponState == WEAPON_RECHAMBERING)
 			{
 				PM_Weapon_FinishRechamber(ps);
 			}
