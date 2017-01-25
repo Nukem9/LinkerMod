@@ -50,8 +50,8 @@ struct playerState_s
 	char _pad5[0xCE];
 	char clientNum;
 	char _pad6[0x13];
-	unsigned __int16 weapon;
-	char _pad7[0x11];
+	unsigned char weapon;
+	char _pad7[0x12];
 	int weaponstate;
 	int weaponstateLeft;
 	unsigned int weaponShotCount;
