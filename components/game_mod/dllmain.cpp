@@ -210,9 +210,11 @@ BOOL GameMod_Init()
 	// (This detour is used for both level_dependencies AND patch overrides)
 	//
 	Detours::X86::DetourFunction((PBYTE)0x004C8890, (PBYTE)&Com_LoadLevelFastFiles);
+#if _UNSTABLE
 	PatchCall(0x007A32E0, (PBYTE)&DB_LinkXAssetEntry);
 	PatchCall(0x007A334E, (PBYTE)&DB_LinkXAssetEntry);
 	PatchCall(0x007A49AA, (PBYTE)&DB_LinkXAssetEntry);
+#endif
 
 	//
 	// DB_LoadGraphicsAssetsForPC hook to automatically attempt to load frontend_patch.ff
