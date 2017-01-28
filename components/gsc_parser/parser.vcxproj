@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BC639CC4-91E1-4F6F-8953-FEC7200DB40C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>parser</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="props\win_flex_bison_custom_build.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>.\bin\</OutDir>
+    <IntDir>obj\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>.\bin\</OutDir>
+    <IntDir>obj\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Bison>
+      <OutputFile>$(ProjectDir)/src/cpp/parser/%(Filename).tab.cpp</OutputFile>
+      <DefinesFile>$(ProjectDir)/src/cpp/parser/%(Filename).tab.hpp</DefinesFile>
+      <Warnings>
+      </Warnings>
+      <Verbose>
+      </Verbose>
+      <Debug>true</Debug>
+      <ReportFile>$(ProjectDir)/output.txt;%(ReportFile)</ReportFile>
+    </Bison>
+    <Flex>
+      <OutputFile>$(ProjectDir)/src/cpp/parser/%(Filename).yy.cpp</OutputFile>
+      <HeaderFile>$(ProjectDir)/src/cpp/parser/%(Filename).yy.h</HeaderFile>
+      <Reentrant>true</Reentrant>
+      <Debug>true</Debug>
+    </Flex>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Bison>
+      <OutputFile>$(ProjectDir)/src/cpp/parser/%(Filename).tab.cpp</OutputFile>
+      <DefinesFile>$(ProjectDir)/src/cpp/parser/%(Filename).tab.hpp</DefinesFile>
+      <Warnings>all</Warnings>
+      <Verbose>
+      </Verbose>
+    </Bison>
+    <Flex>
+      <OutputFile>$(ProjectDir)/src/cpp/parser/%(Filename).yy.cpp</OutputFile>
+      <HeaderFile>$(ProjectDir)/src/cpp/parser/%(Filename).yy.h</HeaderFile>
+      <Reentrant>true</Reentrant>
+    </Flex>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\cpp\**\*.c" />
+    <ClCompile Include="..\src\cpp\**\*.cpp" />
+    <ClCompile Include="src\cpp\cache\cache.cpp" />
+    <ClCompile Include="src\cpp\cl\cl_arg.cpp" />
+    <ClCompile Include="src\cpp\cl\cl_cmd.cpp" />
+    <ClCompile Include="src\cpp\cl\cl_cvar.cpp" />
+    <ClCompile Include="src\cpp\cl\cl_watch_mode.cpp" />
+    <ClCompile Include="src\cpp\cl\commands\cmd_cache_clear.cpp" />
+    <ClCompile Include="src\cpp\cl\commands\cmd_cache_list.cpp" />
+    <ClCompile Include="src\cpp\cl\commands\cmd_cache_remove.cpp" />
+    <ClCompile Include="src\cpp\cl\commands\cmd_cache_update.cpp" />
+    <ClCompile Include="src\cpp\cl\commands\cmd_exit.cpp" />
+    <ClCompile Include="src\cpp\cl\commands\cmd_help.cpp" />
+    <ClCompile Include="src\cpp\cl\commands\cmd_symbols.cpp" />
+    <ClCompile Include="src\cpp\cl\commands\cmd_tree.cpp" />
+    <ClCompile Include="src\cpp\cl\commands\cmd_watch.cpp" />
+    <ClCompile Include="src\cpp\fs\fs.cpp" />
+    <ClCompile Include="src\cpp\main.cpp" />
+    <ClCompile Include="src\cpp\parser\gsc.tab.cpp" />
+    <ClCompile Include="src\cpp\parser\gsc.yy.cpp" />
+    <ClCompile Include="src\cpp\symbols\animtree.cpp" />
+    <ClCompile Include="src\cpp\symbols\conditional.cpp" />
+    <ClCompile Include="src\cpp\symbols\expression.cpp" />
+    <ClCompile Include="src\cpp\symbols\function.cpp" />
+    <ClCompile Include="src\cpp\symbols\group.cpp" />
+    <ClCompile Include="src\cpp\symbols\identifier.cpp" />
+    <ClCompile Include="src\cpp\symbols\include.cpp" />
+    <ClCompile Include="src\cpp\symbols\literal.cpp" />
+    <ClCompile Include="src\cpp\symbols\member.cpp" />
+    <ClCompile Include="src\cpp\symbols\operator_enum.cpp" />
+    <ClCompile Include="src\cpp\symbols\pointer.cpp" />
+    <ClCompile Include="src\cpp\symbols\reference.cpp" />
+    <ClCompile Include="src\cpp\symbols\return.cpp" />
+    <ClCompile Include="src\cpp\symbols\symbol.cpp" />
+    <ClCompile Include="src\cpp\symbols\symbol_enum.cpp" />
+    <ClCompile Include="src\cpp\symbols\wait.cpp" />
+    <ClCompile Include="src\cpp\sys\sys_cpu.cpp" />
+    <ClCompile Include="src\cpp\sys\sys_platform.cpp" />
+    <ClCompile Include="src\cpp\sys\sys_semaphore.cpp" />
+    <ClCompile Include="src\cpp\sys\sys_thread.cpp" />
+    <ClCompile Include="src\cpp\sys\sys_worker.cpp" />
+    <ClCompile Include="src\cpp\util\hash_table.cpp" />
+    <ClCompile Include="src\cpp\util\location.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\cpp\**\*.h" />
+    <ClInclude Include="..\src\cpp\**\*.hpp" />
+    <ClInclude Include="src\cpp\cache\cache.h" />
+    <ClInclude Include="src\cpp\cl\cl_arg.h" />
+    <ClInclude Include="src\cpp\cl\cl_cmd.h" />
+    <ClInclude Include="src\cpp\cl\cl_cvar.h" />
+    <ClInclude Include="src\cpp\cl\cl_watch_mode.h" />
+    <ClInclude Include="src\cpp\cl\commands\cmd_common.h" />
+    <ClInclude Include="src\cpp\fs\fs.h" />
+    <ClInclude Include="src\cpp\parser\gsc.tab.hpp" />
+    <ClInclude Include="src\cpp\parser\gsc.yy.h" />
+    <ClInclude Include="src\cpp\symbols\animtree.h" />
+    <ClInclude Include="src\cpp\symbols\conditional.h" />
+    <ClInclude Include="src\cpp\symbols\expression.h" />
+    <ClInclude Include="src\cpp\symbols\function.h" />
+    <ClInclude Include="src\cpp\symbols\group.h" />
+    <ClInclude Include="src\cpp\symbols\identifier.h" />
+    <ClInclude Include="src\cpp\symbols\include.h" />
+    <ClInclude Include="src\cpp\symbols\literal.h" />
+    <ClInclude Include="src\cpp\symbols\member.h" />
+    <ClInclude Include="src\cpp\symbols\operator_enum.h" />
+    <ClInclude Include="src\cpp\symbols\pointer.h" />
+    <ClInclude Include="src\cpp\symbols\reference.h" />
+    <ClInclude Include="src\cpp\symbols\return.h" />
+    <ClInclude Include="src\cpp\symbols\symbol.h" />
+    <ClInclude Include="src\cpp\symbols\symbol_enum.h" />
+    <ClInclude Include="src\cpp\symbols\wait.h" />
+    <ClInclude Include="src\cpp\sys\sys_cpu.h" />
+    <ClInclude Include="src\cpp\sys\sys_platform.h" />
+    <ClInclude Include="src\cpp\sys\sys_semaphore.h" />
+    <ClInclude Include="src\cpp\sys\sys_thread.h" />
+    <ClInclude Include="src\cpp\sys\sys_worker.h" />
+    <ClInclude Include="src\cpp\util\hash_table.h" />
+    <ClInclude Include="src\cpp\util\llist.h" />
+    <ClInclude Include="src\cpp\util\location.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Flex Include="src\gsc.l" />
+  </ItemGroup>
+  <ItemGroup>
+    <Bison Include="src\gsc.ypp">
+      <FileType>Document</FileType>
+      <Verbose Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Verbose>
+      <Verbose Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Verbose>
+    </Bison>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="props\win_flex_bison_custom_build.targets" />
+  </ImportGroup>
+</Project>
