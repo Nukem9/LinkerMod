@@ -29,4 +29,6 @@ components/D3DBSP_Lib/*/Release
 components/D3DBSP_Lib/*/Debug
 components/launcher/imgui.ini
 
+components/gsc_parser/src/cpp/parser
+
 !*.lib
