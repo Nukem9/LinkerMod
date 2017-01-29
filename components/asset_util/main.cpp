@@ -40,8 +40,6 @@ int __cdecl fileCallback(const char* filePath, const char* fileName)
 }
 #endif
 
-#pragma comment(lib, "gsc_parser.lib")
-
 //
 // Sub-main function
 //	- run AFTER global setup 

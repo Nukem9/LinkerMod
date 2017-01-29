@@ -28,7 +28,7 @@ bool FS_FileExists(const char* qpath)
 	return false;
 }
 
-size_t FS_FileSize(const char* qpath)
+long int FS_FileSize(const char* qpath)
 {
 	struct stat st_buf;
 	int r = stat(qpath, &st_buf);

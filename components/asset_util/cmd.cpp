@@ -21,6 +21,8 @@ REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd, "extract-iwd", "Extract assets from *
 
 REGISTER_GLOBAL_COMMAND(g_cmd_bsp_info, "bsp_info", "Print lump offsets and sizes for a given bsp", Cmd_BspInfo_f, CMD_GLOBALCVARS);
 
+REGISTER_GLOBAL_COMMAND(g_cmd_alias, "alias", "Experimental XModelAlias script analysis", Cmd_Alias_f, CMD_GLOBALCVARS);
+
 #undef CMD_GLOBALCVARS
 #undef CMD_CVARS
 #undef REGISTER_GLOBAL_COMMAND

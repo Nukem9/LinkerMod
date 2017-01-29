@@ -102,11 +102,19 @@ void Symbol::PrintInfoRecursive(int indentLevel) const
 	
 	for(Symbol* c = this->children; c; c = c->NextElem())
 	{
+#ifndef WIN32
 		for(int i = 0; i < indentLevel; i++)
 		{
 			printf("│   ");
 		}
 		printf("%s", c->NextElem() ? "├── " : "└── ");
+#else
+		for (int i = 0; i < indentLevel; i++)
+		{
+			printf("|  ");
+		}
+		printf("%s", c->NextElem() ? "|-- " : "|__ ");
+#endif
 		c->PrintInfoRecursive(indentLevel + 1);
 	}
 }

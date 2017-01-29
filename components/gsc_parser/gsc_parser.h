@@ -8,3 +8,5 @@
 #include "src/cpp/sys/sys_platform.h"
 #include "src/cpp/cache/cache.h"
 #include "src/cpp/fs/fs.h"
+
+#include "src/cpp/parser/gsc.yy.h"
