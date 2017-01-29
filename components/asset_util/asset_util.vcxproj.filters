@@ -57,7 +57,7 @@
     <ClCompile Include="cmds\cmd_bsp.cpp">
       <Filter>cmds</Filter>
     </ClCompile>
-    <ClCompile Include="cmds\cmd_alias.cpp">
+    <ClCompile Include="cmds\cmd_csvgen.cpp">
       <Filter>cmds</Filter>
     </ClCompile>
   </ItemGroup>

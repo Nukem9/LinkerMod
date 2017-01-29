@@ -11,15 +11,6 @@
 #include <set>
 #include <functional>
 
-/*
-	Note: char_usa_raider_r_thompson is broken - as it refers to a clientscript which doesnt exist
-		this may be because the clientscript / character is from waw
-		afaik all characters that have gibs should end up having clientscripts
-
-	REF GOOD: c_brt_fullahead_soldier
-	REF BROKEN: char_usa_raider_r_thompson
-*/
-
 //
 // Enumerate over the children of a symbol, cancels if the callback returns false
 //
@@ -86,7 +77,7 @@ const char* XMA_Expression_ExtractModelName(Expression* expr)
 	return op2_val->value;
 }
 
-void AST_GenCSV_XModelAlias(const char* rawfile, Symbol* AST)
+void AST_GenCSV_XModelAlias(Symbol* AST, const char* rawfile, FILE* csv)
 {
 	Function* main = AST_FindFunction(AST, "main");
 	if (!main)
@@ -126,14 +117,14 @@ void AST_GenCSV_XModelAlias(const char* rawfile, Symbol* AST)
 		return true;
 	});
 
-	Con_Print("rawfile,xmodelalias/%s\r\n", rawfile);
+	fprintf(csv, "rawfile,xmodelalias/%s\n", rawfile);
 	for (const std::string& model : models)
 	{
-		Con_Print("xmodel,%s\r\n", model.c_str());
+		fprintf(csv, "xmodel,%s\n", model.c_str());
 	}
 }
 
-void AST_GenCSV_AIType(const char* rawfile, Symbol* AST)
+void AST_GenCSV_AIType(Symbol* AST, const char* rawfile, FILE* csv)
 {
 	Function* main = AST_FindFunction(AST, "main");
 	if (!main)
@@ -311,24 +302,24 @@ void AST_GenCSV_AIType(const char* rawfile, Symbol* AST)
 		return true;
 	});
 
-	Con_Print("rawfile,aitype/%s\r\n", rawfile);
+	fprintf(csv, "rawfile,aitype/%s\n", rawfile);
 	for (const std::string& character : characters)
 	{
-		Con_Print("character,%s\r\n", character.c_str());
+		fprintf(csv, "character,%s\n", character.c_str());
 	}
 
 	for (const std::string& weapon : weapons)
 	{
-		Con_Print("weapon,sp/%s\r\n", weapon.c_str());
+		fprintf(csv, "weapon,sp/%s\n", weapon.c_str());
 	}
 
 	for (const std::string& include : includes)
 	{
-		Con_Print("include,%s\r\n", include.c_str());
+		fprintf(csv, "include,%s\n", include.c_str());
 	}
 }
 
-void AST_GenCSV_Character(const char* rawfile, Symbol* AST)
+void AST_GenCSV_Character(Symbol* AST, const char* rawfile, FILE* csv)
 {
 	std::string csc_path = AppInfo_RawDir();
 	csc_path += "\\character\\clientscripts\\";
@@ -466,69 +457,200 @@ void AST_GenCSV_Character(const char* rawfile, Symbol* AST)
 		return true;
 	});
 
-	Con_Print("rawfile,character/%s\r\n", rawfile);
+	fprintf(csv, "rawfile,character/%s\n", rawfile);
 	for (const std::string& model : models)
 	{
-		Con_Print("xmodel,%s\r\n", model.c_str());
+		fprintf(csv, "xmodel,%s\n", model.c_str());
 	}
 
 	for (const std::string& xmodelalias : xmodelaliases)
 	{
-		Con_Print("xmodelalias,%s\r\n", xmodelalias.c_str());
+		fprintf(csv, "xmodelalias,%s\n", xmodelalias.c_str());
 	}
 
 	if (csc_path.length() > 0)
 	{
-		Con_Print("rawfile,character/clientscripts/%s", FS_GetFilenameSubString(csc_path.c_str()));
+		fprintf(csv, "rawfile,character/clientscripts/%s", FS_GetFilenameSubString(csc_path.c_str()));
 	}
 }
 
-int Cmd_Alias_f(int argc, char** argv)
+int CSVGen_Callback(const char* filePath, const char* fileName, void(*ast_callback)(Symbol* AST, const char* rawfile, FILE* csv))
 {
+	std::string csv_path = filePath;
+	csv_path[csv_path.length() - 3] = 'c';
+	csv_path[csv_path.length() - 2] = 's';
+	csv_path[csv_path.length() - 1] = 'v';
+
+	if (!fs_overwrite.ValueBool() && FS_FileExists(csv_path.c_str()))
+	{
+		Con_Print("File '%s' already exists - skipping...\n", FS_GetFilenameSubString(csv_path.c_str()));
+		return 1;
+	}
+
+	FILE* h;
+	fopen_s(&h, filePath, "rb");
+
+	if (!h)
+	{
+		Con_Warning("File '%s' could not be opened - skipping...\n", fileName);
+		return -1;
+	}
+
+	const char* typeString = "<unknown>";
+	if (ast_callback == AST_GenCSV_AIType)
+		typeString = "AIType";
+	else if (ast_callback == AST_GenCSV_Character)
+		typeString = "Character";
+	else if (ast_callback == AST_GenCSV_XModelAlias)
+		typeString = "XModelAlias";
+
+	Con_Print("%s (%s)\n", fileName, typeString);
+
+	int fileSize = FS_FileSize(filePath);
+	char* buf = new char[fileSize];
+
+	fread(buf, 1, fileSize, h);
+	fclose(h);
+
+	yyscan_t scanner = NULL;
+	yylex_init(&scanner);
+
+	yy_scan_bytes(buf, fileSize, scanner);
+	delete[] buf;
+
+	Symbol* AST = NULL;
+	int err = yyparse(&AST, scanner);
+	yylex_destroy(scanner);
+
+	FILE* csv = fopen(csv_path.c_str(), "w");
+	if (!csv)
+	{
+		ast_callback(AST, FS_GetFilenameSubString(filePath), csv);
+		fclose(csv);
+	}
+	else
+	{
+		Con_Error("Could not open '%s' for writing...\n", FS_GetFilenameSubString(csv_path.c_str()));
+	}
+	
+	delete AST;
+
+	return 0;
+}
+
+int CSVGen_AIType_Callback(const char* filePath, const char* fileName)
+{
+	return CSVGen_Callback(filePath, fileName, AST_GenCSV_AIType);
+}
+
+int CSVGen_Character_Callback(const char* filePath, const char* fileName)
+{
+	return CSVGen_Callback(filePath, fileName, AST_GenCSV_Character);
+}
+
+int CSVGen_XModelAlias_Callback(const char* filePath, const char* fileName)
+{
+	return CSVGen_Callback(filePath, fileName, AST_GenCSV_XModelAlias);
+}
+
+int Cmd_CSVGen_f(int argc, char** argv)
+{
+	bool autoMode = false;
+	bool explicitType = (csvgen_aitypes.ValueBool() | csvgen_characters.ValueBool() | csvgen_xmodelaliases.ValueBool());
+
+	//
+	// If no explicit types were given - and an asterisk was the only arg - enable automode for all types
+	//
+	if (argc == 2 && strcmp(argv[1], "*") == 0)
+	{
+		csvgen_aitypes.Enable();
+		csvgen_characters.Enable();
+		csvgen_xmodelaliases.Enable();
+		autoMode = true;
+	}
+	else if (argc == 1 && explicitType)
+	{
+		autoMode = 1;
+	}
+
+	if (autoMode && argc < 3)
+	{
+		if (argc < 2)
+		{
+			char* _argv[] = { NULL, "csvgen" };
+			Cmd_Help_f(ARRAYSIZE(_argv), _argv);
+			return -1;
+		}
+
+		char dir_path[MAX_PATH];
+		sprintf_s(dir_path, "%s\\aitype", AppInfo_RawDir());
+		FS_FileIterator(dir_path, "*.gsc", CSVGen_AIType_Callback);
+
+		sprintf_s(dir_path, "%s\\character", AppInfo_RawDir());
+		FS_FileIterator(dir_path, "*.gsc", CSVGen_Character_Callback);
+		
+		sprintf_s(dir_path, "%s\\xmodelalias", AppInfo_RawDir());
+		FS_FileIterator(dir_path, "*.gsc", CSVGen_XModelAlias_Callback);
+
+		return 0;
+	}
+
+	//
+	// We only want to run csv gen for a specific files
+	//	If only 1 type is given via args, use that type, otherwise print a warning and attempt to resolve the type automatically
+	//
+	int typeFlags = 0;
+	typeFlags |= csvgen_aitypes.ValueBool() ? 1 << 0 : 0;
+	typeFlags |= csvgen_characters.ValueBool() ? 1 << 1 : 0;
+	typeFlags |= csvgen_xmodelaliases.ValueBool() ? 1 << 2 : 0;
+
+	if (typeFlags > 1)
+	{
+		Con_Warning("Warning: Multiple type arguments given. Falling back to automatic type mode.\n");
+		explicitType = false;
+	}
+
 	for (int i = 1; i < argc; i++)
 	{
 		const char* filepath = argv[i];
-		if (!FS_FileExists(filepath))
+		const char* filename = FS_GetFilenameSubString(argv[i]);
+
+		if (!explicitType)
 		{
-			Con_Warning("File '%s' doesn't exist - skipping...\n", FS_GetFilenameSubString(filepath));
+			if (!FS_FileExists(filepath))
+				Con_Warning("File '%s' does not exist... skipping\n", filename);
+			else if (strstr(argv[i], "aitype") != 0)
+				CSVGen_AIType_Callback(filepath, filename);
+			else if (strstr(argv[i], "character") != 0)
+				CSVGen_Character_Callback(filepath, filename);
+			else if (strstr(argv[i], "xmodelalias") != 0)
+				CSVGen_XModelAlias_Callback(filepath, filename);
+			else 
+				Con_Warning("Unable to resolve type for file '%s'... skipping\n", filename);
+				
 			continue;
 		}
 
-		FILE* h;
-		fopen_s(&h, filepath, "rb");
-
-		if (!h)
+		switch (typeFlags)
 		{
-			Con_Warning("File '%s' could not be opened - skipping...\n", FS_GetFilenameSubString(filepath));
+		case 1 << 0:
+			CSVGen_AIType_Callback(filepath, filename);
+			break;
+		case 1 << 1:
+			CSVGen_Character_Callback(filepath, filename);
+			break;
+		case 1 << 2:
+			CSVGen_XModelAlias_Callback(filepath, filename);
+			break;
+		default:
+			Con_Warning("Warning: Invalid type flags...");
 			continue;
 		}
-
-		int fileSize = FS_FileSize(filepath);
-		char* buf = new char[fileSize];
-
-		fread(buf, 1, fileSize, h);
-		fclose(h);
-
-		yyscan_t scanner = NULL;
-		yylex_init(&scanner);
-
-		yy_scan_bytes(buf, fileSize, scanner);
-		delete[] buf;
-
-		Symbol* AST = NULL;
-		int err = yyparse(&AST, scanner);
-		yylex_destroy(scanner);
-
-		//AST->PrintInfoRecursive();
-		//AST_GenCSV_XModelAlias(FS_GetFilenameSubString(filepath), AST);
-		//AST_GenCSV_AIType(FS_GetFilenameSubString(filepath), AST);
-		AST_GenCSV_Character(FS_GetFilenameSubString(filepath), AST);
-		delete AST;
 	}
 
 	if (argc < 2)
 	{
-		char* _argv[] = { NULL, "alias" };
+		char* _argv[] = { NULL, "csvgen" };
 		Cmd_Help_f(ARRAYSIZE(_argv), _argv);
 		return -1;
 	}

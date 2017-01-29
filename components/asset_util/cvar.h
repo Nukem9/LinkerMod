@@ -109,6 +109,10 @@ REGISTER_CVAR(g_useLocalized);
 REGISTER_CVAR(ents_useLabels);
 REGISTER_CVAR(ents_genBrushes);
 
+REGISTER_CVAR(csvgen_aitypes);
+REGISTER_CVAR(csvgen_characters);
+REGISTER_CVAR(csvgen_xmodelaliases);
+
 REGISTER_CVAR(fs_outdir);
 
 #undef REGISTER_GLOBAL_CVAR

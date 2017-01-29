@@ -10,7 +10,7 @@ int Cmd_Extract_IWD_f(int argc, char** argv);
 
 int Cmd_BspInfo_f(int argc, char** argv);
 
-int Cmd_Alias_f(int argc, char** argv);
+int Cmd_CSVGen_f(int argc, char** argv);
 
 //
 // An empty test command used for debugging
