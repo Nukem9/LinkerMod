@@ -8,8 +8,17 @@
 #include "../gsc_parser/gsc_parser.h"
 #pragma comment(lib, "gsc_parser.lib")
 
-#include <vector>
+#include <set>
 #include <functional>
+
+/*
+	Note: char_usa_raider_r_thompson is broken - as it refers to a clientscript which doesnt exist
+		this may be because the clientscript / character is from waw
+		afaik all characters that have gibs should end up having clientscripts
+
+	REF GOOD: c_brt_fullahead_soldier
+	REF BROKEN: char_usa_raider_r_thompson
+*/
 
 //
 // Enumerate over the children of a symbol, cancels if the callback returns false
@@ -93,7 +102,7 @@ void AST_GenCSV_XModelAlias(const char* rawfile, Symbol* AST)
 		return;
 	}
 
-	std::vector<std::string> models;
+	std::set<std::string> models;
 	Symbol_EnumChildren(statements, [&models](Symbol* statement) -> bool
 	{
 		//
@@ -113,12 +122,12 @@ void AST_GenCSV_XModelAlias(const char* rawfile, Symbol* AST)
 		std::string modelname = model + 1;
 		modelname[modelname.size() - 1] = '\0';
 
-		models.push_back(modelname);
+		models.insert(modelname);
 		return true;
 	});
 
 	Con_Print("rawfile,xmodelalias/%s\r\n", rawfile);
-	for (std::string& model : models)
+	for (const std::string& model : models)
 	{
 		Con_Print("xmodel,%s\r\n", model.c_str());
 	}
@@ -154,9 +163,9 @@ void AST_GenCSV_AIType(const char* rawfile, Symbol* AST)
 		return;
 	}
 
-	std::vector<std::string> weapons;
-	std::vector<std::string> includes;
-	std::vector<std::string> characters;
+	std::set<std::string> weapons;
+	std::set<std::string> includes;
+	std::set<std::string> characters;
 
 	Symbol_EnumChildren(main_statements, [&includes](Symbol* statement) -> bool
 	{
@@ -220,7 +229,7 @@ void AST_GenCSV_AIType(const char* rawfile, Symbol* AST)
 		else
 			str[str.size() - 1] = '\0'; // Otherwise strip the just trailing quote
 
-		includes.push_back(str);
+		includes.insert(str);
 		return true;
 	});
 
@@ -276,7 +285,7 @@ void AST_GenCSV_AIType(const char* rawfile, Symbol* AST)
 			std::string weapon = string->value + 1;
 			weapon[weapon.size() - 1] = '\0';
 
-			weapons.push_back(weapon);
+			weapons.insert(weapon);
 			return true;
 		}
 
@@ -295,7 +304,7 @@ void AST_GenCSV_AIType(const char* rawfile, Symbol* AST)
 			}
 
 			std::string character = ref->file->value + strlen(substr);
-			characters.push_back(character);
+			characters.insert(character);
 			return true;
 		}
 
@@ -303,19 +312,174 @@ void AST_GenCSV_AIType(const char* rawfile, Symbol* AST)
 	});
 
 	Con_Print("rawfile,aitype/%s\r\n", rawfile);
-	for (std::string& character : characters)
+	for (const std::string& character : characters)
 	{
 		Con_Print("character,%s\r\n", character.c_str());
 	}
 
-	for (std::string& weapon : weapons)
+	for (const std::string& weapon : weapons)
 	{
 		Con_Print("weapon,sp/%s\r\n", weapon.c_str());
 	}
 
-	for (std::string& include : includes)
+	for (const std::string& include : includes)
 	{
 		Con_Print("include,%s\r\n", include.c_str());
+	}
+}
+
+void AST_GenCSV_Character(const char* rawfile, Symbol* AST)
+{
+	std::string csc_path = AppInfo_RawDir();
+	csc_path += "\\character\\clientscripts\\";
+	csc_path += rawfile;
+	
+	if (csc_path[csc_path.size() - 3] == 'g')
+		csc_path[csc_path.size() - 3] = 'c';
+	else if (csc_path[csc_path.size() - 3] == 'G')
+		csc_path[csc_path.size() - 3] = 'C';
+	
+	if (!FS_FileExists(csc_path.c_str()))
+		csc_path.clear();
+
+	Function* precache = AST_FindFunction(AST, "precache");
+	if (!precache)
+	{
+		Con_Warning("script does not contain precache()\n");
+		return;
+	}
+
+	Symbol* precache_statements = precache->Children()->HeadNode()->PrevNode()->Owner();
+	if (precache_statements->Size() < 1)
+	{
+		Con_Warning("precache() function doesn't contain any statments\n");
+		return;
+	}
+
+	std::set<std::string> models;
+	std::set<std::string> xmodelaliases;
+	Symbol_EnumChildren(precache_statements, [&models, &xmodelaliases](Symbol* statement) -> bool
+	{
+		//
+		// Function calls reside inside groups
+		//
+		if (statement->Type() != S_TYPE_GROUP)
+			return true;
+
+		if (statement->Size() < 1)
+			return true;
+
+		Function* call = (Function*)statement->Children()->HeadNode()->Owner();
+
+		//
+		// Skip anything that isnt an expression
+		//
+		if (call->Type() != S_TYPE_FUNCTION_CALL)
+			return true;
+
+		//
+		// Cheap way to get the models
+		//
+		if (call->Children()->HeadNode()->Owner()->Type() == S_TYPE_IDENTIFIER)
+		{
+			Identifier* identifier = (Identifier*)call->Children()->HeadNode()->Owner();
+			Group* arg_group = (Group*)call->Children()->NextElem()->Children();
+
+			if (strcmp(identifier->value, "precacheModel") != 0)
+				return true;
+
+			if (arg_group->Children() == NULL)
+				return true;
+
+			Symbol* args = arg_group->Children();
+
+			int argc = args->Size() + 1; // The size of a linked list never includes the head node
+			if (argc != 1)
+			{
+				Con_Warning("Wrong number of args for precacheItem()\n");
+				return true;
+			}
+
+			if (args->Type() != S_TYPE_LITERAL_STRING)
+			{
+				Con_Warning("Wrong type of args for precacheItem()\n");
+				return true;
+			}
+
+			Literal* string = (Literal*)args;
+			std::string model = string->value + 1;
+			model[model.size() - 1] = '\0';
+
+			models.insert(model);
+			return true;
+		}
+
+		if (call->Children()->HeadNode()->Owner()->Type() == S_TYPE_REFERENCE)
+		{
+			Reference* ref = (Reference*)call->Children()->HeadNode()->Owner();
+		
+			if (strcmp(ref->file->value, "codescripts\\character") != 0)
+				return true;
+
+			if (strcmp(ref->identifier->value, "precacheModelArray") != 0)
+				return true;
+
+			Group* arg_group = (Group*)call->Children()->NextElem()->Children();
+
+			if (arg_group->Children() == NULL)
+				return true;
+
+			Symbol* args = arg_group->Children();
+
+			int argc = args->Size() + 1; // The size of a linked list never includes the head node
+			if (argc != 1)
+			{
+				Con_Warning("Wrong number of args for precacheModelArray()\n");
+				return true;
+			}
+
+			//
+			// The secondary call to the xmodelalias::main()
+			//
+			call = (Function*)args;
+			if (call->Type() != S_TYPE_FUNCTION_CALL)
+			{
+				Con_Warning("Wrong type of args for precacheModelArray()\n");
+				return true;
+			}
+
+			ref = (Reference*)call->Children()->HeadNode()->Owner();
+			if (ref->Type() != S_TYPE_REFERENCE)
+				return true;
+
+			if (strcmp(ref->identifier->value, "main") != 0)
+				return true;
+
+			std::string alias = ref->file->value;
+			if (alias.find("xmodelalias\\") == 0)
+				alias = alias.c_str() + strlen("xmodelalias\\");
+
+			xmodelaliases.insert(alias);
+			return true;
+		}
+
+		return true;
+	});
+
+	Con_Print("rawfile,character/%s\r\n", rawfile);
+	for (const std::string& model : models)
+	{
+		Con_Print("xmodel,%s\r\n", model.c_str());
+	}
+
+	for (const std::string& xmodelalias : xmodelaliases)
+	{
+		Con_Print("xmodelalias,%s\r\n", xmodelalias.c_str());
+	}
+
+	if (csc_path.length() > 0)
+	{
+		Con_Print("rawfile,character/clientscripts/%s", FS_GetFilenameSubString(csc_path.c_str()));
 	}
 }
 
@@ -357,7 +521,8 @@ int Cmd_Alias_f(int argc, char** argv)
 
 		//AST->PrintInfoRecursive();
 		//AST_GenCSV_XModelAlias(FS_GetFilenameSubString(filepath), AST);
-		AST_GenCSV_AIType(FS_GetFilenameSubString(filepath), AST);
+		//AST_GenCSV_AIType(FS_GetFilenameSubString(filepath), AST);
+		AST_GenCSV_Character(FS_GetFilenameSubString(filepath), AST);
 		delete AST;
 	}
 
