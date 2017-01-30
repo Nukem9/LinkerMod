@@ -28,12 +28,16 @@ bool FS_FileExists(const char* qpath)
 	return false;
 }
 
-size_t FS_FileSize(const char* qpath)
+/*
+// This is now defined in gsc_lib
+
+long int FS_FileSize(const char* qpath)
 {
 	struct stat st_buf;
 	int r = stat(qpath, &st_buf);
 	return r == 0 ? st_buf.st_size : -1;
 }
+*/
 
 const char* FS_GetExtensionSubString(const char* filename)
 {

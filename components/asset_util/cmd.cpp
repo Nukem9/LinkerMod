@@ -21,6 +21,8 @@ REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd, "extract-iwd", "Extract assets from *
 
 REGISTER_GLOBAL_COMMAND(g_cmd_bsp_info, "bsp_info", "Print lump offsets and sizes for a given bsp", Cmd_BspInfo_f, CMD_GLOBALCVARS);
 
+REGISTER_GLOBAL_COMMAND(g_cmd_csvgen, "csvgen", "Experimental CSV regeneration for some assets", Cmd_CSVGen_f, CMD_CVARS(&csvgen_aitypes, &csvgen_characters, &csvgen_xmodelaliases));
+
 #undef CMD_GLOBALCVARS
 #undef CMD_CVARS
 #undef REGISTER_GLOBAL_COMMAND

@@ -37,4 +37,6 @@ REGISTER_GLOBAL_COMMAND(g_cmd_extract_iwd);
 
 REGISTER_GLOBAL_COMMAND(g_cmd_bsp_info);
 
+REGISTER_GLOBAL_COMMAND(g_cmd_csvgen);
+
 #undef REGISTER_GLOBAL_COMMAND

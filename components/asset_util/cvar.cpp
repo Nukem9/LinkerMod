@@ -49,6 +49,10 @@ REGISTER_CVAR(g_useLocalized, "includeLocalized", NULL, "Extract from localized 
 REGISTER_CVAR(ents_useLabels, "labels", NULL, "Write entity number in a comment above each entity", false);
 REGISTER_CVAR(ents_genBrushes, "dummyBrushes", NULL, "Generate dummy brushes for script/trigger brush models", true);
 
+REGISTER_CVAR(csvgen_aitypes, "aitype", NULL, "Regenerate all aitype CSVs", false);
+REGISTER_CVAR(csvgen_characters, "character", NULL, "Regenerate all character CSVs", false);
+REGISTER_CVAR(csvgen_xmodelaliases, "xmodelalias", NULL, "Regenerate all xmodelalias CSVs", false);
+
 REGISTER_CVAR(fs_outdir, "outdir", NULL, "Target directory for file output (default is the game's raw directory)", NULL);
 
 #undef REGISTER_GLOBAL_CVAR
