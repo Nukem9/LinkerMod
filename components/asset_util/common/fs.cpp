@@ -80,6 +80,18 @@ const char* FS_GetFilenameSubString(const char* pathname)
 	return last;
 }
 
+const wchar_t* FS_GetFilenameSubStringW(wchar_t* pathname)
+{
+	wchar_t* last = pathname;
+	while (*pathname)
+	{
+		if (*pathname == '/' || *pathname == '\\')
+			last = pathname + 1;
+		++pathname;
+	}
+	return last;
+}
+
 int FS_FileCount(const char* path, const char* pattern)
 {
 	HANDLE dir;

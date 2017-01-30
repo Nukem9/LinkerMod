@@ -18,6 +18,9 @@
     <ClCompile Include="cmds\cmd_ents.cpp" />
     <ClCompile Include="cmds\cmd_extract.cpp" />
     <ClCompile Include="cmds\cmd_help.cpp" />
+    <ClCompile Include="cmds\cmd_rip.cpp" />
+    <ClCompile Include="cmds\ripper\db_registry.cpp" />
+    <ClCompile Include="cmds\ripper\process_info.cpp" />
     <ClCompile Include="common\ff.cpp" />
     <ClCompile Include="common\fs.cpp" />
     <ClCompile Include="common\io.cpp" />
@@ -39,6 +42,9 @@
     <ClInclude Include="arg.h" />
     <ClInclude Include="cmd.h" />
     <ClInclude Include="cmds\cmd_common.h" />
+    <ClInclude Include="cmds\ripper\db_registry.h" />
+    <ClInclude Include="cmds\ripper\foreign_ptr.h" />
+    <ClInclude Include="cmds\ripper\process_info.h" />
     <ClInclude Include="common\ff.h" />
     <ClInclude Include="common\fs.h" />
     <ClInclude Include="common\io.h" />

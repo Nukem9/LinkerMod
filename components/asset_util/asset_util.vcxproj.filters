@@ -60,6 +60,15 @@
     <ClCompile Include="cmds\cmd_csvgen.cpp">
       <Filter>cmds</Filter>
     </ClCompile>
+    <ClCompile Include="cmds\cmd_rip.cpp">
+      <Filter>cmds</Filter>
+    </ClCompile>
+    <ClCompile Include="cmds\ripper\db_registry.cpp">
+      <Filter>cmds\ripper</Filter>
+    </ClCompile>
+    <ClCompile Include="cmds\ripper\process_info.cpp">
+      <Filter>cmds\ripper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cmd.h" />
@@ -112,6 +121,15 @@
     <ClInclude Include="common\iwd.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="cmds\ripper\db_registry.h">
+      <Filter>cmds\ripper</Filter>
+    </ClInclude>
+    <ClInclude Include="cmds\ripper\process_info.h">
+      <Filter>cmds\ripper</Filter>
+    </ClInclude>
+    <ClInclude Include="cmds\ripper\foreign_ptr.h">
+      <Filter>cmds\ripper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="common">
@@ -128,6 +146,9 @@
     </Filter>
     <Filter Include="cmds">
       <UniqueIdentifier>{f2eaf143-9cec-4b52-b528-477c8590ac00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cmds\ripper">
+      <UniqueIdentifier>{0b5340fe-2268-4426-9c05-d7a26685c469}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
