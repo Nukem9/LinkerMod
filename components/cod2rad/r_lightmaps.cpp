@@ -577,12 +577,12 @@ void __cdecl StoreLightBytes(int lmapSet, int lmapRow, int pixelIndex, vec3* lig
 	BYTE* lightBytes_PrimaryImage = (BYTE*)0x00671590;
 	BYTE* sm_pel = &lightBytes_PrimaryImage[2 * (pixelIndex + (subOffset << 10))];
 
-	for (int i = 2; i > 0; i--)
+	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 2; j > 0; j--)
-			*sm_pel++ = EncodeFloatInByte(*pFloats++);
-
-		sm_pel += 1022;
+		for (int j = 0; j < 2; j++)
+		{
+			sm_pel[1024*i + j] = EncodeFloatInByte(pFloats[2*i + j]);
+		}
 	}
 }
 
