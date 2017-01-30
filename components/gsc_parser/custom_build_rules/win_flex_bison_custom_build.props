@@ -14,6 +14,8 @@
       <OutputFile>%(Filename).tab.cpp</OutputFile>
       <DefinesFile>%(Filename).tab.h</DefinesFile>
       <CommandLineTemplate>
+WHERE win_bison.exe >nul 2>nul
+IF %ERRORLEVEL% NEQ 0 EXIT /b 0
 start /B /WAIT /D "%(RootDir)%(Directory)" win_bison.exe [AllOptions] [AdditionalOptions] "%(Filename)%(Extension)"
 exit /b %errorlevel%</CommandLineTemplate>
       <Outputs>%(RootDir)%(Directory)%(OutputFile);</Outputs>
@@ -34,6 +36,8 @@ exit /b %errorlevel%</CommandLineTemplate>
       <OutputFile>%(Filename).flex.cpp</OutputFile>
       <Wincompat>true</Wincompat>
       <CommandLineTemplate>
+WHERE win_flex.exe >nul 2>nul
+IF %ERRORLEVEL% NEQ 0 EXIT /b 0
 start /B /WAIT /D "%(RootDir)%(Directory)" win_flex.exe [AllOptions] [AdditionalOptions] "%(Filename)%(Extension)"
 exit /b %errorlevel%</CommandLineTemplate>
       <Outputs>%(RootDir)%(Directory)%(OutputFile);</Outputs>
