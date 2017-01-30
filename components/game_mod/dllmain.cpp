@@ -301,6 +301,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00890E23, (PBYTE)&mfh_CG_DrawBackdropServerInfo);
 
 	//
+	// Draw the Lagometer even if the player is the host
+	//
+	PatchMemory_WithNOP(0x0068ABFA, 6);
+
+	//
 	// Add Game_Mod Version info to the 'version' dvar
 	//	can be viewed via 'cg_drawVersion 1'
 	//
