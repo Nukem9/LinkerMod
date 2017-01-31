@@ -10,6 +10,7 @@ cmd_function_s& R_Cmd_SaveSun_VAR = *(cmd_function_s*)0x04646160;
 cmd_function_s& R_StaticModelCacheStats_f_VAR = *(cmd_function_s*)0x04646148;
 cmd_function_s& R_StaticModelCacheFlush_f_VAR = *(cmd_function_s*)0x04646130;
 
+cmd_function_s R_FullscreenToggle_f_VAR;
 cmd_function_s R_MaterialList_f_VAR;
 
 const char *R_ErrorDescription(HRESULT hr)
@@ -53,6 +54,11 @@ LONG WINAPI hk_SetWindowLongA(HWND hWnd, int nIndex, LONG dwNewLong)
 	return SetWindowLongA(hWnd, nIndex, dwNewLong);
 }
 
+void R_FullscreenToggle_f()
+{
+	Cbuf_AddText(0, "toggle r_fullscreen; vid_restart;");
+}
+
 void __cdecl R_RegisterCmds()
 {
 	Cmd_AddCommandInternal("screenshot", R_Cmd_Screenshot, &R_Cmd_Screenshot_VAR);
@@ -64,6 +70,8 @@ void __cdecl R_RegisterCmds()
 	Cmd_AddCommandInternal("r_savesun", R_Cmd_SaveSun, &R_Cmd_SaveSun_VAR);
 	Cmd_AddCommandInternal("r_smc_stats", R_StaticModelCacheStats_f, &R_StaticModelCacheStats_f_VAR);
 	Cmd_AddCommandInternal("r_smc_flush", R_StaticModelCacheFlush_f, &R_StaticModelCacheFlush_f_VAR);
+
+	Cmd_AddCommandInternal("r_fullscreen_toggle", R_FullscreenToggle_f, &R_FullscreenToggle_f_VAR);
 
 	Cmd_AddCommandInternal("gfx_world", R_MaterialList_f, &R_MaterialList_f_VAR); // custom
 }
@@ -79,6 +87,8 @@ void __cdecl R_UnregisterCmds()
 	Cmd_RemoveCommand("r_savesun");
 	Cmd_RemoveCommand("r_smc_stats");
 	Cmd_RemoveCommand("r_smc_flush");
+
+	Cmd_RemoveCommand("r_fullscreen_toggle");
 
 	Cmd_RemoveCommand("gfx_world");
 }

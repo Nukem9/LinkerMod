@@ -13,7 +13,7 @@ void __cdecl RB_ShowTess(GfxCmdBufContext context, const float *center, const ch
 	offsetCenter[2] = center[2];
 
 	GfxBackEndData* daata = context.local._s0.source->input.data;
-	R_AddDebugString(&daata->debugGlobals, offsetCenter, color, TEXT_SIZE, va("M:0x%X T:0x%X\n", context.local._s0.state->material, context.local._s0.state->technique));
+	R_AddDebugString(&daata->debugGlobals, offsetCenter, color, TEXT_SIZE, va("M:0x%X T:0x%X\n", context.local._s0.source, context.local._s0.state));
 	return;
 
 	ASSERT(context.local._s0.state->material); // This appears to always be null
