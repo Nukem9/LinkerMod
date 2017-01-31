@@ -1,4 +1,5 @@
 #pragma once
+#include "r_reflection_probe.h"
 
 static_assert(sizeof(D3DFORMAT) == sizeof(DWORD), "D3DFORMAT must be 4 bytes!");
 

@@ -81,3 +81,19 @@ void __cdecl R_MaterialList_f()
 	Com_Printf(8, "%i total geometry materials\n", materialList.count);
 	Com_Printf(8, "Related commands: imagelist, gfx_world, cg_drawfps\n");
 }
+
+MaterialTechniqueSet *__cdecl Material_GetTechniqueSet(Material *material)
+{
+	ASSERT(material);
+	ASSERT_MSG(material->localTechniqueSet, va("material '%s' missing techset. If you are building fastfile, check Launcher for error messages.", material->info.name));
+
+	return material->localTechniqueSet;
+}
+
+MaterialTechnique *__cdecl Material_GetTechnique(Material *material, char techType)
+{
+	MaterialTechniqueSet* techSet = techSet = Material_GetTechniqueSet(material);
+	ASSERT_MSG(techSet, va("material '%s' missing techset. %d tech %d", material->info.name, material->localTechniqueSet != 0, techType));
+
+	return techSet->techniques[techType];
+}

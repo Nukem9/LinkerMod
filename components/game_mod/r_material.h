@@ -1,6 +1,17 @@
 #pragma once
 #include "r_image.h"
 
+struct GfxDrawSurfFields
+{
+	__int64 _bf0;
+};
+
+union GfxDrawSurf
+{
+	GfxDrawSurfFields fields;
+	unsigned __int64 packed;
+};
+
 struct GfxStateBits
 {
 	unsigned int loadBits[2];
@@ -38,6 +49,29 @@ struct MaterialVertexDeclaration
 	bool hasOptionalSource;
 	bool isLoaded;
 	MaterialVertexStreamRouting routing;
+};
+
+enum MaterialVertexDeclType
+{
+	VERTDECL_GENERIC = 0x0,
+	VERTDECL_PACKED = 0x1,
+	VERTDECL_WORLD = 0x2,
+	VERTDECL_WORLD_T1N0 = 0x3,
+	VERTDECL_WORLD_T1N1 = 0x4,
+	VERTDECL_WORLD_T2N0 = 0x5,
+	VERTDECL_WORLD_T2N1 = 0x6,
+	VERTDECL_WORLD_T2N2 = 0x7,
+	VERTDECL_WORLD_T3N0 = 0x8,
+	VERTDECL_WORLD_T3N1 = 0x9,
+	VERTDECL_WORLD_T3N2 = 0xA,
+	VERTDECL_WORLD_T4N0 = 0xB,
+	VERTDECL_WORLD_T4N1 = 0xC,
+	VERTDECL_WORLD_T4N2 = 0xD,
+	VERTDECL_POS_TEX = 0xE,
+	VERTDECL_STATICMODELCACHE = 0xF,
+	VERTDECL_WATER = 0x10,
+	VERTDECL_PARTICLECLOUD = 0x11,
+	VERTDECL_COUNT = 0x12,
 };
 
 struct GfxVertexShaderLoadDef
@@ -192,3 +226,6 @@ struct Material
 };
 
 void __cdecl R_MaterialList_f();
+
+MaterialTechniqueSet *__cdecl Material_GetTechniqueSet(Material *material);
+MaterialTechnique *__cdecl Material_GetTechnique(Material *material, char techType);

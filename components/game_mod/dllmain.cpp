@@ -82,6 +82,14 @@ BOOL GameMod_Init()
 	// Add ?? dvar to enable/disable reading of raw script files
 	//
 	Detours::X86::DetourFunction((PBYTE)0x008A5980, (PBYTE)&hk_Scr_ReadFile);
+	
+	//
+	// Add r_showTess
+	//
+	R_DrawXModelSkinnedCached_o = Detours::X86::DetourFunction((PBYTE)0x0073BF30, (PBYTE)hk_R_DrawXModelSkinnedCached);
+	//R_DrawXModelSkinnedUncached_o = Detours::X86::DetourFunction((PBYTE)0x0073BFC0, (PBYTE)hk_R_DrawXModelSkinnedUncached);
+	R_DrawXModelRigidModelSurf_o = (R_DrawXModelRigidModelSurf_t)Detours::X86::DetourFunction((PBYTE)0x0074A9C0, (PBYTE)hk_R_DrawXModelRigidModelSurf);
+	//Detours::X86::DetourFunction((PBYTE) R_TessXModelWaterList
 
 	//
 	// Always force the cursor to be shown

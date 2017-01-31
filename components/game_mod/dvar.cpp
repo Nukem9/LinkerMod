@@ -2,6 +2,7 @@
 
 dvar_s* r_d3d9ex;
 dvar_s* r_noborder;
+dvar_s* r_showTess;
 dvar_s* sm_quality;
 dvar_s* con_extcon;
 dvar_s* con_inputMaxMatchesShown;
@@ -13,6 +14,17 @@ dvar_s* perk_weapRateEnhanced;
 dvar_s* radiant_live;
 dvar_s* radiant_livePort;
 dvar_s* radiant_liveDebug;
+
+const char* r_showTessNames[] =
+{
+	"off",
+	"tech",
+	"techset",
+	"material",
+	"vertexshader",
+	"pixelshader",
+	NULL
+};
 
 void R_RegisterCustomDvars()
 {
@@ -41,6 +53,8 @@ void R_RegisterCustomDvars()
 	PatchMemory(0x0071F976, (PBYTE)&sampleSize, 4);
 	PatchMemory(0x0073534F, (PBYTE)&sampleSize, 4);
 	PatchMemory(0x00735361, (PBYTE)&smResPower, 1);
+
+	r_showTess = Dvar_RegisterEnum("r_showTess", r_showTessNames, 0, 0x80u, "Show details for each surface");
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;

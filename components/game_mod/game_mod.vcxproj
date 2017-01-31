@@ -119,8 +119,11 @@
     <ClCompile Include="radiant_remote.cpp" />
     <ClCompile Include="ragdoll.cpp" />
     <ClCompile Include="ragdoll_update.cpp" />
+    <ClCompile Include="rb_tess.cpp" />
     <ClCompile Include="reshade.cpp" />
     <ClCompile Include="r_cinematic.cpp" />
+    <ClCompile Include="r_debug.cpp" />
+    <ClCompile Include="r_draw_xmodel.cpp" />
     <ClCompile Include="r_image.cpp" />
     <ClCompile Include="d3d9ex.cpp" />
     <ClCompile Include="r_init.cpp" />
@@ -170,8 +173,11 @@
     <ClInclude Include="radiant_remote.h" />
     <ClInclude Include="ragdoll.h" />
     <ClInclude Include="ragdoll_update.h" />
+    <ClInclude Include="rb_tess.h" />
     <ClInclude Include="reshade.h" />
     <ClInclude Include="r_cinematic.h" />
+    <ClInclude Include="r_debug.h" />
+    <ClInclude Include="r_draw_xmodel.h" />
     <ClInclude Include="r_image.h" />
     <ClInclude Include="r_init.h" />
     <ClInclude Include="r_material.h" />
