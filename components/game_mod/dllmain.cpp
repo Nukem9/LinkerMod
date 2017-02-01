@@ -87,9 +87,9 @@ BOOL GameMod_Init()
 	// Add r_showTess
 	//
 	R_DrawXModelSkinnedCached_o = Detours::X86::DetourFunction((PBYTE)0x0073BF30, (PBYTE)hk_R_DrawXModelSkinnedCached);
-	//R_DrawXModelSkinnedUncached_o = Detours::X86::DetourFunction((PBYTE)0x0073BFC0, (PBYTE)hk_R_DrawXModelSkinnedUncached);
+	R_DrawXModelSkinnedUncached_o = Detours::X86::DetourFunction((PBYTE)0x0073BFC0, (PBYTE)hk_R_DrawXModelSkinnedUncached);
 	R_DrawXModelRigidModelSurf_o = (R_DrawXModelRigidModelSurf_t)Detours::X86::DetourFunction((PBYTE)0x0074A9C0, (PBYTE)hk_R_DrawXModelRigidModelSurf);
-	//Detours::X86::DetourFunction((PBYTE) R_TessXModelWaterList
+	Detours::X86::DetourFunction((PBYTE)0x0073D8B2, (PBYTE)mfh_R_TessXModelWaterList); // Don't enable this until we know what it does
 
 	//
 	// Always force the cursor to be shown

@@ -668,27 +668,27 @@ struct GfxCmdBufPrimState
 	} streams[3];
 
 	IDirect3DVertexDeclaration9 *vertexDecl;
+
+	/*
 	GfxFrameStats frameStats;
 	struct GfxPrimStats *primStats;
 	struct GfxPrimStats *backupPrimStats;
 	struct GfxViewStats *viewStats;
+	*/
 };
 
 struct GfxCmdBufSourceState
 {
 	GfxCodeMatrices matrices;
-
-
-	GfxCmdBufInput input; // check this
+	GfxCmdBufInput input;
 	GfxViewParms viewParms;
-
 	GfxMatrix shadowLookupMatrix;
-	unsigned __int16 constVersions[226];
+	unsigned __int16 constVersions[229];
 	unsigned __int16 matrixVersions[8];
-	__declspec(align(16)) float eyeOffset[4];
+	float eyeOffset[4];
 	unsigned int shadowableLightForShadowLookupMatrix;
-	GfxScaledPlacement *objectPlacement;
-	GfxViewParms *viewParms3D;
+	const GfxScaledPlacement *objectPlacement;
+	const GfxViewParms *viewParms3D;
 	unsigned int depthHackFlags;
 	GfxScaledPlacement skinnedPlacement;
 	int cameraView;
@@ -697,8 +697,8 @@ struct GfxCmdBufSourceState
 	GfxViewport sceneViewport;
 	GfxViewport scissorViewport;
 	float materialTime;
-	float destructibleBurnAmount;
-	float destructibleFadeAmount;
+	float deibleBurnAmount;
+	float deibleFadeAmount;
 	float wetness;
 	GfxViewportBehavior viewportBehavior;
 	int renderTargetWidth;
@@ -708,15 +708,17 @@ struct GfxCmdBufSourceState
 	unsigned int shadowableLightIndex;
 };
 
+STATIC_ASSERT_SIZE(GfxCmdBufSourceState, 0x1A90);
+
 struct GfxCmdBufState
 {
 	char refSamplerState[16];
 	unsigned int samplerState[16];
 	GfxTexture *samplerTexture[16];
 	GfxCmdBufPrimState prim;
-	Material *material;
+	Material *material; // 0xC4
 	char techType;
-	MaterialTechnique *technique;
+	MaterialTechnique *technique; // 0xCC
 	MaterialPass *pass;
 	unsigned int passIndex;
 	GfxDepthRangeType depthRangeType;
@@ -741,18 +743,12 @@ struct GfxCmdBufState
 	char origTechType;
 	int stateOverride;
 };
-STATIC_ASSERT_SIZE(GfxCmdBufState, 0x13D0);
+STATIC_ASSERT_SIZE(GfxCmdBufState, 0x1148);
 
 struct GfxCmdBufContext
 {
-	union
-	{
-		struct
-		{
-			GfxCmdBufSourceState *source;
-			GfxCmdBufState *state;
-		} _s0, local;
-	} local;
+	GfxCmdBufSourceState *source;
+	GfxCmdBufState *state;
 };
 
 struct __declspec(align(16)) refdef_s
