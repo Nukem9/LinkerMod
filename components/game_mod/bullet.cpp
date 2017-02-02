@@ -244,7 +244,7 @@ void Bullet_Fire(gentity_s *attacker, float spread, weaponParms *wp, gentity_s *
 			fireParams.ignoreEntIndex = 1022;
 
 		fireParams.damageMultiplier = 1.0f;
-		fireParams.methodOfDeath = (wp->weapDef->bRifleBullet != 0) + 1;
+		fireParams.methodOfDeath = wp->weapDef->bRifleBullet ? 2 : 1;
 		fireParams.origStart[0] = wp->muzzleTrace[0];
 		fireParams.origStart[1] = wp->muzzleTrace[1];
 		fireParams.origStart[2] = wp->muzzleTrace[2];

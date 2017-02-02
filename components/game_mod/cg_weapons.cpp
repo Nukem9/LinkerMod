@@ -79,7 +79,7 @@ void StartWeaponAnim(int localClientNum, int weaponNum, DObj *obj, int animIndex
 		else
 			rate = 1000.0f;
 	}
-	else if ((weaponstate == 7 || weaponstate == 8) && BG_HasPerk(ps_perks, PERK_RATEOFFIRE))
+	else if ((weaponstate == WEAPON_RECHAMBER_START || weaponstate == WEAPON_RECHAMBERING) && BG_HasPerk(ps_perks, PERK_RATEOFFIRE))
 	{
 		// Doubletap (rate of fire) perk
 		if (perk_weapRateMultiplier->current.value != 0.0f)
