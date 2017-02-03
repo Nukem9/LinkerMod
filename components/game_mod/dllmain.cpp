@@ -454,6 +454,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x007694A0, (PBYTE)&PM_Weapon_WeaponTimeAdjust);
 
 	//
+	// Increase default sv_network_fps to 200
+	//
+	PatchMemory(0x00698BFA, (PBYTE)"\xC8", 1);
+
+	//
 	// Increase Asset Limits
 	//
 	DB_ReallocXAssetPool(ASSET_TYPE_WEAPON, 254); // Must not exceed BYTE_MAX (255)
