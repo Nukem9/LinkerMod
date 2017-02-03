@@ -1,28 +1,5 @@
 #include "stdafx.h"
 
-void(*PM_WeaponUseAmmo)(int ps, int wp, int amount);
-
-void hk_PM_WeaponUseAmmo(int ps, int wp, int amount)
-{
-	if (!player_sustainAmmo->current.enabled)
-		PM_WeaponUseAmmo(ps, wp, amount);
-}
-
-void PM_Weapon_Jam(int ps)
-{
-	// Do nothing. ESI is argument.
-}
-
-void PM_Weapon_FinishRechamber(playerState_s *ps)
-{
-	((void(__thiscall *)(playerState_s *))0x00765CC0)(ps);
-}
-
-int PM_WeaponAmmoAvailable(playerState_s *ps)
-{
-	return ((int(__cdecl *)(playerState_s *))0x005B6D90)(ps);
-}
-
 // /bgame/bg_weapons.cpp:278
 void PM_StartWeaponAnim(playerState_s *ps, int anim, int leftAnim)
 {
@@ -79,6 +56,19 @@ unsigned int *BG_GetWeaponShotCount(playerState_s *ps, bool leftGun)
 		return &ps->weaponShotCountLeft;
 
 	return &ps->weaponShotCount;
+}
+
+// /bgame/bg_weapons.cpp:1204
+void PM_Weapon_FinishRechamber(playerState_s *ps)
+{
+	PM_ContinueWeaponAnim(ps, 0, 0);
+
+	PlayerHeldWeapon *weap = BG_GetHeldWeapon(ps, ps->weapon);
+
+	if (weap)
+		weap->needsRechamber = false;
+
+	ps->weaponstate = WEAPON_READY;
 }
 
 // /bgame/bg_weapons.cpp:1266
@@ -289,4 +279,17 @@ LABEL_100:
 
 	*weaponDelay = 0;
 	return 1;
+}
+
+// /bgame/bg_weapons.cpp:3276
+void PM_Weapon_Jam(/*playerState_s *ps*/)
+{
+	// Do nothing. ESI is argument.
+}
+
+// /bgame/bg_weapons.cpp:6072
+const char *BG_WeaponName(int weapon)
+{
+	return "(FIXME BG_WeaponName)";
+	// return BG_GetWeaponVariantDef(weapon)->szInternalName;
 }
