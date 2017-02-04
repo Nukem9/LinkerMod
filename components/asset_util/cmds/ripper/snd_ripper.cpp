@@ -5,7 +5,6 @@
 #include "../../sys/AppInfo.h"
 #include "../../cvar.h"
 
-
 static snd_csv_enum_bits_entry_t ee_limit_type =			{ 2, 25, enum_priority };
 static snd_csv_enum_bits_entry_t ee_entity_limit_type =		{ 2, 27, enum_priority };
 static snd_csv_enum_bits_entry_t ee_randomize_type =		{ 3, 29, enum_randomize_type };
@@ -93,11 +92,36 @@ unsigned int __cdecl SND_HashName(const char *name)
 	return hash;
 }
 
-void Snd_CSV_PrintHeader(FILE* f)
+void Snd_CSV_PrintHeader_Soundalias(FILE* f)
 {
-	for (int i = 0; i < 74; i++)
+	for (int i = 0; i < ARRAYSIZE(fields_soundalias); i++)
 	{
-		fprintf(f, "%s,", fields[i]);
+		fprintf(f, "%s,", fields_soundalias[i]);
+	}
+	fprintf(f, "\n");
+}
+
+void Snd_CSV_PrintHeader_Snapshot(FILE* f, ForeignPointer<SndDriverGlobals>& globals)
+{
+	for (int i = 0; i < ARRAYSIZE(fields_snapshot); i++)
+	{
+		fprintf(f, "%s,", fields_snapshot[i]);
+	}
+
+	ForeignPointer<snd_snapshot_group> snapshotGroups(globals->snapshotGroups);
+	for (unsigned int i = 0; i < globals->snapshotGroupCount; i++)
+	{
+		fprintf(f, "%s,", snapshotGroups[i].name);
+	}
+
+	fprintf(f, "\n");
+}
+
+void Snd_CSV_PrintHeader_Radverb(FILE* f)
+{
+	for (int i = 0; i < ARRAYSIZE(fields_radverb); i++)
+	{
+		fprintf(f, "%s,", fields_radverb[i]);
 	}
 	fprintf(f, "\n");
 }
@@ -163,10 +187,11 @@ int Rip_Sound_Alias_Callback_f(ForeignPointer<snd_alias_t>& alias, snd_ripper_in
 	ForeignPointer<snd_snapshot> snapshots((snd_snapshot*)instance.bank->snapshots);
 	if (duck_hash != 0)
 	{
-		for (auto& set : *instance.snapshots_table)
+		for (auto& set : *instance.snapshots_map)
 		{
 			bool done = false;
-			for (auto& snapshot : set)
+
+			for (auto& snapshot : set.second)
 			{
 				if (duck_hash == SND_HashName(snapshot->name))
 				{
@@ -369,15 +394,27 @@ int Rip_Sound_Alias_Callback_f(ForeignPointer<snd_alias_t>& alias, snd_ripper_in
 	return 0;
 }
 
-int Rip_Sound_GatherSnapshots_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName>& zoneName, void* data)
+std::string Snd_ResolveBaseName(std::string& str)
+{
+	auto offset = str.find(".");
+
+	if (offset != std::string::npos)
+	{
+		return std::string(str, 0, offset);
+	}
+
+	return str;
+}
+
+int Rip_SoundBank_GatherSnapshots_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName>& zoneName, void* data)
 {
 	_ASSERT(data);
 
-	std::vector<std::vector<ForeignPointer<snd_snapshot>>>* snapshots_table = (std::vector<std::vector<ForeignPointer<snd_snapshot>>>*)data;
-
-	std::vector<ForeignPointer<snd_snapshot>> snapshots(0);
+	snapshots_map_t* snapshots_map = (snapshots_map_t*)data;
 
 	ForeignPointer<SndBank> bank((SndBank*)asset->header.sound);
+	auto& snapshots = (*snapshots_map)[Snd_ResolveBaseName(ReadString(bank->name))];
+
 	if (bank->snapshots == nullptr || bank->snapshotCount == 0)
 		return 0;
 
@@ -386,18 +423,34 @@ int Rip_Sound_GatherSnapshots_Callback_f(ForeignPointer<XAsset>& asset, ForeignP
 		snapshots.push_back(ForeignPointer<snd_snapshot>((snd_snapshot*)bank->snapshots + i));
 	}
 
-	snapshots_table->push_back(snapshots);
 	return 0;
 }
 
-int Rip_Sound_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName>& zoneName, void* data)
+int Rip_SoundBank_GatherRadverbs_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName>& zoneName, void* data)
 {
-	ForeignPointer<SndDriverGlobals> globals((SndDriverGlobals*)DB_FindSingletonAssetForType(ASSET_TYPE_SNDDRIVER_GLOBALS));
+	_ASSERT(data);
 
-	ForeignPointer<SndBank> sound((SndBank*)asset->header.sound);
-	std::string name = ReadString(sound->name, 128);
+	radverbs_map_t* radverbs_map = (radverbs_map_t*)data;
 
-	Con_Print("Exporting %s.csv...\n", name.c_str());
+	ForeignPointer<SndBank> bank((SndBank*)asset->header.sound);
+	auto& radverbs = (*radverbs_map)[Snd_ResolveBaseName(ReadString(bank->name))];
+
+	if (bank->radverbs == nullptr || bank->radverbCount == 0)
+		return 0;
+
+	for (unsigned int i = 0; i < bank->radverbCount; i++)
+	{
+		radverbs.push_back(ForeignPointer<snd_radverb>(bank->radverbs + i));
+	}
+
+	return 0;
+}
+
+int Rip_SoundBank_Soundalias_Callback_f(ForeignPointer<SndBank>& bank, ForeignPointer<SndDriverGlobals>& globals, snapshots_map_t* snapshots_map)
+{
+	std::string name = ReadString(bank->name, 128);
+
+	Con_Print("Exporting soundalias %s.csv...\n", name.c_str());
 
 	int err = FS_CreatePath("soundaliases\\zones\\");
 	if (err)
@@ -409,7 +462,7 @@ int Rip_Sound_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName
 	sprintf_s(path, "%s/soundaliases\\zones\\%s.csv", AppInfo_OutDir(), name.c_str());
 
 	FS_SanitizePath(path);
-	
+
 	if (FS_FileExists(path) && !fs_overwrite.ValueBool())
 	{
 		Con_Print("  ...skipping (file already exists)\n");
@@ -423,7 +476,7 @@ int Rip_Sound_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName
 		return Con_Error("Couldnt open '%s'\n", path);
 	}
 
-	Snd_CSV_PrintHeader(h);
+	Snd_CSV_PrintHeader_Soundalias(h);
 
 	std::string language = "<error>";
 
@@ -433,10 +486,10 @@ int Rip_Sound_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName
 	else
 		Con_Warning("Unable to determine language for '%s'\n", name.c_str());
 
-	snd_ripper_instance_info_t instance = { h, language, globals, sound, (std::vector<std::vector<ForeignPointer<snd_snapshot>>>*)data };
+	snd_ripper_instance_info_t instance = { h, language, globals, bank, snapshots_map };
 
-	ForeignPointer<snd_alias_list_t> alias((snd_alias_list_t*)sound->alias);
-	for (unsigned int i = 0; i < sound->aliasCount; i++)
+	ForeignPointer<snd_alias_list_t> alias((snd_alias_list_t*)bank->alias);
+	for (unsigned int i = 0; i < bank->aliasCount; i++)
 	{
 		ForeignPointer<snd_alias_t> entry((snd_alias_t*)alias[i].head);
 		Rip_Sound_Alias_Callback_f(entry, instance);
@@ -445,3 +498,124 @@ int Rip_Sound_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName
 	fclose(h);
 	return 0;
 }
+
+int Rip_SoundBank_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName>& zoneName, void* data)
+{
+	ForeignPointer<SndDriverGlobals> globals((SndDriverGlobals*)DB_FindSingletonAssetForType(ASSET_TYPE_SNDDRIVER_GLOBALS));
+	ForeignPointer<SndBank> bank((SndBank*)asset->header.sound);
+
+	return Rip_SoundBank_Soundalias_Callback_f(bank, globals, (snapshots_map_t*)data);
+}
+
+
+int Rip_Snapshot_Callback_f(std::string name, std::vector<ForeignPointer<snd_snapshot>>& snapshots)
+{
+	Con_Print("Exporting snapshot %s.snapshot.csv...\n", name.c_str());
+
+	int err = FS_CreatePath("soundaliases\\zones\\snapshots\\");
+	if (err)
+	{
+		return Con_Error("Error: Unable to create output path (0x%X)\n", err);
+	}
+
+	char path[MAX_PATH];
+	sprintf_s(path, "%s/soundaliases\\zones\\snapshots\\%s.csv", AppInfo_OutDir(), name.c_str());
+
+	FS_SanitizePath(path);
+
+	if (FS_FileExists(path) && !fs_overwrite.ValueBool())
+	{
+		Con_Print("  ...skipping (file already exists)\n");
+		return 1;
+	}
+
+	FILE* h = fopen(path, "w");
+
+	if (!h)
+	{
+		return Con_Error("Couldnt open '%s'\n", path);
+	}
+
+	ForeignPointer<SndDriverGlobals> globals((SndDriverGlobals*)DB_FindSingletonAssetForType(ASSET_TYPE_SNDDRIVER_GLOBALS));
+	Snd_CSV_PrintHeader_Snapshot(h, globals);
+
+	for (auto& snapshot : snapshots)
+	{
+		fprintf(h, "%s,", snapshot->name);
+		fprintf(h, "%s,", snapshot->occlusionName);
+		fprintf(h, ","); // loadspec
+		fprintf(h, "%.3g,", snapshot->fadeIn);
+		fprintf(h, ","); // fadeInCurve
+		fprintf(h, "%.3g,", snapshot->fadeOut);
+		fprintf(h, ","); // fadeOutCurve
+		fprintf(h, "%d,", (int)snapshot->distance);
+
+		for (unsigned int i = 0; i < globals->snapshotGroupCount; i++)
+		{
+			fprintf(h, "%.3g,", snapshot->attenuation[i]);
+		}
+
+		fprintf(h, "\n");
+	}
+
+	fclose(h);
+	return 0;
+}
+
+int Rip_Radverb_Callback_f(std::string name, std::vector<ForeignPointer<snd_radverb>>& radverbs)
+{
+	Con_Print("Exporting snapshot %s.radverb.csv...\n", name.c_str());
+
+	int err = FS_CreatePath("soundaliases\\zones\\radverb\\");
+	if (err)
+	{
+		return Con_Error("Error: Unable to create output path (0x%X)\n", err);
+	}
+
+	char path[MAX_PATH];
+	sprintf_s(path, "%s/soundaliases\\zones\\radverb\\%s.csv", AppInfo_OutDir(), name.c_str());
+
+	FS_SanitizePath(path);
+
+	if (FS_FileExists(path) && !fs_overwrite.ValueBool())
+	{
+		Con_Print("  ...skipping (file already exists)\n");
+		return 1;
+	}
+
+	FILE* h = fopen(path, "w");
+
+	if (!h)
+	{
+		return Con_Error("Couldnt open '%s'\n", path);
+	}
+
+	Snd_CSV_PrintHeader_Radverb(h);
+
+	for (auto& radverb : radverbs)
+	{
+		fprintf(h, "%s,", radverb->name);
+		fprintf(h, ","); //loadspec
+		fprintf(h, "%.7g,", radverb->smoothing);
+		fprintf(h, "%.7g,", radverb->earlyTime);
+		fprintf(h, "%.7g,", radverb->lateTime);
+		fprintf(h, "%.7g,", radverb->earlyGain);
+		fprintf(h, "%.7g,", radverb->lateGain);
+		fprintf(h, "%.7g,", radverb->returnGain); 
+		fprintf(h, "%.7g,", radverb->earlyLpf);
+		fprintf(h, "%.7g,", radverb->lateLpf);
+		fprintf(h, "%.7g,", radverb->inputLpf);
+		fprintf(h, "%.7g,", radverb->dampLpf);
+		fprintf(h, "%.7g,", radverb->wallReflect);
+		fprintf(h, "%.7g,", radverb->dryGain);
+		fprintf(h, "%.7g,", radverb->earlySize);
+		fprintf(h, "%.7g,", radverb->lateSize);
+		fprintf(h, "%.7g,", radverb->diffusion);
+
+		fprintf(h, "\n");
+	}
+
+	fclose(h);
+	return 0;
+}
+

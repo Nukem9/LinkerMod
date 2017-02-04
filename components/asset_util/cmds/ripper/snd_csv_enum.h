@@ -2,7 +2,7 @@
 #include <WTypes.h>
 #include "foreign_ptr.h"
 
-static const char* fields[74] =
+static const char* fields_soundalias[] =
 {
 	"name",
 	"file",
@@ -78,6 +78,40 @@ static const char* fields[74] =
 	"file_size_wii",
 	"source_csv",
 	"language",
+};
+
+static const char* fields_snapshot[] =
+{
+	"name",
+	"occlusion",
+	"loadspec",
+	"fadeIn",
+	"fadeInCurve",
+	"fadeOut",
+	"fadeOutCurve",
+	"distance",
+	// ... (Everything after this point is auto generated from snapshotGroups)
+};
+
+static const char* fields_radverb[] =
+{
+	"name",
+	"loadspec",
+	"smoothing",
+	"earlyTime",
+	"lateTime",
+	"earlyGain",
+	"lateGain",
+	"returnGain",
+	"earlyLpf",
+	"lateLpf",
+	"inputLpf",
+	"dampLpf",
+	"wallReflect",
+	"dryGain",
+	"earlySize",
+	"lateSize",
+	"diffusion",
 };
 
 static const char *enum_bus[3] = { "world", "game", "voice" };

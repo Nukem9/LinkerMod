@@ -15,9 +15,28 @@ int Cmd_Rip_f(int argc, char** argv)
 			return err;
 		}
 
-		std::vector<std::vector<ForeignPointer<snd_snapshot>>> snapshots_table(0);
-		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_Sound_GatherSnapshots_Callback_f, NULL, &snapshots_table);
-		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_Sound_Callback_f, NULL, &snapshots_table);
+		Process_SuspendThreads(pid);
+
+		snapshots_map_t snapshots_map(0);
+		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_SoundBank_GatherSnapshots_Callback_f, NULL, &snapshots_map);
+		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_SoundBank_Callback_f, NULL, &snapshots_map);
+
+		for (auto& set : snapshots_map)
+		{
+			std::string name = set.first;
+			Rip_Snapshot_Callback_f(name, set.second);
+		}
+
+		radverbs_map_t radverbs_map(0);
+		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_SoundBank_GatherRadverbs_Callback_f, NULL, &radverbs_map);
+
+		for (auto& set : radverbs_map)
+		{
+			std::string name = set.first;
+			Rip_Radverb_Callback_f(name, set.second);
+		}
+
+		Process_ResumeThreads(pid);
 
 		ProcessInfo_Free();
 		return 0;
