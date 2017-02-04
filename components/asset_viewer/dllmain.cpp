@@ -13,6 +13,19 @@ void strcpy_safe(char *Dest, const char *Src)
 	VirtualProtect(Dest, srcLen, d, &d);
 }
 
+void DEJA_Printf(LPCSTR fmt, ...)
+{
+	char str[256];
+	va_list va;
+
+	va_start(va, fmt);
+	wvsprintfA(str, fmt, va);
+	printf("DEJA \\\\\\\nDEJA >>> ");
+	printf(str);
+	printf("\nDEJA ///\n");
+	va_end(va);
+}
+
 bool g_Initted = false;
 
 BOOL AssetViewerMod_Init()
@@ -78,6 +91,11 @@ BOOL AssetViewerMod_Init()
 #if ASSET_VIEWER_DISABLE_NO_MODEL_SPAM
 	PatchCall(0x00433FA2, (PBYTE)&Com_SuppressNoModelSpam);
 #endif
+
+	//
+	// Print DEJA output to console
+	//
+	Detours::X86::DetourFunction((PBYTE)0x008907B0, (PBYTE)DEJA_Printf);
 
 	g_Initted = true;
 
