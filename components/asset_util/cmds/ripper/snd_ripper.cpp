@@ -26,6 +26,20 @@ static snd_csv_enum_bits_entry_t ee_stop_on_death =			{ 1, 9, enum_yes_no };
 static snd_csv_enum_bits_entry_t ee_bus =					{ 2, 12, enum_bus };
 static snd_csv_enum_bits_entry_t ee_voice_limit =			{ 1, 11, enum_yes_no };
 
+struct snd_csv_context_entry_t
+{
+	const char* type;
+	const char* value[8];
+};
+
+static snd_csv_context_entry_t contexts[] =
+{
+	{"ringoff_plr",	{"indoor",		"outdoor",	NULL, NULL, NULL, NULL, NULL, NULL} },
+	{"mature",		{"explicit",	"safe",		NULL, NULL, NULL, NULL, NULL, NULL} },
+	{"test",		{"high",		"low",		NULL, NULL, NULL, NULL, NULL, NULL} },
+	{"hazmat",		{"mask",		NULL,		NULL, NULL, NULL, NULL, NULL, NULL} },
+};
+
 //
 // Read an external string with max length (len)
 // if len == 0 - the string can be any length
@@ -193,7 +207,38 @@ int Rip_Sound_Alias_Callback_f(ForeignPointer<snd_alias_t>& alias, snd_ripper_in
 	const char* futz = SND_CSV_ResolveEnumBitsString(alias, ee_futz);
 
 	unsigned int contextType_hash = alias->contextType; // context_type
+	snd_csv_context_entry_t* context = NULL;
+
+	for (int i = 0; i < ARRAYSIZE(contexts); i++)
+	{
+		if (contextType_hash == SND_HashName(contexts[i].type))
+		{
+			context = &contexts[i];
+			break;
+		}
+	}
+
+	_ASSERT(!contextType_hash || (contextType_hash && context));
+
 	unsigned int contextValue_hash = alias->contextValue; //context_value
+	const char* context_value = NULL;
+
+	if (context != NULL)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			if (context->value[i] == NULL)
+				break;
+
+			if (contextValue_hash = SND_HashName(context->value[i]))
+			{
+				context_value = (*context).value[i];
+				break;
+			}
+		}
+
+		_ASSERT(context_value);
+	}
 
 	unsigned short compression = 0; //compression
 
@@ -297,8 +342,8 @@ int Rip_Sound_Alias_Callback_f(ForeignPointer<snd_alias_t>& alias, snd_ripper_in
 	fprintf(instance.outputFile, "%s,", mature);
 	fprintf(instance.outputFile, "%s,", doppler);
 	fprintf(instance.outputFile, "%s,", futz);
-	fprintf(instance.outputFile, ","); // , context_type);
-	fprintf(instance.outputFile, ","); // , context_value);
+	fprintf(instance.outputFile, "%s,", context ? context->type : ""); // , context_type);
+	fprintf(instance.outputFile, "%s,", context_value ? context_value : ""); // , context_value);
 	fprintf(instance.outputFile, "%d,", compression);
 	fprintf(instance.outputFile, "%s,", timescale);
 	fprintf(instance.outputFile, "%s,", music);
@@ -361,6 +406,13 @@ int Rip_Sound_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName
 	sprintf_s(path, "%s/soundaliases\\zones\\%s.csv", AppInfo_OutDir(), name.c_str());
 
 	FS_SanitizePath(path);
+	
+	if (FS_FileExists(path) && !fs_overwrite.ValueBool())
+	{
+		Con_Print("  ...skipping (file already exists)\n");
+		return 1;
+	}
+
 	FILE* h = fopen(path, "w");
 
 	if (!h)
