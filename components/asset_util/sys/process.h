@@ -26,3 +26,8 @@ processId_t Process_FindSupportedProcess(unsigned int timeoutDelay=0);
 // Suspend all threads for a given processId
 //
 void Process_SuspendThreads(processId_t pid);
+
+//
+// Resume all threads for a given processId
+//
+void Process_ResumeThreads(processId_t pid);
