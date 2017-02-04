@@ -53,7 +53,7 @@ REGISTER_CVAR(csvgen_aitypes, "aitype", NULL, "Regenerate all aitype CSVs", fals
 REGISTER_CVAR(csvgen_characters, "character", NULL, "Regenerate all character CSVs", false);
 REGISTER_CVAR(csvgen_xmodelaliases, "xmodelalias", NULL, "Regenerate all xmodelalias CSVs", false);
 
-REGISTER_CVAR(fs_outdir, "outdir", NULL, "Target directory for file output (default is the game's raw directory)", NULL);
+REGISTER_CVAR(fs_outdir, "outdir", NULL, "Target directory for file output (default is the game's raw directory)", "");
 
 #undef REGISTER_GLOBAL_CVAR
 #undef REGISTER_CVAR

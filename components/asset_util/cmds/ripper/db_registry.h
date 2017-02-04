@@ -1,6 +1,7 @@
 #pragma once
 #include "../../sys/process.h"
 #include <stdio.h>
+#include <functional>
 
 enum XAssetType
 {
@@ -54,6 +55,7 @@ enum XAssetType
 
 union XAssetHeader
 {
+	struct SndBank *sound;
 	void *data;
 };
 
@@ -108,7 +110,12 @@ const char* DB_GetXAssetName(XAsset *asset);
 // The return value is the number of assets that were successfully enumerated (where the callback succeeded)
 //
 typedef int(__cdecl* asset_callback_t)(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName>& zoneName);
+typedef int(__cdecl* asset_callback_ex_t)(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName>& zoneName, void* data);
+
 int DB_EnumAssetPool(XAssetType type, asset_callback_t assetCallback_f, asset_callback_t assetOverrideCallback_f, const char* zone = NULL);
+int DB_EnumAssetPoolEx(XAssetType type, asset_callback_ex_t assetCallback_f, asset_callback_ex_t assetOverrideCallback_f, void* data, const char* zone = NULL);
+
+void* DB_FindSingletonAssetForType(XAssetType type);
 
 //
 // List all assets of a given type in the asset pool

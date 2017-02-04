@@ -2,6 +2,7 @@
 #include "../setup.h"
 #include "AppInfo.h"
 #include "../common/io.h"
+#include "../common/fs.h"
 
 #include "../cvar.h"
 
@@ -71,8 +72,14 @@ const char* AppInfo_RawDir()
 
 const char* AppInfo_OutDir()
 {
-	if (fs_outdir.ValueString() == NULL)
+	if (strlen(fs_outdir.ValueString()) == 0)
 		return AppInfo_RawDir();
+
+	if (strstr(fs_outdir.ValueString(), ":") != NULL && strstr(fs_outdir.ValueString(), ":") != fs_outdir.ValueString() + 1)
+	{
+		Con_Warning("Invalid output directory - falling back to default\n");
+		fs_outdir.AssignRawString("");
+	}
 
 	return fs_outdir.ValueString();
 }

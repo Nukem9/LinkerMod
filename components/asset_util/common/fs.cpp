@@ -92,6 +92,14 @@ const wchar_t* FS_GetFilenameSubStringW(wchar_t* pathname)
 	return last;
 }
 
+void FS_StripFilename(const char* in, char* out)
+{
+	const char* extension = FS_GetFilenameSubString(in);
+	while (in != extension)
+		*out++ = *in++;
+	*out = 0;
+}
+
 int FS_FileCount(const char* path, const char* pattern)
 {
 	HANDLE dir;
@@ -202,6 +210,11 @@ int FS_CreatePath(const char* _targetPath)
 
 			char* qpath = buf;
 
+			if (strlen(qpath) == 0)
+				continue;
+
+			FS_SanitizePath(qpath);
+
 #if _DEBUG
 			if (!CreateDirectoryA(buf, 0) && GetLastError() != ERROR_ALREADY_EXISTS)
 #else
@@ -262,3 +275,28 @@ int FS_CopyDirectory(char* srcPath, char* destPath, bool overwriteFiles)
 	return 0;
 }
 
+void FS_SanitizePath(char* path)
+{
+	if (path[0] == '/')
+		path[0] = '\\';
+
+	//
+	// Cleanup double / or \
+	//
+	int len = strlen(path);
+	for (int i = 1; i < len; i++)
+	{
+		if (path[i] == '/')
+			path[i] = '\\';
+
+		if (path[i] == '\\' && path[i - 1] == '\\')
+			strcpy(&path[i - 1], &path[i]);
+	}
+
+	//
+	// Trim any leading / or \
+	//
+	const char* c = path;
+	for (; *c == '/' || *c == '\\'; c++);
+	strcpy(path, c);
+}

@@ -1,6 +1,9 @@
 #include "cmd_common.h"
+
 #include "../sys/process.h"
-#include "ripper/process_info.h"
+#include "ripper\process_info.h"
+
+#include "ripper\snd_ripper.h"
 
 int Cmd_Rip_f(int argc, char** argv)
 {
@@ -12,12 +15,9 @@ int Cmd_Rip_f(int argc, char** argv)
 			return err;
 		}
 
-		Con_Warning("NOT CURRENTLY IMPLEMENTED - FALLING BACK TO LISTASSETPOOL");
-
-		for (int i = 0; i < ASSET_TYPE_COUNT; i++)
-		{
-			DB_ListAssetPool((XAssetType)i);
-		}
+		std::vector<std::vector<ForeignPointer<snd_snapshot>>> snapshots_table(0);
+		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_Sound_GatherSnapshots_Callback_f, NULL, &snapshots_table);
+		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_Sound_Callback_f, NULL, &snapshots_table);
 
 		ProcessInfo_Free();
 		return 0;
