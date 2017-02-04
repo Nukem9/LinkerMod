@@ -375,9 +375,12 @@ int Rip_Sound_GatherSnapshots_Callback_f(ForeignPointer<XAsset>& asset, ForeignP
 
 	std::vector<std::vector<ForeignPointer<snd_snapshot>>>* snapshots_table = (std::vector<std::vector<ForeignPointer<snd_snapshot>>>*)data;
 
-	std::vector<ForeignPointer<snd_snapshot>> snapshots(1);
+	std::vector<ForeignPointer<snd_snapshot>> snapshots(0);
 
 	ForeignPointer<SndBank> bank((SndBank*)asset->header.sound);
+	if (bank->snapshots == nullptr || bank->snapshotCount == 0)
+		return 0;
+
 	for (unsigned int i = 0; i < bank->snapshotCount; i++)
 	{
 		snapshots.push_back(ForeignPointer<snd_snapshot>((snd_snapshot*)bank->snapshots + i));
