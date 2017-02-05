@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\shared\imgui\imgui_impl_dx9.cpp" />
     <ClCompile Include="arg.cpp" />
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="cmds\cmd_default.cpp" />
@@ -19,12 +20,15 @@
     <ClCompile Include="common\io.cpp" />
     <ClCompile Include="common\str.cpp" />
     <ClCompile Include="cvar.cpp" />
+    <ClCompile Include="gui\gui_d3d.cpp" />
+    <ClCompile Include="gui\gui_wnd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="setup.cpp" />
     <ClCompile Include="sys\AppInfo.cpp" />
     <ClCompile Include="sys\process.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\shared\imgui\imgui_impl_dx9.h" />
     <ClInclude Include="arg.h" />
     <ClInclude Include="cmd.h" />
     <ClInclude Include="cmds\cmd_common.h" />
@@ -33,6 +37,8 @@
     <ClInclude Include="common\llist.h" />
     <ClInclude Include="common\str.h" />
     <ClInclude Include="cvar.h" />
+    <ClInclude Include="gui\gui_d3d.h" />
+    <ClInclude Include="gui\gui_wnd.h" />
     <ClInclude Include="platform.h" />
     <ClInclude Include="setup.h" />
     <ClInclude Include="sys\AppInfo.h" />
