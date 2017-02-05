@@ -10,9 +10,11 @@ struct wnd_instance_t
 {
 	WNDCLASSEX wc;
 	HWND hWnd;
+
+	bool hasEnteredMessageLoop;
 };
 
 int GUI_InitWindow(wnd_instance_t* wnd);
 void GUI_FreeWindow(wnd_instance_t* wnd);
 
-void GUI_EnterMessageLoop(void);
+void GUI_EnterMessageLoop(wnd_instance_t* wnd);

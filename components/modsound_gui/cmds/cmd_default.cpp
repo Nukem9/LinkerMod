@@ -19,12 +19,7 @@ int Cmd_Default_f(int argc, char** argv)
 	}
 
 	ImGui_ImplDX9_Init(wnd.hWnd, g_d3d.device);
-
-	UpdateWindow(wnd.hWnd);
-	ShowWindow(wnd.hWnd, SW_SHOWDEFAULT);
-
-	GUI_EnterMessageLoop();
-
+	GUI_EnterMessageLoop(&wnd);
 	ImGui_ImplDX9_Shutdown();
 
 	GUI_FreeD3D();

@@ -63,6 +63,7 @@ int GUI_InitWindow(wnd_instance_t* wnd)
 		return 1;
 	}
 
+	wnd->hasEnteredMessageLoop = false;
 	return 0;
 }
 
@@ -71,7 +72,7 @@ void GUI_FreeWindow(wnd_instance_t* wnd)
 	UnregisterClass(WNDCLASS_NAME, wnd->wc.hInstance);
 }
 
-void GUI_EnterMessageLoop(void)
+void GUI_EnterMessageLoop(wnd_instance_t* wnd)
 {
 	MSG msg;
 	ZeroMemory(&msg, sizeof(msg));
@@ -110,5 +111,12 @@ void GUI_EnterMessageLoop(void)
 		}
 
 		g_d3d.device->Present(NULL, NULL, NULL, NULL);
+
+		if (!wnd->hasEnteredMessageLoop)
+		{
+			wnd->hasEnteredMessageLoop = true;
+			UpdateWindow(wnd->hWnd);
+			ShowWindow(wnd->hWnd, SW_SHOWDEFAULT);
+		}
 	}
 }
