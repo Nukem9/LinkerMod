@@ -10,9 +10,20 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	switch (msg)
 	{
-		//case WM_SIZE:
-		//	//...
-		//	return 0;
+	case WM_SIZE:
+		if (g_d3d.device != NULL && wParam != SIZE_MINIMIZED)
+		{
+			ImGui_ImplDX9_InvalidateDeviceObjects();
+			g_d3d.present_params.BackBufferWidth = LOWORD(lParam);
+			g_d3d.present_params.BackBufferHeight = HIWORD(lParam);
+
+			HRESULT hr = g_d3d.device->Reset(&g_d3d.present_params);
+			if (hr == D3DERR_INVALIDCALL)
+				IM_ASSERT(0);
+
+			ImGui_ImplDX9_CreateDeviceObjects();
+		}
+		return 0;
 	case WM_SYSCOMMAND:
 		// Disable ALT application menu
 		if ((wParam & 0xFFF0) == SC_KEYMENU)
