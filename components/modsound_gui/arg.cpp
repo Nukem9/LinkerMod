@@ -265,28 +265,27 @@ int Arg_ParseArguments(int argc, char** argv, ArgParsedInfo* out_info)
 	if (argc <= 0)
 	{
 		out_info->cmd = &g_cmd_default;
-		out_info->argv = argv;
-		out_info->argc = argc;
-		return 0;
 	}
-
-	out_info->cmd = Command::ResolveCommand(*argv);
-	if (!out_info->cmd)
+	else
 	{
-		Con_Error("Error: Command '%s' not recognized\n", *argv);
-		return 2;
-	}
-
-	//
-	// CVar Support
-	// Extract the CVar data from the arg list before passing the rest of the args to the command
-	//
-	char** consumable_argv = &argv[1];
-	for (int consumable_argc = argc - 1; consumable_argc; /*automatically decremented by Arg_ParseArgument*/)
-	{
-		if (int err = Arg_ParseArgument(&consumable_argv, &consumable_argc, out_info->cmd->CVars()))
+		out_info->cmd = Command::ResolveCommand(*argv);
+		if (!out_info->cmd)
 		{
-			return err;
+			Con_Error("Error: Command '%s' not recognized\n", *argv);
+			return 2;
+		}
+
+		//
+		// CVar Support
+		// Extract the CVar data from the arg list before passing the rest of the args to the command
+		//
+		char** consumable_argv = &argv[1];
+		for (int consumable_argc = argc - 1; consumable_argc; /*automatically decremented by Arg_ParseArgument*/)
+		{
+			if (int err = Arg_ParseArgument(&consumable_argv, &consumable_argc, out_info->cmd->CVars()))
+			{
+				return err;
+			}
 		}
 	}
 
