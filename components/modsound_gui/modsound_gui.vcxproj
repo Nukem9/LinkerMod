@@ -11,7 +11,32 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="arg.cpp" />
+    <ClCompile Include="cmd.cpp" />
+    <ClCompile Include="cmds\cmd_default.cpp" />
+    <ClCompile Include="cmds\cmd_help.cpp" />
+    <ClCompile Include="common\fs.cpp" />
+    <ClCompile Include="common\io.cpp" />
+    <ClCompile Include="common\str.cpp" />
+    <ClCompile Include="cvar.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="setup.cpp" />
+    <ClCompile Include="sys\AppInfo.cpp" />
+    <ClCompile Include="sys\process.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="arg.h" />
+    <ClInclude Include="cmd.h" />
+    <ClInclude Include="cmds\cmd_common.h" />
+    <ClInclude Include="common\fs.h" />
+    <ClInclude Include="common\io.h" />
+    <ClInclude Include="common\llist.h" />
+    <ClInclude Include="common\str.h" />
+    <ClInclude Include="cvar.h" />
+    <ClInclude Include="platform.h" />
+    <ClInclude Include="setup.h" />
+    <ClInclude Include="sys\AppInfo.h" />
+    <ClInclude Include="sys\process.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{91BE6BC9-01E4-492A-B9B1-7851F0C4E345}</ProjectGuid>
@@ -56,7 +81,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -72,7 +97,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
