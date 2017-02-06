@@ -6,12 +6,58 @@ void GUI_Render()
 	ImGuiIO& io = ImGui::GetIO();
 	io.MouseDrawCursor = false;
 	ImGui_ImplDX9_NewFrame();
+
+	bool show = true; // Always show the main (virtual) window
+	
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(g_d3d.present_params.BackBufferWidth, g_d3d.present_params.BackBufferHeight), ImGuiSetCond_Always);
+	ImGui::Begin("MODSound_GUI", &show, 
+		ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar |
+		ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_HorizontalScrollbar);
+
+	if (ImGui::BeginMenuBar())
+	{
+		//if (ImGui::BeginMenu("File"))
+		//{
+		//	if (ImGui::MenuItem("Close")) *p_open = false;
+		//	ImGui::EndMenu();
+		//}
+		
+		if (ImGui::BeginMenu("File"))
+		{
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Edit"))
+		{
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("View"))
+		{
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Help"))
+		{
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMenuBar();
+	}
+
+	ImGui::End();
+
+#if 0
 	//
 	// Draw the ImGui test window
 	//
 	bool show_test_window = true;
 	ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
 	ImGui::ShowTestWindow(&show_test_window);
+#endif
+
 	//
 	// Render
 	//
