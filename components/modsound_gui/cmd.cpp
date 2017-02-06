@@ -44,11 +44,16 @@ Command::Command(const char* name, const char* description, cmd_func_t func, CVa
 int Command::Exec(int argc, char** argv) const
 {
 #if _DEBUG
-	Con_Printf("Executing command: '%s' with the following arguments:\n", this->name);
+	const char* command = this->name;
+	if (*command == '\0')
+		command = "$default";
+
+	Con_Printf("Executing command: '%s' with the following arguments:\n", command);
 	for(int i = 0; i < argc; i++)
 	{
 		Con_Printf("  [%d] %s\n", i, argv[i]);
 	}
+	
 	Con_Printf("\n");
 #endif
 
