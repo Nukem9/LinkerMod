@@ -1,27 +1,74 @@
 #include "gui_d3d.h"
 #include "gui_wnd.h"
 
-LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+void GUI_Render()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.MouseDrawCursor = false;
+	ImGui_ImplDX9_NewFrame();
+	//
+	// Draw the ImGui test window
+	//
+	bool show_test_window = true;
+	ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
+	ImGui::ShowTestWindow(&show_test_window);
+	//
+	// Render
+	//
+	g_d3d.device->SetRenderState(D3DRS_ZENABLE, false);
+	g_d3d.device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	g_d3d.device->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
+
+	g_d3d.device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3D_CLEARCOLOR, 1.0f, 0);
+
+	if (g_d3d.device->BeginScene() >= 0)
+	{
+		ImGui::Render();
+		g_d3d.device->EndScene();
+	}
+
+	g_d3d.device->Present(NULL, NULL, NULL, NULL);
+}
+
+LRESULT WINAPI GUI_WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (ImGui_ImplDX9_WndProcHandler(hWnd, msg, wParam, lParam))
 	{
 		return true;
 	}
-
+	
 	switch (msg)
 	{
 	case WM_SIZE:
 		if (g_d3d.device != NULL && wParam != SIZE_MINIMIZED)
 		{
 			ImGui_ImplDX9_InvalidateDeviceObjects();
+			
+			//
+			// Only updating the viewport is faster but leads to stretching etc.
+			/*
+			D3DVIEWPORT9 viewport;
+			viewport.Height = HIWORD(lParam);
+			viewport.Width = LOWORD(lParam) * 2;
+			viewport.X = 0;
+			viewport.Y = 0;
+			viewport.MinZ = 0.0f;
+			viewport.MaxZ = 0.0f;
+			g_d3d.device->SetViewport(&viewport);
+			
+			GUI_Render();
+			*/
+			
 			g_d3d.present_params.BackBufferWidth = LOWORD(lParam);
 			g_d3d.present_params.BackBufferHeight = HIWORD(lParam);
-
+			
 			HRESULT hr = g_d3d.device->Reset(&g_d3d.present_params);
 			if (hr == D3DERR_INVALIDCALL)
 				IM_ASSERT(0);
 
 			ImGui_ImplDX9_CreateDeviceObjects();
+
+			GUI_Render();
 		}
 		return 0;
 	case WM_SYSCOMMAND:
@@ -45,7 +92,7 @@ int GUI_InitWindow(wnd_instance_t* wnd)
 	WNDCLASSEX* wc = &wnd->wc;
 	wc->cbSize = sizeof(WNDCLASSEX);
 	wc->style = CS_CLASSDC;
-	wc->lpfnWndProc = WndProc;
+	wc->lpfnWndProc = GUI_WndProc;
 	wc->cbClsExtra = 0;
 	wc->cbWndExtra = 0;
 	wc->hInstance = GetModuleHandle(NULL);
@@ -97,32 +144,8 @@ void GUI_EnterMessageLoop(wnd_instance_t* wnd)
 			continue;
 		}
 		
-		ImGui_ImplDX9_NewFrame();
-	
-		//
-		// Draw the ImGui test window
-		//
-		bool show_test_window = true;
-		ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-		ImGui::ShowTestWindow(&show_test_window);
-
-		//
-		// Render
-		//
-		g_d3d.device->SetRenderState(D3DRS_ZENABLE, false);
-		g_d3d.device->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-		g_d3d.device->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
+		GUI_Render();
 		
-		g_d3d.device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3D_CLEARCOLOR, 1.0f, 0);
-		
-		if (g_d3d.device->BeginScene() >= 0)
-		{
-			ImGui::Render();
-			g_d3d.device->EndScene();
-		}
-
-		g_d3d.device->Present(NULL, NULL, NULL, NULL);
-
 		if (!wnd->hasEnteredMessageLoop)
 		{
 			wnd->hasEnteredMessageLoop = true;
