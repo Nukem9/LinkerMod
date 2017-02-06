@@ -10,7 +10,7 @@ void GUI_Render()
 	bool show = true; // Always show the main (virtual) window
 	
 	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_Always);
-	ImGui::SetNextWindowSize(ImVec2(g_d3d.present_params.BackBufferWidth, g_d3d.present_params.BackBufferHeight), ImGuiSetCond_Always);
+	ImGui::SetNextWindowSize(ImVec2((float)g_d3d.present_params.BackBufferWidth, (float)g_d3d.present_params.BackBufferHeight), ImGuiSetCond_Always);
 	ImGui::Begin("MODSound_GUI", &show, 
 		ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar |
 		ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
