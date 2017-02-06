@@ -47,6 +47,34 @@ void GUI_Render()
 		ImGui::EndMenuBar();
 	}
 
+	static bool checked = false;
+	ImGui::Checkbox("Checkbox", &checked); // checkbox
+
+	static unsigned int flags = 0;
+	static unsigned int flags_value = 0;
+	ImGui::CheckboxFlags("Checkbox Flags", &flags, flags_value); // checkbox flags ???
+
+	static int currentItem = 0;
+	ImGui::Combo("Combo", &currentItem, "A\0B\0C\0D\0F\0G\0\0"); // enum
+
+	static float float_val = 3.14f;
+	ImGui::InputFloat("Float", &float_val); // float
+	ImGui::SliderFloat("Value", &float_val, 0.0f, 1.0f); // percent
+
+	static int int_val = 35;
+	ImGui::InputInt("Int", &int_val); // int
+
+	//
+	// Clamping for Int Box
+	//
+	if (int_val > 25)
+		int_val = 25;
+	else if (int_val < 0)
+		int_val = 0;
+
+	static char txt_buf[128];
+	ImGui::InputText("TextBox", txt_buf, 128); // text
+
 	ImGui::End();
 
 #if 0
