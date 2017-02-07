@@ -24,6 +24,13 @@ public:
 	virtual void PrintTable(FILE* h = stdout, bool include_debug_info = false) const = 0;
 };
 
+enum CSV_ST_LOADFLAGS
+{
+	CSV_ST_DEFAULT = 0,
+	CSV_ST_PRUNE_EMPTY =			1 << 0,
+	CSV_ST_HEADERLESS_SINGLEFIELD =	1 << 1, // Automatically add the 'name' as the table doesnt contain any field names
+};
+
 //
 // Optimized for loading CSV tables that will not be modified
 //
@@ -35,7 +42,7 @@ private:
 
 public:
 	CSVStaticTable(void);
-	CSVStaticTable(const char* path, bool trim_empty=false);
+	CSVStaticTable(const char* path, int loadflags = CSV_ST_DEFAULT);
 	~CSVStaticTable(void);
 
 	//int FieldCount(void) const;
@@ -52,6 +59,7 @@ public:
 	void Prune(void);
 
 	int ReadFile(const char* path) override;
+	int ReadFile(const char* path, int loadflags);
 	int WriteFile(const char* path, bool overwrite = false) const override;
 
 	void PrintTable(FILE* h = stdout, bool include_debug_info = false) const override;;

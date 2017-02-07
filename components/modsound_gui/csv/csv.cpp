@@ -24,12 +24,10 @@ CSVStaticTable::CSVStaticTable(void) : buf(NULL)
 	this->cells.clear();
 }
 
-CSVStaticTable::CSVStaticTable(const char* path, bool trim_empty) : buf(NULL)
+CSVStaticTable::CSVStaticTable(const char* path, int loadflags) : buf(NULL)
 {
 	this->cells.clear();
-	this->ReadFile(path);
-	if (trim_empty)
-		this->Prune();
+	this->ReadFile(path, loadflags);
 }
 
 CSVStaticTable::~CSVStaticTable(void)
@@ -80,6 +78,11 @@ void CSVStaticTable::Prune(void)
 
 int CSVStaticTable::ReadFile(const char* path)
 {
+	return this->ReadFile(path, CSV_ST_DEFAULT);
+}
+
+int CSVStaticTable::ReadFile(const char* path, int loadflags)
+{
 	int size = FS_FileSize(path);
 
 	this->buf = new char[size + 1];
@@ -125,6 +128,16 @@ int CSVStaticTable::ReadFile(const char* path)
 		}
 
 		tok = strtok_c(NULL, "\r\n", &context);
+	}
+
+	if (loadflags & CSV_ST_PRUNE_EMPTY)
+		this->Prune();
+
+	if (loadflags & CSV_ST_HEADERLESS_SINGLEFIELD)
+	{
+		std::vector<const char*> fields;
+		fields.push_back("name");
+		this->cells.insert(cells.begin(), fields);
 	}
 
 	return 0;

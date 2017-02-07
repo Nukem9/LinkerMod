@@ -4,13 +4,16 @@
 
 #include "../sys/AppInfo.h"
 #include "../common/io.h"
+#include "../common/fs.h"
 
 #include <windows.h>
+
+CSV_Metadata_Globals g_metadata;
 
 //
 // Enums
 //
-const char* csv_enum_widgets[] =
+static const char* csv_enum_widgets[] =
 {
 	"text",
 	"combo",
@@ -21,7 +24,7 @@ const char* csv_enum_widgets[] =
 	NULL
 };
 
-const char* csv_enum_type[] =
+static const char* csv_enum_type[] =
 {
 	"bool",
 	"int",
@@ -32,10 +35,86 @@ const char* csv_enum_type[] =
 	NULL
 };
 
+const char *csv_enum_bus[4] =
+{
+	"world",
+	"game",
+	"voice",
+	NULL
+};
+
+const char *csv_enum_looping[3] =
+{
+	"nonlooping",
+	"looping",
+	NULL
+};
+
+const char *csv_enum_priority[5] =
+{
+	"none",
+	"oldest", 
+	"reject",
+	"priority",
+	NULL
+};
+
+const char *csv_enum_move_type[9] =
+{
+	"none",
+	"left_player",
+	"center_player",
+	"right_player",
+	"random_player",
+	"left_shot",
+	"center_shot",
+	"right_shot",
+	NULL
+};
+
+const char *csv_enum_spatialized[4] =
+{
+	"2d",
+	"3d",
+	"2.5d",
+	NULL
+};
+
+const char *csv_enum_storage_type[5] =
+{
+	"unknown",
+	"loaded",
+	"streamed",
+	"primed",
+	NULL
+};
+
+const char *csv_enum_yes_no[3] =
+{
+	"yes",
+	"no",
+	NULL
+};
+
+const char *csv_enum_yes_no_both[4] =
+{
+	"yes",
+	"no",
+	"both",
+	NULL
+};
+
+const char* csv_enum_pc_format[2] =
+{
+	"wma",
+	NULL
+};
+
+
 //
 // Metadata entries
 //
-csv_entry_t csv_entries[] =
+static csv_entry_t csv_entries_metadata[] =
 {
 	{ "table", offsetof(csv_metadata_s, table), true, CSV_STRING_CONST, 0.0, 32.0, 0, NULL },
 	{ "column", offsetof(csv_metadata_s, column), true, CSV_STRING_CONST, 0.0, 32.0, 0, NULL },
@@ -51,6 +130,55 @@ csv_entry_t csv_entries[] =
 	{ "unit", offsetof(csv_metadata_s, unit), false, CSV_STRING_CONST, 0.0, 0.0, 0, NULL },
 	{ "displayUnit", offsetof(csv_metadata_s, displayUnit), false, CSV_STRING_CONST, 0.0, 0.0, 0, NULL },
 };
+
+//
+//
+//
+enum CSV_ENUM_TABLE_TYPE
+{
+	CSV_ENUM_TABLE_FILE_CSV,
+	CSV_ENUM_TABLE_FILE_TXT,
+	CSV_ENUM_TABLE_INTERNAL,
+};
+
+struct csv_enum_table_metadata_s
+{
+	const char* name;
+	CSV_ENUM_TABLE_TYPE type;
+	void* data;
+};
+
+//
+// This must line up with CSV_ENUM_TABLE_TYPE
+//
+static csv_enum_table_metadata_s csv_metadata_enum_table_info_map[] =
+{
+	{ "bus",			CSV_ENUM_TABLE_INTERNAL, csv_enum_bus },
+	{ "context",		CSV_ENUM_TABLE_FILE_CSV, "globals\\context.csv" },
+	{ "curve",			CSV_ENUM_TABLE_FILE_CSV, "globals\\curves.csv" },
+	{ "group",			CSV_ENUM_TABLE_FILE_CSV, "globals\\group.csv" },
+	{ "limittype",		CSV_ENUM_TABLE_INTERNAL, csv_enum_priority },
+	{ "loadspec",		CSV_ENUM_TABLE_FILE_TXT, "globals\\loadspec.txt" },
+	{ "movetype",		CSV_ENUM_TABLE_INTERNAL, csv_enum_move_type },
+	{ "pan",			CSV_ENUM_TABLE_FILE_CSV, "globals\\pan.csv" },
+	{ "randomizeType",	CSV_ENUM_TABLE_INTERNAL, csv_enum_move_type },
+	{ "snapshot",		CSV_ENUM_TABLE_FILE_CSV, "globals\\snapshot.csv" },
+	{ "snapshotgroup",	CSV_ENUM_TABLE_FILE_CSV, "globals\\snapshot_groups.csv" },
+	{ "spatialized",	CSV_ENUM_TABLE_INTERNAL, csv_enum_spatialized },
+	{ "storage",		CSV_ENUM_TABLE_INTERNAL, csv_enum_storage_type },
+	{ "template",		CSV_ENUM_TABLE_FILE_CSV, "template.csv" },
+};
+
+csv_enum_table_metadata_s* CSV_Metadata_Resolve_EnumTableMapping(const char* key)
+{
+	for (int i = 0; i < ARRAYSIZE(csv_metadata_enum_table_info_map); i++)
+	{
+		if (strcmp(key, csv_metadata_enum_table_info_map[i].name) == 0)
+			return &csv_metadata_enum_table_info_map[i];
+	}
+
+	return 0;
+}
 
 csv_metadata_s::csv_metadata_s(void)
 {
@@ -73,44 +201,134 @@ csv_metadata_s::~csv_metadata_s(void)
 	if (displayUnit) free((void*)displayUnit);
 }
 
-void CSV_Metadata_Init()
+CSV_Metadata_Globals::CSV_Metadata_Globals(void)
+{
+	enums.pans = NULL;
+	enums.curves = NULL;
+	enums.snapshots = NULL;
+	enums.randomize_type = NULL;
+}
+
+CSV_Metadata_Globals::~CSV_Metadata_Globals(void)
+{
+	for (int i = 0; enums.pans && enums.pans[i]; i++)
+		free((void*)enums.pans[i]);
+
+	for (int i = 0; enums.curves && enums.curves[i]; i++)
+		free((void*)enums.curves[i]);
+
+	for (int i = 0; enums.snapshots && enums.snapshots[i]; i++)
+		free((void*)enums.snapshots[i]);
+
+	for (int i = 0; enums.randomize_type && enums.randomize_type[i]; i++)
+		free((void*)enums.randomize_type[i]);
+
+	delete[] this->enums.pans;
+	delete[] this->enums.curves;
+	delete[] this->enums.snapshots;
+	delete[] this->enums.randomize_type;
+}
+
+int CSV_Metadata_Init()
 {
 	Con_Printf("Init CSV system...\n");
 
 	char path[MAX_PATH];
 	sprintf_s(path, "%s\\raw\\soundaliases\\globals\\metadata.csv", AppInfo_AppDir());
-	const CSVStaticTable table(path, true);
+	Con_Printf("Loading '%s'...\n", FS_GetFilenameSubString(path));
+	const CSVStaticTable table(path, CSV_ST_PRUNE_EMPTY);
 
-	std::vector<csv_metadata_s> data;
-	data.resize(table.RowCount()); // reserve enough spaces
+	g_metadata.metadata.clear();
+	g_metadata.metadata.resize(table.RowCount()); // reserve enough spaces
 
 	int count = 0;
-	CSV_LoadEntry_StaticTable(&table, csv_entries, ARRAYSIZE(csv_entries), (BYTE*)&data[0], sizeof(csv_metadata_s), &count);
+	CSV_LoadEntry_StaticTable(&table, csv_entries_metadata, ARRAYSIZE(csv_entries_metadata), (BYTE*)&g_metadata.metadata[0], sizeof(csv_metadata_s), &count);
 
 	// Note that resize does not change the capacity of the std::vector (ie the extra metadata remains allocated)
-	data.resize(count);
+	g_metadata.metadata.resize(count);
 
-	/*
-	enumTable
+	Con_Printf_v("Init default values...\n");
+	for (auto& metadata : g_metadata.metadata)
+	{
+		const char* str = metadata.default_str;
 
-	bus						// static const char *enum_bus[3] = { "world", "game", "voice" };
-	context					// globals/context.csv
-	curve					// globals/curves.csv
-	group					// globals/group.csv
-	limittype				// static const char *enum_priority[5] = { "none", "oldest", "reject", "priority", NULL };
-	loadspec				// globals/loadspec.txt
-	movetype				// static (see snd_csv_enum.h) enum_move_type
-	pan						// globals/pan.csv
-	randomizeType			// static (see snd_csv_enum.h) enum_move_type
-	snapshot				// globals/snapshot.csv
-	snapshotgroup			// globals/snapshot_groups.csv
-	spatialized				// static const char *enum_spatialized[4] = { "2d", "3d", "2.5d", NULL };
-	storage					// static const char *enum_type[5] = { "unknown", "loaded", "streamed", "primed", NULL };
-	template				// template.csv
-	*/
+		// Skip entries without default values (handled later)
+		if (str == NULL)
+			continue;
+
+		switch (metadata.type)
+		{
+		case CSV_FIELD_TYPE::CSV_FIELD_BOOL:
+			// Todo: Real handling for booleans
+			metadata._default.boolean_value = (*str != '\0');
+			break;
+		case CSV_FIELD_TYPE::CSV_FIELD_INT:
+			metadata._default.integer_value = atoi(str);
+			break;
+		case CSV_FIELD_TYPE::CSV_FIELD_FLOAT:
+			metadata._default.float_value = (float)atof(str);
+			break;
+		case CSV_FIELD_TYPE::CSV_FIELD_STRING:
+			// default_str is used
+			break;
+		case CSV_FIELD_TYPE::CSV_FIELD_ENUM:
+			// todo... resolve the values
+			metadata._default.enum_index = -1;
+			break;
+		case CSV_FIELD_TYPE::CSV_FIELD_FLAGS:
+		default:
+			Con_Error("Error: Unhandled field type (%d)\n", metadata.type);
+			return 1;
+		}
+	}
+
 	Con_Printf("Init enum tables...\n");
 
-	//
-	// Todo: Init enum tables
-	//
+	std::vector<CSVStaticTable> enums;
+	enums.resize(ARRAYSIZE(csv_metadata_enum_table_info_map)); // Allocate space for all possibly supported enum tables
+
+	for (unsigned int i = 0; i < g_metadata.metadata.size(); i++)
+	{
+		if (g_metadata.metadata[i].type == CSV_FIELD_TYPE::CSV_FIELD_ENUM)
+		{
+			csv_enum_table_metadata_s* enum_table = CSV_Metadata_Resolve_EnumTableMapping(g_metadata.metadata[i].enumTable);
+			if (!enum_table)
+			{
+				Con_Error("Unable to resolve enum info for enum table '%s'\n", g_metadata.metadata[i].enumTable);
+				return 2;
+			}
+
+			int index = enum_table - csv_metadata_enum_table_info_map;
+			int loadbits = CSV_ST_PRUNE_EMPTY;
+
+			switch (enum_table->type)
+			{
+			case CSV_ENUM_TABLE_INTERNAL:
+				printf("INTERNAL: %s\n", enum_table->name);
+				break;
+			case CSV_ENUM_TABLE_FILE_TXT:
+				loadbits |= CSV_ST_HEADERLESS_SINGLEFIELD;
+			case CSV_ENUM_TABLE_FILE_CSV:
+			{
+				int index = enum_table - csv_metadata_enum_table_info_map;
+				if (!enums[index].isEmpty())
+				{
+					Con_Warning_v("Skipping '%s' - already loaded\n", enum_table->data);
+					continue;
+				}
+
+				sprintf_s(path, "%s\\raw\\soundaliases\\%s", AppInfo_AppDir(), (const char*)enum_table->data);
+				
+				Con_Printf("Loading '%s'...\n", FS_GetFilenameSubString(path));
+				enums[index].ReadFile(path, loadbits);
+				break;
+			}
+			default:
+				Con_Error("Error: Unhandled enum table type (error %d)\n", enum_table->type);
+				return 3;
+			}
+		}
+	}
+
+	return 0;
 }

@@ -6,6 +6,7 @@ enum csv_entry_type
 {
 	CSV_STRING,
 	CSV_STRING_CONST,
+	CSV_STRING_BUFFERED,
 	CSV_FLOAT,
 	CSV_INT,
 	CSV_ENUM,
@@ -33,7 +34,7 @@ struct csv_entry_t
 	float minimum;
 	float maximum;
 	unsigned int length;
-	const char **enum_ids;
+	const char **enums;
 };
 
 int CSV_LoadEntry_StaticTable(const CSVStaticTable* table, csv_entry_t* entry_set, int entry_set_size, BYTE* dest, int dest_stride, int* count);

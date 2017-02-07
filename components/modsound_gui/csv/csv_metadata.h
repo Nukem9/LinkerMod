@@ -41,13 +41,12 @@ public:
 
 	const char* default_str;
 
-	//union
-	//{
-	//	const char* _str;
-	//	int _enum;
-	//	int _int;
-	//	float _float;
-	//} _default;
+	union {
+		int integer_value;
+		float float_value;
+		bool boolean_value;
+		int enum_index;
+	} _default;
 
 	const char* enumTable;
 	const char* enumColumn;
@@ -60,4 +59,33 @@ public:
 	~csv_metadata_s(void);
 };
 
-void CSV_Metadata_Init(void);
+class CSV_Metadata_Globals
+{
+public:
+	std::vector<csv_metadata_s> metadata;
+	
+	struct
+	{
+		const char** pans;
+		const char** curves;
+		const char** snapshots;
+		const char** randomize_type;
+	} enums;
+
+	CSV_Metadata_Globals(void);
+	~CSV_Metadata_Globals(void);
+};
+
+extern const char* csv_enum_bus[4];
+extern const char* csv_enum_looping[3];
+extern const char* csv_enum_priority[5];
+extern const char* csv_enum_move_type[9];
+extern const char* csv_enum_spatialized[4];
+extern const char* csv_enum_storage_type[5];
+extern const char* csv_enum_yes_no[3];
+extern const char* csv_enum_yes_no_both[4];
+extern const char* csv_enum_pc_format[2];
+
+extern CSV_Metadata_Globals g_metadata;
+
+int CSV_Metadata_Init(void);

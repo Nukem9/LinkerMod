@@ -3,14 +3,14 @@
 
 #include <vector>
 
-int CSV_LoadEntry_GetEnumIndex(const char* key, const char** enum_ids)
+int CSV_LoadEntry_GetEnumIndex(const char* key, const char** enums)
 {
-	_ASSERT(enum_ids);
+	_ASSERT(enums);
 
 	int result = -1;
-	for (int i = 0; enum_ids[i]; i++)
+	for (int i = 0; enums[i]; i++)
 	{
-		if (strcmp(key, enum_ids[i]) == 0)
+		if (strcmp(key, enums[i]) == 0)
 			return i;
 	}
 
@@ -48,7 +48,7 @@ int CSV_LoadEntry(const char* value, csv_entry_t* entry, BYTE* dst)
 		*(int*)(dst + entry->offset) = atoi(value);
 		return 0;
 	case CSV_ENUM:
-		val = CSV_LoadEntry_GetEnumIndex(value, entry->enum_ids);
+		val = CSV_LoadEntry_GetEnumIndex(value, entry->enums);
 		if (val == -1)
 		{
 			return -1;
