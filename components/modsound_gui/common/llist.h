@@ -1,8 +1,5 @@
 #pragma once
 
-#include "../gsc_parser/src/cpp/util/llist.h"
-
-#if 0
 template <typename T>
 class LList
 {
@@ -195,4 +192,3 @@ LList<T>* LList<T>::NextNode(void) const
 {
 	return (this->next == head) ? NULL : this->next;
 }
-#endif

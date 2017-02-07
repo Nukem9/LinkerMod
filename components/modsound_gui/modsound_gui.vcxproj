@@ -19,6 +19,10 @@
     <ClCompile Include="common\fs.cpp" />
     <ClCompile Include="common\io.cpp" />
     <ClCompile Include="common\str.cpp" />
+    <ClCompile Include="csv\csv.cpp" />
+    <ClCompile Include="csv\csv_load_entry.cpp" />
+    <ClCompile Include="csv\csv_metadata.cpp" />
+    <ClCompile Include="csv\csv_tables.cpp" />
     <ClCompile Include="cvar.cpp" />
     <ClCompile Include="gui\gui_d3d.cpp" />
     <ClCompile Include="gui\gui_wnd.cpp" />
@@ -36,6 +40,10 @@
     <ClInclude Include="common\io.h" />
     <ClInclude Include="common\llist.h" />
     <ClInclude Include="common\str.h" />
+    <ClInclude Include="csv\csv.h" />
+    <ClInclude Include="csv\csv_load_entry.h" />
+    <ClInclude Include="csv\csv_metadata.h" />
+    <ClInclude Include="csv\csv_tables.h" />
     <ClInclude Include="cvar.h" />
     <ClInclude Include="gui\gui_d3d.h" />
     <ClInclude Include="gui\gui_wnd.h" />
