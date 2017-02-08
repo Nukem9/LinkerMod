@@ -1,6 +1,9 @@
 #include "cmd_common.h"
+
 #include "../sys/process.h"
-#include "ripper/process_info.h"
+#include "ripper\process_info.h"
+
+#include "ripper\snd_ripper.h"
 
 int Cmd_Rip_f(int argc, char** argv)
 {
@@ -12,12 +15,28 @@ int Cmd_Rip_f(int argc, char** argv)
 			return err;
 		}
 
-		Con_Warning("NOT CURRENTLY IMPLEMENTED - FALLING BACK TO LISTASSETPOOL");
+		Process_SuspendThreads(pid);
 
-		for (int i = 0; i < ASSET_TYPE_COUNT; i++)
+		snapshots_map_t snapshots_map(0);
+		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_SoundBank_GatherSnapshots_Callback_f, NULL, &snapshots_map);
+		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_SoundBank_Callback_f, NULL, &snapshots_map);
+
+		for (auto& set : snapshots_map)
 		{
-			DB_ListAssetPool((XAssetType)i);
+			std::string name = set.first;
+			Rip_Snapshot_Callback_f(name, set.second);
 		}
+
+		radverbs_map_t radverbs_map(0);
+		DB_EnumAssetPoolEx(ASSET_TYPE_SOUND, Rip_SoundBank_GatherRadverbs_Callback_f, NULL, &radverbs_map);
+
+		for (auto& set : radverbs_map)
+		{
+			std::string name = set.first;
+			Rip_Radverb_Callback_f(name, set.second);
+		}
+
+		Process_ResumeThreads(pid);
 
 		ProcessInfo_Free();
 		return 0;

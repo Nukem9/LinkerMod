@@ -162,3 +162,24 @@ void Process_SuspendThreads(processId_t pid)
 
 	CloseHandle(threadSnapshot);
 }
+
+void Process_ResumeThreads(processId_t pid)
+{
+	HANDLE threadSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, NULL);
+
+	THREADENTRY32 threadEntry;
+	threadEntry.dwSize = sizeof(THREADENTRY32);
+
+	Thread32First(threadSnapshot, &threadEntry);
+	do
+	{
+		if (threadEntry.th32OwnerProcessID == pid)
+		{
+			HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, threadEntry.th32ThreadID);
+			ResumeThread(hThread);
+			CloseHandle(hThread);
+		}
+	} while (Thread32Next(threadSnapshot, &threadEntry));
+
+	CloseHandle(threadSnapshot);
+}
