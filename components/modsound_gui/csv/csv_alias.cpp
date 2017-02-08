@@ -67,7 +67,7 @@ csv_entry_t csvEntries_53[] =
 	CSV_ENUM_MAPPING("move_time", move_time, false, CSV_USHORT, 0.0f, 65535.0f, 0, NULL),
 	CSV_ENUM_MAPPING("real_delay", real_delay, false, CSV_FLAG, 1.0f, 2.0f, 0, csv_enum_yes_no),
 	CSV_ENUM_MAPPING("subtitle", subtitle, false, CSV_STRING_BUFFERED, 0.0f, 0.0f, CSV_SNDALIAS_SUBTITLE_LEN, NULL),
-	CSV_ENUM_MAPPING("mature", mature, true, CSV_ENUM_BYTE, 0.0f, 0.0f, 0.0f, csv_enum_yes_no_both),
+	CSV_ENUM_MAPPING("mature", mature, true, CSV_ENUM_BYTE, 0.0f, 0.0f, 0, csv_enum_yes_no_both),
 
 	CSV_ENUM_MAPPING("doppler", doppler, false, CSV_FLAG, 1.0f, 4.0f, 0, csv_enum_yes_no),
 	CSV_ENUM_MAPPING("futz", futz, false, CSV_FLAG, 1.0f, 6.0f, 0, csv_enum_yes_no),
