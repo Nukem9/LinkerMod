@@ -55,8 +55,15 @@ public:
 
 	//
 	// Remove all empty rows from the CSV table
+	// returns the number of rows removed
 	//
-	void Prune(void);
+	int PruneRows(void);
+
+	//
+	// Remove all empty columns from the table
+	// returns the number of columns removed
+	//
+	int PruneColumns(void);
 
 	int ReadFile(const char* path) override;
 	int ReadFile(const char* path, int loadflags);
@@ -109,4 +116,4 @@ bool ICSVTable<T>::isEmpty(void) const
 	return this->cells.size() == 0;
 }
 
-void CSV_TEST();
+void CSV_DRAW_TEST();

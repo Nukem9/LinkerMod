@@ -49,7 +49,7 @@ const char* CSVStaticTable::CellValue(int row_index, int field_index) const
 	return this->cells[row_index + 1][field_index];
 }
 
-void CSVStaticTable::Prune(void)
+int CSVStaticTable::PruneRows(void)
 {
 	int pruned_count = 0;
 	for (int r = 0; r < this->RowCount();)
@@ -73,7 +73,39 @@ void CSVStaticTable::Prune(void)
 	}
 
 	if (pruned_count)
-		Con_Printf_v("Pruned %d empty entries from table\n", pruned_count);
+		Con_Printf_v("Pruned %d empty rows from table\n", pruned_count);
+
+	return pruned_count;
+}
+
+int CSVStaticTable::PruneColumns(void)
+{
+	int pruned_count = 0;
+
+	for (int c = 0, actual_column = 0; c < this->FieldCount(); actual_column++)
+	{
+		if (*this->FieldName(c) != '\0')
+		{
+			c++;
+			continue;
+		}
+
+		for (int r = 1; r < this->RowCount(); r++)
+		{
+			if (*this->CellValue(r, c) != '\0')
+				Con_Warning("Warning: Ignoring value with unnamed field (see field %d)\n", actual_column);
+
+			this->cells[r].erase(this->cells[r].begin() + c);
+		}
+
+		this->cells[0].erase(this->cells[0].begin() + c);
+		pruned_count++;
+	}
+
+	if (pruned_count)
+		Con_Printf_v("Pruned %d empty columns from table\n", pruned_count);
+
+	return pruned_count;
 }
 
 int CSVStaticTable::ReadFile(const char* path)
@@ -83,6 +115,7 @@ int CSVStaticTable::ReadFile(const char* path)
 
 int CSVStaticTable::ReadFile(const char* path, int loadflags)
 {
+	Con_Printf_v("Loading CSV '%s...'\n", FS_GetFilenameSubString(path));
 	int size = FS_FileSize(path);
 
 	this->buf = new char[size + 1];
@@ -131,7 +164,10 @@ int CSVStaticTable::ReadFile(const char* path, int loadflags)
 	}
 
 	if (loadflags & CSV_ST_PRUNE_EMPTY)
-		this->Prune();
+	{
+		this->PruneColumns();
+		this->PruneRows();
+	}
 
 	if (loadflags & CSV_ST_HEADERLESS_SINGLEFIELD)
 	{
@@ -184,12 +220,57 @@ void CSVStaticTable::PrintTable(FILE* h, bool include_debug_info) const
 	}
 }
 
-//void CSV_TEST()
-//{
-//	const char* path = "D:\\SteamLibrary\\steamapps\\common\\Call of Duty Black Ops\\raw\\soundaliases\\globals\\metadata.csv";
-//	const CSVStaticTable table(path);
-//	//table.ReadFile(path);
-//	table.PrintTable();
-//
-//	int i = 0;
-//}
+class CSVGrid
+{
+private:
+	CSVStaticTable table;
+	std::vector<float> widths;
+
+public:
+	CSVGrid();
+	~CSVGrid();
+};
+
+static CSVStaticTable table;
+
+#include "imgui\imgui.h"
+#include "imgui\imgui_internal.h"
+#include "../sys/AppInfo.h"
+void CSV_DRAW_TEST()
+{
+
+	//static const CSVStaticTable table(path);
+
+	static bool initted = false;
+	if (!initted)
+	{
+		char path[MAX_PATH];
+		sprintf_s(path, "%s\\raw\\soundaliases\\zmb_music.csv", AppInfo_AppDir());
+		table.ReadFile(path, CSV_ST_PRUNE_EMPTY);
+		initted = true;
+	}
+
+	bool selected = false;
+	ImVec2 size(256, 16.0);
+
+	ImGuiListClipper clipper(table.RowCount(), -1);
+	while (clipper.Step())
+	{
+		int start_c = -1;
+		int end_c = -1;
+
+		for (int r = clipper.DisplayStart; r < clipper.DisplayEnd; r++) // draw each row
+		{
+			float offset = 0;
+			for (int c = 0; c < table.FieldCount(); c++)
+			{
+				if (c > 0)
+					ImGui::SameLine();
+
+				ImGui::Selectable(table.CellValue(r, c), &selected, 0, size);
+			}
+		}
+	}
+
+	clipper.End();
+}

@@ -235,7 +235,6 @@ int CSV_Metadata_Init()
 
 	char path[MAX_PATH];
 	sprintf_s(path, "%s\\raw\\soundaliases\\globals\\metadata.csv", AppInfo_AppDir());
-	Con_Printf("Loading '%s'...\n", FS_GetFilenameSubString(path));
 	const CSVStaticTable table(path, CSV_ST_PRUNE_EMPTY);
 
 	g_metadata.metadata.clear();
@@ -319,7 +318,6 @@ int CSV_Metadata_Init()
 
 				sprintf_s(path, "%s\\raw\\soundaliases\\%s", AppInfo_AppDir(), (const char*)enum_table->data);
 				
-				Con_Printf("Loading '%s'...\n", FS_GetFilenameSubString(path));
 				enums[index].ReadFile(path, loadbits);
 				break;
 			}
