@@ -115,5 +115,3 @@ bool ICSVTable<T>::isEmpty(void) const
 {
 	return this->cells.size() == 0;
 }
-
-void CSV_DRAW_TEST();

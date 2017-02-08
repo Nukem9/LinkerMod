@@ -1,12 +1,17 @@
 #include "gui_d3d.h"
 #include "gui_wnd.h"
+#include "gui_gridview.h"
 
 #include "../csv/csv.h"
+
+GUIGridView grid_view;
+static bool initted = false;
 
 void GUI_Render()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.MouseDrawCursor = false;
+
 	ImGui_ImplDX9_NewFrame();
 
 	bool show = true; // Always show the main (virtual) window
@@ -20,12 +25,6 @@ void GUI_Render()
 
 	if (ImGui::BeginMenuBar())
 	{
-		//if (ImGui::BeginMenu("File"))
-		//{
-		//	if (ImGui::MenuItem("Close")) *p_open = false;
-		//	ImGui::EndMenu();
-		//}
-		
 		if (ImGui::BeginMenu("File"))
 		{
 			ImGui::EndMenu();
@@ -79,7 +78,13 @@ void GUI_Render()
 	ImGui::InputText("TextBox", txt_buf, 128); // text
 #endif
 
-	CSV_DRAW_TEST();
+	if (!initted)
+	{
+		grid_view.LoadTable();
+		initted = true;
+	}
+
+	grid_view.Draw();
 
 	ImGui::End();
 

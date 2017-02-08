@@ -25,6 +25,7 @@
     <ClCompile Include="csv\csv_metadata.cpp" />
     <ClCompile Include="cvar.cpp" />
     <ClCompile Include="gui\gui_d3d.cpp" />
+    <ClCompile Include="gui\gui_gridview.cpp" />
     <ClCompile Include="gui\gui_wnd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="setup.cpp" />
@@ -46,6 +47,7 @@
     <ClInclude Include="csv\csv_metadata.h" />
     <ClInclude Include="cvar.h" />
     <ClInclude Include="gui\gui_d3d.h" />
+    <ClInclude Include="gui\gui_gridview.h" />
     <ClInclude Include="gui\gui_wnd.h" />
     <ClInclude Include="platform.h" />
     <ClInclude Include="setup.h" />
