@@ -78,6 +78,11 @@ int CSVStaticTable::PruneRows(void)
 	return pruned_count;
 }
 
+void CSVStaticTable::DeleteRow(int row_index)
+{
+	this->cells.erase(this->cells.begin() + 1 + row_index);
+}
+
 int CSVStaticTable::PruneColumns(void)
 {
 	int pruned_count = 0;

@@ -1,16 +1,16 @@
 #include "gui_d3d.h"
 #include "gui_wnd.h"
-#include "gui_gridview.h"
+#include "gui_alias_gridview.h"
 
 #include "../csv/csv.h"
 
-GUIGridView grid_view;
+GUIAliasGridView grid_view;
 static bool initted = false;
 
 void GUI_Render()
 {
-	ImGuiIO& io = ImGui::GetIO();
-	io.MouseDrawCursor = false;
+	//ImGuiIO& io = ImGui::GetIO();
+	//io.MouseDrawCursor = false;
 
 	ImGui_ImplDX9_NewFrame();
 

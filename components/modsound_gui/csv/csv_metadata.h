@@ -2,9 +2,11 @@
 #include <string>
 #include <unordered_map>
 
+#include "csv_enum.h"
+
 //extern std::unordered_map<CSVMetadata*, std::string>> g_metadata_map;
 
-enum class CSV_WIGET_TYPE
+enum CSV_WIDGET_TYPE
 {
 	CSV_WIDGET_TEXT,
 	CSV_WIDGET_COMBO,
@@ -33,7 +35,7 @@ public:
 	const char* column;
 	const char* title;
 	const char* tip;
-	CSV_WIGET_TYPE widget;
+	CSV_WIDGET_TYPE widget;
 	CSV_FIELD_TYPE type;
 
 	float _min;
@@ -64,16 +66,20 @@ class CSV_Metadata_Globals
 public:
 	std::vector<csv_metadata_s> metadata;
 	
-	struct
-	{
-		const char** pans;
-		const char** curves;
-		const char** snapshots;
-		const char** randomize_type;
-	} enums;
+	//struct
+	//{
+	//	const char** pans;
+	//	const char** curves;
+	//	const char** snapshots;
+	//	const char** randomize_type;
+	//} enums;
+	std::unordered_map<std::string, CSVEnumInfo> enums;
 
 	CSV_Metadata_Globals(void);
 	~CSV_Metadata_Globals(void);
+	
+	// Returns NULL if none metadata found
+	csv_metadata_s* ResolveMetadataForField(const char* field_name);
 };
 
 extern const char* csv_enum_bus[4];

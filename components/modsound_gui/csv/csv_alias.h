@@ -86,3 +86,7 @@ struct csv_snd_alias_t
 	enum_byte_t snapshot;
 };
 
+csv_entry_t* CSV_ResolveAliasEntryFromFieldName(const char* field_name);
+
+int CSV_LoadSoundAlias(const char* path, std::vector<csv_snd_alias_t>* aliases);
+int CSV_LoadSoundAlias(const CSVStaticTable* table, std::vector<csv_snd_alias_t>* aliases);

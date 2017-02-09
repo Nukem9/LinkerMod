@@ -58,6 +58,7 @@ public:
 	// returns the number of rows removed
 	//
 	int PruneRows(void);
+	void DeleteRow(int row_index);
 
 	//
 	// Remove all empty columns from the table

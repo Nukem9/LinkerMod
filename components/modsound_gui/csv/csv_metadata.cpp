@@ -203,30 +203,21 @@ csv_metadata_s::~csv_metadata_s(void)
 
 CSV_Metadata_Globals::CSV_Metadata_Globals(void)
 {
-	enums.pans = NULL;
-	enums.curves = NULL;
-	enums.snapshots = NULL;
-	enums.randomize_type = NULL;
 }
 
 CSV_Metadata_Globals::~CSV_Metadata_Globals(void)
 {
-	for (int i = 0; enums.pans && enums.pans[i]; i++)
-		free((void*)enums.pans[i]);
+}
 
-	for (int i = 0; enums.curves && enums.curves[i]; i++)
-		free((void*)enums.curves[i]);
+csv_metadata_s* CSV_Metadata_Globals::ResolveMetadataForField(const char* field_name)
+{
+	for (auto& metadata : this->metadata)
+	{
+		if (strcmp(field_name, metadata.column) == 0)
+			return &metadata;
+	}
 
-	for (int i = 0; enums.snapshots && enums.snapshots[i]; i++)
-		free((void*)enums.snapshots[i]);
-
-	for (int i = 0; enums.randomize_type && enums.randomize_type[i]; i++)
-		free((void*)enums.randomize_type[i]);
-
-	delete[] this->enums.pans;
-	delete[] this->enums.curves;
-	delete[] this->enums.snapshots;
-	delete[] this->enums.randomize_type;
+	return 0;
 }
 
 int CSV_Metadata_Init()
@@ -235,8 +226,22 @@ int CSV_Metadata_Init()
 
 	char path[MAX_PATH];
 	sprintf_s(path, "%s\\raw\\soundaliases\\globals\\metadata.csv", AppInfo_AppDir());
-	const CSVStaticTable table(path, CSV_ST_PRUNE_EMPTY);
+	CSVStaticTable table(path, CSV_ST_PRUNE_EMPTY);
 
+	//
+	// Strip excess info as it may or may not be supported by the entry_set
+	//
+	for (int r = 0; r < table.RowCount();)
+	{
+		if (strcmp("alias", table.CellValue(r, 0)) != 0)
+		{
+			table.DeleteRow(r);
+			continue;
+		}
+
+		r++;
+	}
+	
 	g_metadata.metadata.clear();
 	g_metadata.metadata.resize(table.RowCount()); // reserve enough spaces
 
@@ -297,28 +302,39 @@ int CSV_Metadata_Init()
 				return 2;
 			}
 
+			//
+			// Skip any enums tables that have already been initialized
+			//
+			if (g_metadata.enums[enum_table->name].Enums() == NULL)
+				continue;
+
 			int index = enum_table - csv_metadata_enum_table_info_map;
 			int loadbits = CSV_ST_PRUNE_EMPTY;
 
 			switch (enum_table->type)
 			{
 			case CSV_ENUM_TABLE_INTERNAL:
-				printf("INTERNAL: %s\n", enum_table->name);
+				//
+				// Automatically load from the internal array
+				//
+				g_metadata.enums[enum_table->name].LoadFromInternalArray((const char**)enum_table->data);
 				break;
 			case CSV_ENUM_TABLE_FILE_TXT:
 				loadbits |= CSV_ST_HEADERLESS_SINGLEFIELD;
 			case CSV_ENUM_TABLE_FILE_CSV:
 			{
 				int index = enum_table - csv_metadata_enum_table_info_map;
-				if (!enums[index].isEmpty())
+
+				//
+				// Cache the enum CSV if it hasnt already been loaded
+				//
+				if (enums[index].isEmpty())
 				{
-					Con_Warning_v("Skipping '%s' - already loaded\n", enum_table->data);
-					continue;
+					sprintf_s(path, "%s\\raw\\soundaliases\\%s", AppInfo_AppDir(), (const char*)enum_table->data);
+					enums[index].ReadFile(path, loadbits);
 				}
 
-				sprintf_s(path, "%s\\raw\\soundaliases\\%s", AppInfo_AppDir(), (const char*)enum_table->data);
-				
-				enums[index].ReadFile(path, loadbits);
+				g_metadata.enums[enum_table->name].LoadFromTableColumn(&enums[index], g_metadata.metadata[i].enumColumn);
 				break;
 			}
 			default:
@@ -327,6 +343,10 @@ int CSV_Metadata_Init()
 			}
 		}
 	}
+
+	//
+	// Initialize the hardcoded enums
+	//
 
 	return 0;
 }

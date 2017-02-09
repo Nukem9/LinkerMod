@@ -41,6 +41,9 @@ int CSV_LoadEntry(const char* value, csv_entry_t* entry, BYTE* dst)
 	case CSV_STRING_CONST:
 		(*(const char**)(dst + entry->offset)) = _strdup(value);
 		return 0;
+	case CSV_STRING_BUFFERED:
+		strncpy((char*)(dst + entry->offset), value, entry->length);
+		return 0;
 	case CSV_FLOAT:
 		*(float*)(dst + entry->offset) = (float)atof(value);
 		return 0;
@@ -117,11 +120,9 @@ int CSV_LoadEntry_StaticTable(const CSVStaticTable* table, csv_entry_t* entry_se
 	//
 	for (int row_index = 0; row_index < table->RowCount(); row_index++)
 	{
-		//
-		// Skip everything except the alias info right now
-		//
-		if (strcmp(table->CellValue(row_index, 0), "alias") != 0)
-			break;
+		// Skip headers for now
+		if (*table->CellValue(row_index, 0) == '#')
+			continue;
 
 		for (int field_index = 0; field_index < table->FieldCount(); field_index++)
 		{
