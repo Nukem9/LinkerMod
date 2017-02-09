@@ -92,7 +92,7 @@ extern const char* csv_enum_yes_no[3];
 extern const char* csv_enum_yes_no_both[4];
 extern const char* csv_enum_pc_format[2];
 
-extern CSV_Metadata_Globals g_metadata;
+extern CSV_Metadata_Globals* g_metadata;
 
 int CSV_Metadata_Init(void);
 void CSV_Metadata_Free(void);

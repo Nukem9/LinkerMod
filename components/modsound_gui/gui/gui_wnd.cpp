@@ -4,8 +4,7 @@
 
 #include "../csv/csv.h"
 
-GUIAliasGridView grid_view;
-static bool initted = false;
+GUIAliasGridView* grid_view = NULL;
 
 void GUI_Render()
 {
@@ -78,13 +77,7 @@ void GUI_Render()
 	ImGui::InputText("TextBox", txt_buf, 128); // text
 #endif
 
-	if (!initted)
-	{
-		grid_view.LoadTable();
-		initted = true;
-	}
-
-	grid_view.Draw();
+	grid_view->Draw();
 
 	ImGui::End();
 
@@ -209,12 +202,26 @@ int GUI_InitWindow(wnd_instance_t* wnd)
 	}
 
 	wnd->hasEnteredMessageLoop = false;
+
+	//
+	// Initialize the test gridview
+	//
+	_ASSERT(grid_view == NULL);
+	grid_view = new GUIAliasGridView;
+	grid_view->LoadTable();
+
 	return 0;
 }
 
 void GUI_FreeWindow(wnd_instance_t* wnd)
 {
 	UnregisterClass(WNDCLASS_NAME, wnd->wc.hInstance);
+
+	//
+	// Free the debug grid view
+	//
+	_ASSERT(grid_view);
+	delete grid_view;
 }
 
 void GUI_EnterMessageLoop(wnd_instance_t* wnd)

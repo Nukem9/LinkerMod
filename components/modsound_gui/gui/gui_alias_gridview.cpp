@@ -67,7 +67,7 @@ int GUIAliasGridView::LoadTable(const char* path)
 
 		field_defs[i].data_offset = entry->offset;
 
-		if (csv_metadata_s* metadata = g_metadata.ResolveMetadataForField(field))
+		if (csv_metadata_s* metadata = g_metadata->ResolveMetadataForField(field))
 		{
 			field_defs[i].draw_func = gui_alias_widgetfuncs[metadata->widget];
 			continue;

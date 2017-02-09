@@ -8,7 +8,7 @@
 
 #include <windows.h>
 
-CSV_Metadata_Globals g_metadata;
+CSV_Metadata_Globals* g_metadata = NULL;
 
 //
 // Enums
@@ -222,6 +222,8 @@ csv_metadata_s* CSV_Metadata_Globals::ResolveMetadataForField(const char* field_
 
 int CSV_Metadata_Init()
 {
+	_ASSERT(g_metadata == NULL);
+
 	Con_Printf("Init CSV system...\n");
 
 	char path[MAX_PATH];
@@ -242,17 +244,19 @@ int CSV_Metadata_Init()
 		r++;
 	}
 	
-	g_metadata.metadata.clear();
-	g_metadata.metadata.resize(table.RowCount()); // reserve enough spaces
+	g_metadata = new CSV_Metadata_Globals;
+
+	g_metadata->metadata.clear();
+	g_metadata->metadata.resize(table.RowCount()); // reserve enough spaces
 
 	int count = 0;
-	CSV_LoadEntry_StaticTable(&table, csv_entries_metadata, ARRAYSIZE(csv_entries_metadata), (BYTE*)&g_metadata.metadata[0], sizeof(csv_metadata_s), &count);
+	CSV_LoadEntry_StaticTable(&table, csv_entries_metadata, ARRAYSIZE(csv_entries_metadata), (BYTE*)&g_metadata->metadata[0], sizeof(csv_metadata_s), &count);
 
 	// Note that resize does not change the capacity of the std::vector (ie the extra metadata remains allocated)
-	g_metadata.metadata.resize(count);
+	g_metadata->metadata.resize(count);
 
 	Con_Printf_v("Init default values...\n");
-	for (auto& metadata : g_metadata.metadata)
+	for (auto& metadata : g_metadata->metadata)
 	{
 		const char* str = metadata.default_str;
 
@@ -291,21 +295,21 @@ int CSV_Metadata_Init()
 	std::vector<CSVStaticTable> enums;
 	enums.resize(ARRAYSIZE(csv_metadata_enum_table_info_map)); // Allocate space for all possibly supported enum tables
 
-	for (unsigned int i = 0; i < g_metadata.metadata.size(); i++)
+	for (unsigned int i = 0; i < g_metadata->metadata.size(); i++)
 	{
-		if (g_metadata.metadata[i].type == CSV_FIELD_TYPE::CSV_FIELD_ENUM)
+		if (g_metadata->metadata[i].type == CSV_FIELD_TYPE::CSV_FIELD_ENUM)
 		{
-			csv_enum_table_metadata_s* enum_table = CSV_Metadata_Resolve_EnumTableMapping(g_metadata.metadata[i].enumTable);
+			csv_enum_table_metadata_s* enum_table = CSV_Metadata_Resolve_EnumTableMapping(g_metadata->metadata[i].enumTable);
 			if (!enum_table)
 			{
-				Con_Error("Unable to resolve enum info for enum table '%s'\n", g_metadata.metadata[i].enumTable);
+				Con_Error("Unable to resolve enum info for enum table '%s'\n", g_metadata->metadata[i].enumTable);
 				return 2;
 			}
 
 			//
 			// Skip any enums tables that have already been initialized
 			//
-			if (g_metadata.enums[enum_table->name].Enums() == NULL)
+			if (g_metadata->enums[enum_table->name].Enums() == NULL)
 				continue;
 
 			int index = enum_table - csv_metadata_enum_table_info_map;
@@ -317,7 +321,7 @@ int CSV_Metadata_Init()
 				//
 				// Automatically load from the internal array
 				//
-				g_metadata.enums[enum_table->name].LoadFromInternalArray((const char**)enum_table->data);
+				g_metadata->enums[enum_table->name].LoadFromInternalArray((const char**)enum_table->data);
 				break;
 			case CSV_ENUM_TABLE_FILE_TXT:
 				loadbits |= CSV_ST_HEADERLESS_SINGLEFIELD;
@@ -334,7 +338,7 @@ int CSV_Metadata_Init()
 					enums[index].ReadFile(path, loadbits);
 				}
 
-				g_metadata.enums[enum_table->name].LoadFromTableColumn(&enums[index], g_metadata.metadata[i].enumColumn);
+				g_metadata->enums[enum_table->name].LoadFromTableColumn(&enums[index], g_metadata->metadata[i].enumColumn);
 				break;
 			}
 			default:
@@ -353,6 +357,6 @@ int CSV_Metadata_Init()
 
 void CSV_Metadata_Free(void)
 {
-	g_metadata.metadata.clear();
-	g_metadata.enums.clear();
+	_ASSERT(g_metadata);
+	delete g_metadata;
 }
