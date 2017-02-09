@@ -309,7 +309,7 @@ int CSV_Metadata_Init()
 			//
 			// Skip any enums tables that have already been initialized
 			//
-			if (g_metadata->enums[enum_table->name].Enums() == NULL)
+			if (g_metadata->enums[enum_table->name].Enums() != NULL)
 				continue;
 
 			int index = enum_table - csv_metadata_enum_table_info_map;
