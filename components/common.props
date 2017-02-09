@@ -8,10 +8,10 @@
   <ItemDefinitionGroup>
     <Link>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalLibraryDirectories>$(SolutionDir)\build\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\build\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\components\shared</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\components\shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>__CONFIGURATION__="$(ConfigurationName)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
