@@ -1,3 +1,4 @@
+#include <crtdbg.h>
 #include "common/io.h"
 #include <Windows.h>
 
@@ -77,6 +78,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	delete[] argv;
 
+	_CrtDumpMemoryLeaks();
 	return out;
 }
 

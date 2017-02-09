@@ -11,10 +11,15 @@
 
 // WIN32 Specific ( required for _isatty )
 #include <io.h>
+#if _CRTDBG_MAP_ALLOC 
+#include <crtdbg.h>
+#endif
 
 #define isatty		_isatty
 #define fileno		_fileno
+#ifndef _INC_CRTDBG
 #define strdup		_strdup
+#endif
 #define snprintf	_snprintf
 
 #define W32_WARNING_DISABLE(NUM)	__pragma(warning(disable:NUM))
