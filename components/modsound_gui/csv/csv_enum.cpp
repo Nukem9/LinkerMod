@@ -27,7 +27,8 @@ int CSVEnumInfo::LoadFromTableColumn(CSVStaticTable* table, const char* column)
 	{
 		if (strcmp(column, table->FieldName(c)) == 0)
 		{
-			this->enums = new const char*[table->RowCount()];
+			this->enums = new const char*[table->RowCount() + 1];
+			enums[table->RowCount()] = NULL;
 			for (int r = 0; r < table->RowCount(); r++)
 			{
 				this->enums[r] = _strdup(table->CellValue(r, c));
