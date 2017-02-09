@@ -350,3 +350,9 @@ int CSV_Metadata_Init()
 
 	return 0;
 }
+
+void CSV_Metadata_Free(void)
+{
+	g_metadata.metadata.clear();
+	g_metadata.enums.clear();
+}

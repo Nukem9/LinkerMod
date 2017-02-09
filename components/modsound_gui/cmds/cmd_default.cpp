@@ -48,5 +48,7 @@ int Cmd_Default_f(int argc, char** argv)
 
 	Con_Printf("Free window...\n");
 	GUI_FreeWindow(&wnd);
+
+	CSV_Metadata_Free();
 	return 0;
 }
