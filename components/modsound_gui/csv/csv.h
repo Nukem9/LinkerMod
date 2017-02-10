@@ -29,6 +29,7 @@ enum CSV_ST_LOADFLAGS
 	CSV_ST_DEFAULT = 0,
 	CSV_ST_PRUNE_EMPTY =			1 << 0,
 	CSV_ST_HEADERLESS_SINGLEFIELD =	1 << 1, // Automatically add the 'name' as the table doesnt contain any field names
+	CSV_ST_PRUNE_COMMENTS =		1 << 2, // Ignore header / comment lines
 };
 
 //
@@ -54,10 +55,10 @@ public:
 	const char* CellValue(int row_index, int field_index) const;
 
 	//
-	// Remove all empty rows from the CSV table
+	// Remove all empty rows from the CSV table (can also be passed additional bits to prune comments too)
 	// returns the number of rows removed
 	//
-	int PruneRows(void);
+	int PruneRows(int bits = CSV_ST_PRUNE_EMPTY);
 	void DeleteRow(int row_index);
 
 	//

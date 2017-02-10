@@ -49,26 +49,38 @@ const char* CSVStaticTable::CellValue(int row_index, int field_index) const
 	return this->cells[row_index + 1][field_index];
 }
 
-int CSVStaticTable::PruneRows(void)
+int CSVStaticTable::PruneRows(int bits)
 {
+	if ((bits & (CSV_ST_PRUNE_EMPTY | CSV_ST_PRUNE_COMMENTS)) == 0)
+		return 0;
+
 	int pruned_count = 0;
 	for (int r = 0; r < this->RowCount();)
 	{
-		bool content = false;
-		for (int c = 0; c < this->FieldCount(); c++)
-		{
-			if (strlen(this->cells[r+1][c]))
-			{
-				content = true;
-				r++;
-				break;
-			}
-		}
-
-		if (!content)
+		if ((bits & CSV_ST_PRUNE_COMMENTS) && *this->cells[r+1][0] == '#')
 		{
 			this->cells.erase(this->cells.begin() + r + 1);
 			pruned_count++;
+		}
+
+		if (bits & CSV_ST_PRUNE_EMPTY)
+		{
+			bool content = false;
+			for (int c = 0; c < this->FieldCount(); c++)
+			{
+				if (strlen(this->cells[r+1][c]))
+				{
+					content = true;
+					r++;
+					break;
+				}
+			}
+
+			if (!content)
+			{
+				this->cells.erase(this->cells.begin() + r + 1);
+				pruned_count++;
+			}
 		}
 	}
 
@@ -169,10 +181,8 @@ int CSVStaticTable::ReadFile(const char* path, int loadflags)
 	}
 
 	if (loadflags & CSV_ST_PRUNE_EMPTY)
-	{
 		this->PruneColumns();
-		this->PruneRows();
-	}
+	this->PruneRows(loadflags);
 
 	if (loadflags & CSV_ST_HEADERLESS_SINGLEFIELD)
 	{

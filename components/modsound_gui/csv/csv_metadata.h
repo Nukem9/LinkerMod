@@ -3,6 +3,7 @@
 #include <unordered_map>
 
 #include "csv_enum.h"
+#include "csv_load_entry.h"
 
 //extern std::unordered_map<CSVMetadata*, std::string>> g_metadata_map;
 
@@ -56,23 +57,25 @@ public:
 	const char* unit;
 	const char* displayUnit;
 
+	csv_entry_t* entry;
+
+private:
+	// Used to prevent freeing of strings that we didn't use strdup for
+	bool dont_free_strings;
+
 public:
 	csv_metadata_s(void);
+	csv_metadata_s(csv_metadata_s&& move_from); // Move constructor
+
 	~csv_metadata_s(void);
+
+	void MarkStringsAsStatic(void);
 };
 
 class CSV_Metadata_Globals
 {
 public:
 	std::vector<csv_metadata_s> metadata;
-	
-	//struct
-	//{
-	//	const char** pans;
-	//	const char** curves;
-	//	const char** snapshots;
-	//	const char** randomize_type;
-	//} enums;
 	std::unordered_map<std::string, CSVEnumInfo> enums;
 
 	CSV_Metadata_Globals(void);

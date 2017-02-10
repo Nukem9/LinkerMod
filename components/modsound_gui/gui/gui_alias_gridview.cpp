@@ -20,7 +20,7 @@
 //	{ "checklist", GUIView_Alias_DrawCheckList },
 //};
 
-typedef void(*gui_alias_widgetdrawfunc_f)(const char* label, void* data, float column_width);
+typedef void(*gui_alias_widgetdrawfunc_f)(const char* label, void* data, void* metadata, float column_width);
 gui_alias_widgetdrawfunc_f gui_alias_widgetfuncs[CSV_WIDGET_COUNT] =
 {
 	GUIView_Alias_DrawTextBox,
@@ -58,39 +58,54 @@ int GUIAliasGridView::LoadTable(const char* path)
 	for (int i = 0; i < table.FieldCount(); i++)
 	{
 		const char* field = table.FieldName(i);
-		csv_entry_t* entry = CSV_ResolveAliasEntryFromFieldName(field);
+
+		csv_metadata_s* metadata = g_metadata->ResolveMetadataForField(field);
+		if (!metadata)
+		{
+			Con_Error("ERROR: Unable to resolve metadata for field '%s'\n", field);
+			return 1;
+		}
+
+		csv_entry_t* entry = metadata->entry;
 		if (!entry)
 		{
-			Con_Error("ERROR: Unable to resolve entry info for field '%s'\n", field);
-			return 1;
+			Con_Error("ERROR: Metadata for field '%s' is missing entry\n", field);
+			return 2;
 		}
 
+		field_defs[i].draw_func = gui_alias_widgetfuncs[metadata->widget];
 		field_defs[i].data_offset = entry->offset;
+		field_defs[i].metadata = metadata;
 
-		if (csv_metadata_s* metadata = g_metadata->ResolveMetadataForField(field))
-		{
-			field_defs[i].draw_func = gui_alias_widgetfuncs[metadata->widget];
-			continue;
-		}
-		
-		switch (entry->type)
-		{
-		case CSV_DBSPL:
-		case CSV_CENTS:
-		case CSV_NORM_BYTE:
-			field_defs[i].draw_func = GUIView_Alias_DrawKnob;
-			continue;
-		case CSV_FLAG:
-			field_defs[i].draw_func = GUIView_Alias_DrawCheckBox;
-			continue;
-		case CSV_ENUM_BYTE:
-			_ASSERT(entry->enums);
-			field_defs[i].draw_func = GUIView_Alias_DrawComboBox;
-			continue;
-		default:
-			Con_Error("ERROR: Unsupported entry type while initializing widgets for field '%s' (%d)\n", field, entry->type);
-			return 1;
-		}
+		//
+		//if (csv_metadata_s* metadata = g_metadata->ResolveMetadataForField(field))
+		//{
+		//	field_defs[i].draw_func = gui_alias_widgetfuncs[metadata->widget];
+		//	continue;
+		//}
+		//else
+		//{
+		//	return 2;
+		//}
+		//
+		//switch (entry->type)
+		//{
+		//case CSV_DBSPL:
+		//case CSV_CENTS:
+		//case CSV_NORM_BYTE:
+		//	field_defs[i].draw_func = GUIView_Alias_DrawKnob;
+		//	continue;
+		//case CSV_FLAG:
+		//	field_defs[i].draw_func = GUIView_Alias_DrawCheckBox;
+		//	continue;
+		//case CSV_ENUM_BYTE:
+		//	_ASSERT(entry->enums);
+		//	field_defs[i].draw_func = GUIView_Alias_DrawComboBox;
+		//	continue;
+		//default:
+		//	Con_Error("ERROR: Unsupported entry type while initializing widgets for field '%s' (%d)\n", field, entry->type);
+		//	return 1;
+		//}
 	}
 
 	return 0;
@@ -111,7 +126,7 @@ void GUIAliasGridView::Draw(void)
 				sprintf_s(id, "##%d", field_defs.size() * i + f);
 
 				BYTE* data = (BYTE*)&aliases[i];
-				field_defs[f].draw_func(id, data + field_defs[f].data_offset, 32.0f);
+				field_defs[f].draw_func(id, data + field_defs[f].data_offset, field_defs[f].metadata, 32.0f);
 	
 				if (f + 1 < field_count)
 				{

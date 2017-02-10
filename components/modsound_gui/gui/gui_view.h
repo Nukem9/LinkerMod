@@ -10,10 +10,10 @@ struct GUIView_WidgetMapping
 	void(*draw_func)(aT* arg, float column_width);
 };
 
-void GUIView_Alias_DrawTextBox(const char* label, void* data, float column_width);
-void GUIView_Alias_DrawComboBox(const char* label, void* data, float column_width);
-void GUIView_Alias_DrawKnob(const char* label, void* data, float column_width);
-void GUIView_Alias_DrawCheckBox(const char* label, void* data, float column_width);
-void GUIView_Alias_DrawNumber(const char* label, void* data, float column_width);
+void GUIView_Alias_DrawTextBox(const char* label, void* data, void* metadata, float column_width);
+void GUIView_Alias_DrawComboBox(const char* label, void* data, void* metadata, float column_width);
+void GUIView_Alias_DrawKnob(const char* label, void* data, void* metadata, float column_width);
+void GUIView_Alias_DrawCheckBox(const char* label, void* data, void* metadata, float column_width);
+void GUIView_Alias_DrawNumber(const char* label, void* data, void* metadata, float column_width);
 
-void GUIView_Alias_DrawCheckList(const char* label, void* data, float column_width);
+void GUIView_Alias_DrawCheckList(const char* label, void* data, void* metadata, float column_width);

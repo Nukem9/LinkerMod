@@ -5,7 +5,8 @@
 struct GUIAliasGridView_AliasFieldDef
 {
 	int data_offset;
-	void(*draw_func)(const char* label, void* data, float width);
+	csv_metadata_s* metadata;
+	void(*draw_func)(const char* label, void* data, void* metadata, float width);
 };
 
 class GUIAliasGridView
