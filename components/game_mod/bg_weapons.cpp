@@ -293,3 +293,25 @@ const char *BG_WeaponName(int weapon)
 	return "(FIXME BG_WeaponName)";
 	// return BG_GetWeaponVariantDef(weapon)->szInternalName;
 }
+
+void(*G_RegisterWeapon)(unsigned int weapIndex);
+void hk_G_RegisterWeapon(unsigned int weapIndex)
+{
+	// Override the default grenade limit
+	WeaponVariantDef *weapVariantDef = BG_GetWeaponVariantDef(weapIndex);
+
+	if (weapVariantDef->weapDef->weapType == WEAPTYPE_GRENADE)
+	{
+		// Some weapons (perk bottle/xbow/syrette) are classified as grenades, but they
+		// dont't have a valid clip size
+		if (weapVariantDef->iClipSize > 2)
+		{
+			weapVariantDef->weapDef->iStartAmmo += 1;
+			weapVariantDef->weapDef->iMaxAmmo += 1;
+			weapVariantDef->weapDef->iSharedAmmoCap += 1;
+			weapVariantDef->iClipSize += 1;
+		}
+	}
+
+	G_RegisterWeapon(weapIndex);
+}

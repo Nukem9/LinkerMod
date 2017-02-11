@@ -444,6 +444,9 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004625C0, (PBYTE)&Bullet_Fire);
 	Detours::X86::DetourFunction((PBYTE)0x0079A4F1, (PBYTE)&mfh_CG_DrawBulletImpacts1);
 	Detours::X86::DetourFunction((PBYTE)0x0079A5B5, (PBYTE)&mfh_CG_DrawBulletImpacts2);
+	Detours::X86::DetourFunction((PBYTE)0x00654BE0, (PBYTE)&BG_GetAmmoPlayerMax);
+	Detours::X86::DetourFunction((PBYTE)0x0041E480, (PBYTE)&BG_AddAmmoToClip);
+	*(PBYTE *)&G_RegisterWeapon = Detours::X86::DetourFunction((PBYTE)0x006339E0, (PBYTE)&hk_G_RegisterWeapon);
 
 	//
 	// PM (Player Movement) hooks for infinite ammo and weapon jamming

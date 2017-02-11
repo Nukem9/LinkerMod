@@ -52,41 +52,67 @@ enum weapFireType_t
 	WEAPON_FIRETYPECOUNT = 0x7,
 };
 
+enum weapInventoryType_t
+{
+	WEAPINVENTORY_PRIMARY = 0x0,
+	WEAPINVENTORY_OFFHAND = 0x1,
+	WEAPINVENTORY_ITEM = 0x2,
+	WEAPINVENTORY_ALTMODE = 0x3,
+	WEAPINVENTORY_MELEE = 0x4,
+	WEAPINVENTORYCOUNT = 0x5,
+};
+
 struct WeaponDef
 {
 	char _pad1[0x1C];
 	weapType_t weapType;
 	weapClass_t weapClass;
 	PenetrateType penetrateType;
-	char _pad2[0x8];
+	char _pad2[0x4];
+	weapInventoryType_t inventoryType;
 	weapFireType_t fireType;
 	char _pad3[0x38];
 	int offhandSlot;
-	char _pad4[0x2D8];
+	char _pad4[0x2CC];
+	int iStartAmmo;
+	char _pad5[0x4];
+	int iMaxAmmo;
 	int shotCount;
-	char _pad5[0xC];
-	int unlimitedAmmo;
-	char _pad6[0x1F1];
+	char _pad6[0x4];
+	int iSharedAmmoCapIndex;
+	int iSharedAmmoCap;
+	bool unlimitedAmmo;
+	bool ammoCountClipRelative;
+	char _pad7[0x1F3];
 	bool bRifleBullet;
-	char _pad7[0x1C];
+	char _pad8[0x13];
+	bool bClipOnly;
+	char _pad9[0x8];
 	bool bDualWield;
-	char _pad8[0x29];
+	char _pad10[0x29];
 	unsigned int dualWieldWeaponIndex;
-	char _pad9[0x95];
+	char _pad11[0x95];
 	bool bBulletImpactExplode;
-	char _pad10[0x10];
+	char _pad12[0x10];
 	bool holdButtonToThrow;
-	char _pad11[0x16D];
+	char _pad13[0x16D];
 	float fMinDamageRange;
 };
 STATIC_ASSERT_OFFSET(WeaponDef, weapType, 0x1C);
 STATIC_ASSERT_OFFSET(WeaponDef, weapClass, 0x20);
 STATIC_ASSERT_OFFSET(WeaponDef, penetrateType, 0x24);
+STATIC_ASSERT_OFFSET(WeaponDef, inventoryType, 0x2C);
 STATIC_ASSERT_OFFSET(WeaponDef, fireType, 0x30);
 STATIC_ASSERT_OFFSET(WeaponDef, offhandSlot, 0x6C);
+STATIC_ASSERT_OFFSET(WeaponDef, iStartAmmo, 0x33C);
+STATIC_ASSERT_OFFSET(WeaponDef, iMaxAmmo, 0x344);
 STATIC_ASSERT_OFFSET(WeaponDef, shotCount, 0x348);
+STATIC_ASSERT_OFFSET(WeaponDef, iSharedAmmoCapIndex, 0x350);
+STATIC_ASSERT_OFFSET(WeaponDef, iSharedAmmoCap, 0x354);
 STATIC_ASSERT_OFFSET(WeaponDef, unlimitedAmmo, 0x358);
+STATIC_ASSERT_OFFSET(WeaponDef, ammoCountClipRelative, 0x359);
 STATIC_ASSERT_OFFSET(WeaponDef, bRifleBullet, 0x54D);
+STATIC_ASSERT_OFFSET(WeaponDef, bClipOnly, 0x561);
 STATIC_ASSERT_OFFSET(WeaponDef, bDualWield, 0x56A);
 STATIC_ASSERT_OFFSET(WeaponDef, dualWieldWeaponIndex, 0x594);
 STATIC_ASSERT_OFFSET(WeaponDef, bBulletImpactExplode, 0x62D);
@@ -97,10 +123,18 @@ struct WeaponVariantDef
 {
 	char _pad1[0x8];
 	WeaponDef *weapDef;
-	char _pad2[0x40];
+	char _pad2[0x10];
+	unsigned int altWeaponIndex;
+	int iClipSize;
+	char _pad3[0x20];
+	int iAmmoIndex;
+	char _pad4[0x4];
 	int iClipIndex;
 };
 STATIC_ASSERT_OFFSET(WeaponVariantDef, weapDef, 0x8);
+STATIC_ASSERT_OFFSET(WeaponVariantDef, altWeaponIndex, 0x1C);
+STATIC_ASSERT_OFFSET(WeaponVariantDef, iClipSize, 0x20);
+STATIC_ASSERT_OFFSET(WeaponVariantDef, iAmmoIndex, 0x44);
 STATIC_ASSERT_OFFSET(WeaponVariantDef, iClipIndex, 0x4C);
 
 struct weaponParms
