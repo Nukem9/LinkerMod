@@ -459,7 +459,7 @@ BOOL GameMod_Init()
 	//
 	// Increase default sv_network_fps to 200
 	//
-	PatchMemory(0x00698BFA, (PBYTE)"\xC8", 1);
+	//PatchMemory(0x00698BFA, (PBYTE)"\xC8", 1);
 
 	//
 	// Increase Asset Limits
