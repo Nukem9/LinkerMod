@@ -33,10 +33,11 @@ int CSVEnumInfo::LoadFromTableColumn(CSVStaticTable* table, const char* column)
 			{
 				this->enums[r] = _strdup(table->CellValue(r, c));
 			}
+			return 0;
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
 

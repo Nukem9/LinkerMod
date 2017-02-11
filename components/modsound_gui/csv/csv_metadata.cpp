@@ -172,6 +172,9 @@ static csv_enum_table_metadata_s csv_metadata_enum_table_info_map[] =
 
 csv_enum_table_metadata_s* CSV_Metadata_Resolve_EnumTableMapping(const char* key)
 {
+	if (!key)
+		return 0;
+
 	for (int i = 0; i < ARRAYSIZE(csv_metadata_enum_table_info_map); i++)
 	{
 		if (strcmp(key, csv_metadata_enum_table_info_map[i].name) == 0)
