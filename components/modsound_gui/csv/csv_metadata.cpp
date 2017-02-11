@@ -168,6 +168,8 @@ static csv_enum_table_metadata_s csv_metadata_enum_table_info_map[] =
 	{ "spatialized",	CSV_ENUM_TABLE_INTERNAL, csv_enum_spatialized },
 	{ "storage",		CSV_ENUM_TABLE_INTERNAL, csv_enum_storage_type },
 	{ "template",		CSV_ENUM_TABLE_FILE_CSV, "template.csv" },
+	{ "mature",			CSV_ENUM_TABLE_INTERNAL, csv_enum_yes_no_both },
+	{ "pc_format",		CSV_ENUM_TABLE_INTERNAL, csv_enum_pc_format },
 };
 
 csv_enum_table_metadata_s* CSV_Metadata_Resolve_EnumTableMapping(const char* key)
@@ -198,6 +200,8 @@ csv_metadata_s::csv_metadata_s(csv_metadata_s&& arg)
 
 csv_metadata_s::~csv_metadata_s(void)
 {
+	delete[] enum_string;
+
 	if (dont_free_strings)
 		return;
 
@@ -218,6 +222,26 @@ csv_metadata_s::~csv_metadata_s(void)
 void csv_metadata_s::MarkStringsAsStatic(void)
 {
 	this->dont_free_strings = true;
+}
+void csv_metadata_s::GenerateEnumString(void)
+{
+	_ASSERT(this->_enum);
+	_ASSERT(this->enum_string == NULL);
+
+	int buf_size = 1;
+	for (int i = 0; _enum->Enums()[i]; i++)
+	{
+		buf_size += strlen(_enum->Enums()[i]) + 1;
+	}
+
+	this->enum_string = new char[buf_size];
+	char* p = (char*)this->enum_string;
+	for (const char** c =_enum->Enums(); *c; c++)
+	{
+		int len = sprintf_s(p, buf_size - (p - this->enum_string), "%s", *c);
+		p += len + 1;
+	}
+	*p = '\0';
 }
 
 CSV_Metadata_Globals::CSV_Metadata_Globals(void)
@@ -309,9 +333,13 @@ int CSV_Metadata_Init_AddBuiltins(int* builtin_count)
 
 	csv_metadata_s mature;
 	err |= CSV_MetaData_GenerateForAliasEntry(&mature, "mature", "Mature", "", "");
+	mature.enumTable = "mature";
+	mature.enumColumn = "name";
 
 	csv_metadata_s pc_format;
 	err |= CSV_MetaData_GenerateForAliasEntry(&pc_format, "pc_format", "PC Format", "", "");
+	pc_format.enumTable = "pc_format";
+	pc_format.enumColumn = "name";
 
 	if (err)
 		return err;
@@ -427,14 +455,14 @@ int CSV_Metadata_Init()
 	std::vector<CSVStaticTable> enums;
 	enums.resize(ARRAYSIZE(csv_metadata_enum_table_info_map)); // Allocate space for all possibly supported enum tables
 
-	for (unsigned int i = builtin_count; i < g_metadata->metadata.size(); i++)
+	for (unsigned int i = 0; i < g_metadata->metadata.size(); i++)
 	{
 		if (g_metadata->metadata[i].type == CSV_FIELD_TYPE::CSV_FIELD_ENUM)
 		{
 			csv_enum_table_metadata_s* enum_table = CSV_Metadata_Resolve_EnumTableMapping(g_metadata->metadata[i].enumTable);
 			if (!enum_table)
 			{
-				Con_Error("Unable to resolve enum info for enum table '%s'\n", g_metadata->metadata[i].enumTable);
+				Con_Error("Unable to resolve enum info for enum table '%s' (see '%'s)\n", g_metadata->metadata[i].enumTable, g_metadata->metadata[i].column);
 				return 2;
 			}
 
@@ -442,7 +470,10 @@ int CSV_Metadata_Init()
 			// Skip any enums tables that have already been initialized
 			//
 			if (g_metadata->enums[enum_table->name].Enums() != NULL)
+			{
+				g_metadata->metadata[i]._enum = &g_metadata->enums[enum_table->name];
 				continue;
+			}
 
 			int index = enum_table - csv_metadata_enum_table_info_map;
 			int loadbits = CSV_ST_PRUNE_EMPTY | CSV_ST_PRUNE_COMMENTS;
@@ -454,6 +485,7 @@ int CSV_Metadata_Init()
 				// Automatically load from the internal array
 				//
 				g_metadata->enums[enum_table->name].LoadFromInternalArray((const char**)enum_table->data);
+				g_metadata->metadata[i]._enum = &g_metadata->enums[enum_table->name];
 				break;
 			case CSV_ENUM_TABLE_FILE_TXT:
 				loadbits |= CSV_ST_HEADERLESS_SINGLEFIELD;
@@ -471,6 +503,7 @@ int CSV_Metadata_Init()
 				}
 
 				g_metadata->enums[enum_table->name].LoadFromTableColumn(&enums[index], g_metadata->metadata[i].enumColumn);
+				g_metadata->metadata[i]._enum = &g_metadata->enums[enum_table->name];
 				break;
 			}
 			default:

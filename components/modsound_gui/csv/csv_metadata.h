@@ -58,6 +58,8 @@ public:
 	const char* displayUnit;
 
 	csv_entry_t* entry;
+	CSVEnumInfo* _enum;
+	const char* enum_string;
 
 private:
 	// Used to prevent freeing of strings that we didn't use strdup for
@@ -70,6 +72,7 @@ public:
 	~csv_metadata_s(void);
 
 	void MarkStringsAsStatic(void);
+	void GenerateEnumString(void);
 };
 
 class CSV_Metadata_Globals

@@ -17,23 +17,7 @@ void GUIView_Alias_DrawComboBox(const char* label, void* data, void* metadata, f
 	ImVec2 size(column_width, height);
 	csv_metadata_s* meta = (csv_metadata_s*)metadata;
 
-	if (!meta->entry->enums)
-	{
-		ImVec2 size(column_width, height);
-		ImGui::Selectable("ERR COMBO", &selected, 0, size);
-		return;
-	}
-
-	char buf[1024];
-	char* p = buf;
-	for (const char** c = meta->entry->enums; *c; c++)
-	{
-		int len = sprintf_s(p, ARRAYSIZE(buf) - (p - buf), "%s", *c);
-		p += len + 1;
-	}
-	*p = '\0';
-	//meta->entry->enums
-	ImGui::Combo(label, (int*)data, buf);
+	ImGui::Combo(label, (int*)data, meta->enum_string);
 }
 
 void GUIView_Alias_DrawKnob(const char* label, void* data, void* metadata, float column_width)

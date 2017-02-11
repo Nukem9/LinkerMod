@@ -77,6 +77,9 @@ int GUIAliasGridView::LoadTable(const char* path)
 		field_defs[i].data_offset = entry->offset;
 		field_defs[i].metadata = metadata;
 
+		if (metadata->type == CSV_FIELD_TYPE::CSV_FIELD_ENUM)
+			metadata->GenerateEnumString();
+
 		//
 		//if (csv_metadata_s* metadata = g_metadata->ResolveMetadataForField(field))
 		//{
