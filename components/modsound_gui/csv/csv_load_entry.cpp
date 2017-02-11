@@ -60,15 +60,29 @@ int CSV_LoadEntry(const char* value, csv_entry_t* entry, BYTE* dst)
 		*(int*)(dst + entry->offset) = val;
 		return 0;
 	case CSV_FLAG:
+		{
+			if (_stricmp(value, "yes"))
+				*(bool*)(dst + entry->offset) = true;
+			else
+				*(bool*)(dst + entry->offset) = false;
+			return 0;
+		}
+		return 1;
 	case CSV_DBSPL:
+		*(float*)(dst + entry->offset) = (float)atof(value);
 	case CSV_CENTS:
+		*(float*)(dst + entry->offset) = (float)atof(value);
+		return 0;
 	case CSV_HASH:
 	case CSV_ENUM_BITS:
 	case CSV_FLAG_BITS:
 	case CSV_BYTE:
 	case CSV_ENUM_BYTE:
+		return 0;
 	case CSV_SHORT:
 	case CSV_USHORT:
+		*(int*)(dst + entry->offset) = atoi(value);
+		return 0;
 	case CSV_NORM_BYTE:
 
 	case CSV_IGNORE:
