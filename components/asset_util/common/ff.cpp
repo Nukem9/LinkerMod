@@ -234,7 +234,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	//
 	if (snd_header->format != 6 && snd_header->format != 7)
 	{
-		Con_Print_v("IGNORED\n");
+		Con_Print_v("IGNORED (fmt %d)\n", snd_header->format);
 		return 0;
 	}
 	
