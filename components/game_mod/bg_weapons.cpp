@@ -290,7 +290,8 @@ void PM_Weapon_Jam(/*playerState_s *ps*/)
 // /bgame/bg_weapons.cpp:6072
 const char *BG_WeaponName(int weapon)
 {
-	return BG_GetWeaponVariantDef(weapon)->szInternalName;
+	return "(FIXME BG_WeaponName)";
+	// return BG_GetWeaponVariantDef(weapon)->szInternalName;
 }
 
 void(*G_RegisterWeapon)(unsigned int weapIndex);

@@ -121,8 +121,7 @@ STATIC_ASSERT_OFFSET(WeaponDef, fMinDamageRange, 0x7AC);
 
 struct WeaponVariantDef
 {
-	const char *szInternalName;
-	char _pad1[0x4];
+	char _pad1[0x8];
 	WeaponDef *weapDef;
 	char _pad2[0x10];
 	unsigned int altWeaponIndex;
@@ -132,7 +131,6 @@ struct WeaponVariantDef
 	char _pad4[0x4];
 	int iClipIndex;
 };
-STATIC_ASSERT_OFFSET(WeaponVariantDef, szInternalName, 0x0);
 STATIC_ASSERT_OFFSET(WeaponVariantDef, weapDef, 0x8);
 STATIC_ASSERT_OFFSET(WeaponVariantDef, altWeaponIndex, 0x1C);
 STATIC_ASSERT_OFFSET(WeaponVariantDef, iClipSize, 0x20);
