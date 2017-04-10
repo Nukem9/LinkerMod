@@ -32,55 +32,6 @@ struct gentity_s
 STATIC_ASSERT_OFFSET(gentity_s, client, 0x13C);
 STATIC_ASSERT_OFFSET(gentity_s, vehicle, 0x148);
 
-struct renderOptions_s
-{
-	union
-	{
-		unsigned int i;
-
-		struct
-		{
-			int _bf0;
-		};
-	};
-};
-
-struct PlayerHeldWeapon
-{
-	unsigned int weapon;
-	unsigned char model;
-	renderOptions_s options;
-
-	union
-	{
-		float heatPercent;
-		int fuelTankTime;
-	};
-
-	bool overHeating;
-	bool needsRechamber;
-	bool heldBefore;
-	bool quickReload;
-	bool blockWeaponPickup;
-};
-STATIC_ASSERT_OFFSET(PlayerHeldWeapon, weapon, 0x0);
-STATIC_ASSERT_OFFSET(PlayerHeldWeapon, needsRechamber, 0x11);
-STATIC_ASSERT_SIZE(PlayerHeldWeapon, 0x18);
-
-struct AmmoPool
-{
-	int	ammoIndex;
-	int	count;
-};
-STATIC_ASSERT_SIZE(AmmoPool, 0x8);
-
-struct AmmoClip
-{
-	int	clipIndex;
-	int	count;
-};
-STATIC_ASSERT_SIZE(AmmoClip, 0x8);
-
 struct playerState_s
 {
 	int commandTime;
@@ -107,13 +58,9 @@ struct playerState_s
 	unsigned int weaponShotCountLeft;
 	char _pad8[0x48];
 	unsigned int stackFireCount;
-	char _pad9[0x28];
-	PlayerHeldWeapon heldWeapons[15];
-	AmmoPool ammoNotInClip[15];
-	AmmoClip ammoInClip[15];
-	char _pad10[0xC8];
+	char _pad9[0x348];
 	unsigned int perks[1];
-	char _pad11[0x24];
+	char _pad10[0x24];
 	int weapAnim;
 	int weapAnimLeft;
 };
@@ -133,9 +80,6 @@ STATIC_ASSERT_OFFSET(playerState_s, weaponstateLeft, 0x15C);
 STATIC_ASSERT_OFFSET(playerState_s, weaponShotCount, 0x160);
 STATIC_ASSERT_OFFSET(playerState_s, weaponShotCountLeft, 0x164);
 STATIC_ASSERT_OFFSET(playerState_s, stackFireCount, 0x1B0);
-STATIC_ASSERT_OFFSET(playerState_s, heldWeapons, 0x1DC);
-STATIC_ASSERT_OFFSET(playerState_s, ammoNotInClip, 0x344);
-STATIC_ASSERT_OFFSET(playerState_s, ammoInClip, 0x3BC);
 STATIC_ASSERT_OFFSET(playerState_s, perks, 0x4FC);
 STATIC_ASSERT_OFFSET(playerState_s, weapAnim, 0x524);
 STATIC_ASSERT_OFFSET(playerState_s, weapAnimLeft, 0x528);
