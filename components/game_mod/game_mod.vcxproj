@@ -91,7 +91,6 @@
   <ItemGroup>
     <ClCompile Include="bg_perks.cpp" />
     <ClCompile Include="bg_weapons.cpp" />
-    <ClCompile Include="bg_weapons_ammo.cpp" />
     <ClCompile Include="bg_weapons_def.cpp" />
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="CEG.cpp" />
@@ -143,7 +142,6 @@
   <ItemGroup>
     <ClInclude Include="bg_perks.h" />
     <ClInclude Include="bg_weapons.h" />
-    <ClInclude Include="bg_weapons_ammo.h" />
     <ClInclude Include="bg_weapons_def.h" />
     <ClInclude Include="bitarray.h" />
     <ClInclude Include="bullet.h" />
