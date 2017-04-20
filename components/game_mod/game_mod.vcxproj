@@ -103,6 +103,7 @@
     <ClCompile Include="common.cpp" />
     <ClCompile Include="cl_console.cpp" />
     <ClCompile Include="com_bsp_load_obj.cpp" />
+    <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="cscr_parser.cpp" />

@@ -208,6 +208,17 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);
 
 	//
+	// Increase mod description length limit
+	//
+	const int dirListLength = DIRLIST_LEN;
+	ptr = dirList;
+	PatchMemory(0x00623A0B, (PBYTE)&ptr, 4); // dirList
+	PatchMemory(0x00623A65, (PBYTE)&ptr, 4); // dirList
+	PatchMemory(0x00623A06, (PBYTE)&dirListLength, 4);
+
+	PatchCall(0x00455A34, (PBYTE)&FS_ReadModDescription);
+
+	//
 	// Allow the OS to cache fastfiles when loading
 	//
 	ptr = (void *)(FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_OVERLAPPED);
