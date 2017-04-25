@@ -125,6 +125,8 @@ static dvar_s*& perk_weapReloadMultiplier = *(dvar_s **)0x00BDF358;
 static dvar_s*& perk_weapSwitchMultiplier = *(dvar_s **)0x00BDF2C0;
 extern dvar_s* perk_weapRateEnhanced;
 
+static dvar_s*& phys_gravity = *(dvar_s **)0x023D2FA8;
+
 extern dvar_s* r_d3d9ex;
 extern dvar_s* r_noborder;
 extern dvar_s* r_showTess;

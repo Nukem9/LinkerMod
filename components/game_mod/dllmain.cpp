@@ -343,6 +343,10 @@ BOOL GameMod_Init()
 	PatchMemory(0x00700492, (PBYTE)&msg_assertion, 4);
 
 	//
+	// Add error handler to prevent missing physpreset segfault
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0081E030, (PBYTE)hk_Phys_ObjCreateAxis);
+	//
 	// Live radiant initialization hooks
 	//
 	Detours::X86::DetourFunction((PBYTE)0x004B7870, (PBYTE)&RadiantRemoteInit);
