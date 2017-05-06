@@ -1,5 +1,7 @@
 #pragma once
 
+#define VANILLA_DVAR(NAME, ADDRESS) static dvar_s*& NAME = *(dvar_s **)ADDRESS;
+
 enum dvarType_t
 {
 	DVAR_TYPE_BOOL = 0x0,
@@ -89,43 +91,43 @@ struct dvar_s
 };
 STATIC_ASSERT_OFFSET(dvar_s, current, 0x18);
 
-static dvar_s*& fs_gameDirVar = *(dvar_s **)0x025FADE8;
-static dvar_s*& fs_usermapDir = *(dvar_s **)0x025FADE4;
-static dvar_s*& fs_homepath = *(dvar_s **)0x025FBF0C;
-static dvar_s*& fs_basepath = *(dvar_s **)0x025FBF04;
+VANILLA_DVAR(fs_gameDirVar, 0x025FADE8);
+VANILLA_DVAR(fs_usermapDir, 0x025FADE4);
+VANILLA_DVAR(fs_homepath, 0x025FBF0C);
+VANILLA_DVAR(fs_basepath, 0x025FBF04);
 
-static dvar_s*& com_sv_running = *(dvar_s **)0x0243FD3C;
-static dvar_s*& sv_mapname = *(dvar_s **)0x02899CEC;
+VANILLA_DVAR(com_sv_running, 0x0243FD3C);
+VANILLA_DVAR(sv_mapname, 0x02899CEC);
 
-static dvar_s*& developer = *(dvar_s **)0x0243FCA0;
-static dvar_s*& developer_script = *(dvar_s **)0x02481714;
-static dvar_s*& zombietron = *(dvar_s **)0x0247FDE8;
-static dvar_s*& zombiemode = *(dvar_s **)0x0243FDD4;
-static dvar_s*& blackopsmode = *(dvar_s **)0x0243FD24;
-static dvar_s*& useFastFile = *(dvar_s **)0x0247FEC8;
-static dvar_s*& g_connectpaths = *(dvar_s **)0x01C01850;
+VANILLA_DVAR(developer, 0x0243FCA0);
+VANILLA_DVAR(developer_script, 0x02481714);
+VANILLA_DVAR(zombietron, 0x0247FDE8);
+VANILLA_DVAR(zombiemode, 0x0243FDD4);
+VANILLA_DVAR(blackopsmode, 0x0243FD24);
+VANILLA_DVAR(useFastFile, 0x0247FEC8);
+VANILLA_DVAR(g_connectpaths, 0x01C01850);
 
-static dvar_s*& r_reflectionProbeGenerate = *(dvar_s **)0x03B35038;
-static dvar_s*& r_reflectionProbeGenerateExit = *(dvar_s **)0x03B3503C;
-static dvar_s*& r_reflectionProbeRegenerateAll = *(dvar_s **)0x03B20030;
+VANILLA_DVAR(r_reflectionProbeGenerate, 0x03B35038);
+VANILLA_DVAR(r_reflectionProbeGenerateExit, 0x03B3503C);
+VANILLA_DVAR(r_reflectionProbeRegenerateAll, 0x03B20030);
 
-static dvar_s*& ragdoll_reactivation_cutoff = *(dvar_s **)0xBCAEB0;
-static dvar_s*& ragdoll_explode_upbias = *(dvar_s **)0x251CBCC;
-static dvar_s*& ragdoll_explode_force = *(dvar_s **)0x251CBC8;
+VANILLA_DVAR(ragdoll_reactivation_cutoff, 0xBCAEB0);
+VANILLA_DVAR(ragdoll_explode_upbias, 0x251CBCC);
+VANILLA_DVAR(ragdoll_explode_force, 0x251CBC8);
 
-static dvar_s*& g_debugBullets = *(dvar_s **)0x01BD9B48;
-static dvar_s*& sv_bullet_range = *(dvar_s **)0x02899D64;
-static dvar_s*& bg_forceExplosiveBullets = *(dvar_s **)0x00BCD1E8;
-static dvar_s*& vehicle_selfCollision = *(dvar_s **)0x00BCAFCC;
-static dvar_s*& player_sustainAmmo = *(dvar_s **)0x00BCD250;
-static dvar_s*& player_burstFireCooldown = *(dvar_s **)0x00BCD110;
+VANILLA_DVAR(g_debugBullets, 0x01BD9B48);
+VANILLA_DVAR(sv_bullet_range, 0x02899D64);
+VANILLA_DVAR(bg_forceExplosiveBullets, 0x00BCD1E8);
+VANILLA_DVAR(vehicle_selfCollision, 0x00BCAFCC);
+VANILLA_DVAR(player_sustainAmmo, 0x00BCD250);
+VANILLA_DVAR(player_burstFireCooldown, 0x00BCD110);
 
-static dvar_s*& perk_weapRateMultiplier = *(dvar_s **)0x00BDF35C;
-static dvar_s*& perk_weapReloadMultiplier = *(dvar_s **)0x00BDF358;
-static dvar_s*& perk_weapSwitchMultiplier = *(dvar_s **)0x00BDF2C0;
+VANILLA_DVAR(perk_weapRateMultiplier, 0x00BDF35C);
+VANILLA_DVAR(perk_weapReloadMultiplier, 0x00BDF358);
+VANILLA_DVAR(perk_weapSwitchMultiplier, 0x00BDF2C0);
 extern dvar_s* perk_weapRateEnhanced;
 
-static dvar_s*& phys_gravity = *(dvar_s **)0x023D2FA8;
+VANILLA_DVAR(phys_gravity, 0x023D2FA8);
 
 extern dvar_s* r_d3d9ex;
 extern dvar_s* r_noborder;
@@ -138,6 +140,10 @@ extern dvar_s* scr_useFastFileOnly;
 extern dvar_s* gm_build_date;
 extern dvar_s* cg_showServerInfo;
 
+VANILLA_DVAR(sys_configureGHz, 0x0276D9E0)
+VANILLA_DVAR(sys_sysMB, 0x0276DAEC);
+VANILLA_DVAR(sys_gpu, 0x0276D9E4);
+VANILLA_DVAR(sys_configSum, 0x0276F558);
 
 extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;

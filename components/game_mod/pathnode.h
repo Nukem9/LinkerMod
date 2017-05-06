@@ -178,6 +178,9 @@ static badplace_t *g_badplaces = (badplace_t *)0x01A4C088;
 static path_t*& debugPath = *(path_t **)0x01D04484;
 static pathstatic_t *pathstatic = (pathstatic_t *)0x01D04970;
 
+typedef bool (*G_OnlyConnectingPaths_t)();
+static G_OnlyConnectingPaths_t G_OnlyConnectingPaths = (G_OnlyConnectingPaths_t)0x0049D640;
+
 void node_droptofloor(pathnode_t *node);
 void G_InitPathBaseNode(pathbasenode_t *pbnode, pathnode_t *pnode);
 void G_DropPathNodeToFloor(unsigned int nodeIndex);

@@ -442,6 +442,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0070A140, (PBYTE)&hk_Image_CreateCubeTexture_PC);
 
 	//
+	// Disable system config has changed message box when building paths or reflections
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00417750, (PBYTE)&Sys_HasInfoChanged);
+
+	//
 	// Increase the maximum number of ragdolls
 	//
 	PatchMemory(0x00830076, (PBYTE)"\x40", 1); // Ragdoll_GetUnusedBody
