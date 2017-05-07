@@ -43,6 +43,9 @@ int __cdecl ConvertBSP_Post(FILE* h)
 	iBSP->Convert(BSPVERSION_COD_BO);
 
 	Light_FixPrimaryLightInfo(&iBSP->lumps[LUMP_PRIMARY_LIGHTS]);
+	
+	if (Probe_UseDebugSpheres())
+		Probe_AddDebugSpheres(iBSP);
 
 	len = iBSP->PotentialFileSize();
 	buf = new BYTE[len];
@@ -135,6 +138,11 @@ void Init_MapMod()
 	// Add Support for Custom KVs
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0043D649, (PBYTE)&mfh_PrimaryLightHandler);
+
+	//
+	// Add -debugReflectionProbes launch arg
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00406D20, (PBYTE)&Arg_Handle_hk);
 
 	//
 	// (Deprecated): Replacement for the pointfile extension

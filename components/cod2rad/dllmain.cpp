@@ -86,8 +86,8 @@ BOOL cod2rad_Init()
 	//
 	// Enable Techset / Technique Path Redirection
 	//
-	PatchMemory(0x0042CA85, (PBYTE)&techiquePath, 4);
-	PatchMemory(0x0042CB4C, (PBYTE)&techsetPath, 4);
+	//PatchMemory(0x0042CA85, (PBYTE)&techiquePath, 4);
+	//PatchMemory(0x0042CB4C, (PBYTE)&techsetPath, 4);
 
 	//
 	// Patch the requested IWI version to match BO1
