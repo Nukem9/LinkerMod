@@ -45,6 +45,7 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 {
 	char outPath[MAX_PATH];
 	sprintf_s(outPath, "%s/%s", AppInfo_OutDir(), filepath);
+	FS_SanitizePath(outPath);
 
 	if (fs_overwrite.ValueBool())
 	{
@@ -61,9 +62,11 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 	else
 	{
 		Con_Print_v("Extracting file: \"%s\"...	", filepath);
-		if (FS_CreatePath(outPath) != 0)
+
+		int err = FS_CreatePath(outPath);
+		if (err != 0)
 		{
-			Con_Error_v("DIR ERROR\n");
+			Con_Error_v("DIR ERROR (%d)\n", err);
 			return 1;
 		}
 		
@@ -73,7 +76,7 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 			return 1;
 		}
 
-		Con_Print("SUCCESS\n");
+		Con_Print_v("SUCCESS\n");
 		return 0;
 	}
 	
