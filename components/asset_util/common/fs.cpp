@@ -198,29 +198,35 @@ int FS_DirectoryIterator(const char* path, int(__cdecl* FS_DirectoryHandlerCallb
 int FS_CreatePath(const char* _targetPath)
 {
 	char targetPath[1024];
-	sprintf_s(targetPath, "%s/%s", AppInfo_OutDir(), _targetPath);
+	if (strchr(_targetPath, ':') != NULL)
+		strcpy_s(targetPath, _targetPath);
+	else
+		sprintf_s(targetPath, "%s/%s", AppInfo_OutDir(), _targetPath);
 
 	int len = strlen(targetPath);
 	for (int i = 0; i < len; i++)
 	{
-		if (targetPath[i] == '/' || targetPath[i] == '\\')
+		bool skip = false;
+		if (i > 0 && targetPath[i-1] == ':')
+			skip = true;
+
+		if (!skip && (targetPath[i] == '/' || targetPath[i] == '\\'))
 		{
 			char buf[1024] = "";
 			strncpy(buf + strlen(buf), targetPath, i);
 
 			char* qpath = buf;
-
 			if (strlen(qpath) == 0)
 				continue;
 
 			FS_SanitizePath(qpath);
-
 #if _DEBUG
 			if (!CreateDirectoryA(buf, 0) && GetLastError() != ERROR_ALREADY_EXISTS)
 #else
 			if (!CreateDirectoryA(qpath, 0) && GetLastError() != ERROR_ALREADY_EXISTS)
 #endif
 			{
+				
 				return GetLastError();
 			}
 		}
