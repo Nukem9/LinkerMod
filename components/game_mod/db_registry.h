@@ -193,6 +193,9 @@ static DB_LogMissingAsset_t DB_LogMissingAsset = (DB_LogMissingAsset_t)0x004AEC2
 typedef void(__cdecl* DB_EnumXAssets_t)(XAssetType type, void(__cdecl *func)(XAssetHeader, void *), void *inData, bool includeOverride);
 static DB_EnumXAssets_t DB_EnumXAssets = (DB_EnumXAssets_t)0x0054C1C0;
 
+typedef void (__cdecl* DB_ListAssetPool_t)(XAssetType type);
+static DB_ListAssetPool_t DB_ListAssetPool = (DB_ListAssetPool_t)0x007A2C00;
+
 XAssetEntry *DB_LinkXAssetEntry(XAssetEntry *newEntry, int allowOverride);
 const char *DB_GetXAssetName(XAsset *asset);
 const char *DB_GetXAssetHeaderName(XAssetType type, XAssetHeader *header);
@@ -203,3 +206,5 @@ void DB_ModXFileHandle_hk();
 void DB_ModXFileHandle(HANDLE *zoneFile, char* zoneName, FF_DIR *zoneDir);
 
 void* DB_ReallocXAssetPool(XAssetType type, unsigned int size);
+
+void __cdecl DB_ListAssetPool_f(void);

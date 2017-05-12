@@ -179,3 +179,57 @@ void* DB_ReallocXAssetPool(XAssetType type, unsigned int size)
 	
 	return assetPool;
 }
+
+void __cdecl DB_ListAssetPool_f(void)
+{
+	if (Cmd_Argc() >= 2)
+	{
+		const char* val = Cmd_Argv(1);
+
+		// Assume the user typed a number by default
+		// Check if any non-numeric chars appear
+		bool isNumeric = true;
+		for (const char* c = val; *c; c++)
+		{
+			if (!isdigit(*c))
+			{
+				isNumeric = false;
+				break;
+			}
+		}
+
+		Com_Printf(0, "%d\n", isNumeric);
+
+		XAssetType type = ASSET_TYPE_COUNT;
+		if (isNumeric)
+		{
+			type = (XAssetType)atoi(val);
+			if (type < 0 || type >= ASSET_TYPE_COUNT)
+				type = ASSET_TYPE_COUNT;
+		}
+		else
+		{
+			for (int i = 0; i < ASSET_TYPE_COUNT; i++)
+			{
+				if (strcmp(val, DB_GetXAssetTypeName(i)) == 0)
+				{
+					type = (XAssetType)i;
+					break;
+				}
+			}
+		}
+
+		if (type != ASSET_TYPE_COUNT)
+		{
+			DB_ListAssetPool(type);
+			return;
+		}
+	}
+
+	Com_Printf(0, "listassetpool <poolnumber | poolname>: lists all the assets in the specified pool\n");
+	for (int i = 0; i < ASSET_TYPE_COUNT; ++i)
+	{
+		const char* name = DB_GetXAssetTypeName(i);
+		Com_Printf(0, "%d %s\n", i, name);
+	}
+}

@@ -187,6 +187,12 @@ BOOL GameMod_Init()
 	*(uint8_t **)&Com_Init = Detours::X86::DetourFunction((PBYTE)0x004069C0, (PBYTE)&hk_Com_Init);
 
 	//
+	// Add support for listassetpool <name>
+	//
+	const void* pfn = &DB_ListAssetPool_f;
+	PatchMemory(0x00631B59, (PBYTE)&pfn, 4);
+
+	//
 	// CL_Vid_Restart_Complete_f hook to prevent crashes
 	//
 	*(uint8_t **)&CL_Vid_Restart_Complete_f = Detours::X86::DetourFunction((PBYTE)0x005D2F00, (PBYTE)&hk_CL_Vid_Restart_Complete_f); 
