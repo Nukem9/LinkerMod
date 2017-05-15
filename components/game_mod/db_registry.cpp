@@ -198,8 +198,6 @@ void __cdecl DB_ListAssetPool_f(void)
 			}
 		}
 
-		Com_Printf(0, "%d\n", isNumeric);
-
 		XAssetType type = ASSET_TYPE_COUNT;
 		if (isNumeric)
 		{
