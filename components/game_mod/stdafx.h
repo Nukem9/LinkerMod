@@ -23,6 +23,8 @@
 #include "../shared/minidx9/Include/d3dx9.h"
 #pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
 
+#define VANILLA_SYMBOL(NAME, TYPE, ADDRESS) static TYPE& NAME = *(TYPE*)ADDRESS;
+
 #include "CEG.h"
 
 #include "bitarray.h"
@@ -55,6 +57,7 @@
 #include "r_draw_xmodel.h"
 #include "rb_tess.h"
 #include "cscr_parser.h"
+#include "g_scr_main.h"
 #include "threads.h"
 #include "ragdoll.h"
 #include "ragdoll_update.h"

@@ -73,6 +73,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0062A0B0, (PBYTE)&Dvar_SetFromStringByName);
 
 	//
+	// Add support for custom script methods and functions
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0068A640, (PBYTE)&Scr_GetMethod);
+	Detours::X86::DetourFunction((PBYTE)0x0052BF80, (PBYTE)&Scr_GetFunction);
+
+	//
 	// R_RegisterCmds / R_UnregisterCmds replacement
 	//
 	PatchCall(0x006B8300, (PBYTE)&R_RegisterCmds);
@@ -511,7 +517,6 @@ BOOL GameMod_Init()
 	// depending on whether or not reflections are going to be calculated
 	//
 	IsReflectionMode() ? ReflectionMod_Init() : ReShade_Init();
-
 	return TRUE;
 }
 
