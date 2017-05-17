@@ -79,7 +79,7 @@ BOOL GameMod_Init()
 	PatchJump(0x006B8549, (PBYTE)&R_UnregisterCmds);
 
 	//
-	// Add ?? dvar to enable/disable reading of raw script files
+	// Add scr_useFastFileOnly dvar to enable/disable reading of raw script files
 	//
 	Detours::X86::DetourFunction((PBYTE)0x008A5980, (PBYTE)&hk_Scr_ReadFile);
 	
@@ -341,6 +341,7 @@ BOOL GameMod_Init()
 	// Misc Bug Fixes
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007D9590, (PBYTE)&nullsub);
+	Detours::X86::DetourFunction((PBYTE)0x00674C20, (PBYTE)&nullsub);
 	
 	//
 	// Fix for misleading (incorrect) assertion message
@@ -352,6 +353,7 @@ BOOL GameMod_Init()
 	// Add error handler to prevent missing physpreset segfault
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0081E030, (PBYTE)hk_Phys_ObjCreateAxis);
+
 	//
 	// Live radiant initialization hooks
 	//
