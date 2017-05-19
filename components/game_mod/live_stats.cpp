@@ -55,6 +55,7 @@ UserStats_Value::UserStats_Value(float* _value) : type(UserStats_ValueType::VECT
 
 UserStats_Value::UserStats_Value(UserStats_ValueType type)
 {
+	this->type = type;
 	switch (type)
 	{
 	case UserStats_ValueType::UNDEFINED:
@@ -231,6 +232,28 @@ size_t UserStats_Value::DataSize(void) const
 	}
 }
 
+UserStats_Value UserStats_Value::FromData(void* data)
+{
+	int* type = (int*)data;
+	UserStats_Value stat((UserStats_ValueType)*type);
+	if (stat.type == UserStats_ValueType::STRING)
+	{
+		*stat.value.string = (char*)data + 4;
+		return stat;
+	}
+	else if (stat.type == UserStats_ValueType::VECTOR)
+	{
+		float* vec = ((float*)data) + 1;
+		stat.value.vector[0] = vec[0];
+		stat.value.vector[1] = vec[1];
+		stat.value.vector[2] = vec[2];
+		return stat;
+	}
+
+	stat.value.integer = ((int*)data)[1];
+	return stat;
+}
+
 void UserStats_Value::EmitScriptValue(int _inst) const
 {
 	scriptInstance_t inst = (scriptInstance_t)_inst;
@@ -310,6 +333,68 @@ bool UserStats::SetStat(const std::string& key, float* value)
 {
 	map[key] = UserStats_Value(value);
 	return true;
+}
+
+int UserStats::ReadFile(const char* filename)
+{
+	this->Clear();
+
+	std::string path = va("%s\\players\\%s", fs_homepath->current.string, filename);
+
+	FILE* h = NULL;
+	fopen_s(&h, path.c_str(), "rb");
+	fseek(h, 0, SEEK_END);
+	unsigned int size = ftell(h);
+	fseek(h, 0, SEEK_SET);
+
+	BYTE* buf = new BYTE[size + 1];
+	fread(buf, 1, size, h);
+
+	buf[size] = 0; // Ensure that the last byte in the buffer is null to prevent unterminated strings
+
+	fclose(h);
+
+	for (BYTE* ptr = buf; (unsigned int)(ptr - buf) < size;)
+	{
+		std::string name = (char*)(ptr);
+		if (name[0] == '\0')
+			break;
+
+		ptr += name.size() + 1;
+
+		if ((unsigned int)(ptr - buf) >= size)
+			break;
+
+		UserStats_Value stat = UserStats_Value::FromData((void*)ptr);
+		ptr += stat.DataSize() + 4; // append the pointer by the size of the stat entry + the size of the type specifier
+
+		map[name] = stat;
+		
+		Com_Printf(0, "READ STAT: %s\n", name.c_str());
+	}
+
+	return 0;
+}
+
+int UserStats::WriteFile(const char* filename) const
+{
+	int h = FS_FOpenFileWriteToDir(filename, "players", fs_homepath->current.string);
+	for (auto stat : this->map)
+	{
+		auto key = stat.first;
+		auto val = stat.second;
+
+		int type = (int)val.Type();
+
+		FS_Write(key.c_str(), key.size() + 1, h);
+		FS_Write(&type, sizeof(type), h);
+
+		FS_Write(val.Data(), val.DataSize(), h);
+
+	}
+
+	FS_FCloseFile(h);
+	return 0;
 }
 
 typedef void(__cdecl* LiveStorage_ReadStatsFromDir_t)(const char* directory);
@@ -393,6 +478,7 @@ void UserStorage_Init(void)
 	//}
 
 	g_userStats.Clear();
+	g_userStats.ReadFile("stats.bin");
 
 	//g_userStats = new UserStats;
 	//sprintf_s(g_statsDir, 256, fs_gameDirVar->current.string);
@@ -416,6 +502,7 @@ void UserStorage_ReadStatsFromDir(const char* directory)
 	//}
 
 	Com_Printf(0, "LiveStorage_ReadStatsFromDir\n");
+	g_userStats.ReadFile("stats.bin");
 }
 
 void UserStorage_UploadStats(void)
@@ -427,4 +514,5 @@ void UserStorage_UploadStats(void)
 	//}
 
 	Com_Printf(0, "LiveStorage_UploadStats\n");
+	g_userStats.WriteFile("stats.bin");
 }

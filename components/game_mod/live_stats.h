@@ -16,7 +16,7 @@ enum class UserStats_ValueType
 
 struct UserStats_Value
 {
-public:
+private:
 	UserStats_ValueType type;
 
 	union
@@ -54,6 +54,8 @@ public:
 	void* Data(void) const;
 	size_t DataSize(void) const;
 
+	static UserStats_Value FromData(void* data);
+
 	void EmitScriptValue(int inst) const;
 };
 
@@ -74,6 +76,9 @@ public:
 	bool SetStat(const std::string& key, float value);
 	bool SetStat(const std::string& key, const std::string& value);
 	bool SetStat(const std::string& key, float* value);
+
+	int ReadFile(const char* filename);
+	int WriteFile(const char* filename) const;
 };
 
 extern UserStats g_userStats;
