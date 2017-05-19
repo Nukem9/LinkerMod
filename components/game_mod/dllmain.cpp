@@ -487,11 +487,13 @@ BOOL GameMod_Init()
 	//
 	// PM (Player Movement) hooks for infinite ammo and weapon jamming
 	//
+#if !_DEBUG
 	*(PBYTE *)&PM_WeaponUseAmmo = Detours::X86::DetourFunction((PBYTE)0x006979B0, (PBYTE)&hk_PM_WeaponUseAmmo);
 	Detours::X86::DetourFunction((PBYTE)0x00766CF0, (PBYTE)&PM_Weapon_Jam);
 
 	Detours::X86::DetourFunction((PBYTE)0x007951E0, (PBYTE)&hk_StartWeaponAnim);
 	Detours::X86::DetourFunction((PBYTE)0x007694A0, (PBYTE)&PM_Weapon_WeaponTimeAdjust);
+#endif
 
 	//
 	// Increase default sv_network_fps to 200
