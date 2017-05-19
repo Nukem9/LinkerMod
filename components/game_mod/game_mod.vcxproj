@@ -111,6 +111,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
     <ClCompile Include="g_scr_main.cpp" />
+    <ClCompile Include="live_stats.cpp" />
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="dvar.h" />
     <ClInclude Include="g_main_mp.h" />
     <ClInclude Include="g_scr_main.h" />
+    <ClInclude Include="live_stats.h" />
     <ClInclude Include="live_win.h" />
     <ClInclude Include="patch_common.h" />
     <ClInclude Include="patch_usefastfile.h" />

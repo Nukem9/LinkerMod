@@ -79,6 +79,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0052BF80, (PBYTE)&Scr_GetFunction);
 
 	//
+	// Add persistent stat support
+	//
+	LiveStorage_InitMod();
+
+	//
 	// R_RegisterCmds / R_UnregisterCmds replacement
 	//
 	PatchCall(0x006B8300, (PBYTE)&R_RegisterCmds);
@@ -532,6 +537,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		ReShade_Free();
 		if (ReflectionsWereUpdated() && IsInjectionMode())
 			return InjectReflections();
+		UserStorage_Free();
 	}
 
 	return TRUE;

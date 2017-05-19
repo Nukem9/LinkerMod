@@ -21,7 +21,8 @@ BuiltinMethodDef g_customMethods[] =
 
 BuiltinFunctionDef g_customFunctions[] =
 {
-	{ "", NULL, 0 },
+	{ "userstat_get", &Scr_UserStat_Get, 0 },
+	{ "userstat_set", &Scr_UserStat_Set, 0 },
 };
 
 Scr_Method_t Custom_GetMethod(const char** pName)
@@ -95,4 +96,54 @@ Scr_Function_t __cdecl Scr_GetFunction(const char **pName, int *type)
 		return func;
 
 	return BuiltIn_GetFunction(pName, type);
+}
+
+////////////////////////////////////////////////////////
+
+void Scr_UserStat_Get(void)
+{
+	int paramCount = Scr_GetNumParam(SCRIPTINSTANCE_SERVER);
+	if (paramCount != 1)
+	{
+		Scr_Error("USAGE: UserStat_Get( <stat name>)\n", 0);
+		return;
+	}
+
+	const char* key = Scr_GetString(0, SCRIPTINSTANCE_SERVER);
+	auto entry = g_userStats.GetStat(key);
+	entry.EmitScriptValue(SCRIPTINSTANCE_SERVER);
+}
+
+void Scr_UserStat_Set(void)
+{
+	int paramCount = Scr_GetNumParam(SCRIPTINSTANCE_SERVER);
+	if (paramCount != 2)
+	{
+		Scr_Error("USAGE: UserStat_Set( <stat name>, <value> )\n", 0);
+		return;
+	}
+
+	const char* key = Scr_GetString(0, SCRIPTINSTANCE_SERVER);
+	int type = Scr_GetType(1, SCRIPTINSTANCE_SERVER);
+
+	float vec[3];
+
+	switch (type)
+	{
+	case SCR_VALUE_INT:
+		g_userStats.SetStat(key, Scr_GetInt(1, SCRIPTINSTANCE_SERVER));
+		break;
+	case SCR_VALUE_FLOAT:
+		g_userStats.SetStat(key, Scr_GetFloat(1, SCRIPTINSTANCE_SERVER));
+		break;
+	case SCR_VALUE_STRING:
+		g_userStats.SetStat(key, Scr_GetString(1, SCRIPTINSTANCE_SERVER));
+		break;
+	case SCR_VALUE_VEC:
+		Scr_GetVector(1, vec, SCRIPTINSTANCE_SERVER);
+		g_userStats.SetStat(key, vec);
+		break;
+	default:
+		Scr_Error("Invalid Argument", 0);
+	}
 }

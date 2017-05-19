@@ -54,6 +54,9 @@ struct GfxReflectionProbe
 };
 static_assert(sizeof(GfxReflectionProbe) == 0x18, "Size mismatch");
 
+typedef bool (__cdecl* G_ExitAfterToolComplete_t)();
+static G_ExitAfterToolComplete_t G_ExitAfterToolComplete = (G_ExitAfterToolComplete_t)0x0049EF60;
+
 void R_CalcCubeMapViewValues(refdef_s *refdef, CubemapShot cubemapShot, int cubemapSize);
 void R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData);
 void R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData, int probeCount, bool *generateProbe);

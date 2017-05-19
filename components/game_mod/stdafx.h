@@ -42,6 +42,7 @@
 #include "db_registry.h"
 #include "ui_main_pc.h"
 #include "live_win.h"
+#include "live_stats.h"
 #include "cg_scoreboard.h"
 #include "sys_cmds.h"
 #include "r_init.h"
