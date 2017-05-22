@@ -7,6 +7,33 @@ sharedUiInfo_t * const sharedUiInfo = (sharedUiInfo_t * const)0x025760F0;
 int& ui_numArenas = *(int*)0x025F6940;
 char** ui_arenaInfos = *(char*(*)[128])0x025F6740;
 
+//
+// Needed because the Detours lib can't handle relocating relative calls
+//
+void __declspec(naked) UI_OpenMenu_f_o(void)
+{
+	static DWORD UI_GetInfo = 0x0046BE80;
+	static DWORD dwRetn = 0x00847219;
+
+	_asm
+	{
+		push esi
+		push edi
+		push 0
+		call UI_GetInfo
+		jmp dwRetn
+	}
+}
+
+void __cdecl UI_OpenMenu_f(void)
+{
+	if (sv_mapname && sv_mapname->current.string && cl_ingame && cl_ingame->current.enabled)
+	{
+		if (strcmp(sv_mapname->current.string, "frontend") == 0)
+			UI_OpenMenu_f_o();
+	}
+}
+
 bool __cdecl UI_LoadModArenas()
 {
 	int fileHandle = 0;

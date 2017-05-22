@@ -64,6 +64,8 @@ static Live_UpdateUiPopup_t* Live_UpdateUiPopup = (Live_UpdateUiPopup_t*)0x005C8
 typedef void (__cdecl* UI_SetLoadingScreenMaterial_t)(const char *name);
 static UI_SetLoadingScreenMaterial_t UI_SetLoadingScreenMaterial = (UI_SetLoadingScreenMaterial_t)0x005C6F70;
 
+void __cdecl UI_OpenMenu_f(void);
+
 //
 // Functionally the same as UI_SelectedMap except it returns mapLoadName
 //

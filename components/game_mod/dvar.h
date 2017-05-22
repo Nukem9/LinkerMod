@@ -96,6 +96,7 @@ VANILLA_DVAR(fs_usermapDir, 0x025FADE4);
 VANILLA_DVAR(fs_homepath, 0x025FBF0C);
 VANILLA_DVAR(fs_basepath, 0x025FBF04);
 
+VANILLA_DVAR(cl_ingame, 0x02910158);
 VANILLA_DVAR(com_sv_running, 0x0243FD3C);
 VANILLA_DVAR(sv_mapname, 0x02899CEC);
 
