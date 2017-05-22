@@ -147,9 +147,9 @@ BOOL GameMod_Init()
 	PatchMemory_WithNOP(0x00445AA1, 5);		// CL_ParseGamestate
 
 	//
-	// Disable error message boxes with developer_script
+	// Add scr_supressErrors to disable error message boxes with developer_script
 	//
-	PatchMemory(0x005A1732, (PBYTE)"\xE9\xB2\x00\x00\x00", 5);
+	Detours::X86::DetourFunction((PBYTE)0x005A1732, (PBYTE)&mfh_RuntimeError);
 
 #if _DEBUG || _USE_COM_DPRINTF
 	//

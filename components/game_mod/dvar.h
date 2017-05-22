@@ -137,6 +137,7 @@ extern dvar_s* con_extcon;
 extern dvar_s* con_inputMaxMatchesShown;
 extern dvar_s* cg_drawViewpos;
 extern dvar_s* scr_useFastFileOnly;
+extern dvar_s* scr_suppressErrors;
 extern dvar_s* gm_build_date;
 extern dvar_s* cg_showServerInfo;
 
@@ -166,6 +167,9 @@ static Dvar_RegisterString_t* Dvar_RegisterString = (Dvar_RegisterString_t*)0x00
 
 typedef dvar_s *__cdecl Dvar_RegisterInt_t(const char *dvarName, int value, int min, int max, unsigned __int16 flags, const char *description);
 static Dvar_RegisterInt_t* Dvar_RegisterInt = (Dvar_RegisterInt_t*)0x00651910;
+
+typedef dvar_s *(__cdecl* Dvar_RegisterBool_t)(const char *dvarName, bool value, unsigned __int16 flags, const char *description);
+static Dvar_RegisterBool_t Dvar_RegisterBool = (Dvar_RegisterBool_t)0x0045BB20;
 
 typedef dvar_s *__cdecl Dvar_RegisterEnum_t(const char *dvarName, const char **valueList, int defaultIndex, unsigned int flags, const char *description);
 static Dvar_RegisterEnum_t* Dvar_RegisterEnum = (Dvar_RegisterEnum_t*)0x0051BD00;

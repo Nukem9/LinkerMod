@@ -1,19 +1,20 @@
 #include "stdafx.h"
 
-dvar_s* r_d3d9ex;
-dvar_s* r_noborder;
-dvar_s* r_showTess;
-dvar_s* sm_quality;
-dvar_s* con_extcon;
-dvar_s* con_inputMaxMatchesShown;
-dvar_s* cg_drawViewpos;
-dvar_s* scr_useFastFileOnly;
-dvar_s* gm_build_date;
-dvar_s* perk_weapRateEnhanced;
+dvar_s* r_d3d9ex = NULL;
+dvar_s* r_noborder = NULL;
+dvar_s* r_showTess = NULL;
+dvar_s* sm_quality = NULL;
+dvar_s* con_extcon = NULL;
+dvar_s* con_inputMaxMatchesShown = NULL;
+dvar_s* cg_drawViewpos = NULL;
+dvar_s* scr_useFastFileOnly = NULL;
+dvar_s* scr_suppressErrors = NULL;
+dvar_s* gm_build_date = NULL;
+dvar_s* perk_weapRateEnhanced = NULL;
 
-dvar_s* radiant_live;
-dvar_s* radiant_livePort;
-dvar_s* radiant_liveDebug;
+dvar_s* radiant_live = NULL;
+dvar_s* radiant_livePort = NULL;
+dvar_s* radiant_liveDebug = NULL;
 
 const char* r_showTessNames[] =
 {
@@ -77,12 +78,14 @@ void __cdecl CG_RegisterDvars()
 	CG_RegisterDvars_o();
 
 	gm_build_date = Dvar_RegisterString("gm_build_date", __TIMESTAMP__, 0x10 | 0x8, "Compile time for game_mod");
-	
+
 	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 1, "Enable external console window");
 	con_inputMaxMatchesShown = Dvar_RegisterInt("con_inputMaxMatchesShown", 24, 1, 64, 1, "Maximum number of suggestions in the console autocomplete preview");
 	
 	cg_drawViewpos = Dvar_RegisterInt("cg_drawViewpos", 0, 0, 1, 1, "Draw the current player origin and view angles");
 	scr_useFastFileOnly = Dvar_RegisterInt("scr_useFastFileOnly", 0, 0, 1, 0x2, "Disable the loading of raw script files from the current mod's directory");
+
+	scr_suppressErrors = Dvar_RegisterBool("scr_suppressErrors", false, 0x2, "Suppress fatal script errors");
 
 	perk_weapRateEnhanced = Dvar_RegisterInt("perk_weapRateEnhanced", 0, 0, 1, 0x80, "Double tap will shoot 2x the bullets for every shot");
 
