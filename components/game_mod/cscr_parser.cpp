@@ -45,26 +45,21 @@ char *__cdecl Scr_ReadFile(scriptInstance_t inst, const char *filename, const ch
 	return result;
 }
 
-DWORD Scr_ShouldSuppressErrors(void)
+void __declspec(naked) mfh_RuntimeError(void)
 {
 	static DWORD dwRetn_SuppressError = 0x005A17E9;
 	static DWORD dwRetn_HandleError = 0x005A1738;
 
-	if (scr_suppressErrors->current.enabled)
-		return dwRetn_SuppressError;
-	return dwRetn_HandleError;
-}
-
-void __declspec(naked) mfh_RuntimeError(void)
-{
-	static DWORD dwRetn_SuppressError = 0x005A17E9;
-	
 	__asm
 	{
+		push ecx
 		jz SUPPRESS_ERROR
 
-		call Scr_ShouldSuppressErrors
-		jmp eax
+		mov ecx, scr_suppressErrors
+		cmp byte ptr[ecx + 0x18], 0
+		pop ecx
+		jnz SUPPRESS_ERROR
+		jmp dwRetn_HandleError
 
 	SUPPRESS_ERROR:
 		jmp dwRetn_SuppressError
