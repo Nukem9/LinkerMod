@@ -1,6 +1,7 @@
 #pragma once
 
 #define VANILLA_DVAR(NAME, ADDRESS) static dvar_s*& NAME = *(dvar_s **)ADDRESS;
+#define VANILLA_VALUE(NAME, TYPE, ADDRESS) static TYPE& NAME = *(TYPE*)ADDRESS;
 
 enum dvarType_t
 {
@@ -95,6 +96,8 @@ VANILLA_DVAR(fs_gameDirVar, 0x025FADE8);
 VANILLA_DVAR(fs_usermapDir, 0x025FADE4);
 VANILLA_DVAR(fs_homepath, 0x025FBF0C);
 VANILLA_DVAR(fs_basepath, 0x025FBF04);
+
+VANILLA_DVAR(uiscript_debug, 0x02562A20);
 
 VANILLA_DVAR(cl_ingame, 0x02910158);
 VANILLA_DVAR(com_sv_running, 0x0243FD3C);

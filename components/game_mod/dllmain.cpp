@@ -219,6 +219,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x008352F6, (PBYTE)&mfh_UI_FeederSelection_AllMaps);
 
 	//
+	// UI_GetModInfo enhancements
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00858150, (PBYTE)&UI_GetModInfo);
+
+	//
 	// DB_ModXFileHandle hook to enable loading maps from mods
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007A3610, (PBYTE)&DB_ModXFileHandle_hk);

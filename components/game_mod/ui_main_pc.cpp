@@ -107,3 +107,40 @@ void __declspec(naked) mfh_UI_FeederSelection_AllMaps()
 		jmp rtn_UI_FeederSelection_AllMaps
 	}
 }
+
+bool __cdecl GetOperand(OperandStack *dataStack, Operand *data)
+{
+	bool result = false;
+
+	_asm
+	{
+		mov edi, data
+		mov esi, dataStack
+		mov eax, 0x00851930
+		call eax
+		mov result, al
+	}
+
+	return result;
+}
+
+void __cdecl UI_GetModInfo(const int localClientNum, struct itemDef_s *item, OperandStack *dataStack)
+{
+	const char *str = "GetModInfo unhandled";
+
+	Operand operand;
+	GetOperand(dataStack, &operand);
+	const char* src = GetSourceString(operand);
+	if (_stricmp(src, "modName") == 0)
+		str = sharedUiInfo_modList[sharedUiInfo_modIndex].modName;
+	else if (_stricmp(src, "modDescr") == 0)
+		str = sharedUiInfo_modList[sharedUiInfo_modIndex].modDescr;
+
+	if (uiscript_debug && uiscript_debug->current.integer)
+		Expression_TraceInternal("GetModInfo() = %s\n", str);
+
+	int index = dataStack->numOperandLists;
+	dataStack->stack[index].operands[0].dataType = VAL_STRING;
+	dataStack->stack[index].operands[0].internals.string = str;
+	dataStack->stack[dataStack->numOperandLists++].operandCount = 1;
+}
