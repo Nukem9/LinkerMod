@@ -63,7 +63,7 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 	{
 		Con_Print_v("Extracting file: \"%s\"...	", filepath);
 
-		int err = FS_CreatePath(outPath);
+		int err = FS_CreatePath(filepath);
 		if (err != 0)
 		{
 			Con_Error_v("DIR ERROR (%d)\n", err);
