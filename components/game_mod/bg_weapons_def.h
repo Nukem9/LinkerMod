@@ -97,8 +97,11 @@ struct WeaponVariantDef
 {
 	char _pad1[0x8];
 	WeaponDef *weapDef;
+	char _pad2[0x40];
+	int iClipIndex;
 };
 STATIC_ASSERT_OFFSET(WeaponVariantDef, weapDef, 0x8);
+STATIC_ASSERT_OFFSET(WeaponVariantDef, iClipIndex, 0x4C);
 
 struct weaponParms
 {
