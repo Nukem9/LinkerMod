@@ -10,4 +10,8 @@ set ASSET_UTIL=%GAME_DIR%\bin\asset_util.exe
 "%ASSET_UTIL%" extract-iwd --all
 "%ASSET_UTIL%" extract-ff --all
 
+"%ASSET_UTIL%" csvgen --aitype *
+"%ASSET_UTIL%" csvgen --character *
+"%ASSET_UTIL%" csvgen --xmodelalias *
+
 ents.bat
