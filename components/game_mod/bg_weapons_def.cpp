@@ -19,7 +19,7 @@ unsigned int BG_GetWeaponIndex(WeaponVariantDef *weapVariantDef)
 {
 	ASSERT(weapVariantDef);
 
-	for (unsigned int weapIndex = 0; weapIndex <= bg_lastParsedWeaponIndex; ++weapIndex)
+	for (unsigned int weapIndex = 0; weapIndex <= bg_lastParsedWeaponIndex; weapIndex++)
 	{
 		if (weapVariantDef == bg_weaponVariantDefs[weapIndex])
 			return weapIndex;

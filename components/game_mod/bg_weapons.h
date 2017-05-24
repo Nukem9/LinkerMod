@@ -129,6 +129,9 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml);
 void PM_Weapon_Jam(/*playerState_s *ps*/);
 const char *BG_WeaponName(int weapon);
 
+extern void (* G_RegisterWeapon)(unsigned int weapIndex);
+void hk_G_RegisterWeapon(unsigned int weapIndex);
+
 // /bgame/bg_weapons.h:300
 static int BG_GetHeldWeaponSlot(playerState_s *ps, int weapon)
 {

@@ -1,11 +1,21 @@
 #include "stdafx.h"
 
+// /bgame/bg_weapons_ammo.cpp:194
+int BG_GetSharedAmmoCapSize(unsigned int capIndex)
+{
+	if (capIndex < bg_numSharedAmmoCaps)
+		return bg_sharedAmmoCaps[capIndex]->iSharedAmmoCap;
+
+	ASSERT_MSG((unsigned)(capIndex) < (unsigned)(bg_numSharedAmmoCaps), "capIndex doesn't index bg_numSharedAmmoCaps");
+	return 0;
+}
+
 // /bgame/bg_weapons_ammo.cpp:257
 AmmoClip *BG_GetAmmoClip(playerState_s *ps, int clipIndex)
 {
 	ASSERT(ps);
 
-	for (int slot = 0; slot < 15; ++slot)
+	for (int slot = 0; slot < ARRAYSIZE(ps->ammoInClip); slot++)
 	{
 		if (ps->ammoInClip[slot].clipIndex == clipIndex)
 			return &ps->ammoInClip[slot];
@@ -19,7 +29,7 @@ AmmoClip *BG_GetFreeAmmoClip(playerState_s *ps, int clipIndex)
 {
 	ASSERT(ps);
 
-	for (int slot = 0; slot < 15; ++slot)
+	for (int slot = 0; slot < ARRAYSIZE(ps->ammoInClip); slot++)
 	{
 		// If we find a free/empty slot, zero it and return
 		if (!ps->ammoInClip[slot].clipIndex)
@@ -29,14 +39,14 @@ AmmoClip *BG_GetFreeAmmoClip(playerState_s *ps, int clipIndex)
 		}
 	}
 
-	for (int slot = 0; slot < 15; ++slot)
+	for (int slot = 0; slot < ARRAYSIZE(ps->ammoInClip); slot++)
 	{
 		AmmoClip *clip = &ps->ammoInClip[slot];
 
 		ASSERT(clip->clipIndex != 0);
 
 		bool matched = false;
-		for (int weaponSlot = 0; weaponSlot < 15; ++weaponSlot)
+		for (int weaponSlot = 0; weaponSlot < ARRAYSIZE(ps->heldWeapons); weaponSlot++)
 		{
 			if (BG_GetWeaponVariantDef(ps->heldWeapons[weaponSlot].weapon)->iClipIndex == clip->clipIndex)
 			{
@@ -82,6 +92,77 @@ void BG_AddAmmoToClip(playerState_s *ps, int clipIndex, int amount)
 		clip->count = 0;
 	else
 		clip->count += amount;
+
+	// Stockpile perk: the player can have one extra regular or special grenade
+	for (int slot = 0; slot < ARRAYSIZE(ps->heldWeapons); slot++)
+	{
+		WeaponVariantDef *weapVariantDef = BG_GetWeaponVariantDef(ps->heldWeapons[slot].weapon);
+
+		// We only care about grenades for now
+		if (weapVariantDef->weapDef->weapType != WEAPTYPE_GRENADE)
+			continue;
+
+		if (weapVariantDef->iClipIndex != clipIndex)
+			continue;
+
+		if (weapVariantDef->iClipSize <= 2)
+			continue;
+
+		// Perk enabled:  clipMax
+		// Perk disabled: clipMax - 1
+		int maximum = weapVariantDef->iClipSize;
+
+		if (!BG_HasPerk(ps->perks, PERK_STOCKPILE))
+			maximum -= 1;
+
+		clip->count = min(clip->count, maximum);
+		break;
+	}
+}
+
+// /bgame/bg_weapons_ammo.cpp:470
+int BG_GetAmmoPlayerMax(playerState_s *ps, unsigned int weaponIndex, unsigned int weaponIndexToSkip)
+{
+	WeaponDef *weapDef = BG_GetWeaponDef(weaponIndex);
+	WeaponVariantDef *weapVarDef = BG_GetWeaponVariantDef(weaponIndex);
+
+	if (weapDef->iSharedAmmoCapIndex >= 0)
+		return BG_GetSharedAmmoCapSize(weapDef->iSharedAmmoCapIndex);
+
+	if (BG_WeaponIsClipOnly(weaponIndex))
+		return BG_GetClipSize(weaponIndex);
+
+	int total = 0;
+	for (int slot = 0; slot < ARRAYSIZE(ps->heldWeapons); slot++)
+	{
+		int thisWeapIdx = ps->heldWeapons[slot].weapon;
+
+		if (thisWeapIdx == weaponIndexToSkip)
+			continue;
+
+		WeaponDef *thisWeapDef = BG_GetWeaponDef(thisWeapIdx);
+
+		if (BG_GetWeaponVariantDef(thisWeapIdx)->iAmmoIndex == weapVarDef->iAmmoIndex &&
+			(thisWeapDef->inventoryType != WEAPINVENTORY_ALTMODE || BG_GetWeaponVariantDef(thisWeapIdx)->altWeaponIndex != thisWeapIdx))
+		{
+			if (thisWeapDef->iSharedAmmoCapIndex >= 0)
+				return BG_GetSharedAmmoCapSize(thisWeapDef->iSharedAmmoCapIndex);
+
+			total += BG_GetMaxAmmo(thisWeapIdx);
+
+			// Stockpile perk: all of the player's weapons can store two extra magazines
+			if (BG_HasPerk(ps->perks, PERK_STOCKPILE))
+				total += (BG_GetClipSize(thisWeapIdx) * 2);
+		}
+	}
+
+	return total;
+}
+
+// /bgame/bg_weapons_ammo.cpp:670
+int BG_WeaponIsClipOnly(int weapon)
+{
+	return BG_GetWeaponDef(weapon)->bClipOnly;
 }
 
 // /bgame/bg_weapons_ammo.cpp:796
