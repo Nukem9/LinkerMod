@@ -41,6 +41,13 @@ goto:eof
 echo Exporting %MAP% ...
 "%ASSET_UTIL%" ents "%FF_DIR%%MAP%.ff" >> "%OUT_DIR%%MAP%.map"
 
+:: If Asset Util did not exit correctly
+::  we need to delete the map file
+IF %ERRORLEVEL% NEQ 0 (
+	echo ERROR^(%ERRORLEVEL%^): Deleting file...
+	del "%OUT_DIR%%MAP%.map"
+)
+
 ::
 ::cuba
 ::vorkuta
