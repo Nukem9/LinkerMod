@@ -118,13 +118,23 @@ processId_t Process_FindSupportedProcess(unsigned int timeoutDelay)
 	if (timeoutDelay > 0)
 		Con_Print("Waiting for supported process to launch...\n");
 
-	for (;;)
+	for (bool had_to_wait = false;; had_to_wait = true)
 	{
 		LARGE_INTEGER split;
 		QueryPerformanceCounter(&split);
 
 		if (processId_t pid = Process_FindSupportedProcess_Launched())
+		{
+			//
+			// If we had to wait for the process to launch - and *just* found the process
+			// that means the process probably *just* launched
+			// So we wait a bit for the process to initialize before returning it
+			//
+			if (timeoutDelay && had_to_wait)
+				Sleep(100);
+
 			return pid;
+		}
 
 		LARGE_INTEGER elapsed_ms;
 		elapsed_ms.QuadPart = split.QuadPart - start.QuadPart;
@@ -182,4 +192,13 @@ void Process_ResumeThreads(processId_t pid)
 	} while (Thread32Next(threadSnapshot, &threadEntry));
 
 	CloseHandle(threadSnapshot);
+}
+
+bool Process_KillProcess(processId_t pid)
+{
+	HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+	if (!hProc)
+		return false;
+
+	return TerminateProcess(hProc, 0) ? true : false;
 }
