@@ -113,6 +113,10 @@ REGISTER_CVAR(csvgen_aitypes);
 REGISTER_CVAR(csvgen_characters);
 REGISTER_CVAR(csvgen_xmodelaliases);
 
+REGISTER_CVAR(rip_waitForProcess);
+REGISTER_CVAR(rip_waitForMap);
+REGISTER_CVAR(rip_killProcess);
+
 REGISTER_CVAR(fs_outdir);
 
 #undef REGISTER_GLOBAL_CVAR

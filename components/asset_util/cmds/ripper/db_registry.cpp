@@ -2,6 +2,8 @@
 #include "foreign_ptr.h"
 #include "../../common/io.h"
 
+#include "dvar.h"
+
 static const char* g_assetNames[] =
 {
 	"xmodelpieces",
@@ -230,4 +232,25 @@ void DB_ListAssetPool(XAssetType type, const char* zone)
 {
 	int count = DB_EnumAssetPool(type, DB_ListAssetPool_AssetCallback, DB_ListAssetPool_AssetCallback, zone);
 	printf("Total of %d assets in %s pool\n", count, DB_GetXAssetTypeName(type));
+}
+
+void DB_WaitForMapToLoad(void)
+{
+	// Delay (ms) to prevent the checks from causing the game process to slow down
+	const unsigned int sleep_delay = 100;
+
+	Con_Print("Waiting for map to load...	");
+
+	while (*g_process.cl_ingame == NULL)
+	{
+		Sleep(sleep_delay);
+	}
+
+	ForeignPointer<dvar_s> cl_ingame_val = *g_process.cl_ingame;
+	while (!cl_ingame_val->current.enabled)
+	{
+		Sleep(sleep_delay);
+	}
+
+	Con_Print("Map Loaded!\n");
 }

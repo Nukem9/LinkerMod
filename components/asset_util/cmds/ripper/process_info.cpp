@@ -14,14 +14,15 @@ int ProcessInfo_Init(processId_t pid)
 		g_process.db_hashTable = ForeignPointer<unsigned __int16>((unsigned __int16*)0x00CD81F8);
 		g_process.db_assetEntryPool = ForeignPointer<XAssetEntryPoolEntry>((XAssetEntryPoolEntry*)0x00DE85D8);
 		g_process.db_zoneNames = ForeignPointer<XZoneName>((XZoneName*)0x010C6608);
+		g_process.cl_ingame = ForeignPointer<dvar_s*>((dvar_s**)0x02910158);
 		break;
 	case PROCESS_BLACK_OPS_MP:
 		g_process.db_hashTable = ForeignPointer<unsigned __int16>((unsigned __int16*)0x24365D8);
 		g_process.db_assetEntryPool = ForeignPointer<XAssetEntryPoolEntry>((XAssetEntryPoolEntry*)0x252FC18);
 		g_process.db_zoneNames = ForeignPointer<XZoneName>((XZoneName*)0x028C9B08);
+		g_process.cl_ingame = ForeignPointer<dvar_s*>((dvar_s**)0x00E67B30);
 		break;
 	default:
-		printf("%d\n", type);
 		ProcessInfo_Free();
 		return -1;
 	}
