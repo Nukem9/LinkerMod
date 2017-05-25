@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+std::vector<WeaponVariantDef *> bg_StockpileCheckedDefs;
+std::vector<WeaponVariantDef *> bg_StockpilePatchedDefs;
+
 // /bgame/bg_weapons_def.cpp:62
 WeaponVariantDef *BG_GetWeaponVariantDef(unsigned int weaponIndex)
 {
@@ -29,8 +32,18 @@ unsigned int BG_GetWeaponIndex(WeaponVariantDef *weapVariantDef)
 	return 0;
 }
 
+// /bgame/bg_weapons_def.cpp:274
+void BG_ClearWeaponDef()
+{
+	bg_StockpileCheckedDefs.clear();
+	bg_StockpilePatchedDefs.clear();
+
+	((void(__cdecl *)())0x004F2900)();
+}
+
 // /bgame/bg_weapons_def.cpp:???
 void BG_SetWeaponUsed(int clientIndex, int weapIndex)
 {
+	// Sets a bit flag if a player used the weapon at least once
 	((DWORD *)0xBDF508)[weapIndex / 32 + 4 * clientIndex] |= 1 << weapIndex % 32;
 }

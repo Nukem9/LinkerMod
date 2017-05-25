@@ -6,7 +6,7 @@ int BG_GetSharedAmmoCapSize(unsigned int capIndex)
 	if (capIndex < bg_numSharedAmmoCaps)
 		return bg_sharedAmmoCaps[capIndex]->iSharedAmmoCap;
 
-	ASSERT_MSG((unsigned)(capIndex) < (unsigned)(bg_numSharedAmmoCaps), "capIndex doesn't index bg_numSharedAmmoCaps");
+	ASSERT_MSG(capIndex < bg_numSharedAmmoCaps, "capIndex doesn't index bg_numSharedAmmoCaps");
 	return 0;
 }
 
@@ -57,7 +57,7 @@ AmmoClip *BG_GetFreeAmmoClip(playerState_s *ps, int clipIndex)
 		}
 
 		if (!matched)
-			Com_PrintError(17, "found ammo clip %i that we do not have a weapon for\n", slot);
+			Com_PrintError(17, "Found ammo clip %i that we do not have a weapon for\n", slot);
 	}
 
 	return nullptr;
@@ -98,14 +98,14 @@ void BG_AddAmmoToClip(playerState_s *ps, int clipIndex, int amount)
 	{
 		WeaponVariantDef *weapVariantDef = BG_GetWeaponVariantDef(ps->heldWeapons[slot].weapon);
 
-		// We only care about grenades for now
+		// We only care about grenades for now (max ammo: 3 or 4)
 		if (weapVariantDef->weapDef->weapType != WEAPTYPE_GRENADE)
 			continue;
 
 		if (weapVariantDef->iClipIndex != clipIndex)
 			continue;
 
-		if (weapVariantDef->iClipSize <= 2)
+		if (weapVariantDef->iClipSize < 3)
 			continue;
 
 		// Perk enabled:  clipMax

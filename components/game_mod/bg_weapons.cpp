@@ -293,22 +293,35 @@ const char *BG_WeaponName(int weapon)
 	return BG_GetWeaponVariantDef(weapon)->szInternalName;
 }
 
+// /game/g_items.cpp:1525
 void(*G_RegisterWeapon)(unsigned int weapIndex);
 void hk_G_RegisterWeapon(unsigned int weapIndex)
 {
-	// Override the default grenade limit
+	// Override the default grenade limit (See PERK_STOCKPILE)
 	WeaponVariantDef *weapVariantDef = BG_GetWeaponVariantDef(weapIndex);
 
 	if (weapVariantDef->weapDef->weapType == WEAPTYPE_GRENADE)
 	{
-		// Some weapons (perk bottle/xbow/syrette) are classified as grenades, but they
-		// dont't have a valid clip size
-		if (weapVariantDef->iClipSize > 2)
+		auto& usedDefs = bg_StockpileCheckedDefs;
+		auto& patchedDefs = bg_StockpilePatchedDefs;
+
+		// Make sure we've never used this variant before
+		if (std::find(usedDefs.begin(), usedDefs.end(), weapVariantDef) == usedDefs.end())
 		{
-			weapVariantDef->weapDef->iStartAmmo += 1;
-			weapVariantDef->weapDef->iMaxAmmo += 1;
-			weapVariantDef->weapDef->iSharedAmmoCap += 1;
-			weapVariantDef->iClipSize += 1;
+			usedDefs.push_back(weapVariantDef);
+
+			// Some weapons (perk bottle/xbow/syrette) are classified as grenades, but they
+			// dont't have a valid clip size
+			if (weapVariantDef->iClipSize == 3 ||
+				weapVariantDef->iClipSize == 4)
+			{
+				weapVariantDef->weapDef->iStartAmmo += 1;
+				weapVariantDef->weapDef->iMaxAmmo += 1;
+				weapVariantDef->weapDef->iSharedAmmoCap += 1;
+				weapVariantDef->iClipSize += 1;
+
+				patchedDefs.push_back(weapVariantDef);
+			}
 		}
 	}
 

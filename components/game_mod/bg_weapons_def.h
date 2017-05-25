@@ -157,7 +157,11 @@ STATIC_ASSERT_OFFSET(weaponParms, weapDef, 0x40);
 static WeaponVariantDef **bg_weaponVariantDefs = (WeaponVariantDef **)0x00BE19A8;
 static unsigned int& bg_lastParsedWeaponIndex = *(unsigned int *)0x00BE1FB0;
 
+extern std::vector<WeaponVariantDef *> bg_StockpileCheckedDefs;
+extern std::vector<WeaponVariantDef *> bg_StockpilePatchedDefs;
+
 WeaponVariantDef *BG_GetWeaponVariantDef(unsigned int weaponIndex);
 WeaponDef *BG_GetWeaponDef(unsigned int weaponIndex);
 unsigned int BG_GetWeaponIndex(WeaponVariantDef *weapVariantDef);
+void BG_ClearWeaponDef();
 void BG_SetWeaponUsed(int clientIndex, int weapIndex);
