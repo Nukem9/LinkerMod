@@ -20,19 +20,31 @@ if not exist %OUT_DIR% mkdir %OUT_DIR%
 
 (for %%m in (%SP_MAPS%) do (
 	set MAP=%%m
-	if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	if [%OVERWRITE%] == [] (
+		if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	) else (
+		call :export
+	)
 ))
 
 (for %%m in (%ZM_MAPS%) do (
 	set MAP=%%m
-	if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	if [%OVERWRITE%] == [] (
+		if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	) else (
+		call :export
+	)
 ))
 
 set OUT_DIR=%GAME_DIR%\map_source\_prefabs\maps\mp\
 if not exist %OUT_DIR% mkdir %OUT_DIR%
 (for %%m in (%MP_MAPS%) do (
 	set MAP=%%m
-	if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	if [%OVERWRITE%] == [] (
+		if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	) else (
+		call :export
+	)
 ))
 
 goto:eof

@@ -15,4 +15,7 @@ set ASSET_UTIL=%GAME_DIR%\bin\asset_util.exe
 "%ASSET_UTIL%" csvgen --xmodelalias *
 
 soundalias.bat
+
+set OVERWRITE=1
 ents.bat
+set OVERWRITE=
