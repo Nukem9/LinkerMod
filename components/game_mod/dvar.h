@@ -101,6 +101,8 @@ VANILLA_DVAR(uiscript_debug, 0x02562A20);
 
 VANILLA_DVAR(cl_ingame, 0x02910158);
 VANILLA_DVAR(com_sv_running, 0x0243FD3C);
+VANILLA_DVAR(com_maxclients, 0x02481720);
+VANILLA_DVAR(com_developer, 0x0243FCA0);
 VANILLA_DVAR(sv_mapname, 0x02899CEC);
 
 VANILLA_DVAR(developer, 0x0243FCA0);
@@ -130,7 +132,6 @@ VANILLA_DVAR(player_clipSizeMultiplier, 0x00BCAF84);
 VANILLA_DVAR(perk_weapRateMultiplier, 0x00BDF35C);
 VANILLA_DVAR(perk_weapReloadMultiplier, 0x00BDF358);
 VANILLA_DVAR(perk_weapSwitchMultiplier, 0x00BDF2C0);
-
 
 VANILLA_DVAR(phys_gravity, 0x023D2FA8);
 

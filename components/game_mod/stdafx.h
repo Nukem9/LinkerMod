@@ -56,6 +56,7 @@
 #include "r_material_load_obj.h"
 #include "r_draw_xmodel.h"
 #include "rb_tess.h"
+#include "cscr_vm.h"
 #include "cscr_parser.h"
 #include "threads.h"
 #include "ragdoll.h"
@@ -72,6 +73,7 @@
 #include "pathnode.h"
 #include "pathnode_load_obj.h"
 #include "radiant_remote.h"
+#include "g_client_script_cmd_mp.h"
 
 #include "win_localize.h"
 #include "win_exception.h"

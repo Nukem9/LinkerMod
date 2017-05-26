@@ -40,6 +40,7 @@ static Com_Printf_t Com_Error = (Com_Printf_t)0x00651D90;
 //
 void Com_ToolPrintf(int channel, const char* fmt, ...);
 void Com_ToolError(int channel, const char* fmt, ...);
+void Com_DPrintf(int channel, const char *fmt, ...);
 
 typedef char *va_t(const char *format, ...);
 static va_t* va = (va_t*)0x0057CDD0;

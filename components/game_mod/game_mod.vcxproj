@@ -108,9 +108,11 @@
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="cscr_parser.cpp" />
+    <ClCompile Include="cscr_vm.cpp" />
     <ClCompile Include="db_registry.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
+    <ClCompile Include="g_client_script_cmd_mp.cpp" />
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
@@ -163,9 +165,11 @@
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="cscr_parser.h" />
+    <ClInclude Include="cscr_vm.h" />
     <ClInclude Include="d3d9ex.h" />
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
+    <ClInclude Include="g_client_script_cmd_mp.h" />
     <ClInclude Include="g_main_mp.h" />
     <ClInclude Include="live_win.h" />
     <ClInclude Include="patch_common.h" />

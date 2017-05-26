@@ -52,6 +52,25 @@ void Com_ToolError(int channel, const char* fmt, ...)
 	Com_Error(channel, "%s", msg);
 }
 
+void Com_DPrintf(int channel, const char *fmt, ...)
+{
+	if (!com_developer || !com_developer->current.integer)
+		return;
+
+	if (channel > 31)
+		return;
+
+	va_list va;
+	char msg[4096];
+
+	va_start(va, fmt);
+	_vsnprintf_s(msg, _TRUNCATE, fmt, va);
+	va_end(va);
+
+	msg[4095] = '\0';
+	Com_Printf(channel, "%s", msg);
+}
+
 bool Com_IsMenuLevel(const char *name)
 {
 	if (!name)

@@ -1,5 +1,7 @@
 #pragma once
 
+#define MAX_GENTITIES 1024
+
 struct gentity_s;
 struct gclient_s;
 struct scr_vehicle_s;
@@ -28,9 +30,11 @@ struct gentity_s
 	gclient_s *client;
 	char _pad1[0x8];
 	scr_vehicle_s *vehicle;
+	char _pad2[0x200];
 };
 STATIC_ASSERT_OFFSET(gentity_s, client, 0x13C);
 STATIC_ASSERT_OFFSET(gentity_s, vehicle, 0x148);
+STATIC_ASSERT_SIZE(gentity_s, 0x34C);
 
 struct renderOptions_s
 {
@@ -139,9 +143,32 @@ STATIC_ASSERT_OFFSET(playerState_s, ammoInClip, 0x3BC);
 STATIC_ASSERT_OFFSET(playerState_s, perks, 0x4FC);
 STATIC_ASSERT_OFFSET(playerState_s, weapAnim, 0x524);
 STATIC_ASSERT_OFFSET(playerState_s, weapAnimLeft, 0x528);
+//STATIC_ASSERT_SIZE(playerState_s, 0x0);
+
+struct clientState_s
+{
+	char _pad1[0x7C];
+	unsigned int perks[1];
+	char _pad2[0x1CA8];
+};
+STATIC_ASSERT_OFFSET(clientState_s, perks, 0x7C);
+STATIC_ASSERT_SIZE(clientState_s, 0x1D28);
+
+struct clientSession_t
+{
+};
 
 struct gclient_s
 {
 	playerState_s ps;
+	//clientSession_t sess;
 };
 STATIC_ASSERT_OFFSET(gclient_s, ps, 0x0);
+
+struct client_t
+{
+	char _pad1[0x101B0];
+};
+STATIC_ASSERT_SIZE(client_t, 0x101B0);
+
+static gentity_s *g_entities = (gentity_s *)0x01A796F8;
