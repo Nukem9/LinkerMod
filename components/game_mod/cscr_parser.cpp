@@ -52,9 +52,9 @@ void __declspec(naked) mfh_RuntimeError(void)
 
 	__asm
 	{
-		push ecx
 		jz SUPPRESS_ERROR
 
+		push ecx
 		mov ecx, scr_suppressErrors
 		cmp byte ptr[ecx + 0x18], 0
 		pop ecx
