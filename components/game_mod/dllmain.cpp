@@ -161,12 +161,12 @@ BOOL GameMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x00847210, (PBYTE)&UI_OpenMenu_f);
 
-#if _DEBUG || _USE_COM_DPRINTF
 	//
 	// Enable Com_DPrintf
 	//
-	PatchMemory_WithNOP(0x0060F7E7, 2);
+	Detours::X86::DetourFunction((PBYTE)0x0060F7D0, (PBYTE)&Com_DPrintf);
 
+#if _DEBUG || _USE_COM_DPRINTF
 	PatchMemory_WithNOP(0x007A499B, 5); // "Redundant asset: '%s','%s'\n"
 	PatchMemory_WithNOP(0x007A2E82, 5); // "Could not load %s \"%s\".\n"
 	PatchMemory_WithNOP(0x007A2E9B, 5); // "Could not load %s \"%s\".\n"
