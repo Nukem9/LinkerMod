@@ -302,8 +302,7 @@ void hk_G_RegisterWeapon(unsigned int weapIndex)
 
 	if (weapVariantDef->weapDef->weapType == WEAPTYPE_GRENADE)
 	{
-		auto& usedDefs = bg_StockpileCheckedDefs;
-		auto& patchedDefs = bg_StockpilePatchedDefs;
+		auto& usedDefs = bg_CheckedVariantDefs;
 
 		// Make sure we've never used this variant before
 		if (std::find(usedDefs.begin(), usedDefs.end(), weapVariantDef) == usedDefs.end())
@@ -320,7 +319,8 @@ void hk_G_RegisterWeapon(unsigned int weapIndex)
 				weapVariantDef->weapDef->iSharedAmmoCap += 1;
 				weapVariantDef->iClipSize += 1;
 
-				patchedDefs.push_back(weapVariantDef);
+				bg_PatchedVariantDefs.push_back(weapVariantDef);
+				bg_PatchedWeapDefs.push_back(weapVariantDef->weapDef);
 			}
 		}
 	}

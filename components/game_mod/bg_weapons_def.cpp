@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
-std::vector<WeaponVariantDef *> bg_StockpileCheckedDefs;
-std::vector<WeaponVariantDef *> bg_StockpilePatchedDefs;
+std::vector<WeaponVariantDef *> bg_CheckedVariantDefs;
+std::vector<WeaponVariantDef *> bg_PatchedVariantDefs;
+std::vector<WeaponDef *> bg_PatchedWeapDefs;
 
 // /bgame/bg_weapons_def.cpp:62
 WeaponVariantDef *BG_GetWeaponVariantDef(unsigned int weaponIndex)
@@ -35,8 +36,9 @@ unsigned int BG_GetWeaponIndex(WeaponVariantDef *weapVariantDef)
 // /bgame/bg_weapons_def.cpp:274
 void BG_ClearWeaponDef()
 {
-	bg_StockpileCheckedDefs.clear();
-	bg_StockpilePatchedDefs.clear();
+	bg_CheckedVariantDefs.clear();
+	bg_PatchedVariantDefs.clear();
+	bg_PatchedWeapDefs.clear();
 
 	((void(__cdecl *)())0x004F2900)();
 }

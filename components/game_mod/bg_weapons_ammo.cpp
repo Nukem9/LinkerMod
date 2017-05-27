@@ -1,5 +1,63 @@
 #include "stdafx.h"
 
+// /bgame/bg_weapons_ammo.cpp:86
+void BG_SetupWeaponDefSharedAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef)
+{
+	ASSERT(weapDef);
+	ASSERT(weapDef->szSharedAmmoCapName);
+
+	weapDef->iSharedAmmoCapIndex = -1;
+
+	if (!*weapDef->szSharedAmmoCapName)
+		return;
+
+	Com_DPrintf(17, "%s: %s\n", BG_WeaponName(weapIndex), weapDef->szSharedAmmoCapName);
+
+	unsigned int index = 0;
+	for (;; index++)
+	{
+		// Check if this was a new entry
+		if (index >= bg_numSharedAmmoCaps)
+		{
+			bg_sharedAmmoCaps[index] = weapDef;
+			weapDef->iSharedAmmoCapIndex = index;
+			bg_numSharedAmmoCaps++;
+			return;
+		}
+
+		// Duplicate entry, now check for conflicting ammo counts
+		if (!_stricmp(bg_sharedAmmoCaps[index]->szSharedAmmoCapName, weapDef->szSharedAmmoCapName))
+			break;
+	}
+
+	weapDef->iSharedAmmoCapIndex = index;
+
+	if (bg_sharedAmmoCaps[index]->iSharedAmmoCap != weapDef->iSharedAmmoCap && index)
+	{
+		for (unsigned int otherWeapIndex = 1; otherWeapIndex < weapIndex; otherWeapIndex++)
+		{
+			WeaponDef *otherWeapDef = BG_GetWeaponDef(otherWeapIndex);
+
+			if (!_stricmp(bg_sharedAmmoCaps[index]->szSharedAmmoCapName, otherWeapDef->szSharedAmmoCapName)
+				&& otherWeapDef->iSharedAmmoCap == bg_sharedAmmoCaps[index]->iSharedAmmoCap)
+			{
+				// Skip weapons that we have patched for PERK_STOCKPILE
+				if (std::find(bg_PatchedWeapDefs.begin(), bg_PatchedWeapDefs.end(), otherWeapDef) != bg_PatchedWeapDefs.end())
+					return;
+
+				Com_Error(ERR_DROP, "Shared ammo cap mismatch for \"%s\" shared ammo cap: '%s\" set it to %i, but \"%s\" already set it to %i.",
+					weapDef->szSharedAmmoCapName,
+					BG_WeaponName(weapIndex),
+					weapDef->iSharedAmmoCap,
+					BG_WeaponName(otherWeapIndex),
+					otherWeapDef->iSharedAmmoCap);
+			}
+		}
+
+		ASSERT_MSG(false, "unreachable");
+	}
+}
+
 // /bgame/bg_weapons_ammo.cpp:194
 int BG_GetSharedAmmoCapSize(unsigned int capIndex)
 {

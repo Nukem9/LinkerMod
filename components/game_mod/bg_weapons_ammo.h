@@ -3,6 +3,7 @@
 static WeaponDef **bg_sharedAmmoCaps = (WeaponDef **)0x00BDF798;
 static unsigned int& bg_numSharedAmmoCaps = *(unsigned int *)0x00BDFD98;
 
+void BG_SetupWeaponDefSharedAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef);
 int BG_GetSharedAmmoCapSize(unsigned int capIndex);
 AmmoClip *BG_GetAmmoClip(playerState_s *ps, int clipIndex);
 AmmoClip *BG_GetFreeAmmoClip(playerState_s *ps, int clipIndex);

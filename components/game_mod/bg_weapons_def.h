@@ -78,7 +78,7 @@ struct WeaponDef
 	char _pad5[0x4];
 	int iMaxAmmo;
 	int shotCount;
-	char _pad6[0x4];
+	const char *szSharedAmmoCapName;
 	int iSharedAmmoCapIndex;
 	int iSharedAmmoCap;
 	bool unlimitedAmmo;
@@ -107,6 +107,7 @@ STATIC_ASSERT_OFFSET(WeaponDef, offhandSlot, 0x6C);
 STATIC_ASSERT_OFFSET(WeaponDef, iStartAmmo, 0x33C);
 STATIC_ASSERT_OFFSET(WeaponDef, iMaxAmmo, 0x344);
 STATIC_ASSERT_OFFSET(WeaponDef, shotCount, 0x348);
+STATIC_ASSERT_OFFSET(WeaponDef, szSharedAmmoCapName, 0x34C);
 STATIC_ASSERT_OFFSET(WeaponDef, iSharedAmmoCapIndex, 0x350);
 STATIC_ASSERT_OFFSET(WeaponDef, iSharedAmmoCap, 0x354);
 STATIC_ASSERT_OFFSET(WeaponDef, unlimitedAmmo, 0x358);
@@ -157,8 +158,9 @@ STATIC_ASSERT_OFFSET(weaponParms, weapDef, 0x40);
 static WeaponVariantDef **bg_weaponVariantDefs = (WeaponVariantDef **)0x00BE19A8;
 static unsigned int& bg_lastParsedWeaponIndex = *(unsigned int *)0x00BE1FB0;
 
-extern std::vector<WeaponVariantDef *> bg_StockpileCheckedDefs;
-extern std::vector<WeaponVariantDef *> bg_StockpilePatchedDefs;
+extern std::vector<WeaponVariantDef *> bg_CheckedVariantDefs;
+extern std::vector<WeaponVariantDef *> bg_PatchedVariantDefs;
+extern std::vector<WeaponDef *> bg_PatchedWeapDefs;
 
 WeaponVariantDef *BG_GetWeaponVariantDef(unsigned int weaponIndex);
 WeaponDef *BG_GetWeaponDef(unsigned int weaponIndex);
