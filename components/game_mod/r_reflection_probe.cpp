@@ -6,9 +6,76 @@ extern bool	g_reflectionsUpdated;
 extern char	g_ffDir[MAX_PATH];
 extern int	g_probeCount;
 
+VANILLA_VALUE(lockPvsViewParms, GfxViewParms, 0x0396F730);
+
+VANILLA_VALUE(s_cmdList, GfxCmdArray*, 0x03B370C0);
+VANILLA_VALUE(frontEndDataOut, GfxBackEndData*, 0x03B3708C);
+
+void __declspec(naked) R_SetViewParmsForScene(refdef_s *refdef, GfxViewParms *viewParms)
+{
+	_asm
+	{
+		pushad
+		mov eax, 0x006C7F80
+		mov edi, viewParms
+		mov esi, refdef
+		call eax
+		popad
+		retn
+	}
+}
+
 void R_CalcCubeMapViewValues(refdef_s *refdef, CubemapShot cubemapShot, int cubemapSize)
 {
 	((void(__cdecl *)(refdef_s *, CubemapShot, int))0x006CEC80)(refdef, cubemapShot, cubemapSize);
+}
+
+inline void R_BeginSharedCmdList(void)
+{
+	frontEndDataOut->cmds = &s_cmdList->cmds[s_cmdList->usedTotal];
+}
+
+inline void R_ClearClientCmdList2D(void)
+{
+	frontEndDataOut->viewInfo[frontEndDataOut->viewInfoCount].cmds = NULL;
+}
+
+inline void R_SetLodOrigin(refdef_s *refdef)
+{
+	if (r_lockPvs->modified)
+	{
+		Dvar_ClearModified(r_lockPvs);
+		R_SetViewParmsForScene(refdef, &lockPvsViewParms);
+	}
+
+	float* vec = (float*)0x3AC3060;
+	vec[0] = refdef->vieworg[0];
+	vec[1] = refdef->vieworg[1];
+	vec[2] = refdef->vieworg[2];
+
+	int* unk1 = (int*)0x3AC3058;		*unk1 = refdef->time;
+	float* unk2 = (float*)0x3AC305C;	*unk2 = refdef->time * 0.001f;
+
+	R_UpdateFrameFog(refdef->localClientNum);
+	R_UpdateFrameSun();
+}
+
+inline void R_UpdateSpotLightEffect(FxCmd *cmd)
+{
+	Sys_ResetUpdateSpotLightEffectEvent();
+	Sys_AddWorkerCmdInternal((void*)0x00BA5420, cmd, 0);
+}
+
+inline void R_UpdateNonDependentEffects(FxCmd *cmd)
+{
+	Sys_ResetUpdateNonDependentEffectsEvent();
+	Sys_AddWorkerCmdInternal((void*)0x00BA52E0, cmd, 0);
+}
+
+inline void R_UpdateRemainingEffects(FxCmd *cmd)
+{
+	Sys_AddWorkerCmdInternal((void*)0x00BA5300, cmd, 0);
+	Sys_AddWorkerCmdInternal((void*)0x00BA5330, cmd, 0);
 }
 
 void R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData)
@@ -27,46 +94,39 @@ void R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData)
 
 	R_InitPrimaryLights(refdef.primaryLights[0].dir);
 
+	FxCmd cmd;
+	FxCameraUpdate fxCam;
+
 	for (int cubemapShot = 1; cubemapShot < 7; cubemapShot++)
 	{
 		R_BeginCubemapShot(256, 0);
 		R_BeginFrame();
-
-		GfxCmdArray* s_cmdList = *(GfxCmdArray**)0x03B370C0;
-		GfxBackEndData* frontEndDataOut = *(GfxBackEndData**)0x03B3708C;
-		frontEndDataOut->cmds = &s_cmdList->cmds[s_cmdList->usedTotal];
-		frontEndDataOut->viewInfo[frontEndDataOut->viewInfoCount].cmds = NULL;
+		R_BeginSharedCmdList();
+		R_ClearClientCmdList2D();
 
 		R_ClearScene(0);
+
 		FX_BeginUpdate(0);
 		R_CalcCubeMapViewValues(&refdef, cubemapShot, 256);
 
-		float* vec = (float*)0x3AC3060;
-		vec[0] = refdef.vieworg[0];
-		vec[1] = refdef.vieworg[1];
-		vec[2] = refdef.vieworg[2];
-
-		int* unk1 = (int*)0x3AC3058;		*unk1 = refdef.time;
-		float* unk2 = (float*)0x3AC305C;	*unk2 = refdef.time * 0.001f;
+		R_SetLodOrigin(&refdef);
 
 		R_UpdateFrameFog(refdef.localClientNum);
 		R_UpdateFrameSun();
 
 		float zFar = R_GetFarPlaneDist();
-		FxCameraUpdate fxUpdateCmd;
-		memset(&fxUpdateCmd, 0, sizeof(FxCameraUpdate));
-		FxCmd cmd;
-		memset(&cmd, 0, sizeof(FxCmd));
 
-		FX_GetCameraUpdateFromRefdefAndZFar(&fxUpdateCmd, &refdef, zFar);
-		FX_SetNextUpdateCamera(0, &fxUpdateCmd);
+		// Not entirely sure if this is needed or not...
+		//memset(&fxCam, 0, sizeof(FxCameraUpdate));
+		//memset(&cmd, 0, sizeof(FxCmd));
+
+		FX_GetCameraUpdateFromRefdefAndZFar(&fxCam, &refdef, zFar);
+		FX_SetNextUpdateCamera(0, &fxCam);
 		FX_FillUpdateCmd(0, &cmd);
-		Sys_ResetUpdateSpotLightEffectEvent();
-		Sys_AddWorkerCmdInternal((void*)0x00BA5420, &cmd, 0);
-		Sys_ResetUpdateNonDependentEffectsEvent();
-		Sys_AddWorkerCmdInternal((void*)0x00BA52E0, &cmd, 0);
-		Sys_AddWorkerCmdInternal((void*)0x00BA5300, &cmd, 0);
-		Sys_AddWorkerCmdInternal((void*)0x00BA5330, &cmd, 0);
+
+		R_UpdateSpotLightEffect(&cmd);
+		R_UpdateNonDependentEffects(&cmd);
+		R_UpdateRemainingEffects(&cmd);
 
 		R_RenderScene(&refdef, 0);
 		R_EndFrame();
@@ -82,6 +142,7 @@ void R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData, int pr
 {
 	Com_ToolPrintf(0, "----------------------------------------\n");
 	Com_ToolPrintf(0, "Generating reflections...\n");
+	fflush(stdout);
 
 	g_probeCount = probeCount;
 
@@ -105,6 +166,7 @@ void R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData, int pr
 			probeCount,
 			formatTime((int)elapsedTime),
 			formatTime((int)remainingTime));
+		fflush(stdout);
 	}
 
 	Com_ToolPrintf(0, "Finished in %s.\n", formatTime((int)difftime(currTime, initTime)));
@@ -122,6 +184,8 @@ bool R_CopyReflectionsFromLumpData(DiskGfxReflectionProbe *probeRawData, DiskGfx
 
 void R_GenerateReflections(const char *mapname, GfxReflectionProbe *probes, const unsigned int probeCount)
 {
+	//return;
+
 	ASSERT(r_reflectionProbeGenerate);
 	ASSERT(probeCount < MAX_MAP_REFLECTION_PROBES);
 

@@ -54,6 +54,11 @@ struct GfxReflectionProbe
 };
 static_assert(sizeof(GfxReflectionProbe) == 0x18, "Size mismatch");
 
+typedef void (__cdecl* R_CubemapShotRestoreState_t)(void);
+static R_CubemapShotRestoreState_t R_CubemapShotRestoreState = (R_CubemapShotRestoreState_t)0x007087D0;
+
+void R_SetViewParmsForScene(refdef_s *refdef, GfxViewParms *viewParms);
+
 void R_CalcCubeMapViewValues(refdef_s *refdef, CubemapShot cubemapShot, int cubemapSize);
 void R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData);
 void R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData, int probeCount, bool *generateProbe);

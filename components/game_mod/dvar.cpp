@@ -119,3 +119,8 @@ void Dvar_SetFromStringByName(const char *dvarName, const char *string)
 
 	Dvar_SetFromStringByNameFromSource(dvarName, string, DVAR_SOURCE_INTERNAL, 0);
 }
+
+void Dvar_ClearModified(dvar_s *dvar)
+{
+	dvar->modified = 0;
+}

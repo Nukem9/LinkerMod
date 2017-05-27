@@ -111,6 +111,8 @@ VANILLA_DVAR(blackopsmode, 0x0243FD24);
 VANILLA_DVAR(useFastFile, 0x0247FEC8);
 VANILLA_DVAR(g_connectpaths, 0x01C01850);
 
+VANILLA_DVAR(r_lockPvs, 0x03B1FD24);
+
 VANILLA_DVAR(r_reflectionProbeGenerate, 0x03B35038);
 VANILLA_DVAR(r_reflectionProbeGenerateExit, 0x03B3503C);
 VANILLA_DVAR(r_reflectionProbeRegenerateAll, 0x03B20030);
@@ -178,7 +180,6 @@ static Dvar_RegisterBool_t Dvar_RegisterBool = (Dvar_RegisterBool_t)0x0045BB20;
 typedef dvar_s *__cdecl Dvar_RegisterEnum_t(const char *dvarName, const char **valueList, int defaultIndex, unsigned int flags, const char *description);
 static Dvar_RegisterEnum_t* Dvar_RegisterEnum = (Dvar_RegisterEnum_t*)0x0051BD00;
 
-
 void mfh_R_RegisterDvars();
 
 typedef void (__cdecl* CG_RegisterDvars_t)();
@@ -188,3 +189,5 @@ void __cdecl CG_RegisterDvars();
 
 dvar_s *Dvar_SetFromStringByNameFromSource(const char *dvarName, const char *string, DvarSetSource source, unsigned int flags);
 void Dvar_SetFromStringByName(const char *dvarName, const char *string);
+
+void Dvar_ClearModified(dvar_s *dvar);
