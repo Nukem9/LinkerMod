@@ -117,6 +117,9 @@ VANILLA_DVAR(r_reflectionProbeGenerate, 0x03B35038);
 VANILLA_DVAR(r_reflectionProbeGenerateExit, 0x03B3503C);
 VANILLA_DVAR(r_reflectionProbeRegenerateAll, 0x03B20030);
 
+VANILLA_DVAR(cg_drawVersion, 0x02F67B14);
+VANILLA_DVAR(cg_drawMaterial, 0x02FF676C);
+
 VANILLA_DVAR(ragdoll_reactivation_cutoff, 0xBCAEB0);
 VANILLA_DVAR(ragdoll_explode_upbias, 0x251CBCC);
 VANILLA_DVAR(ragdoll_explode_force, 0x251CBC8);

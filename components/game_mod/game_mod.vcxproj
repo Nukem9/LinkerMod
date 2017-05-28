@@ -94,6 +94,7 @@
     <ClCompile Include="bg_weapons_def.cpp" />
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="CEG.cpp" />
+    <ClCompile Include="cg_draw_debug.cpp" />
     <ClCompile Include="cg_scoreboard.cpp" />
     <ClCompile Include="cg_weapons.cpp" />
     <ClCompile Include="cl_debugdata.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="bitarray.h" />
     <ClInclude Include="bullet.h" />
     <ClInclude Include="CEG.h" />
+    <ClInclude Include="cg_draw_debug.h" />
     <ClInclude Include="cg_scoreboard.h" />
     <ClInclude Include="cg_weapons.h" />
     <ClInclude Include="cl_debugdata.h" />

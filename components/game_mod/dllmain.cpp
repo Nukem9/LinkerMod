@@ -92,6 +92,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0073D8B2, (PBYTE)mfh_R_TessXModelWaterList); // Don't enable this until we know what it does
 
 	//
+	// Add CG_DrawFullScreenDebugOverlays
+	//
+	Detours::X86::DetourFunction((PBYTE)0x004075E8, (PBYTE)&mfh_CG_DrawFullScreenDebugOverlays);
+
+	//
 	// Always force the cursor to be shown
 	//
 	//PatchMemory(0x00683C50, (PBYTE)"\xC3", 1); // sub_683C50
