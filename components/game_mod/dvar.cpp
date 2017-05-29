@@ -16,6 +16,17 @@ dvar_s* radiant_live = NULL;
 dvar_s* radiant_livePort = NULL;
 dvar_s* radiant_liveDebug = NULL;
 
+dvar_s* r_renderTweaks = NULL;
+dvar_s* r_renderLit = NULL;
+dvar_s* r_renderStandardPostFx = NULL;
+dvar_s* r_renderDistortion = NULL;
+dvar_s* r_renderEmissive = NULL;
+dvar_s* r_renderCorona = NULL;
+dvar_s* r_renderSuperflare = NULL;
+dvar_s* r_renderSun = NULL;
+dvar_s* r_renderReflected = NULL;
+dvar_s* r_renderCloakHDR = NULL;
+
 const char* r_showTessNames[] =
 {
 	"off",
@@ -92,6 +103,19 @@ void __cdecl CG_RegisterDvars()
 	radiant_live = Dvar_RegisterInt("radiant_live", 0, 0, 1, 0x0, "Enable live Radiant updates in the game");
 	radiant_livePort = Dvar_RegisterInt("radiant_livePort", 3700, 0, 65535, 0x0, "Network port for Radiant");
 	radiant_liveDebug = Dvar_RegisterInt("radiant_liveDebug", 0, 0, 1, 0x0, "Debugging prints for Radiant commands");
+
+	// Must be set at launch time to function correctly
+	r_renderTweaks = Dvar_RegisterBool("r_renderTweaks", false, 0x2, "Allow renderer tweaks");
+
+	r_renderLit = Dvar_RegisterBool("r_renderLit", true, 0x2, "");
+	r_renderStandardPostFx = Dvar_RegisterBool("r_renderStandardPostFx", true, 0x2, "");
+	r_renderDistortion = Dvar_RegisterBool("r_renderDistortion", true, 0x2, "");
+	r_renderEmissive = Dvar_RegisterBool("r_renderEmissive", true, 0x2, "");
+	r_renderCorona = Dvar_RegisterBool("r_renderCorona", true, 0x2, "");
+	r_renderSuperflare = Dvar_RegisterBool("r_renderSuperflare", true, 0x2, "");
+	r_renderSun = Dvar_RegisterBool("r_renderSun", true, 0x2, "");
+	r_renderReflected = Dvar_RegisterBool("r_renderReflected", true, 0x2, "");
+	r_renderCloakHDR = Dvar_RegisterBool("r_renderCloakHDR", true, 0x2, "");
 
 	// Set the max number of suggestions to show in the console autocomplete preview
 	PatchMemory(0x00B72F7C, (PBYTE)&con_inputMaxMatchesShown->current.value, 4);

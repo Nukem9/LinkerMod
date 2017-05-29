@@ -59,6 +59,59 @@ void R_FullscreenToggle_f()
 	Cbuf_AddText(0, "toggle r_fullscreen; vid_restart;");
 }
 
+//
+// Function template for jmping to a specific address if a dvar is enabled
+// or doing retn otherwise
+//
+template<const DWORD _dwJmpTrue, dvar_s*& _dvar>
+void __declspec(naked) DvarConditionalCallTemplate(void)
+{
+	static dvar_s* const & dvar = _dvar;
+	static const DWORD dwJmpTrue = _dwJmpTrue;
+
+	_asm
+	{
+		pushad
+		mov ebx, dvar
+		mov eax, dword ptr [ebx]
+		cmp byte ptr[eax + 0x18], 0
+		jz CASE_FALSE
+
+	//CASE_TRUE:
+		popad
+		jmp dwJmpTrue
+
+	CASE_FALSE:
+		popad
+		retn
+	}
+}
+
+#define ADD_DVARCONDITIONALCALL(_ADDRESS, _JMP_TGT_TRUE, _DVAR) PatchCall(_ADDRESS, ForceCastPointer<BYTE>(DvarConditionalCallTemplate<_JMP_TGT_TRUE, _DVAR >))
+
+void R_InitRenderTweaks(void)
+{
+	if (r_renderTweaks == NULL || !r_renderTweaks->current.enabled)
+		return;
+	/*
+		Add Toggles for various render functions
+		A (semi) fix for reflection HDR issues is to disable:
+		r_renderLit				// Disable (water, etc.) materials
+		r_renderStandardPostFx	// Disable the screenspace reflection buffer
+		r_renderDistortion		// Disable the screenspace reflection buffer
+	*/
+	ADD_DVARCONDITIONALCALL(0x006D27E2, 0x00737ED0, r_renderLit); // This tends to hide water materials
+	ADD_DVARCONDITIONALCALL(0x006D2C94, 0x006D1D60, r_renderStandardPostFx);
+	ADD_DVARCONDITIONALCALL(0x006D27BA, 0x006D1CF0, r_renderDistortion); // R_ResolveDistortion					
+	ADD_DVARCONDITIONALCALL(0x006D29FC, 0x006D1CF0, r_renderDistortion); // R_ResolveDistortion					
+	ADD_DVARCONDITIONALCALL(0x006D2A0D, 0x006D1A80, r_renderEmissive);
+	ADD_DVARCONDITIONALCALL(0x006D28FC, 0x006E3350, r_renderCorona);
+	ADD_DVARCONDITIONALCALL(0x006D290C, 0x00722EF0, r_renderSuperflare);
+	ADD_DVARCONDITIONALCALL(0x006D28D6, 0x00723E90, r_renderSun);
+	ADD_DVARCONDITIONALCALL(0x006D27D1, 0x006D1C60, r_renderReflected);
+	ADD_DVARCONDITIONALCALL(0x006D2C5E, 0x00737720, r_renderCloakHDR);
+}
+
 void __cdecl R_RegisterCmds()
 {
 	Cmd_AddCommandInternal("screenshot", R_Cmd_Screenshot, &R_Cmd_Screenshot_VAR);
@@ -74,6 +127,8 @@ void __cdecl R_RegisterCmds()
 	Cmd_AddCommandInternal("r_fullscreen_toggle", R_FullscreenToggle_f, &R_FullscreenToggle_f_VAR);
 
 	Cmd_AddCommandInternal("gfx_world", R_MaterialList_f, &R_MaterialList_f_VAR); // custom
+
+	R_InitRenderTweaks();
 }
 
 void __cdecl R_UnregisterCmds()

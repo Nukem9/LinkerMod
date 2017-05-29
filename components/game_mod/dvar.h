@@ -159,6 +159,17 @@ extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;
 extern dvar_s* radiant_liveDebug;
 
+extern dvar_s* r_renderTweaks;
+extern dvar_s* r_renderLit;
+extern dvar_s* r_renderStandardPostFx;
+extern dvar_s* r_renderDistortion;
+extern dvar_s* r_renderEmissive;
+extern dvar_s* r_renderCorona;
+extern dvar_s* r_renderSuperflare;
+extern dvar_s* r_renderSun;
+extern dvar_s* r_renderReflected;
+extern dvar_s* r_renderCloakHDR;
+
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;
 

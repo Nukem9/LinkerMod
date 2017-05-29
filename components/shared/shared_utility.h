@@ -199,3 +199,16 @@ namespace Detours
 	}
 }
 #endif
+
+template <typename _New_t, typename _Old_t>
+static inline _New_t* ForceCastPointer(_Old_t* addr)
+{
+	union
+	{
+		_Old_t* _old;
+		_New_t* _new;
+	} u;
+
+	u._old = addr;
+	return u._new;
+}
