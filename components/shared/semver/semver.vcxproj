@@ -12,10 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="semantic_version.h" />
-    <ClInclude Include="version.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="semantic_version_v1.cpp" />

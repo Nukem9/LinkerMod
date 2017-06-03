@@ -20,7 +20,7 @@
 // Shared files
 //
 #include "../shared/shared_utility.h"
-#include "semver/version.h"
+#include "../shared/shared_version.h"
 
 #include "../shared/minidx9/Include/d3dx9.h"
 #pragma comment(lib, "../shared/minidx9/Lib/x86/d3dx9.lib")
