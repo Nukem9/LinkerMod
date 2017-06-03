@@ -245,6 +245,8 @@ BOOL GameMod_Init()
 
 	PatchCall(0x00455A34, (PBYTE)&FS_ReadModDescription);
 
+	Detours::X86::DetourFunction((PBYTE)0x00455920, (PBYTE)&FS_GetModList);
+
 	//
 	// Allow the OS to cache fastfiles when loading
 	//
