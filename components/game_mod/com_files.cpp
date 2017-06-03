@@ -61,7 +61,7 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize)
 		//
 		// Try to load mod.json first
 		//
-		strcpy(descPath, name);
+		strcpy_s(descPath, name);
 		strncat_s(descPath, "/mod.json", bufLen);
 
 		char* descData = descPath + 1;
@@ -82,7 +82,7 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize)
 			//
 			// Otherwise fallback to legacy description.txt
 			//
-			strcpy(descPath, name);
+			strcpy_s(descPath, name);
 			strncat_s(descPath, "/description.txt", bufLen);
 
 			int descHandle = 0;
@@ -103,8 +103,6 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize)
 				descData[0] = '\0';
 			}
 		}
-
-		
 
 		int nDescLen = strlen(descPath) + 1;
 		if (nLen + nTotal + nDescLen + 2 >= bufsize)
