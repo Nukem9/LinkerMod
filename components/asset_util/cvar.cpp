@@ -53,6 +53,10 @@ REGISTER_CVAR(csvgen_aitypes, "aitype", NULL, "Regenerate all aitype CSVs", fals
 REGISTER_CVAR(csvgen_characters, "character", NULL, "Regenerate all character CSVs", false);
 REGISTER_CVAR(csvgen_xmodelaliases, "xmodelalias", NULL, "Regenerate all xmodelalias CSVs", false);
 
+REGISTER_CVAR(rip_waitForProcess, "waitForProcess", NULL, "Wait for a supported process to launch", false);
+REGISTER_CVAR(rip_waitForMap, "waitForMap", NULL, "Wait for a map to load before continuing", false);
+REGISTER_CVAR(rip_killProcess, "killProcess", NULL, "Terminate the game process when ripping is compeleted", false);
+
 REGISTER_CVAR(fs_outdir, "outdir", NULL, "Target directory for file output (default is the game's raw directory)", "");
 
 #undef REGISTER_GLOBAL_CVAR

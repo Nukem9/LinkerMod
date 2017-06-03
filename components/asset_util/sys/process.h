@@ -31,3 +31,8 @@ void Process_SuspendThreads(processId_t pid);
 // Resume all threads for a given processId
 //
 void Process_ResumeThreads(processId_t pid);
+
+//
+// Kill a given process
+//
+bool Process_KillProcess(processId_t pid);

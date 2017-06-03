@@ -523,7 +523,7 @@ int CSVGen_Callback(const char* filePath, const char* fileName, void(*ast_callba
 	yylex_destroy(scanner);
 
 	FILE* csv = fopen(csv_path.c_str(), "w");
-	if (!csv)
+	if (csv)
 	{
 		ast_callback(AST, FS_GetFilenameSubString(filePath), csv);
 		fclose(csv);
@@ -555,27 +555,37 @@ int CSVGen_XModelAlias_Callback(const char* filePath, const char* fileName)
 
 int Cmd_CSVGen_f(int argc, char** argv)
 {
+	// Automatically iterate over all files for the enabled types
 	bool autoMode = false;
+
+	// True if the user manually defined specific types to handle
 	bool explicitType = (csvgen_aitypes.ValueBool() | csvgen_characters.ValueBool() | csvgen_xmodelaliases.ValueBool());
 
 	//
-	// If no explicit types were given - and an asterisk was the only arg - enable automode for all types
+	// If no explicit types were given - or an asterisk was the only arg - enable automode for all types
+	// If the user doesnt explicitly provide files to be parsed or
+	// the user provides only an asterisk as the file
+	// we automatically assume that we need to enter autoMode to automatically parse all files for the given types
 	//
-	if (argc == 2 && strcmp(argv[1], "*") == 0)
+	if (argc == 1 || (argc == 2 && strcmp(argv[1], "*") == 0))
 	{
-		csvgen_aitypes.Enable();
-		csvgen_characters.Enable();
-		csvgen_xmodelaliases.Enable();
 		autoMode = true;
-	}
-	else if (argc == 1 && explicitType)
-	{
-		autoMode = 1;
+
+		// If no explicit types were given - we enable all types
+		if (!explicitType)
+		{
+			csvgen_aitypes.Enable();
+			csvgen_characters.Enable();
+			csvgen_xmodelaliases.Enable();
+		}
 	}
 
-	if (autoMode && argc < 3)
+	//
+	// Automatic file mode logic
+	//
+	if (autoMode)
 	{
-		if (argc < 2)
+		if (argc < 1 || argc > 2)
 		{
 			char* _argv[] = { NULL, "csvgen" };
 			Cmd_Help_f(ARRAYSIZE(_argv), _argv);
@@ -583,18 +593,29 @@ int Cmd_CSVGen_f(int argc, char** argv)
 		}
 
 		char dir_path[MAX_PATH];
-		sprintf_s(dir_path, "%s\\aitype", AppInfo_RawDir());
-		FS_FileIterator(dir_path, "*.gsc", CSVGen_AIType_Callback);
+		if (csvgen_aitypes.ValueBool())
+		{
+			sprintf_s(dir_path, "%s\\aitype", AppInfo_RawDir());
+			FS_FileIterator(dir_path, "*.gsc", CSVGen_AIType_Callback);
+		}
 
-		sprintf_s(dir_path, "%s\\character", AppInfo_RawDir());
-		FS_FileIterator(dir_path, "*.gsc", CSVGen_Character_Callback);
+		if (csvgen_characters.ValueBool())
+		{
+			sprintf_s(dir_path, "%s\\character", AppInfo_RawDir());
+			FS_FileIterator(dir_path, "*.gsc", CSVGen_Character_Callback);
+		}
 		
-		sprintf_s(dir_path, "%s\\xmodelalias", AppInfo_RawDir());
-		FS_FileIterator(dir_path, "*.gsc", CSVGen_XModelAlias_Callback);
+		if (csvgen_xmodelaliases.ValueBool())
+		{
+			sprintf_s(dir_path, "%s\\xmodelalias", AppInfo_RawDir());
+			FS_FileIterator(dir_path, "*.gsc", CSVGen_XModelAlias_Callback);
+		}
 
 		return 0;
 	}
 
+	//
+	// Explicit file mode logic
 	//
 	// We only want to run csv gen for a specific files
 	//	If only 1 type is given via args, use that type, otherwise print a warning and attempt to resolve the type automatically
@@ -604,10 +625,15 @@ int Cmd_CSVGen_f(int argc, char** argv)
 	typeFlags |= csvgen_characters.ValueBool() ? 1 << 1 : 0;
 	typeFlags |= csvgen_xmodelaliases.ValueBool() ? 1 << 2 : 0;
 
-	if (typeFlags > 1)
+	for (int i = 0, bitCount = 0; i < sizeof(typeFlags) * 8; i++)
 	{
-		Con_Warning("Warning: Multiple type arguments given. Falling back to automatic type mode.\n");
-		explicitType = false;
+		bitCount += (typeFlags >> i) & 1;
+		if (bitCount > 1)
+		{
+			Con_Warning("Warning: Multiple type arguments given. Falling back to automatic type resolution mode.\n");
+			explicitType = false;
+			break;
+		}
 	}
 
 	for (int i = 1; i < argc; i++)
@@ -615,15 +641,18 @@ int Cmd_CSVGen_f(int argc, char** argv)
 		const char* filepath = argv[i];
 		const char* filename = FS_GetFilenameSubString(argv[i]);
 
+		//
+		// Automatic Type Resolution
+		//
 		if (!explicitType)
 		{
 			if (!FS_FileExists(filepath))
 				Con_Warning("File '%s' does not exist... skipping\n", filename);
-			else if (strstr(argv[i], "aitype") != 0)
+			else if (csvgen_aitypes.ValueBool() && strstr(argv[i], "aitype") != 0)
 				CSVGen_AIType_Callback(filepath, filename);
-			else if (strstr(argv[i], "character") != 0)
+			else if (csvgen_characters.ValueBool() && strstr(argv[i], "character") != 0)
 				CSVGen_Character_Callback(filepath, filename);
-			else if (strstr(argv[i], "xmodelalias") != 0)
+			else if (csvgen_xmodelaliases.ValueBool() && strstr(argv[i], "xmodelalias") != 0)
 				CSVGen_XModelAlias_Callback(filepath, filename);
 			else 
 				Con_Warning("Unable to resolve type for file '%s'... skipping\n", filename);
@@ -631,6 +660,9 @@ int Cmd_CSVGen_f(int argc, char** argv)
 			continue;
 		}
 
+		//
+		// Explicit type logic
+		//
 		switch (typeFlags)
 		{
 		case 1 << 0:
@@ -644,15 +676,19 @@ int Cmd_CSVGen_f(int argc, char** argv)
 			break;
 		default:
 			Con_Warning("Warning: Invalid type flags...");
-			continue;
 		}
 	}
 
+	//
+	// This should never be reached in automatic file mode
+	// Thus - there should always be at least 1 file provided
+	//
 	if (argc < 2)
 	{
 		char* _argv[] = { NULL, "csvgen" };
 		Cmd_Help_f(ARRAYSIZE(_argv), _argv);
 		return -1;
 	}
+
 	return 0;
 }

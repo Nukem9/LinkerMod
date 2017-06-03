@@ -7,11 +7,17 @@
 set GAME_DIR=..\..
 set ASSET_UTIL=%GAME_DIR%\bin\asset_util.exe
 
-"%ASSET_UTIL%" extract-iwd --all
-"%ASSET_UTIL%" extract-ff --all
+set ASSET_UTIL_FLAGS=
 
-"%ASSET_UTIL%" csvgen --aitype *
-"%ASSET_UTIL%" csvgen --character *
-"%ASSET_UTIL%" csvgen --xmodelalias *
+set OVERWRITE=1
+if [%OVERWRITE%] == [1] (set ASSET_UTIL_FLAGS=-o)
 
+"%ASSET_UTIL%" extract-iwd %ASSET_UTIL_FLAGS% --all
+"%ASSET_UTIL%" extract-ff %ASSET_UTIL_FLAGS% --all
+
+"%ASSET_UTIL%" csvgen %ASSET_UTIL_FLAGS% --aitype --character --xmodelalias *
+
+soundalias.bat
 ents.bat
+
+set OVERWRITE=

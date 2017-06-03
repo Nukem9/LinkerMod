@@ -5,14 +5,23 @@
 
 #include "ripper\snd_ripper.h"
 
+bool kill_process = true;
+bool wait = true;
+
 int Cmd_Rip_f(int argc, char** argv)
 {
-	if (processId_t pid = Process_FindSupportedProcess())
+	unsigned int timeoutDelay = rip_waitForProcess.ValueBool() ? UINT_MAX : 0;
+	if (processId_t pid = Process_FindSupportedProcess(timeoutDelay))
 	{
 		if (int err = ProcessInfo_Init(pid))
 		{
 			Con_Error("Couldn't initialize process info\n");
 			return err;
+		}
+
+		if (rip_waitForMap.ValueBool())
+		{
+			DB_WaitForMapToLoad();
 		}
 
 		Process_SuspendThreads(pid);
@@ -39,6 +48,12 @@ int Cmd_Rip_f(int argc, char** argv)
 		Process_ResumeThreads(pid);
 
 		ProcessInfo_Free();
+
+		if (rip_killProcess.ValueBool())
+		{
+			Process_KillProcess(pid);
+		}
+
 		return 0;
 	}
 

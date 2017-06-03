@@ -75,6 +75,9 @@
     <ClCompile Include="cmds\ripper\snd_ripper.cpp">
       <Filter>cmds\ripper</Filter>
     </ClCompile>
+    <ClCompile Include="cmds\cmd_search.cpp">
+      <Filter>cmds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cmd.h" />
@@ -148,6 +151,9 @@
     <ClInclude Include="cmds\ripper\snd_ripper.h">
       <Filter>cmds\ripper</Filter>
     </ClInclude>
+    <ClInclude Include="cmds\search\handler.h">
+      <Filter>cmds\search</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="common">
@@ -167,6 +173,9 @@
     </Filter>
     <Filter Include="cmds\ripper">
       <UniqueIdentifier>{0b5340fe-2268-4426-9c05-d7a26685c469}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cmds\search">
+      <UniqueIdentifier>{83e72f22-768f-431b-bdf5-d614ad8a8b54}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
