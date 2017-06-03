@@ -1,7 +1,8 @@
 #pragma once
 
 #include <sstream>
-#include "semantic_version.h"
+#include <string>
+#include "semver/semantic_version.h"
 
 typedef semver::v2::Version Version_t;
 
@@ -13,15 +14,24 @@ typedef semver::v2::Version Version_t;
 		return g_version;
 	}
 	
-	__declspec(dllexport) const std::string DLL_VersionString()
+	__declspec(dllexport) const char* DLL_VersionString()
 	{
-		std::ostringstream oss;
-		oss << g_version;
-		return oss.str();
+		static char version[32] = "";
+
+		if (*version == '\0')
+		{
+			std::ostringstream oss;
+			oss << g_version;
+
+			ASSERT(oss.str().length() < ARRAYSIZE(version) - 1);
+			strcpy_s(version, ARRAYSIZE(version), oss.str().c_str());
+		}
+	
+		return version;
 	}
 #else
 __declspec(dllexport) const Version_t& DLL_Version();
-__declspec(dllexport) const std::string DLL_VersionString();
+__declspec(dllexport) const char* DLL_VersionString();
 #endif
 
 
