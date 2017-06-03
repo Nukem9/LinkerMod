@@ -1,3 +1,4 @@
+#define G_VERSION 1, 0, 0
 #include "stdafx.h"
 
 void strcpy_safe(char *Dest, const char *Src)

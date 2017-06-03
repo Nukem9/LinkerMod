@@ -1,3 +1,4 @@
+#define G_VERSION 1, 2, 0
 #include "stdafx.h"
 
 static char* techsetPath = "pimp/techsets/%s%s.techset";

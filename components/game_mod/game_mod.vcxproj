@@ -133,8 +133,6 @@
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_reflection_probe.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
-    <ClCompile Include="semver\semantic_version_v1.cpp" />
-    <ClCompile Include="semver\semantic_version_v2.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="sv_main_mp.cpp" />
     <ClCompile Include="sys_cmds.cpp" />
@@ -192,7 +190,6 @@
     <ClInclude Include="r_rendercmds.h" />
     <ClInclude Include="r_scene.h" />
     <ClInclude Include="r_screenshot.h" />
-    <ClInclude Include="semver\semantic_version.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv_ccmds_mp.h" />
     <ClInclude Include="sv_main_mp.h" />
@@ -204,6 +201,11 @@
     <ClInclude Include="win_exception.h" />
     <ClInclude Include="win_localize.h" />
     <ClInclude Include="win_main.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\shared\semver\semver.vcxproj">
+      <Project>{5fb372dd-a7e1-4a4b-9a28-3ac02543e9e8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

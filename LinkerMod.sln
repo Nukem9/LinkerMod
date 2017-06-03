@@ -69,6 +69,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "detours", "components\share
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gsc_parser", "components\gsc_parser\gsc_parser.vcxproj", "{C61A8481-11F8-4A98-9776-C5A4E1F13D98}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "semver", "components\shared\semver\semver.vcxproj", "{5FB372DD-A7E1-4A4B-9A28-3AC02543E9E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -137,6 +139,10 @@ Global
 		{C61A8481-11F8-4A98-9776-C5A4E1F13D98}.Debug|Win32.Build.0 = Debug|Win32
 		{C61A8481-11F8-4A98-9776-C5A4E1F13D98}.Release|Win32.ActiveCfg = Release|Win32
 		{C61A8481-11F8-4A98-9776-C5A4E1F13D98}.Release|Win32.Build.0 = Release|Win32
+		{5FB372DD-A7E1-4A4B-9A28-3AC02543E9E8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5FB372DD-A7E1-4A4B-9A28-3AC02543E9E8}.Debug|Win32.Build.0 = Debug|Win32
+		{5FB372DD-A7E1-4A4B-9A28-3AC02543E9E8}.Release|Win32.ActiveCfg = Release|Win32
+		{5FB372DD-A7E1-4A4B-9A28-3AC02543E9E8}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

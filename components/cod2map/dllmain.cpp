@@ -1,3 +1,4 @@
+#define G_VERSION 1, 0, 0
 #include "stdafx.h"
 
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)

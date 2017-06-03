@@ -12,6 +12,7 @@
 // Shared files
 //
 #include "../shared/shared_utility.h"
+#include "semver\version.h"
 
 #include "linker.h"
 

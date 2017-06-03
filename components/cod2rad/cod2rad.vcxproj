@@ -140,6 +140,11 @@
     <ClCompile Include="threading.cpp" />
     <ClCompile Include="vector.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\shared\semver\semver.vcxproj">
+      <Project>{5fb372dd-a7e1-4a4b-9a28-3ac02543e9e8}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
