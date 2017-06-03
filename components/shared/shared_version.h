@@ -34,4 +34,28 @@ __declspec(dllexport) const Version_t& DLL_Version();
 __declspec(dllexport) const char* DLL_VersionString();
 #endif
 
+//
+// The library's comparison operators are screwed up - so we need a custom comparison func
+//
+namespace semver
+{
+	namespace v2
+	{
+		static bool IsCompatibleVersion(Version& constraint, Version& version)
+		{
+			if (constraint.GetMajorVersion() != version.GetMajorVersion())
+				return false;
 
+			if (constraint.GetMajorVersion() > version.GetMajorVersion())
+				return false;
+
+			if (constraint.GetMajorVersion() < version.GetMajorVersion())
+				return true;
+
+			if (constraint.GetPatchVersion() > version.GetPatchVersion())
+				return false;
+
+			return true;
+		}
+	}
+}
