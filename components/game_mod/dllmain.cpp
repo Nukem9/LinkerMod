@@ -243,6 +243,7 @@ BOOL GameMod_Init()
 	PatchMemory(0x00623A65, (PBYTE)&ptr, 4); // dirList
 	PatchMemory(0x00623A06, (PBYTE)&dirListLength, 4);
 
+	// This is superfluous since we hook FS_GetModList anyway
 	PatchCall(0x00455A34, (PBYTE)&FS_ReadModDescription);
 
 	Detours::X86::DetourFunction((PBYTE)0x00455920, (PBYTE)&FS_GetModList);

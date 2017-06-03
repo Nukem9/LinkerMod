@@ -7,6 +7,13 @@ struct XFile
 	unsigned int blockSize[7];
 };
 
+enum DESC_TYPE
+{
+	DESC_ERROR = 0,
+	DESC_DESC = 1,
+	DESC_JSON = 2,
+};
+
 #define MODDESC_LEN 254
 #define DIRLIST_LEN 8192 * (MODDESC_LEN / 48)
 

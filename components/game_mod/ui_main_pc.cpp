@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "jsoncpp\include\json\json.h"
 
 #define ARENA_FILE_MAX_SIZE 8192
 
@@ -124,6 +125,39 @@ bool __cdecl GetOperand(OperandStack *dataStack, Operand *data)
 	return result;
 }
 
+const char* UI_GetModInfo_JSon_GetString(const char* str, const char* key)
+{
+	static char desc[MODDESC_LEN];
+
+	memset(desc, 0, MODDESC_LEN);
+
+	Json::Reader reader;
+	Json::Value root;
+
+	const char* nullstr = "";
+#if _DEBUG
+	const bool isDebug = true;
+	#else
+	const bool isDebug = false;
+#endif
+
+	if (!reader.parse(str, root))
+		return isDebug ? "Couldn't parse JSon" : nullstr;
+	
+	if (!root.isObject())
+		return isDebug ? "Root isn't an object!" : nullstr;;
+
+	if (!root.isMember(key))
+		return isDebug ? "Can't find key" : nullstr;;
+
+	if (!root[key].isString())
+		return isDebug ? "Key does not refer to a string type" : nullstr;;
+
+	std::string tmp = root["desc"].asString();
+	strcpy_s(desc, tmp.c_str());
+	return  desc;
+}
+
 void __cdecl UI_GetModInfo(const int localClientNum, struct itemDef_s *item, OperandStack *dataStack)
 {
 	const char *str = "GetModInfo unhandled";
@@ -134,7 +168,25 @@ void __cdecl UI_GetModInfo(const int localClientNum, struct itemDef_s *item, Ope
 	if (_stricmp(src, "modName") == 0)
 		str = sharedUiInfo_modList[sharedUiInfo_modIndex].modName;
 	else if (_stricmp(src, "modDescr") == 0)
+	{
 		str = sharedUiInfo_modList[sharedUiInfo_modIndex].modDescr;
+		if (str != NULL)
+		{
+			switch (*str)
+			{
+			case DESC_DESC:
+				str++;
+				break;
+			case DESC_JSON:
+				str = UI_GetModInfo_JSon_GetString(str + 1, "desc");
+				break;
+			default:
+				str = "";
+				break;
+			}
+		}
+		
+	}
 
 	if (uiscript_debug && uiscript_debug->current.integer)
 		Expression_TraceInternal("GetModInfo() = %s\n", str);
