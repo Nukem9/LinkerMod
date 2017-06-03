@@ -133,6 +133,8 @@
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_reflection_probe.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
+    <ClCompile Include="semver\semantic_version_v1.cpp" />
+    <ClCompile Include="semver\semantic_version_v2.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="sv_main_mp.cpp" />
     <ClCompile Include="sys_cmds.cpp" />
@@ -190,12 +192,14 @@
     <ClInclude Include="r_rendercmds.h" />
     <ClInclude Include="r_scene.h" />
     <ClInclude Include="r_screenshot.h" />
+    <ClInclude Include="semver\semantic_version.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv_ccmds_mp.h" />
     <ClInclude Include="sv_main_mp.h" />
     <ClInclude Include="sys_cmds.h" />
     <ClInclude Include="threads.h" />
     <ClInclude Include="ui_main_pc.h" />
+    <ClInclude Include="version.h" />
     <ClInclude Include="win_common.h" />
     <ClInclude Include="win_exception.h" />
     <ClInclude Include="win_localize.h" />
