@@ -145,15 +145,15 @@ const char* UI_GetModInfo_JSon_GetString(const char* str, const char* key)
 		return isDebug ? "Couldn't parse JSon" : nullstr;
 	
 	if (!root.isObject())
-		return isDebug ? "Root isn't an object!" : nullstr;;
+		return isDebug ? "Root isn't an object!" : nullstr;
 
 	if (!root.isMember(key))
-		return isDebug ? "Can't find key" : nullstr;;
+		return isDebug ? "Can't find key" : nullstr;
 
 	if (!root[key].isString())
 		return isDebug ? "Key does not refer to a string type" : nullstr;;
 
-	std::string tmp = root["desc"].asString();
+	std::string tmp = root[key].asString(); // Ensures the string data isn't destroyed before strcpy runs
 	strcpy_s(desc, tmp.c_str());
 	return  desc;
 }
