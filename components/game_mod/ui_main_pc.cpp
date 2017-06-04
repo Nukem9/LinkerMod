@@ -125,11 +125,9 @@ bool __cdecl GetOperand(OperandStack *dataStack, Operand *data)
 	return result;
 }
 
-const char* UI_GetModInfo_JSon_GetString(const char* str, const char* key)
+const char* UI_GetModInfo_JSon_GetString(const char* str, const char* key, char* buf, unsigned int buf_len)
 {
-	static char desc[MODDESC_LEN];
-
-	memset(desc, 0, MODDESC_LEN);
+	memset(buf, 0, buf_len);
 
 	Json::Reader reader;
 	Json::Value root;
@@ -154,8 +152,39 @@ const char* UI_GetModInfo_JSon_GetString(const char* str, const char* key)
 		return isDebug ? "Key does not refer to a string type" : nullstr;;
 
 	std::string tmp = root[key].asString(); // Ensures the string data isn't destroyed before strcpy runs
-	strcpy_s(desc, tmp.c_str());
-	return  desc;
+	strcpy_s(buf, buf_len, tmp.c_str());
+	return  buf;
+}
+
+const char* UI_GetModInfo_GetDescription(const char* str)
+{
+	static char desc[MODDESC_LEN];
+	return UI_GetModInfo_JSon_GetString(str , "desc", desc, ARRAYSIZE(desc));
+}
+
+const char* UI_GetModInfo_GetCompatibilityInfo(const char* str)
+{
+	const char* nullstr = "";
+
+	char versionString[32];
+	const char* data = UI_GetModInfo_JSon_GetString(str, "comp", versionString, ARRAYSIZE(versionString));
+	if (!*data)
+		return nullstr;
+
+	static char compInfo[MAX_PATH];
+	compInfo[0] = '\0';
+
+	Version_t dep_ver(data);
+	if (!semver::v2::IsCompatibleVersion(dep_ver, (Version_t&)DLL_Version()))
+	{
+		sprintf_s(compInfo, "^1Requires Game_Mod %d.%d.%d+\n",
+			dep_ver.GetMajorVersion(),
+			dep_ver.GetMinorVersion(),
+			dep_ver.GetPatchVersion());
+		return compInfo;
+	}
+
+	return nullstr;
 }
 
 void __cdecl UI_GetModInfo(const int localClientNum, struct itemDef_s *item, OperandStack *dataStack)
@@ -178,14 +207,31 @@ void __cdecl UI_GetModInfo(const int localClientNum, struct itemDef_s *item, Ope
 				str++;
 				break;
 			case DESC_JSON:
-				str = UI_GetModInfo_JSon_GetString(str + 1, "desc");
+				str = UI_GetModInfo_GetDescription(str + 1);
 				break;
 			default:
 				str = "";
 				break;
 			}
 		}
-		
+	}
+	else if (_stricmp(src, "modCompat") == 0)
+	{
+		str = sharedUiInfo_modList[sharedUiInfo_modIndex].modDescr;
+		if (str != NULL)
+		{
+			switch (*str)
+			{
+			case DESC_JSON:
+				str = UI_GetModInfo_GetCompatibilityInfo(str + 1);
+				break;
+			case DESC_DESC:
+				// We just assume that legacy mods are compatible for now
+			default:
+				str = "";
+				break;
+			}
+		}
 	}
 
 	if (uiscript_debug && uiscript_debug->current.integer)

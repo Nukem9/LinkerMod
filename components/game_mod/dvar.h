@@ -138,6 +138,9 @@ extern dvar_s* perk_weapRateEnhanced;
 
 VANILLA_DVAR(phys_gravity, 0x023D2FA8);
 
+extern dvar_s* gm_build_date;
+extern dvar_s* gm_version;
+
 extern dvar_s* r_d3d9ex;
 extern dvar_s* r_noborder;
 extern dvar_s* r_showTess;
@@ -147,7 +150,6 @@ extern dvar_s* con_inputMaxMatchesShown;
 extern dvar_s* cg_drawViewpos;
 extern dvar_s* scr_useFastFileOnly;
 extern dvar_s* scr_suppressErrors;
-extern dvar_s* gm_build_date;
 extern dvar_s* cg_showServerInfo;
 
 VANILLA_DVAR(sys_configureGHz, 0x0276D9E0)
