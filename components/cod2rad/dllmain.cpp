@@ -29,6 +29,14 @@ int __cdecl MaterialRedirect(char* dst, const char* fmt, const char* name)
 }
 #endif
 
+#if CUSTOM_RAND
+int getRandomNumber()
+{
+	return 4;	// chosen by fair dice roll.
+				// guaranteed to be random.
+}
+#endif
+
 const int MAX_MAP_COLLISIONVERTS = 65536 * 2;
 const int MAX_MAP_COLLISIONVERTS_SIZE = MAX_MAP_COLLISIONVERTS * 12;
 BYTE collVertData[MAX_MAP_COLLISIONVERTS_SIZE];
@@ -128,6 +136,10 @@ BOOL cod2rad_Init()
 	
 #if MINIMAL_MATERIALS
 	PatchCall(0x0042CD4A, (PBYTE)&MaterialRedirect);
+#endif
+
+#if CUSTOM_RAND
+	Detours::X86::DetourFunction((PBYTE)0x004047C3, (PBYTE)&getRandomNumber);
 #endif
 
 	g_initted = true;
