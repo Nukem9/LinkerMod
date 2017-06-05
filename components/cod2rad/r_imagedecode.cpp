@@ -1,5 +1,39 @@
 #include "stdafx.h"
 
+bool SaveBitmap(char* filepath, BYTE* pixels, int width, int height, int bytesPerPixel) {
+	FILE* f = fopen(filepath, "wb");
+	if (f == NULL)
+	{
+		Com_Printf("ERROR: Could not save image %s\n", filepath);
+		return false;
+	}
+
+	BITMAPINFOHEADER info;
+	ZeroMemory(&info, sizeof(info));
+	info.biSize = sizeof(BITMAPINFOHEADER);
+	info.biWidth = width;
+	info.biHeight = height;
+	info.biPlanes = 1;
+	info.biBitCount = bytesPerPixel * 8;
+	info.biCompression = BI_RGB;
+	info.biSizeImage = width * height * bytesPerPixel;
+
+	BITMAPFILEHEADER header;
+	ZeroMemory(&header, sizeof(header));
+	header.bfType = 'B' + ('M' << 8);
+	header.bfOffBits = sizeof(BITMAPFILEHEADER) + info.biSize;
+	header.bfSize = header.bfOffBits + info.biSizeImage;
+	header.bfReserved1 = 0;
+	header.bfReserved2 = 0;
+
+	fwrite(&header, 1, sizeof(BITMAPFILEHEADER), f);
+	fwrite(&info, 1, sizeof(BITMAPINFOHEADER), f);
+	fwrite(pixels, 1, info.biSizeImage, f);
+	fclose(f);
+
+	return true;
+}
+
 void __declspec(naked) hk_Image_GetRawPixels(void)
 {
 	_asm
@@ -77,7 +111,10 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 
 	t4::GfxImageFileHeader dummyHeader(*header);
 
-	int bytesPerPixel = 4;
+	// For Debugging
+	sprintf_s(path, "dump/%s.bmp", imageName);
+	Com_Printf("Loading image %dx%d (%d fmt)  %s\n", width, height, header->format, path);
+
 	switch (header->format)
 	{
 	case IMG_FORMAT_BITMAP_RGBA:
@@ -140,4 +177,5 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 	}
 
 	FS_FreeFile(header);
+	
 }
