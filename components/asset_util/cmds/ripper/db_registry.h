@@ -122,3 +122,4 @@ void* DB_FindSingletonAssetForType(XAssetType type);
 // the zone argument can be used to filter by a specific zone name
 //
 void DB_ListAssetPool(XAssetType type, const char* zone = NULL);
+void DB_WaitForMapToLoad(void);

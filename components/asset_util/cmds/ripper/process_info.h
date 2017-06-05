@@ -7,6 +7,8 @@
 #include "db_registry.h"
 #include "foreign_ptr.h"
 
+#include "dvar.h"
+
 struct ProcessInfo
 {
 	HANDLE handle;
@@ -15,6 +17,8 @@ struct ProcessInfo
 	ForeignPointer<unsigned __int16> db_hashTable;
 	ForeignPointer<XAssetEntryPoolEntry> db_assetEntryPool;
 	ForeignPointer<XZoneName> db_zoneNames;
+
+	ForeignPointer<dvar_s*> cl_ingame;
 };
 
 extern ProcessInfo g_process;

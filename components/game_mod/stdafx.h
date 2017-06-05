@@ -43,6 +43,7 @@
 #include "ui_main_pc.h"
 #include "live_win.h"
 #include "cg_scoreboard.h"
+#include "cg_draw_debug.h"
 #include "sys_cmds.h"
 #include "r_init.h"
 #include "r_image.h"

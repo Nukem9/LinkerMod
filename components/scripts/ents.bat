@@ -20,19 +20,31 @@ if not exist %OUT_DIR% mkdir %OUT_DIR%
 
 (for %%m in (%SP_MAPS%) do (
 	set MAP=%%m
-	if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	if [%OVERWRITE%] == [] (
+		if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	) else (
+		call :export
+	)
 ))
 
 (for %%m in (%ZM_MAPS%) do (
 	set MAP=%%m
-	if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	if [%OVERWRITE%] == [] (
+		if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	) else (
+		call :export
+	)
 ))
 
 set OUT_DIR=%GAME_DIR%\map_source\_prefabs\maps\mp\
 if not exist %OUT_DIR% mkdir %OUT_DIR%
 (for %%m in (%MP_MAPS%) do (
 	set MAP=%%m
-	if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	if [%OVERWRITE%] == [] (
+		if not exist "%OUT_DIR%%%m.map" (call :export) else (echo Skipping %%m ...)
+	) else (
+		call :export
+	)
 ))
 
 goto:eof
@@ -40,6 +52,13 @@ goto:eof
 :export
 echo Exporting %MAP% ...
 "%ASSET_UTIL%" ents "%FF_DIR%%MAP%.ff" >> "%OUT_DIR%%MAP%.map"
+
+:: If Asset Util did not exit correctly
+::  we need to delete the map file
+IF %ERRORLEVEL% NEQ 0 (
+	echo ERROR^(%ERRORLEVEL%^): Deleting file...
+	del "%OUT_DIR%%MAP%.map"
+)
 
 ::
 ::cuba

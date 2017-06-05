@@ -128,7 +128,7 @@ int FS_FileCount(const char* path, const char* pattern)
 	return count;
 }
 
-int FS_FileIterator(const char* path, const char* pattern, int(__cdecl* FS_FileHandlerCallback)(const char* filePath, const char* fileName))
+int FS_FileIterator(const char* path, const char* pattern, FS_FileHandlerCallback_t FS_FileHandlerCallback)
 {
 	HANDLE dir;
 	WIN32_FIND_DATAA file_data;
@@ -160,7 +160,7 @@ int FS_FileIterator(const char* path, const char* pattern, int(__cdecl* FS_FileH
 	return count;
 }
 
-int FS_DirectoryIterator(const char* path, int(__cdecl* FS_DirectoryHandlerCallback)(const char* path))
+int FS_DirectoryIterator(const char* path, FS_DirectoryHandlerCallback_t FS_DirectoryHandlerCallback)
 {
 	HANDLE dir;
 	WIN32_FIND_DATAA file_data;

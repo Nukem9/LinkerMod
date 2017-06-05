@@ -245,7 +245,7 @@ char* FindEntsString(BYTE* start, BYTE* end)
 					return p;
 				}
 
-				Con_Print("Trying different offset... (%d attempts remaining)\n", retryCount - 1);
+				Con_Print_v("Trying different offset... (%d attempts remaining)\n", retryCount - 1);
 				p--;
 			}
 		}
