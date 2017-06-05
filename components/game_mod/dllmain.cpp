@@ -105,7 +105,7 @@ BOOL GameMod_Init()
 	//
 	// Add Support for DrawVisionSetDebug()
 	//
-	Detours::X86::DetourFunction((PBYTE)0x0045EB1A, (PBYTE)&mfh_CG_VisionSetApplyToRefdef);
+	//Detours::X86::DetourFunction((PBYTE)0x0045EB1A, (PBYTE)&mfh_CG_VisionSetApplyToRefdef);
 
 	//
 	// Always force the cursor to be shown
