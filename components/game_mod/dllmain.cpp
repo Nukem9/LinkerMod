@@ -1,6 +1,11 @@
 #define G_VERSION 1, 1, 0
 #include "stdafx.h"
 
+// Defined in patch_misc.cpp
+#if USE_MISC_PATCHES
+void PatchMisc();
+#endif
+
 BOOL GameMod_Init()
 {
 	//
@@ -510,6 +515,10 @@ BOOL GameMod_Init()
 	// Increase default sv_network_fps to 200
 	//
 	//PatchMemory(0x00698BFA, (PBYTE)"\xC8", 1);
+
+#if USE_MISC_PATCHES
+	PatchMisc();
+#endif
 
 	//
 	// Increase Asset Limits
