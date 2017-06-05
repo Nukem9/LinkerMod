@@ -108,8 +108,11 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize)
 		if (nLen + nTotal + nDescLen + 2 >= bufsize)
 			break;
 
+#pragma warning( push )
+#pragma warning( disable : 4996 )
 		strcpy(listbuf, name);
 		strcpy(&listbuf[nLen], descPath);
+#pragma warning( pop )  
 
 		listbuf = &listbuf[nLen + nDescLen];
 		nTotal += nDescLen + nLen;
