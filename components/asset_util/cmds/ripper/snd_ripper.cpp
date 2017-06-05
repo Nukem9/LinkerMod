@@ -347,7 +347,7 @@ int Rip_Sound_Alias_Callback_f(ForeignPointer<snd_alias_t>& alias, snd_ripper_in
 	fprintf(instance.outputFile, "%s,", type);
 	fprintf(instance.outputFile, "%s,", loop);
 	fprintf(instance.outputFile, "%s,", randomize_type);
-	fprintf(instance.outputFile, "%d,", (double)probability / (double)UCHAR_MAX);
+	fprintf(instance.outputFile, "%.3g,", (double)probability / (double)UCHAR_MAX);
 	fprintf(instance.outputFile, "%d,", start_delay);
 	fprintf(instance.outputFile, "%.3g,", 100.0 * (double)reverb_send / (double)USHRT_MAX);
 	fprintf(instance.outputFile, "%s,", duck.c_str());
