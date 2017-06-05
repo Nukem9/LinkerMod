@@ -147,3 +147,15 @@ void __cdecl R_UnregisterCmds()
 
 	Cmd_RemoveCommand("gfx_world");
 }
+
+struct Font_s *__cdecl R_RegisterFont(const char *name, int imageTrack)
+{
+	typedef Font_s *(__cdecl *R_RegisterFont_t)(const char *, int);
+	R_RegisterFont_t func;
+
+	if (useFastFile->current.enabled)
+		func = (R_RegisterFont_t)0x006D30B0; // R_RegisterFont_FastFile;
+	else
+		func = (R_RegisterFont_t)0x006D3010; // R_RegisterFont_LoadObj;
+	return func(name, imageTrack);
+}
