@@ -61,4 +61,22 @@ struct GfxRawImage
 	GfxRawPixel *pixels;
 };
 
-int __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName);
+// Black Ops
+struct GfxImageFileHeader
+{
+	char tag[3];
+	char version;
+	char format;
+	char flags;
+	__int16 dimensions[3];
+	float gamma;
+	int fileSizeForPicmip[8];
+};
+
+typedef void (__cdecl* Image_LoadPixels_t)(struct GfxRawImage * image, struct GfxImageFileHeader * header, unsigned __int8 * pixels, int bitsPerPixel);
+static Image_LoadPixels_t Image_LoadBitmap = (Image_LoadPixels_t)0x004176B0;
+static Image_LoadPixels_t Image_LoadWavelet = (Image_LoadPixels_t)0x004178A0;
+static Image_LoadPixels_t Image_LoadDxtc = (Image_LoadPixels_t)0x004177F0;
+
+void hk_Image_GetRawPixels(void);
+void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName);
