@@ -287,6 +287,17 @@ void PM_Weapon_Jam(/*playerState_s *ps*/)
 	// Do nothing. ESI is argument.
 }
 
+// /bgame/bg_weapons.cpp:5958
+WeaponVariantDef *BG_LoadWeaponVariantDef(const char *name)
+{
+	// Load from rawfiles: BG_LoadWeaponVariantDef_LoadObj
+	if (!useFastFile->current.enabled)
+		return ((WeaponVariantDef *(__cdecl *)(const char *))0x00768110)(name);
+
+	// Load from fastfile: BG_LoadWeaponVariantDef_FastFile
+	return ((WeaponVariantDef *(__cdecl *)(const char *))0x00768170)(name);
+}
+
 // /bgame/bg_weapons.cpp:6072
 const char *BG_WeaponName(int weapon)
 {
@@ -300,7 +311,7 @@ void hk_G_RegisterWeapon(unsigned int weapIndex)
 	// Override the default grenade limit (See PERK_STOCKPILE)
 	WeaponVariantDef *weapVariantDef = BG_GetWeaponVariantDef(weapIndex);
 
-	if (weapVariantDef->weapDef->weapType == WEAPTYPE_GRENADE)
+	if (false && weapVariantDef->weapDef->weapType == WEAPTYPE_GRENADE)
 	{
 		auto& usedDefs = bg_CheckedVariantDefs;
 

@@ -1,5 +1,48 @@
 #include "stdafx.h"
 
+// /bgame/bg_weapons_ammo.cpp:39
+void BG_SetupWeaponDefAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef, WeaponVariantDef *weapVarDef)
+{
+	ASSERT(weapDef);
+
+	if (weapDef->sharedAmmo)
+	{
+		for (unsigned int index = 0; index < bg_numAmmoTypes; ++index)
+		{
+			if (!strcmp(bg_weapAmmoTypes[index]->szAmmoName, weapVarDef->szAmmoName))
+			{
+				weapVarDef->iAmmoIndex = index;
+				return;
+			}
+		}
+	}
+
+	// Check if this weapon was dual-wield
+	if (weapVarDef->iAmmoIndex < 0
+		|| weapVarDef->iAmmoIndex >= bg_numAmmoTypes
+		|| bg_weapAmmoTypes[weapVarDef->iAmmoIndex] != weapVarDef)
+	{
+		WeaponVariantDef *dwWeaponVarDef;
+		unsigned int dwIndex;
+
+		if (weapDef->bDualWield
+			&& (dwIndex = BG_GetWeaponIndexForName(weapDef->szDualWieldWeaponName)) != 0
+			&& (dwWeaponVarDef = BG_GetWeaponVariantDef(dwIndex), dwWeaponVarDef->iAmmoIndex >= 0)
+			&& dwWeaponVarDef->iAmmoIndex < bg_numAmmoTypes
+			&& bg_weapAmmoTypes[dwWeaponVarDef->iAmmoIndex] == dwWeaponVarDef)
+		{
+			weapVarDef->iAmmoIndex = dwWeaponVarDef->iAmmoIndex;
+		}
+		else
+		{
+			ASSERT_MSG(bg_numWeapClips < 2048, "bg_numWeapClips doesn't index ARRAY_COUNT(bg_weapClips)");
+
+			bg_weapAmmoTypes[bg_numAmmoTypes] = weapVarDef;
+			weapVarDef->iAmmoIndex = bg_numAmmoTypes++;
+		}
+	}
+}
+
 // /bgame/bg_weapons_ammo.cpp:86
 void BG_SetupWeaponDefSharedAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef)
 {
@@ -43,7 +86,15 @@ void BG_SetupWeaponDefSharedAmmoIndexes(unsigned int weapIndex, WeaponDef *weapD
 			{
 				// Skip weapons that we have patched for PERK_STOCKPILE
 				if (std::find(bg_PatchedWeapDefs.begin(), bg_PatchedWeapDefs.end(), otherWeapDef) != bg_PatchedWeapDefs.end())
+				{
+					Com_Printf(0, "AMMO: %i %i\n", weapDef->iMaxAmmo, weapDef->iSharedAmmoCap);
+
+					int capMax = max(bg_sharedAmmoCaps[index]->iSharedAmmoCap, weapDef->iSharedAmmoCap);
+
+					bg_sharedAmmoCaps[index]->iSharedAmmoCap = capMax;
+					weapDef->iSharedAmmoCap = capMax;
 					return;
+				}
 
 				Com_Error(ERR_DROP, "Shared ammo cap mismatch for \"%s\" shared ammo cap: '%s\" set it to %i, but \"%s\" already set it to %i.",
 					weapDef->szSharedAmmoCapName,
@@ -55,6 +106,43 @@ void BG_SetupWeaponDefSharedAmmoIndexes(unsigned int weapIndex, WeaponDef *weapD
 		}
 
 		ASSERT_MSG(false, "unreachable");
+	}
+}
+
+// /bgame/bg_weapons_ammo.cpp:134
+void BG_SetupWeaponDefClipIndexes(WeaponDef *weapDef, WeaponVariantDef *weapVarDef)
+{
+	ASSERT(weapDef);
+
+	if (weapDef->unlimitedAmmo)
+	{
+		// Nothing to use/draw with unlimited ammo weapons
+		weapVarDef->iClipIndex = -1;
+		return;
+	}
+
+	// Determine shared ammo clip index
+	if (weapDef->sharedAmmo)
+	{
+		for (unsigned int index = 0; index < bg_numWeapClips; index++)
+		{
+			if (!strcmp(bg_weapClips[index]->szClipName, weapVarDef->szClipName))
+			{
+				weapVarDef->iClipIndex = index;
+				return;
+			}
+		}
+	}
+
+	// Add a new entry if this was a new clip type
+	if (weapVarDef->iClipIndex < 0
+		|| weapVarDef->iClipIndex >= bg_numWeapClips
+		|| bg_weapClips[weapVarDef->iClipIndex] != weapVarDef)
+	{
+		ASSERT_MSG(bg_numWeapClips < 2048, "bg_numWeapClips doesn't index ARRAY_COUNT(bg_weapClips)");
+
+		bg_weapClips[bg_numWeapClips] = weapVarDef;
+		weapVarDef->iClipIndex = bg_numWeapClips++;
 	}
 }
 

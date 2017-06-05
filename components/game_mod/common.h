@@ -89,6 +89,7 @@ struct LevelDependency
 	char required[64];	// FF required for loading the map
 };
 
+int StringTable_HashString(const char *string);
 bool Com_IsMenuLevel(const char *name);
 bool Com_IsSpecopLevel(const char *name);
 void Com_GetLevelSharedFastFiles(const char *mapName);

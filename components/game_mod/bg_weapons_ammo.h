@@ -1,9 +1,16 @@
 #pragma once
 
+static WeaponVariantDef **bg_weapAmmoTypes = (WeaponVariantDef **)0x00BDF998;
 static WeaponDef **bg_sharedAmmoCaps = (WeaponDef **)0x00BDF798;
-static unsigned int& bg_numSharedAmmoCaps = *(unsigned int *)0x00BDFD98;
+static WeaponVariantDef **bg_weapClips = (WeaponVariantDef **)0x00BDFB98;
 
+static unsigned int& bg_numAmmoTypes = *(unsigned int *)0x00BDF794;
+static unsigned int& bg_numSharedAmmoCaps = *(unsigned int *)0x00BDFD98;
+static unsigned int& bg_numWeapClips = *(unsigned int *)0x00BDF790;
+
+void BG_SetupWeaponDefAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef, WeaponVariantDef *weapVarDef);
 void BG_SetupWeaponDefSharedAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef);
+void BG_SetupWeaponDefClipIndexes(WeaponDef *weapDef, WeaponVariantDef *weapVarDef);
 int BG_GetSharedAmmoCapSize(unsigned int capIndex);
 AmmoClip *BG_GetAmmoClip(playerState_s *ps, int clipIndex);
 AmmoClip *BG_GetFreeAmmoClip(playerState_s *ps, int clipIndex);

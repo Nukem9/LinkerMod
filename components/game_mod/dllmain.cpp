@@ -489,7 +489,9 @@ BOOL GameMod_Init()
 	*(PBYTE *)&G_RegisterWeapon = Detours::X86::DetourFunction((PBYTE)0x006339E0, (PBYTE)&hk_G_RegisterWeapon);
 	Detours::X86::DetourFunction((PBYTE)0x0064FB98, (PBYTE)&BG_ClearWeaponDef, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x0065B423, (PBYTE)&BG_ClearWeaponDef, Detours::X86Option::USE_CALL);
-	Detours::X86::DetourFunction((PBYTE)0x004C3600, (PBYTE)&BG_SetupWeaponDefSharedAmmoIndexes);
+	Detours::X86::DetourFunction((PBYTE)0x00517950, (PBYTE)(unsigned int(*)(const char*, void(*regWeap)(unsigned int)))BG_GetWeaponIndexForName);
+	Detours::X86::DetourFunction((PBYTE)0x004A0570, (PBYTE)&BG_FindWeaponIndexForName);
+	Detours::X86::DetourFunction((PBYTE)0x00506E80, (PBYTE)&DB_ExternalInitAssets);
 
 	//
 	// PM (Player Movement) hooks for infinite ammo and weapon jamming

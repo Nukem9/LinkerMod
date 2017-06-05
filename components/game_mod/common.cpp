@@ -74,6 +74,11 @@ void Com_DPrintf(int channel, const char *fmt, ...)
 	Com_Printf(channel, "%s", msg);
 }
 
+int StringTable_HashString(const char *string)
+{
+	return ((int (__cdecl *)(const char *))0x005F4650)(string);
+}
+
 bool Com_IsMenuLevel(const char *name)
 {
 	if (!name)

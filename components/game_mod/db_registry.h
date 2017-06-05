@@ -204,7 +204,7 @@ void DB_SyncXAssets();
 void DB_LoadGraphicsAssetsForPC();
 void DB_ModXFileHandle_hk();
 void DB_ModXFileHandle(HANDLE *zoneFile, char* zoneName, FF_DIR *zoneDir);
-
 void* DB_ReallocXAssetPool(XAssetType type, unsigned int size);
-
 void __cdecl DB_ListAssetPool_f(void);
+bool DB_IsXAssetDefault(XAssetType type, const char *name);
+void DB_ExternalInitAssets();

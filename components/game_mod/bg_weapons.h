@@ -127,6 +127,7 @@ bool BurstFirePending(playerState_s *ps);
 bool WeaponUsesBurstCooldown(unsigned int weaponIdx);
 int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml);
 void PM_Weapon_Jam(/*playerState_s *ps*/);
+WeaponVariantDef *BG_LoadWeaponVariantDef(const char *name);
 const char *BG_WeaponName(int weapon);
 
 extern void (* G_RegisterWeapon)(unsigned int weapIndex);
