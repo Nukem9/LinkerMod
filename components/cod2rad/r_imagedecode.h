@@ -49,6 +49,10 @@ struct GfxRawPixel
 	char g;
 	char b;
 	char a;
+
+	GfxRawPixel(void);
+	GfxRawPixel(vec3& vec);
+	GfxRawPixel(vec4& vec);
 };
 
 struct GfxRawImage
@@ -121,7 +125,7 @@ enum GfxImageFileFormat
 typedef void (__cdecl* Image_LoadPixels_t)(struct GfxRawImage * image, struct t4::GfxImageFileHeader * header, unsigned __int8 * pixels, int bitsPerPixel);
 //static Image_LoadPixels_t Image_DecodeBitmap = (Image_LoadPixels_t)0x004176B0;
 //static Image_LoadPixels_t Image_DecodeWavelet = (Image_LoadPixels_t)0x004178A0;
-static Image_LoadPixels_t Image_LoadDxtc = (Image_LoadPixels_t)0x004177F0;
+//static Image_LoadPixels_t Image_DecodeDxtc = (Image_LoadPixels_t)0x004177F0;
 
 int Image_CountMipmapsForFile(t5::GfxImageFileHeader *fileHeader);
 
@@ -130,3 +134,4 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName);
 
 void Image_CopyBitmapData(BYTE *data, GfxRawImage *image, t5::GfxImageFileHeader *imageFile);
 void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFileHeader *imageFile, BYTE *data, int bytesPerPixel);
+void __cdecl Image_DecodeDxtc(struct GfxRawImage *image, struct t5::GfxImageFileHeader *imageFile, BYTE *data, int bytesPerPixel);

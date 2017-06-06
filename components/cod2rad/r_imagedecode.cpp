@@ -1,6 +1,63 @@
 #include "stdafx.h"
 #include "r_image_wavelet.h"
 
+union ddscolor_t
+{
+	struct
+	{
+		unsigned __int16 b : 5;
+		unsigned __int16 g : 6;
+		unsigned __int16 r : 5;
+	};
+
+	unsigned __int16 rgb;
+};
+STATIC_ASSERT_SIZE(ddscolor_t, 2);
+
+struct DdsBlock_Dxt1_t
+{
+	ddscolor_t color0;
+	ddscolor_t color1;
+	char bits[4];
+};
+STATIC_ASSERT_SIZE(DdsBlock_Dxt1_t, 8);
+
+struct DdsBlock_Dxt3_t
+{
+	char alpha[8];
+	DdsBlock_Dxt1_t color;
+};
+STATIC_ASSERT_SIZE(DdsBlock_Dxt3_t, 16);
+
+struct DdsBlock_Dxt5_t
+{
+	char alpha0;
+	char alpha1;
+	char alpha[6];
+	DdsBlock_Dxt1_t color;
+};
+STATIC_ASSERT_SIZE(DdsBlock_Dxt5_t, 16);
+
+GfxRawPixel::GfxRawPixel(void)
+{
+}
+
+GfxRawPixel::GfxRawPixel(vec3& vec)
+{
+	this->r = (BYTE)(vec.r * 255.0f);
+	this->g = (BYTE)(vec.g * 255.0f);
+	this->b = (BYTE)(vec.b * 255.0f);
+	this->a = -1;
+}
+
+GfxRawPixel::GfxRawPixel(vec4& vec)
+{
+	this->r = (BYTE)(vec.r * 255.0f);
+	this->g = (BYTE)(vec.g * 255.0f);
+	this->b = (BYTE)(vec.b * 255.0f);
+	this->a = (BYTE)(vec.a * 255.0f);
+}
+
 bool SaveBitmap(char* filepath, BYTE* pixels, int width, int height, int bytesPerPixel) {
 	FILE* f = NULL;
 	fopen_s(&f, filepath, "wb");
@@ -179,12 +236,12 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 		break;
 	case IMG_FORMAT_DXT1:
 		image->hasAlpha = 0;
-		Image_LoadDxtc(image, &dummyHeader, pixels, 8);
+		Image_DecodeDxtc(image, header, pixels, 8);
 		break;
 	case IMG_FORMAT_DXT3:
 	case IMG_FORMAT_DXT5:
 		image->hasAlpha = 1;
-		Image_LoadDxtc(image, &dummyHeader, pixels, 16);
+		Image_DecodeDxtc(image, header, pixels, 16);
 		break;
 	case IMG_FORMAT_BITMAP_RGB565:
 		image->hasAlpha = 0;
@@ -324,22 +381,169 @@ void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFi
 	ASSERT(imageFile);
 	
 	int faceCount = (imageFile->flags & 4) != 0 ? 6 : 1;
-	int mipCount = Image_CountMipmapsForFile(imageFile) - 1;
-	for (int mipLevel = mipCount; mipLevel >= 0; mipLevel--)
+	for (int mipLevel = Image_CountMipmapsForFile(imageFile) - 1; mipLevel >= 0; mipLevel--)
 	{
-		int width = imageFile->dimensions[0] >> mipLevel;
-		if (width <= 1)
-			width = 1;
+		int width = max(imageFile->dimensions[0] >> mipLevel, 1);
+		int height = max(imageFile->dimensions[1] >> mipLevel, 1);
 
-		int height = imageFile->dimensions[1] >> mipLevel;
-		if (height <= 1)
-			height = 1;
-		
 		int mipSize = bytesPerPixel * width * height;
+
 		for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
 		{
 			if (faceIndex == 0 && mipLevel == 0)
 				Image_CopyBitmapData(data, image, imageFile);
+
+			data += mipSize;
+		}
+	}
+}
+
+inline vec3 Pixel_Unpack_RGB565(unsigned __int16 packed)
+{
+	vec3 dst;
+	dst.r = (packed >> 11) / 32.0f;
+	dst.g = ((packed >> 5) & 0x3F) / 64.0f;
+	dst.b = (packed & 0x1F) / 32.0f;
+	return dst;
+}
+
+void Immage_DecompressDxt1_Internal(GfxRawImage *image, DdsBlock_Dxt1_t *data, int x, int y, bool hasAlpha)
+{
+	vec3 color0 = Pixel_Unpack_RGB565(data->color0.rgb);
+	vec3 color1 = Pixel_Unpack_RGB565(data->color1.rgb);
+
+	GfxRawPixel rgba[4];
+
+	if (hasAlpha || data->color0.rgb > data->color1.rgb)
+	{
+		rgba[0] = color0;
+		rgba[1] = color1;
+
+		rgba[2] = (color1 + (color0 * 2.0f)) / 3.0f;
+		rgba[3] = (color0 + (color1 * 2.0f)) / 3.0f;
+	}
+	else
+	{ 
+		rgba[0] = color0;
+		rgba[1] = color1;
+
+		rgba[2] = (color0 + color1) / 2.0f;
+
+		rgba[3].r = 0;
+		rgba[3].g = 0;
+		rgba[3].b = 0;
+		rgba[3].a = 0;
+	}
+
+	image->pixels[(x + 0) + (y + 0 * image->width)] = rgba[(data->bits[0] >> 0) & 3];
+	image->pixels[(x + 1) + (y + 0 * image->width)] = rgba[(data->bits[0] >> 2) & 3];
+	image->pixels[(x + 2) + (y + 0 * image->width)] = rgba[(data->bits[0] >> 4) & 3];
+	image->pixels[(x + 3) + (y + 0 * image->width)] = rgba[(data->bits[0] >> 6) & 3];
+
+	image->pixels[(x + 0) + (y + 1 * image->width)] = rgba[(data->bits[1] >> 0) & 3];
+	image->pixels[(x + 1) + (y + 1 * image->width)] = rgba[(data->bits[1] >> 2) & 3];
+	image->pixels[(x + 2) + (y + 1 * image->width)] = rgba[(data->bits[1] >> 4) & 3];
+	image->pixels[(x + 3) + (y + 1 * image->width)] = rgba[(data->bits[1] >> 6) & 3];
+
+	image->pixels[(x + 0) + (y + 2 * image->width)] = rgba[(data->bits[2] >> 0) & 3];
+	image->pixels[(x + 1) + (y + 2 * image->width)] = rgba[(data->bits[2] >> 2) & 3];
+	image->pixels[(x + 2) + (y + 2 * image->width)] = rgba[(data->bits[2] >> 4) & 3];
+	image->pixels[(x + 3) + (y + 2 * image->width)] = rgba[(data->bits[2] >> 6) & 3];
+
+	image->pixels[(x + 0) + (y + 3 * image->width)] = rgba[(data->bits[3] >> 0) & 3];
+	image->pixels[(x + 1) + (y + 3 * image->width)] = rgba[(data->bits[3] >> 2) & 3];
+	image->pixels[(x + 2) + (y + 3 * image->width)] = rgba[(data->bits[3] >> 4) & 3];
+	image->pixels[(x + 3) + (y + 3 * image->width)] = rgba[(data->bits[3] >> 6) & 3];
+}
+
+void Image_DecompressDxt1(DdsBlock_Dxt1_t* data, struct GfxRawImage *image, int x, int y)
+{
+	Immage_DecompressDxt1_Internal(image, data, x, y, true);
+}
+
+// TODO - cleanup the left side
+void Image_DecompressDxt3(DdsBlock_Dxt3_t* data, struct GfxRawImage *image, int x, int y)
+{
+	Immage_DecompressDxt1_Internal(image, &data->color, x, y, true);
+
+	*(&image->pixels[x + 0].a + 4 * y * image->width) = 17 * (data->alpha[0] & 0xF);
+	*(&image->pixels[x + 1].a + 4 * y * image->width) = 17 * (data->alpha[0] >> 4);
+	*(&image->pixels[x + 2].a + 4 * y * image->width) = 17 * (data->alpha[1] & 0xF);
+	*(&image->pixels[x + 3].a + 4 * y * image->width) = 17 * (data->alpha[1] >> 4);
+
+	*(&image->pixels[x + 0].a + 4 * (y + 1) * image->width) = 17 * (data->alpha[2] & 0xF);
+	*(&image->pixels[x + 1].a + 4 * (y + 1) * image->width) = 17 * (data->alpha[2] >> 4);
+	*(&image->pixels[x + 2].a + 4 * (y + 1) * image->width) = 17 * (data->alpha[3] & 0xF);
+	*(&image->pixels[x + 3].a + 4 * (y + 1) * image->width) = 17 * (data->alpha[3] >> 4);
+
+	*(&image->pixels[x + 0].a + 4 * (y + 2) * image->width) = 17 * (data->alpha[4] & 0xF);
+	*(&image->pixels[x + 1].a + 4 * (y + 2) * image->width) = 17 * (data->alpha[4] >> 4);
+	*(&image->pixels[x + 2].a + 4 * (y + 2) * image->width) = 17 * (data->alpha[5] & 0xF);
+	*(&image->pixels[x + 3].a + 4 * (y + 2) * image->width) = 17 * (data->alpha[5] >> 4);
+
+	*(&image->pixels[x + 0].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[6] & 0xF);
+	*(&image->pixels[x + 1].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[6] >> 4);
+	*(&image->pixels[x + 2].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[7] & 0xF);
+	*(&image->pixels[x + 3].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[7] >> 4);
+}
+
+void Image_CopyDxtcData(BYTE *data, GfxRawImage *image, t5::GfxImageFileHeader *imageFile)
+{
+	typedef void(*Image_DecompressDxtcBlock_t)(void* data, GfxRawImage *image, int x, int y);
+	Image_DecompressDxtcBlock_t Image_DecompressDxtcBlock = NULL;
+	int bytesPerPixel = 1;
+
+	switch (imageFile->format)
+	{
+	case IMG_FORMAT_DXT1:
+		Image_DecompressDxtcBlock = (Image_DecompressDxtcBlock_t)Image_DecompressDxt1;
+		bytesPerPixel = 8;
+		break;
+	case IMG_FORMAT_DXT3:
+		Image_DecompressDxtcBlock = (Image_DecompressDxtcBlock_t)Image_DecompressDxt3;
+		bytesPerPixel = 16;
+		break;
+	case IMG_FORMAT_DXT5:
+		//Image_DecompressDxtcBlock = Image_DecompressDxt5;
+		ASSERT(false);
+		bytesPerPixel = 16;
+		break;
+	default:
+		Com_Error("unhandled case - unsupported image format for file '%s'", image->name);
+		return;
+	}
+
+	// Size of DXT compressed block in pixels
+	const int DXT_BLOCK_WIDTH = 4;
+	const int DXT_BLOCK_HEIGHT = 4;
+
+	for (int y = 0; y < image->height; y += DXT_BLOCK_WIDTH)
+	{
+		for (int x = 0; x < image->width; x += DXT_BLOCK_HEIGHT)
+		{
+			Image_DecompressDxtcBlock(data, image, x, y);
+			data += bytesPerPixel;
+		}
+	}
+}
+
+void __cdecl Image_DecodeDxtc(struct GfxRawImage *image, struct t5::GfxImageFileHeader *imageFile, BYTE *data, int bytesPerPixel)
+{
+	ASSERT(image);
+	ASSERT(imageFile);
+
+	int faceCount = (imageFile->flags & 4) != 0 ? 6 : 1;
+	for (int mipLevel = Image_CountMipmapsForFile(imageFile) - 1; mipLevel >= 0; mipLevel--)
+	{
+		int width = max(imageFile->dimensions[0] >> mipLevel, 1);
+		int height = max(imageFile->dimensions[1] >> mipLevel, 1);
+
+		int mipSize = bytesPerPixel * ((width + 3) >> 2) * ((height + 3) >> 2);
+
+		for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
+		{
+			if (faceIndex == 0 && mipLevel == 0)
+				Image_CopyDxtcData(data, image, imageFile);
 
 			data += mipSize;
 		}
