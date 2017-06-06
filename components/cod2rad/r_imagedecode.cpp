@@ -318,7 +318,7 @@ void Image_CopyBitmapData(BYTE *pixels, GfxRawImage *image, t5::GfxImageFileHead
 	}
 }
 
-void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFileHeader *imageFile, BYTE *pixels, int bytesPerPixel)
+void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFileHeader *imageFile, BYTE *data, int bytesPerPixel)
 {
 	ASSERT(image);
 	ASSERT(imageFile);
@@ -327,24 +327,21 @@ void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFi
 	int mipCount = Image_CountMipmapsForFile(imageFile) - 1;
 	for (int mipLevel = mipCount; mipLevel >= 0; mipLevel--)
 	{
-		while (1)
+		int width = imageFile->dimensions[0] >> mipLevel;
+		if (width <= 1)
+			width = 1;
+
+		int height = imageFile->dimensions[1] >> mipLevel;
+		if (height <= 1)
+			height = 1;
+		
+		int mipSize = bytesPerPixel * width * height;
+		for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
 		{
-			int width = imageFile->dimensions[0] >> mipLevel;
-			if (width <= 1)
-				width = 1;
+			if (faceIndex == 0 && mipLevel == 0)
+				Image_CopyBitmapData(data, image, imageFile);
 
-			int height = imageFile->dimensions[1] >> mipLevel;
-			if (height <= 1)
-				height = 1;
-			
-			int mipSize = bytesPerPixel * width * height;
-			for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
-			{
-				if (faceIndex == 0 && mipLevel == 0)
-					Image_CopyBitmapData(pixels, image, imageFile);
-
-				pixels += mipSize;
-			}
+			data += mipSize;
 		}
 	}
 }
