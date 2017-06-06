@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "r_image_wavelet.h"
 
 bool SaveBitmap(char* filepath, BYTE* pixels, int width, int height, int bytesPerPixel) {
 	FILE* f = NULL;
@@ -158,23 +159,23 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 		break;
 	case IMG_FORMAT_WAVELET_RGBA:
 		image->hasAlpha = 1;
-		Image_LoadWavelet(image, &dummyHeader, pixels, 4);
+		Image_DecodeWavelet(image, header, pixels, 4);
 		break;
 	case IMG_FORMAT_WAVELET_RGB:
 		image->hasAlpha = 0;
-		Image_LoadWavelet(image, &dummyHeader, pixels, 3);
+		Image_DecodeWavelet(image, header, pixels, 3);
 		break;
 	case IMG_FORMAT_WAVELET_LUMINANCE_ALPHA:
 		image->hasAlpha = 1;
-		Image_LoadWavelet(image, &dummyHeader, pixels, 2);
+		Image_DecodeWavelet(image, header, pixels, 2);
 		break;
 	case IMG_FORMAT_WAVELET_LUMINANCE:
 		image->hasAlpha = 0;
-		Image_LoadWavelet(image, &dummyHeader, pixels, 1);
+		Image_DecodeWavelet(image, header, pixels, 1);
 		break;
 	case IMG_FORMAT_WAVELET_ALPHA:
 		image->hasAlpha = 1;
-		Image_LoadWavelet(image, &dummyHeader, pixels, 1);
+		Image_DecodeWavelet(image, header, pixels, 1);
 		break;
 	case IMG_FORMAT_DXT1:
 		image->hasAlpha = 0;

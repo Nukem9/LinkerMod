@@ -49,4 +49,6 @@
 #pragma comment(lib, "../../build/Release/D3DBSP_Lib.lib")
 #endif
 
+#define VANILLA_VALUE(NAME, TYPE, ADDRESS) static TYPE& NAME = *(TYPE*)ADDRESS;
+
 using namespace D3DBSP_Lib;

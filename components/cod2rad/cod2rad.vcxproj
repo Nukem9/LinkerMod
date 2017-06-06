@@ -100,6 +100,7 @@
     <ClInclude Include="PageGuard.h" />
     <ClInclude Include="print.h" />
     <ClInclude Include="r_imagedecode.h" />
+    <ClInclude Include="r_image_wavelet.h" />
     <ClInclude Include="r_lightgrid.h" />
     <ClInclude Include="r_lightmaps.h" />
     <ClInclude Include="r_light_load_obj.h" />
@@ -128,6 +129,7 @@
     <ClCompile Include="PageGuard.cpp" />
     <ClCompile Include="print.cpp" />
     <ClCompile Include="r_imagedecode.cpp" />
+    <ClCompile Include="r_image_wavelet.cpp" />
     <ClCompile Include="r_lightgrid.cpp" />
     <ClCompile Include="r_lightmaps.cpp" />
     <ClCompile Include="r_light_load_obj.cpp" />
