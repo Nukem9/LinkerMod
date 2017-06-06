@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
 bool SaveBitmap(char* filepath, BYTE* pixels, int width, int height, int bytesPerPixel) {
-	FILE* f = fopen(filepath, "wb");
+	FILE* f = NULL;
+	fopen_s(&f, filepath, "wb");
 	if (f == NULL)
 	{
 		Com_Printf("ERROR: Could not save image %s\n", filepath);
@@ -66,6 +67,30 @@ t4::GfxImageFileHeader::GfxImageFileHeader(t5::GfxImageFileHeader& header)
 	fileSizeForPicmip[3] = header.fileSizeForPicmip[3];
 }
 
+unsigned int Image_CountMipmaps(unsigned int imageFlags, unsigned int width, unsigned int height, unsigned int depth)
+{
+	if (imageFlags & 2)
+		return 1;
+	
+	unsigned int mipCount = 1;
+	unsigned int mipRes = 1;
+	while (mipRes < width || mipRes < height || mipRes < depth)
+	{
+		mipRes *= 2;
+		++mipCount;
+	}
+	return mipCount;
+}
+
+int Image_CountMipmapsForFile(t5::GfxImageFileHeader *fileHeader)
+{
+	return Image_CountMipmaps(
+		fileHeader->flags,
+		fileHeader->dimensions[0],
+		fileHeader->dimensions[1],
+		fileHeader->dimensions[2]);
+}
+
 bool __cdecl Image_ValidateHeader(t5::GfxImageFileHeader *imageFile, const char *filepath)
 {
 	if (imageFile->tag[0] == 'I' && imageFile->tag[1] == 'W' && imageFile->tag[2] == 'i')
@@ -119,19 +144,19 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 	{
 	case IMG_FORMAT_BITMAP_RGBA:
 		image->hasAlpha = 1;
-		Image_LoadBitmap(image, &dummyHeader, pixels, 4);
+		Image_DecodeBitmap(image, header, pixels, 4);
 		break;
 	case IMG_FORMAT_BITMAP_RGB:
 		image->hasAlpha = 0;
-		Image_LoadBitmap(image, &dummyHeader, pixels, 3);
+		Image_DecodeBitmap(image, header, pixels, 3);
 		break;
 	case IMG_FORMAT_BITMAP_LUMINANCE:
 		image->hasAlpha = 0;
-		Image_LoadBitmap(image, &dummyHeader, pixels, 1);
+		Image_DecodeBitmap(image, header, pixels, 1);
 		break;
 	case IMG_FORMAT_BITMAP_ALPHA:
 		image->hasAlpha = 1;
-		Image_LoadBitmap(image, &dummyHeader, pixels, 1);
+		Image_DecodeBitmap(image, header, pixels, 1);
 		break;
 	case IMG_FORMAT_WAVELET_RGBA:
 		image->hasAlpha = 1;
@@ -164,12 +189,12 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 		break;
 	case IMG_FORMAT_BITMAP_RGB565:
 		image->hasAlpha = 0;
-		Image_LoadBitmap(image, &dummyHeader, pixels, 2);
+		Image_DecodeBitmap(image, header, pixels, 2);
 		break;
 	case IMG_FORMAT_BITMAP_LUMINANCE_ALPHA:
 	case IMG_FORMAT_BITMAP_RGB5A3:
 		image->hasAlpha = 1;
-		Image_LoadBitmap(image, &dummyHeader, pixels, 2);
+		Image_DecodeBitmap(image, header, pixels, 2);
 		break;
 	default:
 		Con_Error("Unhandled image type: %d (%s)\n", header->format, imageName);
@@ -177,5 +202,148 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 	}
 
 	FS_FreeFile(header);
+}
+
+void Image_CopyBitmapData(BYTE *pixels, GfxRawImage *image, t5::GfxImageFileHeader *imageFile)
+{
+	PBYTE src = pixels;
+	GfxRawPixel* dst = image->pixels;
 	
+	int i = imageFile->dimensions[0] * imageFile->dimensions[1];
+	
+	switch (imageFile->format)
+	{
+	case IMG_FORMAT_BITMAP_RGBA:
+	case IMG_FORMAT_WAVELET_RGBA:
+		for (; i; --i)
+		{
+			dst->r = src[2];
+			dst->g = src[1];
+			dst->b = src[0];
+			dst->a = src[3];
+			src += 4;
+			++dst;
+		}
+		break;
+	case IMG_FORMAT_BITMAP_RGB:
+	case IMG_FORMAT_WAVELET_RGB:
+		for (; i; --i)
+		{
+			dst->r = src[2];
+			dst->g = src[1];
+			dst->b = src[0];
+			dst->a = -1;
+			src += 3;
+			++dst;
+		}
+		break;
+	case IMG_FORMAT_BITMAP_LUMINANCE_ALPHA:
+	case IMG_FORMAT_WAVELET_LUMINANCE_ALPHA:
+		for (; i; --i)
+		{
+			dst->r = src[0];
+			dst->g = src[0];
+			dst->b = src[0];
+			dst->a = src[1];
+			src += 2;
+			++dst;
+		}
+		break;
+	case IMG_FORMAT_BITMAP_LUMINANCE:
+	case IMG_FORMAT_WAVELET_LUMINANCE:
+		for (; i; --i)
+		{
+			dst->r = src[0];
+			dst->g = src[0];
+			dst->b = src[0];
+			dst->a = -1;
+			++src;
+			++dst;
+		}
+		break;
+	case IMG_FORMAT_BITMAP_ALPHA:
+	case IMG_FORMAT_WAVELET_ALPHA:
+		for (; i; --i)
+		{
+			dst->r = 0;
+			dst->g = 0;
+			dst->b = 0;
+			dst->a = *src++;
+			++dst;
+		}
+		break;
+	case IMG_FORMAT_BITMAP_RGB565:
+		for (; i; --i)
+		{
+			dst->r = (src[0] >> 5) | src[0] & 0xF8;
+			dst->g = 32 * src[0] | ((BYTE)(src[0] & 6 | (src[1] >> 2) & 0x38) >> 1);
+			dst->b = 8 * src[1] | (src[1] >> 2) & 7;
+			dst->a = 0;
+			++dst;
+		}
+		break;
+	case IMG_FORMAT_BITMAP_RGB5A3:
+		for (; i; --i)
+		{
+			BYTE r, g, b1, b2, a, v11, v12;
+			if ((*src & 0x80u) == 0)
+			{
+				v11 = 16 * src[0];
+				v12 = src[1];
+				a = ((BYTE)(2 * (src[0] & 0xF0) | ((BYTE)(2 * (src[0] & 0xF0)) >> 3)) >> 3) | 2 * (src[0] & 0xF0);
+				r = (v11 >> 4) | v11;
+				g = ((BYTE)(v12 & 0xF0) >> 4) | v12 & 0xF0;
+				b1 = 16 * v12;
+				b2 = b1 >> 4;
+			}
+			else
+			{
+				BYTE _b = src[1];
+				r = ((BYTE)(2 * (src[0] & 0xFC)) >> 5) | 2 * (src[0] & 0xFC);
+				g = ((BYTE)((src[0] << 6) | (_b >> 2) & 0x38) >> 5) | (src[0] << 6) | (_b >> 2) & 0x38;
+				b1 = 8 * _b;
+				a = -1;
+				b2 = (BYTE)(8 * _b) >> 5;
+			}
+
+			dst->g = g;
+			dst->r = r;
+			dst->b = b2 | b1;
+			dst->a = a;
+			++dst;
+		}
+		break;
+	default:
+		ASSERT_MSG(false, "unhandled case");
+		break;
+	}
+}
+
+void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFileHeader *imageFile, BYTE *pixels, int bytesPerPixel)
+{
+	ASSERT(image);
+	ASSERT(imageFile);
+	
+	int faceCount = (imageFile->flags & 4) != 0 ? 6 : 1;
+	int mipCount = Image_CountMipmapsForFile(imageFile) - 1;
+	for (int mipLevel = mipCount; mipLevel >= 0; mipLevel--)
+	{
+		while (1)
+		{
+			int width = imageFile->dimensions[0] >> mipLevel;
+			if (width <= 1)
+				width = 1;
+			int height = imageFile->dimensions[1] >> mipLevel;
+			if (height <= 1)
+				height = 1;
+			
+			int mipSize = bytesPerPixel * width * height;
+			for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
+			{
+				if (faceIndex == 0 && mipLevel == 0)
+					Image_CopyBitmapData(pixels, image, imageFile);
+				pixels += mipSize;
+			}
+		}
+	}
 }

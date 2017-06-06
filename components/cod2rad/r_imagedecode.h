@@ -119,9 +119,11 @@ enum GfxImageFileFormat
 };
 
 typedef void (__cdecl* Image_LoadPixels_t)(struct GfxRawImage * image, struct t4::GfxImageFileHeader * header, unsigned __int8 * pixels, int bitsPerPixel);
-static Image_LoadPixels_t Image_LoadBitmap = (Image_LoadPixels_t)0x004176B0;
+//static Image_LoadPixels_t Image_DecodeBitmap = (Image_LoadPixels_t)0x004176B0;
 static Image_LoadPixels_t Image_LoadWavelet = (Image_LoadPixels_t)0x004178A0;
 static Image_LoadPixels_t Image_LoadDxtc = (Image_LoadPixels_t)0x004177F0;
 
 void hk_Image_GetRawPixels(void);
 void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName);
+
+void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFileHeader *imageFile, BYTE *pixels, int bytesPerPixel);
