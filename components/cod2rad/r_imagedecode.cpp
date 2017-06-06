@@ -74,11 +74,13 @@ unsigned int Image_CountMipmaps(unsigned int imageFlags, unsigned int width, uns
 	
 	unsigned int mipCount = 1;
 	unsigned int mipRes = 1;
+
 	while (mipRes < width || mipRes < height || mipRes < depth)
 	{
 		mipRes *= 2;
 		++mipCount;
 	}
+
 	return mipCount;
 }
 
@@ -96,18 +98,14 @@ bool __cdecl Image_ValidateHeader(t5::GfxImageFileHeader *imageFile, const char 
 	if (imageFile->tag[0] == 'I' && imageFile->tag[1] == 'W' && imageFile->tag[2] == 'i')
 	{
 		if (imageFile->version == 13)
-		{
-			return 1;
-		}
-		else
-		{
-			Com_Printf("ERROR: image '%s' is version %i but should be version %i\n", filepath, imageFile->version, 13);
-			return 0;
-		}
+			return true;
+		
+		Com_Printf("ERROR: image '%s' is version %i but should be version %i\n", filepath, imageFile->version, 13);
+		return false;
 	}
 
 	Com_Printf("ERROR: image '%s' is not an IW image\n", filepath);
-	return 0;
+	return false;
 }
 
 void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
@@ -333,6 +331,7 @@ void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFi
 			int width = imageFile->dimensions[0] >> mipLevel;
 			if (width <= 1)
 				width = 1;
+
 			int height = imageFile->dimensions[1] >> mipLevel;
 			if (height <= 1)
 				height = 1;
@@ -342,6 +341,7 @@ void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFi
 			{
 				if (faceIndex == 0 && mipLevel == 0)
 					Image_CopyBitmapData(pixels, image, imageFile);
+
 				pixels += mipSize;
 			}
 		}
