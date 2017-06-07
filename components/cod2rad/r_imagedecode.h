@@ -63,6 +63,11 @@ struct GfxRawImage
 	int width;
 	int height;
 	GfxRawPixel *pixels;
+
+	inline GfxRawPixel& Pixel(int x, int y)
+	{
+		return this->pixels[y  * this->width + x];
+	}
 };
 STATIC_ASSERT_SIZE(GfxRawImage, 0x54);
 

@@ -435,25 +435,25 @@ void Image_DecompressDxt1_Internal(GfxRawImage *image, DdsBlock_Dxt1_t *data, in
 		rgba[3].a = 0;
 	}
 
-	image->pixels[(x + 0) + ((y + 0) * image->width)] = rgba[(data->bits[0] >> 0) & 3];
-	image->pixels[(x + 1) + ((y + 0) * image->width)] = rgba[(data->bits[0] >> 2) & 3];
-	image->pixels[(x + 2) + ((y + 0) * image->width)] = rgba[(data->bits[0] >> 4) & 3];
-	image->pixels[(x + 3) + ((y + 0) * image->width)] = rgba[(data->bits[0] >> 6) & 3];
+	image->Pixel(x + 0, y + 0) = rgba[(data->bits[0] >> 0) & 3];
+	image->Pixel(x + 1, y + 0) = rgba[(data->bits[0] >> 2) & 3];
+	image->Pixel(x + 2, y + 0) = rgba[(data->bits[0] >> 4) & 3];
+	image->Pixel(x + 3, y + 0) = rgba[(data->bits[0] >> 6) & 3];
 
-	image->pixels[(x + 0) + ((y + 1) * image->width)] = rgba[(data->bits[1] >> 0) & 3];
-	image->pixels[(x + 1) + ((y + 1) * image->width)] = rgba[(data->bits[1] >> 2) & 3];
-	image->pixels[(x + 2) + ((y + 1) * image->width)] = rgba[(data->bits[1] >> 4) & 3];
-	image->pixels[(x + 3) + ((y + 1) * image->width)] = rgba[(data->bits[1] >> 6) & 3];
+	image->Pixel(x + 0, y + 1) = rgba[(data->bits[1] >> 0) & 3];
+	image->Pixel(x + 1, y + 1) = rgba[(data->bits[1] >> 2) & 3];
+	image->Pixel(x + 2, y + 1) = rgba[(data->bits[1] >> 4) & 3];
+	image->Pixel(x + 3, y + 1) = rgba[(data->bits[1] >> 6) & 3];
 
-	image->pixels[(x + 0) + ((y + 2) * image->width)] = rgba[(data->bits[2] >> 0) & 3];
-	image->pixels[(x + 1) + ((y + 2) * image->width)] = rgba[(data->bits[2] >> 2) & 3];
-	image->pixels[(x + 2) + ((y + 2) * image->width)] = rgba[(data->bits[2] >> 4) & 3];
-	image->pixels[(x + 3) + ((y + 2) * image->width)] = rgba[(data->bits[2] >> 6) & 3];
+	image->Pixel(x + 0, y + 2) = rgba[(data->bits[2] >> 0) & 3];
+	image->Pixel(x + 1, y + 2) = rgba[(data->bits[2] >> 2) & 3];
+	image->Pixel(x + 2, y + 2) = rgba[(data->bits[2] >> 4) & 3];
+	image->Pixel(x + 3, y + 2) = rgba[(data->bits[2] >> 6) & 3];
 
-	image->pixels[(x + 0) + ((y + 3) * image->width)] = rgba[(data->bits[3] >> 0) & 3];
-	image->pixels[(x + 1) + ((y + 3) * image->width)] = rgba[(data->bits[3] >> 2) & 3];
-	image->pixels[(x + 2) + ((y + 3) * image->width)] = rgba[(data->bits[3] >> 4) & 3];
-	image->pixels[(x + 3) + ((y + 3) * image->width)] = rgba[(data->bits[3] >> 6) & 3];
+	image->Pixel(x + 0, y + 3) = rgba[(data->bits[3] >> 0) & 3];
+	image->Pixel(x + 1, y + 3) = rgba[(data->bits[3] >> 2) & 3];
+	image->Pixel(x + 2, y + 3) = rgba[(data->bits[3] >> 4) & 3];
+	image->Pixel(x + 3, y + 3) = rgba[(data->bits[3] >> 6) & 3];
 }
 
 void Image_DecompressDxt1(DdsBlock_Dxt1_t* data, struct GfxRawImage *image, int x, int y)
@@ -461,30 +461,29 @@ void Image_DecompressDxt1(DdsBlock_Dxt1_t* data, struct GfxRawImage *image, int 
 	Image_DecompressDxt1_Internal(image, data, x, y, false);
 }
 
-// TODO - cleanup the left side
 void Image_DecompressDxt3(DdsBlock_Dxt3_t* data, struct GfxRawImage *image, int x, int y)
 {
-
-	*(&image->pixels[x + 0].a + 4 * y * image->width) = 17 * (data->alpha[0] & 0xF);
-	*(&image->pixels[x + 1].a + 4 * y * image->width) = 17 * (data->alpha[0] >> 4);
-	*(&image->pixels[x + 2].a + 4 * y * image->width) = 17 * (data->alpha[1] & 0xF);
-	*(&image->pixels[x + 3].a + 4 * y * image->width) = 17 * (data->alpha[1] >> 4);
-
-	*(&image->pixels[x + 0].a + 4 * (y + 1) * image->width) = 17 * (data->alpha[2] & 0xF);
-	*(&image->pixels[x + 1].a + 4 * (y + 1) * image->width) = 17 * (data->alpha[2] >> 4);
-	*(&image->pixels[x + 2].a + 4 * (y + 1) * image->width) = 17 * (data->alpha[3] & 0xF);
-	*(&image->pixels[x + 3].a + 4 * (y + 1) * image->width) = 17 * (data->alpha[3] >> 4);
-
-	*(&image->pixels[x + 0].a + 4 * (y + 2) * image->width) = 17 * (data->alpha[4] & 0xF);
-	*(&image->pixels[x + 1].a + 4 * (y + 2) * image->width) = 17 * (data->alpha[4] >> 4);
-	*(&image->pixels[x + 2].a + 4 * (y + 2) * image->width) = 17 * (data->alpha[5] & 0xF);
-	*(&image->pixels[x + 3].a + 4 * (y + 2) * image->width) = 17 * (data->alpha[5] >> 4);
-
-	*(&image->pixels[x + 0].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[6] & 0xF);
-	*(&image->pixels[x + 1].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[6] >> 4);
-	*(&image->pixels[x + 2].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[7] & 0xF);
-	*(&image->pixels[x + 3].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[7] >> 4);
 	Image_DecompressDxt1_Internal(image, &data->color, x, y, true);
+
+	image->Pixel(x + 0, y + 0).a = 17 * (data->alpha[0] & 0xF);
+	image->Pixel(x + 1, y + 0).a = 17 * (data->alpha[0] >> 4);
+	image->Pixel(x + 2, y + 0).a = 17 * (data->alpha[1] & 0xF);
+	image->Pixel(x + 3, y + 0).a = 17 * (data->alpha[1] >> 4);
+
+	image->Pixel(x + 0, y + 1).a = 17 * (data->alpha[2] & 0xF);
+	image->Pixel(x + 1, y + 1).a = 17 * (data->alpha[2] >> 4);
+	image->Pixel(x + 2, y + 1).a = 17 * (data->alpha[3] & 0xF);
+	image->Pixel(x + 3, y + 1).a = 17 * (data->alpha[3] >> 4);
+
+	image->Pixel(x + 0, y + 2).a = 17 * (data->alpha[4] & 0xF);
+	image->Pixel(x + 1, y + 2).a = 17 * (data->alpha[4] >> 4);
+	image->Pixel(x + 2, y + 2).a = 17 * (data->alpha[5] & 0xF);
+	image->Pixel(x + 3, y + 2).a = 17 * (data->alpha[5] >> 4);
+
+	image->Pixel(x + 0, y + 3).a = 17 * (data->alpha[6] & 0xF);
+	image->Pixel(x + 1, y + 3).a = 17 * (data->alpha[6] >> 4);
+	image->Pixel(x + 2, y + 3).a = 17 * (data->alpha[7] & 0xF);
+	image->Pixel(x + 3, y + 3).a = 17 * (data->alpha[7] >> 4);
 }
 
 void Image_CopyDxtcData(BYTE *data, GfxRawImage *image, t5::GfxImageFileHeader *imageFile)
