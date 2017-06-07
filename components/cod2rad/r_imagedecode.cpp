@@ -462,12 +462,12 @@ void Image_DecompressDxt1_Internal(GfxRawImage *image, DdsBlock_Dxt1_t *data, in
 	image->Pixel(x + 3, y + 3) = rgba[(data->bits[3] >> 6) & 3];
 }
 
-void Image_DecompressDxt1(DdsBlock_Dxt1_t* data, struct GfxRawImage *image, int x, int y)
+void Image_DecompressDxt1(DdsBlock_Dxt1_t* data, GfxRawImage *image, int x, int y)
 {
 	Image_DecompressDxt1_Internal(image, data, x, y, false);
 }
 
-void Image_DecompressDxt3(DdsBlock_Dxt3_t* data, struct GfxRawImage *image, int x, int y)
+void Image_DecompressDxt3(DdsBlock_Dxt3_t* data, GfxRawImage *image, int x, int y)
 {
 	Image_DecompressDxt1_Internal(image, &data->color, x, y, true);
 
@@ -492,6 +492,70 @@ void Image_DecompressDxt3(DdsBlock_Dxt3_t* data, struct GfxRawImage *image, int 
 	image->Pixel(x + 3, y + 3).a = 17 * (data->alpha[7] >> 4);
 }
 
+void __cdecl Image_DecompressDxt5(DdsBlock_Dxt5_t *data, GfxRawImage *image, int x, int y)
+{
+	Image_DecompressDxt1_Internal(image, &data->color, x, y, true);
+
+	BYTE alpha[8];
+	alpha[0] = data->alpha0;
+	alpha[1] = data->alpha1;
+
+	// Calculate the remaining alpha values
+	if (alpha[0] > alpha[1])
+	{
+		alpha[2] = (BYTE)((6 * (float)alpha[0] + 1 * (float)alpha[1]) / 7.0f);
+		alpha[3] = (BYTE)((5 * (float)alpha[0] + 2 * (float)alpha[1]) / 7.0f);
+		alpha[4] = (BYTE)((4 * (float)alpha[0] + 3 * (float)alpha[1]) / 7.0f);
+		alpha[5] = (BYTE)((3 * (float)alpha[0] + 4 * (float)alpha[1]) / 7.0f);
+		alpha[6] = (BYTE)((2 * (float)alpha[0] + 5 * (float)alpha[1]) / 7.0f);
+		alpha[7] = (BYTE)((1 * (float)alpha[0] + 6 * (float)alpha[1]) / 7.0f);
+	}
+	else
+	{
+		alpha[2] = (BYTE)((4 * (float)alpha[0] + 1 * (float)alpha[1]) / 5.0f);
+		alpha[3] = (BYTE)((3 * (float)alpha[0] + 2 * (float)alpha[1]) / 5.0f);
+		alpha[4] = (BYTE)((2 * (float)alpha[0] + 3 * (float)alpha[1]) / 5.0f);
+		alpha[5] = (BYTE)((1 * (float)alpha[0] + 4 * (float)alpha[1]) / 5.0f);
+		alpha[6] = 0;
+		alpha[7] = 255;
+	}
+
+	// Calculate the alpha lookup indices
+	BYTE indices[16];
+	for (int i = 0; i < 2; i++)
+	{
+		int value = 0;
+		// Load 3 bytes into 'value'
+		for (int j = 0; j < 3; j++)
+			value |= (data->alpha[i * 3 + j] << 8 * j);
+
+		// Unpack 8 3-bit indices from the loaded bytes
+		for (int j = 0; j < 8; j++)
+			indices[i * 8 + j] = (BYTE)((value >> 3 * j) & 7);
+	}
+
+	// Apply the alpha values to their respective pixels
+	image->Pixel(x + 0, y + 0).a = alpha[indices[0]];
+	image->Pixel(x + 1, y + 0).a = alpha[indices[1]];
+	image->Pixel(x + 2, y + 0).a = alpha[indices[2]];
+	image->Pixel(x + 3, y + 0).a = alpha[indices[3]];
+
+	image->Pixel(x + 0, y + 1).a = alpha[indices[4]];
+	image->Pixel(x + 1, y + 1).a = alpha[indices[5]];
+	image->Pixel(x + 2, y + 1).a = alpha[indices[6]];
+	image->Pixel(x + 3, y + 1).a = alpha[indices[7]];
+
+	image->Pixel(x + 0, y + 2).a = alpha[indices[8]];
+	image->Pixel(x + 1, y + 2).a = alpha[indices[9]];
+	image->Pixel(x + 2, y + 2).a = alpha[indices[10]];
+	image->Pixel(x + 3, y + 2).a = alpha[indices[11]];
+
+	image->Pixel(x + 0, y + 3).a = alpha[indices[12]];
+	image->Pixel(x + 1, y + 3).a = alpha[indices[13]];
+	image->Pixel(x + 2, y + 3).a = alpha[indices[14]];
+	image->Pixel(x + 3, y + 3).a = alpha[indices[15]];
+}
+
 void Image_CopyDxtcData(BYTE *data, GfxRawImage *image, t5::GfxImageFileHeader *imageFile)
 {
 	typedef void(*Image_DecompressDxtcBlock_t)(void* data, GfxRawImage *image, int x, int y);
@@ -509,8 +573,7 @@ void Image_CopyDxtcData(BYTE *data, GfxRawImage *image, t5::GfxImageFileHeader *
 		bytesPerPixel = 16;
 		break;
 	case IMG_FORMAT_DXT5:
-		//Image_DecompressDxtcBlock = Image_DecompressDxt5;
-		ASSERT(false);
+		Image_DecompressDxtcBlock = (Image_DecompressDxtcBlock_t)Image_DecompressDxt5;
 		bytesPerPixel = 16;
 		break;
 	default:
