@@ -435,30 +435,30 @@ void Immage_DecompressDxt1_Internal(GfxRawImage *image, DdsBlock_Dxt1_t *data, i
 		rgba[3].a = 0;
 	}
 
-	image->pixels[(x + 0) + (y + 0 * image->width)] = rgba[(data->bits[0] >> 0) & 3];
-	image->pixels[(x + 1) + (y + 0 * image->width)] = rgba[(data->bits[0] >> 2) & 3];
-	image->pixels[(x + 2) + (y + 0 * image->width)] = rgba[(data->bits[0] >> 4) & 3];
-	image->pixels[(x + 3) + (y + 0 * image->width)] = rgba[(data->bits[0] >> 6) & 3];
+	image->pixels[(x + 0) + ((y + 0) * image->width)] = rgba[(data->bits[0] >> 0) & 3];
+	image->pixels[(x + 1) + ((y + 0) * image->width)] = rgba[(data->bits[0] >> 2) & 3];
+	image->pixels[(x + 2) + ((y + 0) * image->width)] = rgba[(data->bits[0] >> 4) & 3];
+	image->pixels[(x + 3) + ((y + 0) * image->width)] = rgba[(data->bits[0] >> 6) & 3];
 
-	image->pixels[(x + 0) + (y + 1 * image->width)] = rgba[(data->bits[1] >> 0) & 3];
-	image->pixels[(x + 1) + (y + 1 * image->width)] = rgba[(data->bits[1] >> 2) & 3];
-	image->pixels[(x + 2) + (y + 1 * image->width)] = rgba[(data->bits[1] >> 4) & 3];
-	image->pixels[(x + 3) + (y + 1 * image->width)] = rgba[(data->bits[1] >> 6) & 3];
+	image->pixels[(x + 0) + ((y + 1) * image->width)] = rgba[(data->bits[1] >> 0) & 3];
+	image->pixels[(x + 1) + ((y + 1) * image->width)] = rgba[(data->bits[1] >> 2) & 3];
+	image->pixels[(x + 2) + ((y + 1) * image->width)] = rgba[(data->bits[1] >> 4) & 3];
+	image->pixels[(x + 3) + ((y + 1) * image->width)] = rgba[(data->bits[1] >> 6) & 3];
 
-	image->pixels[(x + 0) + (y + 2 * image->width)] = rgba[(data->bits[2] >> 0) & 3];
-	image->pixels[(x + 1) + (y + 2 * image->width)] = rgba[(data->bits[2] >> 2) & 3];
-	image->pixels[(x + 2) + (y + 2 * image->width)] = rgba[(data->bits[2] >> 4) & 3];
-	image->pixels[(x + 3) + (y + 2 * image->width)] = rgba[(data->bits[2] >> 6) & 3];
+	image->pixels[(x + 0) + ((y + 2) * image->width)] = rgba[(data->bits[2] >> 0) & 3];
+	image->pixels[(x + 1) + ((y + 2) * image->width)] = rgba[(data->bits[2] >> 2) & 3];
+	image->pixels[(x + 2) + ((y + 2) * image->width)] = rgba[(data->bits[2] >> 4) & 3];
+	image->pixels[(x + 3) + ((y + 2) * image->width)] = rgba[(data->bits[2] >> 6) & 3];
 
-	image->pixels[(x + 0) + (y + 3 * image->width)] = rgba[(data->bits[3] >> 0) & 3];
-	image->pixels[(x + 1) + (y + 3 * image->width)] = rgba[(data->bits[3] >> 2) & 3];
-	image->pixels[(x + 2) + (y + 3 * image->width)] = rgba[(data->bits[3] >> 4) & 3];
-	image->pixels[(x + 3) + (y + 3 * image->width)] = rgba[(data->bits[3] >> 6) & 3];
+	image->pixels[(x + 0) + ((y + 3) * image->width)] = rgba[(data->bits[3] >> 0) & 3];
+	image->pixels[(x + 1) + ((y + 3) * image->width)] = rgba[(data->bits[3] >> 2) & 3];
+	image->pixels[(x + 2) + ((y + 3) * image->width)] = rgba[(data->bits[3] >> 4) & 3];
+	image->pixels[(x + 3) + ((y + 3) * image->width)] = rgba[(data->bits[3] >> 6) & 3];
 }
 
 void Image_DecompressDxt1(DdsBlock_Dxt1_t* data, struct GfxRawImage *image, int x, int y)
 {
-	Immage_DecompressDxt1_Internal(image, data, x, y, true);
+	Immage_DecompressDxt1_Internal(image, data, x, y, false);
 }
 
 // TODO - cleanup the left side
