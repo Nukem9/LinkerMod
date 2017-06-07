@@ -407,7 +407,7 @@ inline vec3 Pixel_Unpack_RGB565(unsigned __int16 packed)
 	return dst;
 }
 
-void Immage_DecompressDxt1_Internal(GfxRawImage *image, DdsBlock_Dxt1_t *data, int x, int y, bool hasAlpha)
+void Image_DecompressDxt1_Internal(GfxRawImage *image, DdsBlock_Dxt1_t *data, int x, int y, bool hasAlpha)
 {
 	vec3 color0 = Pixel_Unpack_RGB565(data->color0.rgb);
 	vec3 color1 = Pixel_Unpack_RGB565(data->color1.rgb);
@@ -458,13 +458,12 @@ void Immage_DecompressDxt1_Internal(GfxRawImage *image, DdsBlock_Dxt1_t *data, i
 
 void Image_DecompressDxt1(DdsBlock_Dxt1_t* data, struct GfxRawImage *image, int x, int y)
 {
-	Immage_DecompressDxt1_Internal(image, data, x, y, false);
+	Image_DecompressDxt1_Internal(image, data, x, y, false);
 }
 
 // TODO - cleanup the left side
 void Image_DecompressDxt3(DdsBlock_Dxt3_t* data, struct GfxRawImage *image, int x, int y)
 {
-	Immage_DecompressDxt1_Internal(image, &data->color, x, y, true);
 
 	*(&image->pixels[x + 0].a + 4 * y * image->width) = 17 * (data->alpha[0] & 0xF);
 	*(&image->pixels[x + 1].a + 4 * y * image->width) = 17 * (data->alpha[0] >> 4);
@@ -485,6 +484,7 @@ void Image_DecompressDxt3(DdsBlock_Dxt3_t* data, struct GfxRawImage *image, int 
 	*(&image->pixels[x + 1].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[6] >> 4);
 	*(&image->pixels[x + 2].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[7] & 0xF);
 	*(&image->pixels[x + 3].a + 4 * (y + 3) * image->width) = 17 * (data->alpha[7] >> 4);
+	Image_DecompressDxt1_Internal(image, &data->color, x, y, true);
 }
 
 void Image_CopyDxtcData(BYTE *data, GfxRawImage *image, t5::GfxImageFileHeader *imageFile)
