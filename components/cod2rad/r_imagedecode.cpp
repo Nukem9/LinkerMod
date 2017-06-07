@@ -67,27 +67,33 @@ bool SaveBitmap(char* filepath, BYTE* pixels, int width, int height, int bytesPe
 		return false;
 	}
 
-	BITMAPINFOHEADER info;
+	BITMAPV4HEADER info;
 	ZeroMemory(&info, sizeof(info));
-	info.biSize = sizeof(BITMAPINFOHEADER);
-	info.biWidth = width;
-	info.biHeight = height;
-	info.biPlanes = 1;
-	info.biBitCount = bytesPerPixel * 8;
-	info.biCompression = BI_RGB;
-	info.biSizeImage = width * height * bytesPerPixel;
+	info.bV4Size = sizeof(BITMAPV4HEADER);
+	info.bV4Width = width;
+	info.bV4Height = height;
+	info.bV4Planes = 1;
+	info.bV4BitCount = bytesPerPixel * 8;
+	info.bV4V4Compression = BI_BITFIELDS;
+	info.bV4SizeImage = width * height * bytesPerPixel;
+
+	info.bV4RedMask		= 0x000000FF;
+	info.bV4GreenMask	= 0x0000FF00;
+	info.bV4BlueMask	= 0x00FF0000;
+	if (bytesPerPixel == 4)
+		info.bV4AlphaMask	= 0xFF000000;
 
 	BITMAPFILEHEADER header;
 	ZeroMemory(&header, sizeof(header));
 	header.bfType = 'B' + ('M' << 8);
-	header.bfOffBits = sizeof(BITMAPFILEHEADER) + info.biSize;
-	header.bfSize = header.bfOffBits + info.biSizeImage;
+	header.bfOffBits = sizeof(BITMAPFILEHEADER) + info.bV4Size;
+	header.bfSize = header.bfOffBits + info.bV4SizeImage;
 	header.bfReserved1 = 0;
 	header.bfReserved2 = 0;
 
 	fwrite(&header, 1, sizeof(BITMAPFILEHEADER), f);
-	fwrite(&info, 1, sizeof(BITMAPINFOHEADER), f);
-	fwrite(pixels, 1, info.biSizeImage, f);
+	fwrite(&info, 1, sizeof(BITMAPV4HEADER), f);
+	fwrite(pixels, 1, info.bV4SizeImage, f);
 	fclose(f);
 
 	return true;
