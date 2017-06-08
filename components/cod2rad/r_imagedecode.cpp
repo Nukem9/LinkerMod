@@ -386,7 +386,7 @@ void __cdecl Image_DecodeBitmap(struct GfxRawImage *image, struct t5::GfxImageFi
 	ASSERT(image);
 	ASSERT(imageFile);
 	
-	int faceCount = (imageFile->flags & 4) != 0 ? 6 : 1;
+	int faceCount = (imageFile->flags & t5::IMG_FLAG_CUBEMAP) != 0 ? 6 : 1;
 	for (int mipLevel = Image_CountMipmapsForFile(imageFile) - 1; mipLevel >= 0; mipLevel--)
 	{
 		int width = max(imageFile->dimensions[0] >> mipLevel, 1);
@@ -603,7 +603,7 @@ void __cdecl Image_DecodeDxtc(struct GfxRawImage *image, struct t5::GfxImageFile
 	ASSERT(image);
 	ASSERT(imageFile);
 
-	int faceCount = (imageFile->flags & 4) != 0 ? 6 : 1;
+	int faceCount = (imageFile->flags & t5::IMG_FLAG_CUBEMAP) != 0 ? 6 : 1;
 	for (int mipLevel = Image_CountMipmapsForFile(imageFile) - 1; mipLevel >= 0; mipLevel--)
 	{
 		int width = max(imageFile->dimensions[0] >> mipLevel, 1);

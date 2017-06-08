@@ -276,7 +276,7 @@ void __cdecl Image_DecodeWavelet(GfxRawImage *image, t5::GfxImageFileHeader *ima
 	decode.dataInitialized = 0;
 
 	unsigned int totalSize = bytesPerPixel * width * height;
-	int faceCount = ((imageFile->flags & 4) != 0) ? 6 : 1;
+	int faceCount = ((imageFile->flags & t5::IMG_FLAG_CUBEMAP) != 0) ? 6 : 1;
 
 	memset(to, 0, sizeof(PBYTE) * faceCount);
 	for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
