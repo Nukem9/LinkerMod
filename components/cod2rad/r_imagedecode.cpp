@@ -268,7 +268,7 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 	}
 
 #if IMAGE_DUMP
-	SaveBitmap(path, (char*)image->pixels, image->width, image->height, 4);
+	SaveBitmap(path, (BYTE*)image->pixels, image->width, image->height, 4);
 #endif
 	FS_FreeFile(header);
 }
