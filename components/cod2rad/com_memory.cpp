@@ -19,6 +19,11 @@ STATIC_ASSERT_SIZE(hunkUsed_t, 8);
 VANILLA_VALUE(s_hunkData, char*, 0x174EFFC0);
 VANILLA_VALUE(hunk_low, hunkUsed_t, 0x1748F158);
 
+namespace vanilla
+{
+	auto free = (void(__cdecl*)(void*lpMem))0x00402FD7;
+}
+
 void* FS_AllocMem(size_t size)
 {
 	if (size % 4096)
@@ -34,12 +39,14 @@ void* _Hunk_AllocTempMemoryInternal(size_t _size)
 {
 	static DWORD dwFunc = 0x004219A0;
 
+	void* result = NULL;
 	_asm
 	{
 		mov eax, _size
 		call dwFunc
-		retn
+		mov result, eax
 	}
+	return result;
 }
 
 void _Hunk_FreeTempMemory(void *buf)
@@ -56,6 +63,6 @@ void _Hunk_FreeTempMemory(void *buf)
 	}
 	else
 	{
-		free(buf);
+		vanilla::free(buf);
 	}
 }
