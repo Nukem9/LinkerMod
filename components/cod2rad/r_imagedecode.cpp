@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "r_image_wavelet.h"
 
+#define IMAGE_DUMP	0
+#define IMAGE_LOG	0
+
 union ddscolor_t
 {
 	struct
@@ -198,9 +201,10 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 
 	t4::GfxImageFileHeader dummyHeader(*header);
 
-	// For Debugging
+#if IMAGE_DUMP || IMAGE_LOG
 	sprintf_s(path, "dump/%s.bmp", imageName);
 	Com_Printf("Loading image %dx%d (%d fmt)  %s\n", width, height, header->format, path);
+#endif
 
 	switch (header->format)
 	{
@@ -263,6 +267,9 @@ void __cdecl Image_GetRawPixels(GfxRawImage *image, const char *imageName)
 		break;
 	}
 
+#if IMAGE_DUMP
+	SaveBitmap(path, (char*)image->pixels, image->width, image->height, 4);
+#endif
 	FS_FreeFile(header);
 }
 
