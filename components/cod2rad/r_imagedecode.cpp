@@ -500,22 +500,25 @@ void __cdecl Image_DecompressDxt5(DdsBlock_Dxt5_t *data, GfxRawImage *image, int
 	alpha[0] = data->alpha0;
 	alpha[1] = data->alpha1;
 
+	int alpha0 = (BYTE)data->alpha0;
+	int alpha1 = (BYTE)data->alpha1;
+
 	// Calculate the remaining alpha values
 	if (alpha[0] > alpha[1])
 	{
-		alpha[2] = (BYTE)((6 * (float)alpha[0] + 1 * (float)alpha[1]) / 7.0f);
-		alpha[3] = (BYTE)((5 * (float)alpha[0] + 2 * (float)alpha[1]) / 7.0f);
-		alpha[4] = (BYTE)((4 * (float)alpha[0] + 3 * (float)alpha[1]) / 7.0f);
-		alpha[5] = (BYTE)((3 * (float)alpha[0] + 4 * (float)alpha[1]) / 7.0f);
-		alpha[6] = (BYTE)((2 * (float)alpha[0] + 5 * (float)alpha[1]) / 7.0f);
-		alpha[7] = (BYTE)((1 * (float)alpha[0] + 6 * (float)alpha[1]) / 7.0f);
+		alpha[2] = (BYTE)((6 * alpha0 + 1 * alpha1) / 7);
+		alpha[3] = (BYTE)((5 * alpha0 + 2 * alpha1) / 7);
+		alpha[4] = (BYTE)((4 * alpha0 + 3 * alpha1) / 7);
+		alpha[5] = (BYTE)((3 * alpha0 + 4 * alpha1) / 7);
+		alpha[6] = (BYTE)((2 * alpha0 + 5 * alpha1) / 7);
+		alpha[7] = (BYTE)((1 * alpha0 + 6 * alpha1) / 7);
 	}
 	else
 	{
-		alpha[2] = (BYTE)((4 * (float)alpha[0] + 1 * (float)alpha[1]) / 5.0f);
-		alpha[3] = (BYTE)((3 * (float)alpha[0] + 2 * (float)alpha[1]) / 5.0f);
-		alpha[4] = (BYTE)((2 * (float)alpha[0] + 3 * (float)alpha[1]) / 5.0f);
-		alpha[5] = (BYTE)((1 * (float)alpha[0] + 4 * (float)alpha[1]) / 5.0f);
+		alpha[2] = (BYTE)((4 * alpha0 + 1 * alpha1) / 5);
+		alpha[3] = (BYTE)((3 * alpha0 + 2 * alpha1) / 5);
+		alpha[4] = (BYTE)((2 * alpha0 + 3 * alpha1) / 5);
+		alpha[5] = (BYTE)((1 * alpha0 + 4 * alpha1) / 5);
 		alpha[6] = 0;
 		alpha[7] = 255;
 	}
@@ -527,7 +530,7 @@ void __cdecl Image_DecompressDxt5(DdsBlock_Dxt5_t *data, GfxRawImage *image, int
 		int value = 0;
 		// Load 3 bytes into 'value'
 		for (int j = 0; j < 3; j++)
-			value |= (data->alpha[i * 3 + j] << 8 * j);
+			value |= ((BYTE)data->alpha[i * 3 + j] << 8 * j);
 
 		// Unpack 8 3-bit indices from the loaded bytes
 		for (int j = 0; j < 8; j++)
