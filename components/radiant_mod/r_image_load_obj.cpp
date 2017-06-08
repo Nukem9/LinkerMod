@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "r_image_wavelet.h"
 
 SRCLINE(103)
 char Image_GetPcStreamedMips(GfxImageFileHeader *fileHeader)
@@ -219,29 +220,21 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 	case 5:
 		Image_LoadBitmap(image, fileHeader, srcData, D3DFMT_A8, 1, allocFlags);
 		break;
-		// 	case 6:
-		// 		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_A8R8G8B8, 4, allocFlags);
-		// 		break;
-		// 	case 7:
-		// 		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_X8R8G8B8, 3, allocFlags);
-		// 		break;
-		// 	case 8:
-		// 		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_A8L8, 2, allocFlags);
-		// 		break;
-		// 	case 9:
-		// 		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_L8, 1, allocFlags);
-		// 		break;
-		// 	case 10:
-		// 		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_A8, 1, allocFlags);
-		// 		break;
 	case 6:
-	case 7:
-	case 8:
-	case 9:
-	case 10:
-		Image_LoadDxtc(image, fileHeader, srcData, D3DFMT_DXT1, 8, allocFlags);
+		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_A8R8G8B8, 4, allocFlags);
 		break;
-
+	case 7:
+		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_X8R8G8B8, 3, allocFlags);
+		break;
+	case 8:
+		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_A8L8, 2, allocFlags);
+		break;
+	case 9:
+		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_L8, 1, allocFlags);
+		break;
+	case 10:
+		Image_LoadWavelet(image, fileHeader, srcData, D3DFMT_A8, 1, allocFlags);
+		break;
 	case 11:
 		Image_LoadDxtc(image, fileHeader, srcData, D3DFMT_DXT1, 8, allocFlags);
 		break;
