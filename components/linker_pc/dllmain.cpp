@@ -1,5 +1,6 @@
 #define G_VERSION 1, 0, 0
 #include "stdafx.h"
+#include "r_material_load_obj.h"
 
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 {
@@ -62,6 +63,13 @@ BOOL LinkerMod_Init()
 	// Prevent dropping pathnodes if a custom ents file is loaded
 	//
 	Detours::X86::DetourFunction((PBYTE)0x00420493, (PBYTE)&mfh_MapEnts_ParseEntities);
+
+#if FIND_STATEMAPS
+	//
+	// Custom material loading code for bruteforcing statemaps for missing techniques
+	//
+	Detours::X86::DetourFunction((PBYTE)0x004853C0, (PBYTE)&Material_LoadRaw);
+#endif
 
 	g_initted = TRUE;
 	return TRUE;
