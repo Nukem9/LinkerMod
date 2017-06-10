@@ -5,6 +5,8 @@
 struct GfxImage;
 struct water_t;
 
+struct MaterialStateMap;
+
 struct MaterialTechniqueSet
 {
 	const char *name;
@@ -39,7 +41,10 @@ struct MaterialConstantDef
 	float _literal[4];
 };
 
-struct GfxStateBits;
+struct GfxStateBits
+{
+	unsigned int loadBits[2];
+};
 
 struct GfxDrawSurfFields
 {
@@ -147,6 +152,12 @@ struct MaterialRaw
 	unsigned int constantTableOffset;
 };
 
+typedef bool(__cdecl* Material_HashStateMap_t)(const char *name, unsigned int *foundHashIndex);
+static Material_HashStateMap_t Material_HashStateMap = (Material_HashStateMap_t)0x0047ECB0;
+
+typedef MaterialStateMap *(__cdecl* Material_LoadStateMap_t)(const char *name);
+static Material_LoadStateMap_t Material_LoadStateMap = (Material_LoadStateMap_t)0x0047F870;
+
 typedef unsigned int (__cdecl* R_HashString_t)(const char *string);
 static R_HashString_t R_HashString = (R_HashString_t)0x0048D200;
 
@@ -167,5 +178,7 @@ static Material_BuildStateBitsTable_t Material_BuildStateBitsTable = (Material_B
 
 typedef char (__cdecl* MaterialTexture_IsMatureContent_t)(const char texSemantic, const char *texImageName);
 static MaterialTexture_IsMatureContent_t MaterialTexture_IsMatureContent = (MaterialTexture_IsMatureContent_t)0x00483DF0;
+
+void hk_Material_RegisterStateMap(void);
 
 Material *__cdecl Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType);

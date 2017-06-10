@@ -1,5 +1,7 @@
 #pragma once
 
+struct HunkUser;
+
 typedef void *(__cdecl * Z_Malloc_t)(int size);
 static Z_Malloc_t Z_Malloc = (Z_Malloc_t)0x4C5B20;
 
@@ -20,3 +22,6 @@ static Hunk_CheckTempMemoryHighClear_t Hunk_CheckTempMemoryHighClear = (Hunk_Che
 
 typedef void (__cdecl * Hunk_FreeTempMemory_t)(void *buf);
 static Hunk_FreeTempMemory_t Hunk_FreeTempMemory = (Hunk_FreeTempMemory_t)0x4C5F90;
+
+typedef void (__cdecl* Hunk_UserDestroy_t)(HunkUser *user);
+static Hunk_UserDestroy_t Hunk_UserDestroy = (Hunk_UserDestroy_t)0x004D37A0;

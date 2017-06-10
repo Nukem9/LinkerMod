@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include "r_material_load_obj.h"
 
+#define FIND_STATEMAPS 1
+
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 {
 	printf("\n\nEXCEPTION DETECTED:\n");
@@ -69,6 +71,8 @@ BOOL LinkerMod_Init()
 	// Custom material loading code for bruteforcing statemaps for missing techniques
 	//
 	Detours::X86::DetourFunction((PBYTE)0x004853C0, (PBYTE)&Material_LoadRaw);
+
+	PatchCall(0x0047FA0E, (PBYTE)&hk_Material_RegisterStateMap);
 #endif
 
 	g_initted = TRUE;

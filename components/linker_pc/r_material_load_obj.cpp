@@ -45,7 +45,9 @@ struct MaterialTypeInfo
 	unsigned int prefixLen;
 };
 
-MaterialTypeInfo* g_materialTypeInfo = (MaterialTypeInfo*)0x005717DC;
+static MaterialTypeInfo* g_materialTypeInfo = (MaterialTypeInfo*)0x005717DC;
+static MaterialStateMap** smHashTable = (MaterialStateMap**)0x011685F0;
+
 
 water_t * Material_RegisterWaterImage(struct MaterialWaterDef *water)
 {
@@ -85,6 +87,53 @@ bool Material_FinishLoadingInstance(MaterialRaw *mtlRaw, const char *techniqueSe
 	}
 	
 	return result;
+}
+
+MaterialStateMap *Material_FindStateMap(const char *name)
+{
+	unsigned int hashIndex;
+
+	if (Material_HashStateMap(name, &hashIndex))
+		return smHashTable[hashIndex];
+	
+	return NULL;
+}
+
+void Material_SetStateMap(const char *name, MaterialStateMap *stateMap)
+{
+	unsigned int hashIndex;
+	Material_HashStateMap(name, &hashIndex);
+	smHashTable[hashIndex] = stateMap;
+}
+
+MaterialStateMap *__cdecl Material_RegisterStateMap(const char *name)
+{
+
+	MaterialStateMap *stateMap = Material_FindStateMap(name);
+	if (stateMap)
+	{
+		return stateMap;
+	}
+	
+	stateMap = Material_LoadStateMap(name);
+	if (stateMap)
+	{
+		Material_SetStateMap(name, stateMap);
+		return stateMap;
+	}
+	
+	return NULL;
+}
+
+void __declspec(naked) hk_Material_RegisterStateMap(void)
+{
+	_asm
+	{
+		push edi // name
+		call Material_RegisterStateMap
+		add esp, 4
+		retn
+	}
 }
 
 unsigned int __cdecl Material_GetTechniqueSetDrawRegion(MaterialTechniqueSet *techniqueSet)
