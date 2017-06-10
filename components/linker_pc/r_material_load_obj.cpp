@@ -45,7 +45,7 @@ struct MaterialTypeInfo
 	unsigned int prefixLen;
 };
 
-MaterialTypeInfo* g_materialTypeInfo = (MaterialTypeInfo*)0x005717E0;
+MaterialTypeInfo* g_materialTypeInfo = (MaterialTypeInfo*)0x005717DC;
 
 water_t * Material_RegisterWaterImage(struct MaterialWaterDef *water)
 {
@@ -65,7 +65,7 @@ water_t * Material_RegisterWaterImage(struct MaterialWaterDef *water)
 	return result;
 }
 
-bool __cdecl Material_FinishLoadingInstance(MaterialRaw *mtlRaw, const char *techniqueSetVertDeclPrefix, MaterialTechniqueSet **techniqueSet, unsigned int materialType)
+bool Material_FinishLoadingInstance(MaterialRaw *mtlRaw, const char *techniqueSetVertDeclPrefix, MaterialTechniqueSet **techniqueSet, unsigned int materialType)
 {
 	static DWORD dwCall = 0x00484C70;
 
