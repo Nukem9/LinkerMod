@@ -108,6 +108,38 @@ void Material_SetStateMap(const char *name, MaterialStateMap *stateMap)
 
 MaterialStateMap *__cdecl Material_RegisterStateMap(const char *name)
 {
+#if STATEMAP_PRECACHE_ALL
+	static bool needToCache = true;
+	if (needToCache)
+	{
+		needToCache = false;
+
+		int fileCount = 0;
+		const char** files = FS_ListFiles("statemaps", "sm", FS_LIST_ALL, &fileCount, 11);
+		
+		if (fileCount == 0)
+			Com_Error(DEFAULT, "ERROR: Unable to cache statemaps - no statemaps found!");
+
+		Com_Printf(VERBOSE, "Attempting to cache %d statemaps...\n", fileCount);
+
+		int successCount = 0;
+		for (int i = 0; i < fileCount; i++)
+		{
+			int len = strlen(files[i]);
+			char* str = (char*)files[i];
+			str[len - 3] = '\0';
+			if (Material_RegisterStateMap(str))
+				successCount++;
+			else
+				Com_PrintError(DEFAULT, "^3WARNING: Unable to cache statemap '%s'\n", str);
+		}
+
+		FS_FreeFileList(files, 0);
+
+		Com_Printf(VERBOSE, "Cached %d of %d statemaps\n", successCount, fileCount);
+	}
+#endif
+
 
 	MaterialStateMap *stateMap = Material_FindStateMap(name);
 	if (stateMap)
