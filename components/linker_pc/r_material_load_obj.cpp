@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "r_material_load_obj.h"
 
+#include <unordered_map>
+
+std::vector<MaterialStateMap*> g_stateMapCache;
+
 enum
 {
 	SAMPLER_FILTER_SHIFT = 0x0,
@@ -43,6 +47,29 @@ struct MaterialTypeInfo
 	const char *prefix;
 	const char *techniqueSetPrefix;
 	unsigned int prefixLen;
+};
+
+struct MaterialMetaStateMap : public MaterialStateMap
+{
+	MaterialMetaStateMap(const char* _name)
+	{
+		name = _strdup(_name);
+		for (int i = 0; i < 10; i++)
+		{
+			ruleSet[i] = new MaterialStateMapRuleSet;
+			memset(ruleSet[i], 0, sizeof(MaterialStateMapRuleSet));
+			ruleSet[i]->ruleCount = 1;
+		}
+	}
+
+	~MaterialMetaStateMap(void)
+	{
+		free((void*)name);
+		for (int i = 0; i < 10; i++)
+		{
+			delete ruleSet[i];
+		}
+	}
 };
 
 static MaterialTypeInfo* g_materialTypeInfo = (MaterialTypeInfo*)0x005717DC;
@@ -128,8 +155,12 @@ MaterialStateMap *__cdecl Material_RegisterStateMap(const char *name)
 			int len = strlen(files[i]);
 			char* str = (char*)files[i];
 			str[len - 3] = '\0';
-			if (Material_RegisterStateMap(str))
+			MaterialStateMap* sm = Material_RegisterStateMap(str);
+			if (sm)
+			{
+				g_stateMapCache.push_back(sm);
 				successCount++;
+			}
 			else
 				Com_PrintError(DEFAULT, "^3WARNING: Unable to cache statemap '%s'\n", str);
 		}
@@ -140,6 +171,13 @@ MaterialStateMap *__cdecl Material_RegisterStateMap(const char *name)
 	}
 #endif
 
+#if TECHNIQUE_FIND_STATEMAPS
+	// Pass a dummy meta-statemap to be handled by Material_LoadRaw
+	if (*name == '<')
+	{
+		return (MaterialStateMap*)new MaterialMetaStateMap(name);
+	}
+#endif
 
 	MaterialStateMap *stateMap = Material_FindStateMap(name);
 	if (stateMap)
@@ -153,7 +191,7 @@ MaterialStateMap *__cdecl Material_RegisterStateMap(const char *name)
 		Material_SetStateMap(name, stateMap);
 		return stateMap;
 	}
-	
+
 	return NULL;
 }
 
@@ -189,6 +227,155 @@ void Material_SetMaterialDrawRegion(Material *material)
 	if (!cameraRegion && material->info.sortKey >= 24)
 		cameraRegion = 1;
 	material->cameraRegion = (char)cameraRegion;
+}
+
+//bool Material_BuildStateBitsForTarget(Material* material)
+//{
+//
+//}
+class GfxStateBitsTargetData
+{
+private:
+	int techType;
+	Material* material;
+
+	GfxStateBits targetBits;
+
+	// The index of the current statemap we're using in g_stateMapCache
+	int stateMapIndex;
+
+public:
+	GfxStateBitsTargetData(Material* mtl, int techniqueType, GfxStateBits& targetStateBits)
+	{
+		this->material = mtl;
+		this->techType = techniqueType;
+		this->targetBits = targetStateBits;
+
+		stateMapIndex = -1;
+	}
+
+	GfxStateBits StateBits(void) const
+	{
+		int entry = material->stateBitsEntry[techType];
+		return material->stateBitsTable[entry];
+	}
+
+	GfxStateBits TargetBits(void) const
+	{
+		return targetBits;
+	}
+
+	MaterialTechnique* Technique(void) const
+	{
+		if (!material->techniqueSet)
+			return NULL;
+
+		return material->techniqueSet->techniques[techType];
+	}
+
+	MaterialStateMap** StateMap(void) const
+	{
+		if (!material->techniqueSet)
+			return NULL;
+
+		MaterialTechnique* tech = this->Technique();
+		return (MaterialStateMap**)&tech->passArray[tech->passCount];
+	}
+
+	bool IsValid(void)
+	{
+		int entry = material->stateBitsEntry[techType];
+		GfxStateBits& stateBits = material->stateBitsTable[entry];
+
+		if (stateBits.loadBits[0] == targetBits.loadBits[0] &&
+			stateBits.loadBits[1] == targetBits.loadBits[1])
+			return true;
+
+		return false;
+	}
+
+	bool TryNextStateMap(void)
+	{
+		// We should really do some sort of cleanup - but we need to be careful
+		// because other techniques might? use the same statemap pointer...
+		if (stateMapIndex == -1)
+		{
+			delete (MaterialMetaStateMap*)*this->StateMap();
+		}
+	
+		stateMapIndex++;
+	
+		if ((unsigned int)stateMapIndex >= g_stateMapCache.size())
+			return false;
+	
+		*this->StateMap() = g_stateMapCache[stateMapIndex];
+		return true;
+	}
+};
+
+void Material_BuildStateBits_Regen(Material* material, MaterialRaw* mtlRaw)
+{
+	Material_BuildStateBitsTable(material, mtlRaw->info.toolFlags, mtlRaw->refStateBits);
+
+	std::vector<GfxStateBitsTargetData> targets;
+	for (int techType = 0; techType < 130; techType++)
+	{
+		if (material->techniqueSet->techniques[techType] == NULL)
+			continue;
+
+		MaterialTechnique* tech = material->techniqueSet->techniques[techType];
+		MaterialStateMap ** stateMapTable = (MaterialStateMap **)&tech->passArray[tech->passCount];
+
+		if (*stateMapTable[0]->name != '<')
+			continue;
+
+		// Extract the target statebit values from the string
+		GfxStateBits targetBits;
+#pragma warning( push )
+#pragma warning( disable : 4996 )
+		sscanf(stateMapTable[0]->name, "%*c%i%*c%i%*c", &targetBits.loadBits[0], &targetBits.loadBits[1]);
+#pragma warning( pop )  
+
+		unsigned int entry = material->stateBitsEntry[techType];
+		GfxStateBits* stateBits = material->stateBitsTable;
+
+		GfxStateBitsTargetData targetData(material, techType, targetBits);
+
+		if (targetData.IsValid())
+			continue;
+
+		// Statbits mismatch - add to the vector
+		targets.push_back(targetData);
+	}
+
+	// Try a different statemap for each technique with mismatched bits
+	// Once we find one with a valid match we print it and remove it from list
+	while (targets.size() != 0)
+	{
+		for (unsigned int i = 0; i < targets.size(); i++)
+		{
+			if (!targets[i].TryNextStateMap())
+			{
+				Com_PrintError(0, "Unable to resolve statemap for technique '%s'", targets[i].Technique()->name);
+				targets.erase(targets.begin() + i--);
+			}
+		}
+
+		Material_BuildStateBitsTable(material, mtlRaw->info.toolFlags, mtlRaw->refStateBits);
+
+		for (unsigned int i = 0; i < targets.size(); i++)
+		{
+			if (targets[i].IsValid())
+			{
+				Com_Printf(0, "^5Tech: '%s': StateMap: '%s'!\n", targets[i].Technique()->name, targets[i].StateMap()[0]->name);
+
+				//printf("TARGET: 0x%X, 0x%X\n", targets[i].TargetBits().loadBits[0], targets[i].TargetBits().loadBits[1]);
+				//printf("CURRENT: 0x%X, 0x%X\n", targets[i].StateBits().loadBits[0], targets[i].StateBits().loadBits[1]);
+
+				targets.erase(targets.begin() + i--);
+			}
+		}
+	}
 }
 
 Material *__cdecl Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialType)
@@ -282,7 +469,10 @@ Material *__cdecl Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialTyp
 				char* constName = (char *)mtlRaw + constantTableRaw[constIndex].nameOffset;
 				material->localConstantTable[constIndex].nameHash = R_HashString(constName);
 
-				strcpy_s(material->localConstantTable[constIndex].name, 12, constName);
+#pragma warning( push )
+#pragma warning( disable : 4996 )
+				strncpy(material->localConstantTable[constIndex].name, constName, 12);
+#pragma warning( pop )  
 
 				float* _literal = material->localConstantTable[constIndex]._literal;
 				float* literal_raw = constantTableRaw[constIndex].literal;
@@ -294,6 +484,13 @@ Material *__cdecl Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialTyp
 		}
 
 		Material_BuildStateBitsTable(material, mtlRaw->info.toolFlags, mtlRaw->refStateBits);
+		
+#if TECHNIQUE_FIND_STATEMAPS
+		Material_BuildStateBits_Regen(material, mtlRaw);
+#else
+		Material_BuildStateBitsTable(material, mtlRaw->info.toolFlags, mtlRaw->refStateBits);
+#endif
+		
 		Material_SetMaterialDrawRegion(material);
 
 		if (Material_Validate(material))
@@ -316,6 +513,16 @@ Material *__cdecl Material_LoadRaw(MaterialRaw *mtlRaw, unsigned int materialTyp
 			if (mtlRaw->info.surfaceFlags & 0x800)
 				material->info.gameFlags |= 0x200u;
 			
+#if MATERIAL_LOG_STATEBITS
+			printf("Material: %s\n\tStateBits (%d):\n", material->info.name, material->stateBitsCount);
+			for (unsigned int i = 0; i < (BYTE)material->stateBitsCount; i++)
+			{
+				unsigned int entry = material->stateBitsEntry[i];
+				GfxStateBits* stateBits = material->stateBitsTable;
+				printf("\t[%3d]: 0x%08X 0x%08X\n", stateBits[entry].loadBits[0], stateBits[entry].loadBits[1]);
+			}
+#endif
+
 			return material;
 		}
 		

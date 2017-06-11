@@ -5,7 +5,25 @@
 struct GfxImage;
 struct water_t;
 
-struct MaterialStateMap;
+struct MaterialStateMapRule
+{
+	unsigned int stateBitsMask[2];
+	unsigned int stateBitsValue[2];
+	unsigned int stateBitsSet[2];
+	unsigned int stateBitsClear[2];
+};
+
+struct MaterialStateMapRuleSet
+{
+	int ruleCount;
+	MaterialStateMapRule rules[1];
+};
+
+struct MaterialStateMap
+{
+	const char *name;
+	MaterialStateMapRuleSet *ruleSet[10];
+};
 
 struct MaterialTechniqueSet
 {
@@ -152,6 +170,95 @@ struct MaterialRaw
 	unsigned int constantTableOffset;
 };
 
+struct GfxVertexShaderLoadDef
+{
+	unsigned int *program;
+	unsigned __int16 programSize;
+};
+
+struct MaterialVertexShaderProgram
+{
+	void *vs;
+	GfxVertexShaderLoadDef loadDef;
+};
+
+struct MaterialVertexShader
+{
+	const char *name;
+	MaterialVertexShaderProgram prog;
+};
+
+struct GfxPixelShaderLoadDef
+{
+	unsigned int *program;
+	unsigned __int16 programSize;
+};
+
+struct MaterialPixelShaderProgram
+{
+	void *ps;
+	GfxPixelShaderLoadDef loadDef;
+};
+
+struct MaterialPixelShader
+{
+	const char *name;
+	MaterialPixelShaderProgram prog;
+};
+
+struct MaterialArgumentCodeConst
+{
+	unsigned __int16 index;
+	char firstRow;
+	char rowCount;
+};
+
+union MaterialArgumentDef
+{
+	const float *literalConst;
+	MaterialArgumentCodeConst codeConst;
+	unsigned int codeSampler;
+	unsigned int nameHash;
+};
+
+struct MaterialShaderArgument
+{
+	unsigned __int16 type;
+	unsigned __int16 dest;
+	MaterialArgumentDef u;
+};
+
+struct MaterialPass
+{
+	struct MaterialVertexDeclaration *vertexDecl;
+	MaterialVertexShader *vertexShader;
+
+	union
+	{
+		MaterialPixelShader *pixelShader;
+		MaterialPixelShader *localPixelShader;
+	};
+
+	char perPrimArgCount;
+	char perObjArgCount;
+	char stableArgCount;
+	char customSamplerFlags;
+
+	union
+	{
+		MaterialShaderArgument *localArgs;
+		MaterialShaderArgument *args;
+	};
+};
+
+struct MaterialTechnique
+{
+	const char *name;
+	unsigned __int16 flags;
+	unsigned __int16 passCount;
+	MaterialPass passArray[1];
+};
+
 typedef bool(__cdecl* Material_HashStateMap_t)(const char *name, unsigned int *foundHashIndex);
 static Material_HashStateMap_t Material_HashStateMap = (Material_HashStateMap_t)0x0047ECB0;
 
@@ -164,7 +271,7 @@ static R_HashString_t R_HashString = (R_HashString_t)0x0048D200;
 typedef GfxImage *(__cdecl* Image_Register_t)(const char *imageName, char semantic);
 static Image_Register_t Image_Register = (Image_Register_t)0x0041B4E0;
 
-typedef Material* (__cdecl* Material_Alloc_t)(unsigned int size);
+typedef void* (__cdecl* Material_Alloc_t)(unsigned int size);
 static Material_Alloc_t Material_Alloc = (Material_Alloc_t)0x004072F0;
 
 typedef bool (__cdecl* Material_Validate_t)(Material *material);
