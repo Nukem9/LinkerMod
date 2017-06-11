@@ -85,7 +85,7 @@ void __cdecl R_MaterialList_f()
 MaterialTechniqueSet *__cdecl Material_GetTechniqueSet(Material *material)
 {
 	ASSERT(material);
-	ASSERT_MSG(material->localTechniqueSet, va("material '%s' missing techset. If you are building fastfile, check Launcher for error messages.", material->info.name));
+	ASSERT_MSG_VA(material->localTechniqueSet, "material '%s' missing techset. If you are building fastfile, check Launcher for error messages.", material->info.name);
 
 	return material->localTechniqueSet;
 }
@@ -93,7 +93,7 @@ MaterialTechniqueSet *__cdecl Material_GetTechniqueSet(Material *material)
 MaterialTechnique *__cdecl Material_GetTechnique(Material *material, char techType)
 {
 	MaterialTechniqueSet* techSet = techSet = Material_GetTechniqueSet(material);
-	ASSERT_MSG(techSet, va("material '%s' missing techset. %d tech %d", material->info.name, material->localTechniqueSet != 0, techType));
+	ASSERT_MSG_VA(techSet, "material '%s' missing techset. %d tech %d", material->info.name, material->localTechniqueSet != 0, techType);
 
 	return techSet->techniques[techType];
 }

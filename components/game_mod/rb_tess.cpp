@@ -57,7 +57,7 @@ void __cdecl RB_ShowTess(GfxCmdBufContext context, const float *center, const ch
 		infoIdString = "M";
 		break;
 	default:
-		ASSERT_MSG(0, va("Unknown value for r_showTess: %i", r_showTess));
+		ASSERT_MSG_VA(0, "Unknown value for r_showTess: %i", r_showTess);
 		infoString = "?";
 		infoIdString = "?";
 		break;
