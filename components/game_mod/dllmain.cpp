@@ -72,6 +72,7 @@ BOOL GameMod_Init()
 	PatchMemory(0x006CA53A, (PBYTE)&flags, 4); // r_lodScaleSkinned
 	PatchMemory(0x006CA568, (PBYTE)&flags, 4); // r_lodBiasSkinned
 	PatchMemory(0x006CBE29, (PBYTE)&flags, 4); // r_enablePlayerShadow
+	PatchMemory(0x004A6CF1, (PBYTE)&flags, 4); // ai_water_trails
 
 	//
 	// Stop vanilla scripts from resetting the user's fov
