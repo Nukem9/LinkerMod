@@ -379,10 +379,13 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00674C20, (PBYTE)&nullsub);
 	
 	//
-	// Fix for misleading (incorrect) assertion message
+	// Fix for misleading (incorrect) assertion / error message
 	//
-	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
-	PatchMemory(0x00700492, (PBYTE)&msg_assertion, 4);
+	const char* msg = "expected 'constant' or 'material', found '%s' instead\n";
+	PatchMemory(0x00700492, (PBYTE)&msg, 4);
+
+	msg = "You can only call SetBlur on players.";
+	PatchMemory(0x00896DBC, (PBYTE)&msg, 4);
 
 	//
 	// Add error handler to prevent missing physpreset segfault
