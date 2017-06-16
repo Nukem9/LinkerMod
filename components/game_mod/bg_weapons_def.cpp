@@ -215,6 +215,35 @@ void BG_SetupWeaponIndex(unsigned int weapIndex)
 {
 	Com_DPrintf(0, "[Idx %04d] Setting up weapon %s...\n", weapIndex, bg_weaponVariantDefs[weapIndex]->szInternalName);
 
+	// Override the default grenade limit (See PERK_STOCKPILE)
+	WeaponVariantDef *variant = BG_GetWeaponVariantDef(weapIndex);
+
+	if (variant->weapDef->weapType == WEAPTYPE_GRENADE)
+	{
+		auto& usedDefs = bg_CheckedVariantDefs;
+
+		// Make sure we've never used this variant before
+		if (std::find(usedDefs.begin(), usedDefs.end(), variant) == usedDefs.end())
+		{
+			usedDefs.push_back(variant);
+
+			// Some weapons (perk bottle/xbow/syrette) are classified as grenades, but they
+			// dont't have a valid clip size
+			if (variant->iClipSize == 3 ||
+				variant->iClipSize == 4)
+			{
+				variant->weapDef->iStartAmmo += 1;
+				variant->weapDef->iMaxAmmo += 1;
+				variant->weapDef->iSharedAmmoCap += 1;
+				variant->iClipSize += 1;
+
+				bg_PatchedVariantDefs.push_back(variant);
+				bg_PatchedWeapDefs.push_back(variant->weapDef);
+			}
+		}
+	}
+
+	// Continue with normal setup
 	BG_SetUpAmmoForWeapon(weapIndex);
 	BG_FillInWeaponItems(weapIndex);
 }

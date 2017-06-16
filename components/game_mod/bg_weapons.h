@@ -130,9 +130,6 @@ void PM_Weapon_Jam(/*playerState_s *ps*/);
 WeaponVariantDef *BG_LoadWeaponVariantDef(const char *name);
 const char *BG_WeaponName(int weapon);
 
-extern void (* G_RegisterWeapon)(unsigned int weapIndex);
-void hk_G_RegisterWeapon(unsigned int weapIndex);
-
 // /bgame/bg_weapons.h:300
 static int BG_GetHeldWeaponSlot(playerState_s *ps, int weapon)
 {

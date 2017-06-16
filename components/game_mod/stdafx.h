@@ -37,6 +37,7 @@
 #include "bg_weapons_def.h"
 #include "bg_weapons_ammo.h"
 #include "bg_weapons_load_obj.h"
+#include "g_items.h"
 #include "sv_ccmds_mp.h"
 #include "cl_main_mp.h"
 #include "cl_console.h"

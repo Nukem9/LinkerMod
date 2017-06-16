@@ -492,6 +492,8 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00654BE0, (PBYTE)&BG_GetAmmoPlayerMax);
 	Detours::X86::DetourFunction((PBYTE)0x0041E480, (PBYTE)&BG_AddAmmoToClip);
 	Detours::X86::DetourFunction((PBYTE)0x006339E0, (PBYTE)&G_RegisterWeapon);
+	Detours::X86::DetourFunction((PBYTE)0x004B2F90, (PBYTE)&IsItemRegistered);
+	Detours::X86::DetourFunction((PBYTE)0x004B5030, (PBYTE)&ClearRegisteredItems);
 	Detours::X86::DetourFunction((PBYTE)0x00517950, (PBYTE)(unsigned int(*)(const char*, void(*)(unsigned int)))BG_GetWeaponIndexForName);
 	Detours::X86::DetourFunction((PBYTE)0x0063E060, (PBYTE)(unsigned int(*)(const char*))BG_GetWeaponIndexForName);
 	Detours::X86::DetourFunction((PBYTE)0x004A0570, (PBYTE)&BG_FindWeaponIndexForName);

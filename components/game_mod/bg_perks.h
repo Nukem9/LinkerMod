@@ -53,5 +53,12 @@ static void BG_ClearPerks(unsigned int *perks)
 	perks[0] = 0;
 }
 
+// /game/bg_perks.h:???
+static bool BG_WeaponHasPerk(WeaponDef *weapDef, unsigned int perkIndex)
+{
+	// This is only implemented in BO2
+	return false;
+}
+
 unsigned int BG_GetPerkIndexForName(const char *perkName);
 const char *BG_GetPerkNameForIndex(unsigned int perkIndex);

@@ -146,7 +146,7 @@ void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *st
 	Bullet_RandomDir(randSeed, &right, &up);
 
 	// BO2 weapon perk: bullet spread is horizontal only
-	if (Com_SessionMode_IsZombiesGame() && /* BG_WeaponHasPerk(wp->weapDef, 3) */ false)
+	if (Com_SessionMode_IsZombiesGame() && BG_WeaponHasPerk(nullptr, 3))
 	{
 		right = 0.0f;
 		up = 0.0f;
