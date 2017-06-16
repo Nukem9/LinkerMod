@@ -13,6 +13,7 @@
 // Shared files
 //
 #include "../shared/shared_utility.h"
+#include "../shared/shared_version.h"
 
 #include "PageGuard.h"
 #include "print.h"
@@ -47,5 +48,7 @@
 #else
 #pragma comment(lib, "../../build/Release/D3DBSP_Lib.lib")
 #endif
+
+#define VANILLA_VALUE(NAME, TYPE, ADDRESS) static TYPE& NAME = *(TYPE*)ADDRESS;
 
 using namespace D3DBSP_Lib;

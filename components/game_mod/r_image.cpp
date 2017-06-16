@@ -217,7 +217,7 @@ _D3DFORMAT __cdecl R_ImagePixelFormat(GfxImage *image)
 		image->texture.cubemap->GetLevelDesc(0, &surfaceDesc);
 		return surfaceDesc.Format;
 	default:
-		ASSERT_MSG(false, va("unhandled case %i for %s", image->mapType, image->name));
+		ASSERT_MSG_VA(false, "unhandled case %i for %s", image->mapType, image->name);
 		return D3DFMT_UNKNOWN;
 	}
 	
@@ -318,7 +318,7 @@ void __cdecl R_ImageList_f()
 				break;
 
 			default:
-				ASSERT_MSG(0, va("unhandled case: %d", format));
+				ASSERT_MSG_VA(0, "unhandled case: %d", format);
 		}
 
 		Com_Printf(8, "  %s", imageTypeName[image->track]);

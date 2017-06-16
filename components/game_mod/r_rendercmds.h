@@ -53,3 +53,9 @@ static FX_SetNextUpdateCamera_t* FX_SetNextUpdateCamera = (FX_SetNextUpdateCamer
 
 typedef void __cdecl FX_FillUpdateCmd_t(int localClientNum, FxCmd *cmd);
 static FX_FillUpdateCmd_t* FX_FillUpdateCmd = (FX_FillUpdateCmd_t*)0x005C8FB0;
+
+typedef void (__cdecl* R_AddCmdDrawText_t)(const char *text, int maxChars, Font_s *font, float x, float y, float xScale, float yScale, float rotation, const float *color, int style);
+static R_AddCmdDrawText_t R_AddCmdDrawText = (R_AddCmdDrawText_t)0x006D6460;
+
+typedef void(__cdecl* R_AddCmdProjectionSet2D_t)();
+static R_AddCmdProjectionSet2D_t R_AddCmdProjectionSet2D = (R_AddCmdProjectionSet2D_t)0x006D7D30;

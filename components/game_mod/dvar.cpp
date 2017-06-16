@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+dvar_s* gm_build_date = NULL;
+dvar_s* gm_version = NULL;
+
 dvar_s* r_d3d9ex = NULL;
 dvar_s* r_noborder = NULL;
 dvar_s* r_showTess = NULL;
@@ -9,7 +12,6 @@ dvar_s* con_inputMaxMatchesShown = NULL;
 dvar_s* cg_drawViewpos = NULL;
 dvar_s* scr_useFastFileOnly = NULL;
 dvar_s* scr_suppressErrors = NULL;
-dvar_s* gm_build_date = NULL;
 dvar_s* perk_weapRateEnhanced = NULL;
 
 dvar_s* radiant_live = NULL;
@@ -89,7 +91,8 @@ void __cdecl CG_RegisterDvars()
 	CG_RegisterDvars_o();
 
 	gm_build_date = Dvar_RegisterString("gm_build_date", __TIMESTAMP__, 0x10 | 0x8, "Compile time for game_mod");
-
+	gm_version = Dvar_RegisterString("gm_version", DLL_VersionString(), 0x10 | 0x8, "Game_Mod version");
+	
 	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 1, "Enable external console window");
 	con_inputMaxMatchesShown = Dvar_RegisterInt("con_inputMaxMatchesShown", 24, 1, 64, 1, "Maximum number of suggestions in the console autocomplete preview");
 	

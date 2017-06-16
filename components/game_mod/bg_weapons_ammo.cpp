@@ -239,7 +239,7 @@ void BG_AddAmmoToClip(playerState_s *ps, int clipIndex, int amount)
 	ASSERT(ps);
 
 	AmmoClip *clip = BG_AddAmmoClip(ps, clipIndex);
-	ASSERT_MSG(clip, va("Tried to add ammo for clipIndex %i but there are no free available clips", clipIndex));
+	ASSERT_MSG_VA(clip, "Tried to add ammo for clipIndex %i but there are no free available clips", clipIndex);
 
 	if ((amount + clip->count) <= 0)
 		clip->count = 0;

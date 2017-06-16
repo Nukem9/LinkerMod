@@ -118,6 +118,7 @@
     <ClCompile Include="g_items.cpp" />
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="patch_common.cpp" />
+    <ClCompile Include="patch_misc.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
     <ClCompile Include="patch_reflections.cpp" />
     <ClCompile Include="pathnode.cpp" />
@@ -206,10 +207,19 @@
     <ClInclude Include="sys_cmds.h" />
     <ClInclude Include="threads.h" />
     <ClInclude Include="ui_main_pc.h" />
+    <ClInclude Include="version.h" />
     <ClInclude Include="win_common.h" />
     <ClInclude Include="win_exception.h" />
     <ClInclude Include="win_localize.h" />
     <ClInclude Include="win_main.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\shared\jsoncpp\makefiles\msvc\lib_json.vcxproj">
+      <Project>{1e6c2c1c-6453-4129-ae3f-0ee8e6599c89}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\shared\semver\semver.vcxproj">
+      <Project>{5fb372dd-a7e1-4a4b-9a28-3ac02543e9e8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

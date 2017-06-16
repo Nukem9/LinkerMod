@@ -153,7 +153,7 @@ void Path_ValidateNode(pathnode_t *node)
 	for (; j >= 0; --j)
 	{
 		pathlink_s *link = &node->constant.Links[j];
-		ASSERT_MSG(!link->disconnectCount, va("%d, %d, %d", Path_ConvertNodeToIndex(node), j, link->nodeNum));
+		ASSERT_MSG_VA(!link->disconnectCount, "%d, %d, %d", Path_ConvertNodeToIndex(node), j, link->nodeNum);
 	}
 }
 

@@ -98,6 +98,7 @@
     <ClInclude Include="crc32.h" />
     <ClInclude Include="linker.h" />
     <ClInclude Include="pathnode_load_obj.h" />
+    <ClInclude Include="r_material_load_obj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />
   </ItemGroup>
@@ -117,10 +118,16 @@
     </ClCompile>
     <ClCompile Include="linker.cpp" />
     <ClCompile Include="pathnode_load_obj.cpp" />
+    <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\shared\semver\semver.vcxproj">
+      <Project>{5fb372dd-a7e1-4a4b-9a28-3ac02543e9e8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

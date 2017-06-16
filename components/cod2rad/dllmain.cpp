@@ -1,3 +1,4 @@
+#define G_VERSION 1, 3, 0
 #include "stdafx.h"
 
 static char* techsetPath = "pimp/techsets/%s%s.techset";
@@ -25,6 +26,14 @@ int __cdecl MaterialRedirect(char* dst, const char* fmt, const char* name)
 		return sprintf(dst, fmt, name);
 	else
 		return sprintf(dst, fmt, "blockout_test_asphalt");
+}
+#endif
+
+#if CUSTOM_RAND
+int getRandomNumber()
+{
+	return 4;	// chosen by fair dice roll.
+				// guaranteed to be random.
 }
 #endif
 
@@ -95,6 +104,7 @@ BOOL cod2rad_Init()
 	PatchMemory(0x00417AA7, (PBYTE)"\xEB", 1);
 	PatchMemory(0x00417B41, (PBYTE)"\x30", 1);
 	FS_FileOpen = (FS_FileOpen_t)Detours::X86::DetourFunction((PBYTE)0x004034E8, (PBYTE)&FS_ImageRedirect);
+	Detours::X86::DetourFunction((PBYTE)0x00417A50, (PBYTE)&hk_Image_GetRawPixels);
 
 	//
 	// Patch Xmodel loading functions to support Black Ops
@@ -127,6 +137,10 @@ BOOL cod2rad_Init()
 	
 #if MINIMAL_MATERIALS
 	PatchCall(0x0042CD4A, (PBYTE)&MaterialRedirect);
+#endif
+
+#if CUSTOM_RAND
+	Detours::X86::DetourFunction((PBYTE)0x004047C3, (PBYTE)&getRandomNumber);
 #endif
 
 	g_initted = true;

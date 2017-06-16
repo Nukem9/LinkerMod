@@ -137,15 +137,12 @@ VANILLA_DVAR(player_clipSizeMultiplier, 0x00BCAF84);
 VANILLA_DVAR(perk_weapRateMultiplier, 0x00BDF35C);
 VANILLA_DVAR(perk_weapReloadMultiplier, 0x00BDF358);
 VANILLA_DVAR(perk_weapSwitchMultiplier, 0x00BDF2C0);
+extern dvar_s* perk_weapRateEnhanced;
 
 VANILLA_DVAR(phys_gravity, 0x023D2FA8);
 
-VANILLA_DVAR(sys_configureGHz, 0x0276D9E0)
-VANILLA_DVAR(sys_sysMB, 0x0276DAEC);
-VANILLA_DVAR(sys_gpu, 0x0276D9E4);
-VANILLA_DVAR(sys_configSum, 0x0276F558);
-
-extern dvar_s* perk_weapRateEnhanced;
+extern dvar_s* gm_build_date;
+extern dvar_s* gm_version;
 
 extern dvar_s* r_d3d9ex;
 extern dvar_s* r_noborder;
@@ -156,8 +153,12 @@ extern dvar_s* con_inputMaxMatchesShown;
 extern dvar_s* cg_drawViewpos;
 extern dvar_s* scr_useFastFileOnly;
 extern dvar_s* scr_suppressErrors;
-extern dvar_s* gm_build_date;
 extern dvar_s* cg_showServerInfo;
+
+VANILLA_DVAR(sys_configureGHz, 0x0276D9E0)
+VANILLA_DVAR(sys_sysMB, 0x0276DAEC);
+VANILLA_DVAR(sys_gpu, 0x0276D9E4);
+VANILLA_DVAR(sys_configSum, 0x0276F558);
 
 extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;
@@ -173,6 +174,8 @@ extern dvar_s* r_renderSuperflare;
 extern dvar_s* r_renderSun;
 extern dvar_s* r_renderReflected;
 extern dvar_s* r_renderCloakHDR;
+
+VANILLA_DVAR(showVisionSetDebugInfo, 0x00C23D40);
 
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;
@@ -200,7 +203,7 @@ static Dvar_RegisterEnum_t* Dvar_RegisterEnum = (Dvar_RegisterEnum_t*)0x0051BD00
 
 void mfh_R_RegisterDvars();
 
-typedef void (__cdecl* CG_RegisterDvars_t)();
+typedef void(__cdecl* CG_RegisterDvars_t)();
 extern CG_RegisterDvars_t CG_RegisterDvars_o;
 
 void __cdecl CG_RegisterDvars();

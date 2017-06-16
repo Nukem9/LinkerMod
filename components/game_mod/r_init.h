@@ -22,3 +22,5 @@ LONG WINAPI hk_SetWindowLongA(HWND hWnd, int nIndex, LONG dwNewLong);
 
 void __cdecl R_RegisterCmds();
 void __cdecl R_UnregisterCmds();
+
+struct Font_s *__cdecl R_RegisterFont(const char *name, int imageTrack);

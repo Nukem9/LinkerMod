@@ -176,7 +176,7 @@ struct MaterialConstantDef
 {
 	unsigned int nameHash;
 	char name[12];
-	float literal[4];
+	float _literal[4];
 };
 
 union MaterialTextureDefInfo

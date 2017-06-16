@@ -16,6 +16,7 @@
 // Shared files
 //
 #include "../shared/shared_utility.h"
+#include "../shared/shared_version.h"
 
 #include "PageGuard.h"
 

@@ -1,4 +1,10 @@
+#define G_VERSION 1, 1, 0
 #include "stdafx.h"
+
+// Defined in patch_misc.cpp
+#if USE_MISC_PATCHES
+void PatchMisc();
+#endif
 
 BOOL GameMod_Init()
 {
@@ -66,6 +72,7 @@ BOOL GameMod_Init()
 	PatchMemory(0x006CA53A, (PBYTE)&flags, 4); // r_lodScaleSkinned
 	PatchMemory(0x006CA568, (PBYTE)&flags, 4); // r_lodBiasSkinned
 	PatchMemory(0x006CBE29, (PBYTE)&flags, 4); // r_enablePlayerShadow
+	PatchMemory(0x004A6CF1, (PBYTE)&flags, 4); // ai_water_trails
 
 	//
 	// Stop vanilla scripts from resetting the user's fov
@@ -95,6 +102,11 @@ BOOL GameMod_Init()
 	// Add CG_DrawFullScreenDebugOverlays
 	//
 	Detours::X86::DetourFunction((PBYTE)0x004075E8, (PBYTE)&mfh_CG_DrawFullScreenDebugOverlays);
+
+	//
+	// Add Support for DrawVisionSetDebug()
+	//
+	//Detours::X86::DetourFunction((PBYTE)0x0045EB1A, (PBYTE)&mfh_CG_VisionSetApplyToRefdef);
 
 	//
 	// Always force the cursor to be shown
@@ -242,7 +254,10 @@ BOOL GameMod_Init()
 	PatchMemory(0x00623A65, (PBYTE)&ptr, 4); // dirList
 	PatchMemory(0x00623A06, (PBYTE)&dirListLength, 4);
 
+	// This is superfluous since we hook FS_GetModList anyway
 	PatchCall(0x00455A34, (PBYTE)&FS_ReadModDescription);
+
+	Detours::X86::DetourFunction((PBYTE)0x00455920, (PBYTE)&FS_GetModList);
 
 	//
 	// Allow the OS to cache fastfiles when loading
@@ -364,10 +379,13 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00674C20, (PBYTE)&nullsub);
 	
 	//
-	// Fix for misleading (incorrect) assertion message
+	// Fix for misleading (incorrect) assertion / error message
 	//
-	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
-	PatchMemory(0x00700492, (PBYTE)&msg_assertion, 4);
+	const char* msg = "expected 'constant' or 'material', found '%s' instead\n";
+	PatchMemory(0x00700492, (PBYTE)&msg, 4);
+
+	msg = "You can only call SetBlur on players.";
+	PatchMemory(0x00896DBC, (PBYTE)&msg, 4);
 
 	//
 	// Add error handler to prevent missing physpreset segfault
@@ -517,6 +535,10 @@ BOOL GameMod_Init()
 	// Increase default sv_network_fps to 200
 	//
 	//PatchMemory(0x00698BFA, (PBYTE)"\xC8", 1);
+
+#if USE_MISC_PATCHES
+	PatchMisc();
+#endif
 
 	//
 	// Increase Asset Limits

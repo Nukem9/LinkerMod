@@ -1,10 +1,19 @@
 #pragma once
 
+enum ConChannel
+{
+	DEFAULT = 0,
+	VERBOSE = 2,
+};
+
 typedef void (__cdecl * Com_Printf_t)(int level, const char *fmt, ...);
-static Com_Printf_t Com_Printf = (Com_Printf_t)0x416B30;
+
+// level must be 2 for it to only print when -verbose is used
+static Com_Printf_t Com_Printf = (Com_Printf_t)0x00407300;
 
 typedef void (__cdecl * Com_Error_t)(int code, const char *fmt, ...);
 static Com_Error_t Com_Error = (Com_Error_t)0x416810;
+static Com_Printf_t Com_PrintError = (Com_Printf_t)0x416B30;
 
 typedef int (__cdecl * FS_FOpenFile_t)(const char *qpath, int *fileHandle);
 static FS_FOpenFile_t FS_FOpenFile = (FS_FOpenFile_t)0x4C9280;

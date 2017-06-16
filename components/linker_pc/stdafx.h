@@ -12,9 +12,12 @@
 // Shared files
 //
 #include "../shared/shared_utility.h"
+#include "../shared/shared_version.h"
 
 #include "linker.h"
 
 #include "T5.h"
 #include "crc32.h"
 #include "assertive.h"
+
+#define VANILLA_VALUE(NAME, TYPE, ADDRESS) static TYPE& NAME = *(TYPE*)ADDRESS;

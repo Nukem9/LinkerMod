@@ -57,7 +57,7 @@ const char *DB_GetXAssetHeaderName(XAssetType type, XAssetHeader *header)
 	ASSERT(header->data);
 
 	const char *name = DB_XAssetGetNameHandler[type](header);
-	ASSERT_MSG(name, va("Name not found for asset type %s\n", DB_GetXAssetTypeName(type)));
+	ASSERT_MSG_VA(name, "Name not found for asset type %s\n", DB_GetXAssetTypeName(type));
 
 	return name;
 }
