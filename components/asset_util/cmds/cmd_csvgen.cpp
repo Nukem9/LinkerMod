@@ -357,7 +357,7 @@ void AST_GenCSV_Character(Symbol* AST, const char* rawfile, FILE* csv)
 		if (statement->Type() != S_TYPE_GROUP)
 			return true;
 
-		if (statement->Size() < 1)
+		if (!statement->Children() || statement->Children()->Size() + 1 < 1)
 			return true;
 
 		Function* call = (Function*)statement->Children()->HeadNode()->Owner();
