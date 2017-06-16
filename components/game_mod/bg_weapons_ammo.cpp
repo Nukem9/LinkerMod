@@ -88,18 +88,6 @@ void BG_SetupWeaponDefSharedAmmoIndexes(unsigned int weapIndex, WeaponDef *weapD
 			if (!_stricmp(bg_sharedAmmoCaps[index]->szSharedAmmoCapName, otherWeapDef->szSharedAmmoCapName)
 				&& otherWeapDef->iSharedAmmoCap == bg_sharedAmmoCaps[index]->iSharedAmmoCap)
 			{
-				// Skip weapons that we have patched for PERK_STOCKPILE
-				if (std::find(bg_PatchedWeapDefs.begin(), bg_PatchedWeapDefs.end(), otherWeapDef) != bg_PatchedWeapDefs.end())
-				{
-					Com_Printf(0, "AMMO: %i %i\n", weapDef->iMaxAmmo, weapDef->iSharedAmmoCap);
-
-					int capMax = max(bg_sharedAmmoCaps[index]->iSharedAmmoCap, weapDef->iSharedAmmoCap);
-
-					bg_sharedAmmoCaps[index]->iSharedAmmoCap = capMax;
-					weapDef->iSharedAmmoCap = capMax;
-					return;
-				}
-
 				Com_Error(ERR_DROP, "Shared ammo cap mismatch for \"%s\" shared ammo cap: '%s\" set it to %i, but \"%s\" already set it to %i.",
 					weapDef->szSharedAmmoCapName,
 					BG_WeaponName(weapIndex),
@@ -263,14 +251,8 @@ void BG_AddAmmoToClip(playerState_s *ps, int clipIndex, int amount)
 	{
 		WeaponVariantDef *weapVariantDef = BG_GetWeaponVariantDef(ps->heldWeapons[slot].weapon);
 
-		// We only care about grenades for now (max ammo: 3 or 4)
-		if (weapVariantDef->weapDef->weapType != WEAPTYPE_GRENADE)
-			continue;
-
-		if (weapVariantDef->iClipIndex != clipIndex)
-			continue;
-
-		if (weapVariantDef->iClipSize < 3)
+		// Was this one of the variants we patched (BG_SetupWeaponIndex)? If not, skip it
+		if (std::find(bg_CheckedVariantDefs.begin(), bg_CheckedVariantDefs.end(), weapVariantDef) == bg_CheckedVariantDefs.end())
 			continue;
 
 		// Perk enabled:  clipMax
@@ -339,8 +321,6 @@ bool ValueInArray(const int *weaponArray, int value)
 // /bgame/bg_weapons_ammo.cpp:525
 void AddValueToArray(int *weaponArray, int value)
 {
-	signed int slot;
-
 	for (int slot = 0; slot < 15; slot++)
 	{
 		if (weaponArray[slot])

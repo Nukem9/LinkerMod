@@ -93,6 +93,7 @@
     <ClCompile Include="bg_weapons.cpp" />
     <ClCompile Include="bg_weapons_ammo.cpp" />
     <ClCompile Include="bg_weapons_def.cpp" />
+    <ClCompile Include="bg_weapons_load_obj.cpp" />
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="CEG.cpp" />
     <ClCompile Include="cg_draw_debug.cpp" />
@@ -114,6 +115,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
     <ClCompile Include="g_client_script_cmd_mp.cpp" />
+    <ClCompile Include="g_items.cpp" />
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
@@ -150,6 +152,7 @@
     <ClInclude Include="bg_weapons.h" />
     <ClInclude Include="bg_weapons_ammo.h" />
     <ClInclude Include="bg_weapons_def.h" />
+    <ClInclude Include="bg_weapons_load_obj.h" />
     <ClInclude Include="bitarray.h" />
     <ClInclude Include="bullet.h" />
     <ClInclude Include="CEG.h" />
@@ -172,6 +175,7 @@
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
     <ClInclude Include="g_client_script_cmd_mp.h" />
+    <ClInclude Include="g_items.h" />
     <ClInclude Include="g_main_mp.h" />
     <ClInclude Include="live_win.h" />
     <ClInclude Include="patch_common.h" />
