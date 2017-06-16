@@ -491,11 +491,16 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0079A5B5, (PBYTE)&mfh_CG_DrawBulletImpacts2);
 	Detours::X86::DetourFunction((PBYTE)0x00654BE0, (PBYTE)&BG_GetAmmoPlayerMax);
 	Detours::X86::DetourFunction((PBYTE)0x0041E480, (PBYTE)&BG_AddAmmoToClip);
-	*(PBYTE *)&G_RegisterWeapon = Detours::X86::DetourFunction((PBYTE)0x006339E0, (PBYTE)&hk_G_RegisterWeapon);
-	Detours::X86::DetourFunction((PBYTE)0x0064FB98, (PBYTE)&BG_ClearWeaponDef, Detours::X86Option::USE_CALL);
-	Detours::X86::DetourFunction((PBYTE)0x0065B423, (PBYTE)&BG_ClearWeaponDef, Detours::X86Option::USE_CALL);
-	Detours::X86::DetourFunction((PBYTE)0x00517950, (PBYTE)(unsigned int(*)(const char*, void(*regWeap)(unsigned int)))BG_GetWeaponIndexForName);
+	Detours::X86::DetourFunction((PBYTE)0x006339E0, (PBYTE)&G_RegisterWeapon);
+	Detours::X86::DetourFunction((PBYTE)0x00517950, (PBYTE)(unsigned int(*)(const char*, void(*)(unsigned int)))BG_GetWeaponIndexForName);
+	Detours::X86::DetourFunction((PBYTE)0x0063E060, (PBYTE)(unsigned int(*)(const char*))BG_GetWeaponIndexForName);
 	Detours::X86::DetourFunction((PBYTE)0x004A0570, (PBYTE)&BG_FindWeaponIndexForName);
+	Detours::X86::DetourFunction((PBYTE)0x004F2900, (PBYTE)&BG_ClearWeaponDef);
+	Detours::X86::DetourFunction((PBYTE)0x00425770, (PBYTE)&BG_GetWeaponDef);
+	Detours::X86::DetourFunction((PBYTE)0x00553DF0, (PBYTE)&BG_GetWeaponIndex);
+	Detours::X86::DetourFunction((PBYTE)0x00444740, (PBYTE)&BG_GetWeaponVariantDef);
+	Detours::X86::DetourFunction((PBYTE)0x00595AC0, (PBYTE)&BG_GetMaxPickupableAmmo);
+	Detours::X86::DetourFunction((PBYTE)0x004B7D10, (PBYTE)&Com_FreeWeaponInfoMemory);
 	Detours::X86::DetourFunction((PBYTE)0x00506E80, (PBYTE)&DB_ExternalInitAssets);
 
 	//

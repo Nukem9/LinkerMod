@@ -23,3 +23,8 @@ void Scr_ObjectError(const char *error, scriptInstance_t inst)
 {
 	((void(__cdecl *)(const char *, scriptInstance_t))0x0064A840)(error, inst);
 }
+
+void SL_RemoveRefToString(scriptInstance_t inst, unsigned int stringValue)
+{
+	((void(__cdecl *)(scriptInstance_t, unsigned int))0x00545370)(inst, stringValue);
+}

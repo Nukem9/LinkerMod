@@ -305,6 +305,7 @@ const char *BG_WeaponName(int weapon)
 }
 
 // /game/g_items.cpp:1525
+/*
 void(*G_RegisterWeapon)(unsigned int weapIndex);
 void hk_G_RegisterWeapon(unsigned int weapIndex)
 {
@@ -337,4 +338,4 @@ void hk_G_RegisterWeapon(unsigned int weapIndex)
 	}
 
 	G_RegisterWeapon(weapIndex);
-}
+}*/

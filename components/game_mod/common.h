@@ -24,6 +24,8 @@ enum errorParm_t
 	ERR_LOCALIZATION = 0x6,
 };
 
+static int& weaponInfoSource = *(int *)0x024817D8;
+
 extern void (__cdecl * Com_Init)(char *commandLine);
 
 void hk_Com_Init(char *commandLine);
@@ -98,3 +100,4 @@ bool DB_IsLevelDependency(const char *name);
 bool DB_IsZoneLoaded(const char *name);
 void Com_LoadCommonFastFile();
 void Com_LoadLevelFastFiles(const char *mapName);
+void Com_FreeWeaponInfoMemory(int source);

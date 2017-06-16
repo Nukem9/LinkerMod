@@ -348,3 +348,21 @@ void Com_LoadLevelFastFiles(const char *mapName)
 	DB_LoadXAssets(zoneInfo, zoneCount, 0);
 	R_EndRemoteScreenUpdate(nullptr);
 }
+
+void Com_FreeWeaponInfoMemory(int source)
+{
+	if (weaponInfoSource == source)
+	{
+		weaponInfoSource = 0;
+
+		if (!useFastFile->current.enabled)
+		{
+			BG_ClearWeaponDefInternal();
+			BG_FreeWeaponDefStrings();
+		}
+
+		bg_lastParsedWeaponIndex = 0;
+		bg_firstWeaponTableIndex = 0;
+		bg_lastWeaponTableIndex = 0;
+	}
+}

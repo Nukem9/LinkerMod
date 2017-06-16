@@ -18,3 +18,4 @@ const char *Scr_GetString(unsigned int index, scriptInstance_t inst);
 void Scr_AddBool(int value, scriptInstance_t inst);
 void Scr_Error(const char *error, bool force_terminal);
 void Scr_ObjectError(const char *error, scriptInstance_t inst);
+void SL_RemoveRefToString(scriptInstance_t inst, unsigned int stringValue);

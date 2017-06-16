@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+WeaponVariantDef *bg_weapAmmoTypes[2048];
+WeaponDef *bg_sharedAmmoCaps[2048];
+WeaponVariantDef *bg_weapClips[2048];
+
 // /bgame/bg_weapons_ammo.cpp:39
 void BG_SetupWeaponDefAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef, WeaponVariantDef *weapVarDef)
 {
@@ -35,7 +39,7 @@ void BG_SetupWeaponDefAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef, We
 		}
 		else
 		{
-			ASSERT_MSG(bg_numWeapClips < 2048, "bg_numWeapClips doesn't index ARRAY_COUNT(bg_weapClips)");
+			ASSERT_MSG(bg_numWeapClips < ARRAYSIZE(bg_weapClips), "bg_numWeapClips doesn't index ARRAY_COUNT(bg_weapClips)");
 
 			bg_weapAmmoTypes[bg_numAmmoTypes] = weapVarDef;
 			weapVarDef->iAmmoIndex = bg_numAmmoTypes++;
@@ -139,11 +143,26 @@ void BG_SetupWeaponDefClipIndexes(WeaponDef *weapDef, WeaponVariantDef *weapVarD
 		|| weapVarDef->iClipIndex >= bg_numWeapClips
 		|| bg_weapClips[weapVarDef->iClipIndex] != weapVarDef)
 	{
-		ASSERT_MSG(bg_numWeapClips < 2048, "bg_numWeapClips doesn't index ARRAY_COUNT(bg_weapClips)");
+		ASSERT_MSG(bg_numWeapClips < ARRAYSIZE(bg_weapClips), "bg_numWeapClips doesn't index ARRAY_COUNT(bg_weapClips)");
 
 		bg_weapClips[bg_numWeapClips] = weapVarDef;
 		weapVarDef->iClipIndex = bg_numWeapClips++;
 	}
+}
+
+// /bgame/bg_weapons_ammo.cpp:170
+void BG_ClearWeaponDefAmmo()
+{
+	WeaponVariantDef *defaultWeap = BG_LoadDefaultWeaponVariantDef();
+
+	bg_weapAmmoTypes[0] = defaultWeap;
+	bg_numAmmoTypes = 1;
+
+	bg_sharedAmmoCaps[0] = defaultWeap->weapDef;
+	bg_numSharedAmmoCaps = 1;
+
+	bg_weapClips[0] = defaultWeap;
+	bg_numWeapClips = 1;
 }
 
 // /bgame/bg_weapons_ammo.cpp:194
@@ -303,6 +322,105 @@ int BG_GetAmmoPlayerMax(playerState_s *ps, unsigned int weaponIndex, unsigned in
 	}
 
 	return total;
+}
+
+// /bgame/bg_weapons_ammo.cpp:513
+bool ValueInArray(const int *weaponArray, int value)
+{
+	for (int slot = 0; slot < 15; slot++)
+	{
+		if (weaponArray[slot] == value)
+			return true;
+	}
+
+	return false;
+}
+
+// /bgame/bg_weapons_ammo.cpp:525
+void AddValueToArray(int *weaponArray, int value)
+{
+	signed int slot;
+
+	for (int slot = 0; slot < 15; slot++)
+	{
+		if (weaponArray[slot])
+			continue;
+
+		weaponArray[slot] = value;
+		return;
+	}
+
+	ASSERT(false);
+}
+
+// /bgame/bg_weapons_ammo.cpp:542
+int BG_GetMaxPickupableAmmo(playerState_s *ps, unsigned int weaponIndex)
+{
+	int clipCounted[15];
+	int ammoCounted[15];
+
+	memset(ammoCounted, 0, sizeof(clipCounted));
+	memset(clipCounted, 0, sizeof(ammoCounted));
+
+	WeaponDef *weapDef = BG_GetWeaponDef(weaponIndex);
+
+	// If this weapon uses part of the shared ammo pool
+	if (weapDef->iSharedAmmoCapIndex >= 0)
+	{
+		int ammo = BG_GetSharedAmmoCapSize(weapDef->iSharedAmmoCapIndex);
+
+		for (int slot = 0; slot < ARRAYSIZE(ps->heldWeapons); slot++)
+		{
+			unsigned int currWeap = ps->heldWeapons[slot].weapon;
+
+			if (!currWeap)
+				continue;
+
+			WeaponDef *curWeapDef = BG_GetWeaponDef(currWeap);
+
+			if (curWeapDef->iSharedAmmoCapIndex != weapDef->iSharedAmmoCapIndex)
+				continue;
+
+			if (BG_WeaponIsClipOnly(currWeap))
+			{
+				if (!ValueInArray(clipCounted, BG_ClipForWeapon(currWeap)))
+				{
+					AddValueToArray(clipCounted, BG_ClipForWeapon(currWeap));
+					ammo -= BG_GetAmmoInClip(ps, currWeap);
+				}
+			}
+			else
+			{
+				if (!ValueInArray(ammoCounted, BG_AmmoForWeapon(currWeap)))
+				{
+					AddValueToArray(ammoCounted, BG_AmmoForWeapon(currWeap));
+					ammo -= BG_GetAmmoNotInClip(ps, currWeap);
+				}
+			}
+		}
+
+		return ammo;
+	}
+
+	// Simple check if this weapon has no ammo stock (clip only)
+	if (BG_WeaponIsClipOnly(weaponIndex))
+		return BG_GetClipSize(weaponIndex) - BG_GetAmmoInClip(ps, weaponIndex);
+
+	// Otherwise do the normal calculation with clip/stock
+	int maxAmmo = BG_GetAmmoPlayerMax(ps, weaponIndex, 0);
+	return maxAmmo - BG_GetAmmoNotInClip(ps, weaponIndex);
+}
+
+// /bgame/bg_weapons_ammo.cpp:660
+int BG_ClipForWeapon(int weapon)
+{
+	return BG_GetWeaponVariantDef(weapon)->iClipIndex;
+}
+
+// /bgame/bg_weapons_ammo.cpp:665
+int BG_AmmoForWeapon(int weapon)
+{
+	return BG_GetWeaponVariantDef(weapon)->iAmmoIndex;
 }
 
 // /bgame/bg_weapons_ammo.cpp:670

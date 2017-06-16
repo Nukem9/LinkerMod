@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+WeaponVariantDef *bg_weaponVariantDefs[2048];
+WeaponVariantDefHash bg_weaponVariantNameHashTable[2048];
+
 std::vector<WeaponVariantDef *> bg_CheckedVariantDefs;
 std::vector<WeaponVariantDef *> bg_PatchedVariantDefs;
 std::vector<WeaponDef *> bg_PatchedWeapDefs;
@@ -37,6 +40,35 @@ unsigned int BG_GetWeaponIndex(WeaponVariantDef *weapVariantDef)
 
 	ASSERT_MSG(false, "Weapon variant not in table, unknown weapon index?!");
 	return 0;
+}
+
+// /bgame/bg_weapons_def.cpp:100
+void BG_FreeWeaponDefStrings()
+{
+	for (unsigned int i = 1; i <= bg_lastParsedWeaponIndex; i++)
+	{
+		WeaponVariantDef *weapVariantDef = bg_weaponVariantDefs[i];
+		WeaponDef *weapDef = weapVariantDef->weapDef;
+		
+		ASSERT(weapVariantDef && weapDef);
+
+		// Weapon hide tag names
+		for (int j = 0; j < 32; j++)
+		{
+			if (weapVariantDef->hideTags[j])
+				SL_RemoveRefToString(SCRIPTINSTANCE_SERVER, weapVariantDef->hideTags[j]);
+		}
+
+		// Weapon notetrack names
+		for (int j = 0; j < 20; j++)
+		{
+			if (weapDef->notetrackSoundMapKeys[j])
+				SL_RemoveRefToString(SCRIPTINSTANCE_SERVER, weapDef->notetrackSoundMapKeys[j]);
+
+			if (weapDef->notetrackSoundMapValues[j])
+				SL_RemoveRefToString(SCRIPTINSTANCE_SERVER, weapDef->notetrackSoundMapValues[j]);
+		}
+	}
 }
 
 // /bgame/bg_weapons_def.cpp:159
@@ -145,6 +177,19 @@ void BG_SetupWeaponMountedVersions(unsigned int weaponIndex, void(__cdecl *regWe
 	}
 }
 
+// /bgame/bg_weapons_def.cpp:265
+void BG_InitDefaultWeaponDef()
+{
+	ASSERT(bg_lastParsedWeaponIndex == 0);
+
+	WeaponVariantDef *defaultWeap = BG_LoadDefaultWeaponVariantDef();
+
+	bg_weaponVariantDefs[0] = defaultWeap;
+	bg_weaponVariantNameHashTable[0].weaponIndex = 0;
+	bg_weaponVariantNameHashTable[0].hash = StringTable_HashString(defaultWeap->szInternalName);
+	bg_weaponVariantNameHashTableSorted = false;
+}
+
 // /bgame/bg_weapons_def.cpp:274
 void BG_ClearWeaponDef()
 {
@@ -152,13 +197,23 @@ void BG_ClearWeaponDef()
 	bg_PatchedVariantDefs.clear();
 	bg_PatchedWeapDefs.clear();
 
-	((void(__cdecl *)())0x004F2900)();
+	BG_InitDefaultWeaponDef();
+
+	//for (int itemIdx = 1; itemIdx < 2048; itemIdx++)
+	//	bg_itemlist[itemIdx].giType = 0;
+
+	memset((void *)0xBDD2BC, 0, 0x1FFC);
+
+	BG_ClearWeaponDefAmmo();
+	BG_LoadPlayerAnimTypes();
+	BG_LoadWeaponMergeSupport();
+	BG_ClearWeaponDefInternal();
 }
 
 // /bgame/bg_weapons_def.cpp:298
 void BG_SetupWeaponIndex(unsigned int weapIndex)
 {
-	Com_Printf(0, "[%04d] Setting up weapon %s...\n", weapIndex, bg_weaponVariantDefs[weapIndex]->szInternalName);
+	Com_DPrintf(0, "[Idx %04d] Setting up weapon %s...\n", weapIndex, bg_weaponVariantDefs[weapIndex]->szInternalName);
 
 	BG_SetUpAmmoForWeapon(weapIndex);
 	BG_FillInWeaponItems(weapIndex);
@@ -167,7 +222,7 @@ void BG_SetupWeaponIndex(unsigned int weapIndex)
 // /bgame/bg_weapons_def.cpp:305
 int BG_SetupWeaponVariantDef(WeaponVariantDef *weapVariantDef, void(__cdecl *regWeap)(unsigned int))
 {
-	ASSERT_MSG(bg_lastParsedWeaponIndex < 2048, "bg_lastParsedWeaponIndex doesn't index ARRAY_COUNT(bg_weaponVariantDefs)");
+	ASSERT_MSG(bg_lastParsedWeaponIndex < ARRAYSIZE(bg_weaponVariantDefs), "bg_lastParsedWeaponIndex doesn't index ARRAY_COUNT(bg_weaponVariantDefs)");
 
 	unsigned int weapIndex = bg_lastParsedWeaponIndex + 1;
 	bg_lastParsedWeaponIndex = weapIndex;
