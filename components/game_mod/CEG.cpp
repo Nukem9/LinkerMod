@@ -49,10 +49,14 @@ void Patch_CEG()
 	Detours::X86::DetourFunction((PBYTE)0x8EF04F, (PBYTE)&hk_inline_memcpy);
 	Detours::X86::DetourFunction((PBYTE)0x8EF168, (PBYTE)&hk_inline_memcpy2);
 
-	Detours::X86::DetourFunction((PBYTE)0x8EE640, (PBYTE)&sub_8EE640);
+	Detours::X86::DetourFunction((PBYTE)0x8EE640, (PBYTE)&sub_8EE640);	// Patch intentional nullptr
+	Detours::X86::DetourFunction((PBYTE)0x9A2860, (PBYTE)&sub_9A2860);	// Patch HWBP check
+	Detours::X86::DetourFunction((PBYTE)0x9A2800, (PBYTE)&sub_9A2800);	// Patch HWBP check
+	Detours::X86::DetourFunction((PBYTE)0x9A2900, (PBYTE)&sub_9A2900);	// Patch HWBP check
 
-	FixupFunction(0x0060CC10, 0x004F20F0);// CEGObfuscate<LiveStats_Init> => LiveStats_Init
-	FixupFunction(0x00580460, 0x0079E6D0);// CEGObfuscate<Con_Restricted_SetLists> => Con_Restricted_SetLists
+	PatchMemory(0x004682B0, (PBYTE)"\xC3", 1);	// Buggy CEG MD5 checks
+	FixupFunction(0x0060CC10, 0x004F20F0);		// CEGObfuscate<LiveStats_Init> => LiveStats_Init
+	FixupFunction(0x00580460, 0x0079E6D0);		// CEGObfuscate<Con_Restricted_SetLists> => Con_Restricted_SetLists
 }
 
 DWORD __declspec(noinline) GetNewAddress(DWORD dwOld)
@@ -128,6 +132,73 @@ void *sub_8EE640(void *Nullptr1, void *Nullptr2)
 
 	*(void **)0xBA1C24 = Nullptr2;
 	return (void *)0xBA1C24;
+}
+
+DWORD sub_9A2860(PEXCEPTION_RECORD a1, int a2, PCONTEXT a3)
+{
+	if ((a3->ContextFlags & 0x10010) == 0x10010)
+	{
+		if (a1->ExceptionCode != 0xE06D7363)
+		{
+			a1->ExceptionFlags = 0;
+			return EXCEPTION_CONTINUE_SEARCH;
+		}
+	}
+	else
+	{
+		a3->ContextFlags |= 0x10010u;
+	}
+
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+DWORD sub_9A2800(PEXCEPTION_RECORD a1, int a2, PCONTEXT a3)
+{
+	if (a1->ExceptionCode == 0xE06D7363 && a1->NumberParameters == 3)
+		*(DWORD *)a1->ExceptionInformation[2] = a1->ExceptionInformation[1];
+
+	a1->ExceptionFlags = 0;
+
+	if ((a3->ContextFlags & 0x10010) != 0x10010)
+		a3->ContextFlags |= 0x10010u;
+
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+
+DWORD sub_9A2900(PEXCEPTION_RECORD a1, int a2, PCONTEXT a3)
+{
+	DWORD tempDR7 = a3->Dr7;
+	a3->Dr7 = 0;
+
+	if ((a3->ContextFlags & 0x10010) == 0x10010 && LOBYTE(a3->Dr7))
+	{
+		DWORD v6 = *(DWORD *)a2;
+		*(DWORD *)(v6 + 4) = 0x9A2228;
+		*(DWORD *)(v6 + 8) = 0x9A28C0;
+
+		a3->ContextFlags |= 0x10010u;
+		a3->Dr7 = tempDR7;
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+	else if (a1->ExceptionCode == 0xC0000005)
+	{
+		// See: sub_8EE640
+		a3->ContextFlags |= 0x10010u;
+		a3->Dr7 = tempDR7;
+		a3->Eax = 0xBA1C24;
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+
+	a3->ContextFlags |= 0x10010u;
+	a3->Dr7 = tempDR7;
+
+	if (a1->ExceptionCode == 0xE06D7363)
+	{
+		a1->ExceptionFlags = 0;
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+
+	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
 void __fastcall sub_5CBF00(void *thisptr, PVOID _EDX, DWORD address, size_t scanSize)
