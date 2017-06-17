@@ -251,8 +251,11 @@ void BG_AddAmmoToClip(playerState_s *ps, int clipIndex, int amount)
 	{
 		WeaponVariantDef *weapVariantDef = BG_GetWeaponVariantDef(ps->heldWeapons[slot].weapon);
 
+		if (weapVariantDef->iClipIndex != clipIndex)
+			continue;
+
 		// Was this one of the variants we patched (BG_SetupWeaponIndex)? If not, skip it
-		if (std::find(bg_CheckedVariantDefs.begin(), bg_CheckedVariantDefs.end(), weapVariantDef) == bg_CheckedVariantDefs.end())
+		if (std::find(bg_PatchedVariantDefs.begin(), bg_PatchedVariantDefs.end(), weapVariantDef) == bg_PatchedVariantDefs.end())
 			continue;
 
 		// Perk enabled:  clipMax
