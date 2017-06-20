@@ -1,0 +1,2 @@
+# Normalize line endings to CRLF on checkout
+* text eol=crlf
