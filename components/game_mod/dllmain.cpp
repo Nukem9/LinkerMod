@@ -94,12 +94,11 @@ BOOL GameMod_Init()
 	// Detour GScr_NewDebugHudElem to GScr_NewHudElem
 	//
 	Detours::X86::DetourFunction((PBYTE)0x00600BF0, (PBYTE)0x006707C0);
-
 	//
 	// Patch openfile, closefile
 	//
 	Scr_PatchFunctions();
-
+	
 	//
 	// Add r_showTess
 	//
@@ -177,7 +176,7 @@ BOOL GameMod_Init()
 	// Add scr_supressErrors to disable error message boxes with developer_script
 	//
 	Detours::X86::DetourFunction((PBYTE)0x005A1732, (PBYTE)&mfh_RuntimeError);
-
+	
 	//
 	// Add com_cfg_readOnly dvar - to allow prevention of writing to the config
 	//
@@ -193,12 +192,12 @@ BOOL GameMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x00847210, (PBYTE)&UI_OpenMenu_f);
 
-#if _DEBUG || _USE_COM_DPRINTF
 	//
 	// Enable Com_DPrintf
 	//
-	PatchMemory_WithNOP(0x0060F7E7, 2);
+	Detours::X86::DetourFunction((PBYTE)0x0060F7D0, (PBYTE)&Com_DPrintf);
 
+#if _DEBUG || _USE_COM_DPRINTF
 	PatchMemory_WithNOP(0x007A499B, 5); // "Redundant asset: '%s','%s'\n"
 	PatchMemory_WithNOP(0x007A2E82, 5); // "Could not load %s \"%s\".\n"
 	PatchMemory_WithNOP(0x007A2E9B, 5); // "Could not load %s \"%s\".\n"
@@ -423,13 +422,10 @@ BOOL GameMod_Init()
 	// Additional perk logic
 	//
 	Detours::X86::DetourFunction((PBYTE)0x00584480, (PBYTE)&BG_GetPerkIndexForName);
-
-	ptr = (BYTE *)(PERK_COUNT);
-	PatchMemory(0x007D9066, (PBYTE)&ptr, 1);
-	PatchMemory(0x007D911C, (PBYTE)&ptr, 1);
-	PatchMemory(0x007D91E1, (PBYTE)&ptr, 1);
-	ptr = (BYTE *)(PERK_COUNT - 1);
-	PatchMemory(0x0087CFBF, (PBYTE)&ptr, 1);
+	Detours::X86::DetourFunction((PBYTE)0x0087CF80, (PBYTE)&SV_SetPerk_f);
+	Detours::X86::DetourFunction((PBYTE)0x007D8FF0, (PBYTE)&PlayerCmd_SetPerk);
+	Detours::X86::DetourFunction((PBYTE)0x007D90B0, (PBYTE)&PlayerCmd_HasPerk);
+	Detours::X86::DetourFunction((PBYTE)0x007D9170, (PBYTE)&PlayerCmd_UnsetPerk);
 
 	//
 	// Increase PMem size
@@ -525,13 +521,27 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004625C0, (PBYTE)&Bullet_Fire);
 	Detours::X86::DetourFunction((PBYTE)0x0079A4F1, (PBYTE)&mfh_CG_DrawBulletImpacts1);
 	Detours::X86::DetourFunction((PBYTE)0x0079A5B5, (PBYTE)&mfh_CG_DrawBulletImpacts2);
+	Detours::X86::DetourFunction((PBYTE)0x00654BE0, (PBYTE)&BG_GetAmmoPlayerMax);
+	Detours::X86::DetourFunction((PBYTE)0x0041E480, (PBYTE)&BG_AddAmmoToClip);
+	Detours::X86::DetourFunction((PBYTE)0x006339E0, (PBYTE)&G_RegisterWeapon);
+	Detours::X86::DetourFunction((PBYTE)0x004B2F90, (PBYTE)&IsItemRegistered);
+	Detours::X86::DetourFunction((PBYTE)0x004B5030, (PBYTE)&ClearRegisteredItems);
+	Detours::X86::DetourFunction((PBYTE)0x00517950, (PBYTE)(unsigned int(*)(const char*, void(*)(unsigned int)))BG_GetWeaponIndexForName);
+	Detours::X86::DetourFunction((PBYTE)0x0063E060, (PBYTE)(unsigned int(*)(const char*))BG_GetWeaponIndexForName);
+	Detours::X86::DetourFunction((PBYTE)0x004A0570, (PBYTE)&BG_FindWeaponIndexForName);
+	Detours::X86::DetourFunction((PBYTE)0x004F2900, (PBYTE)&BG_ClearWeaponDef);
+	Detours::X86::DetourFunction((PBYTE)0x00425770, (PBYTE)&BG_GetWeaponDef);
+	Detours::X86::DetourFunction((PBYTE)0x00553DF0, (PBYTE)&BG_GetWeaponIndex);
+	Detours::X86::DetourFunction((PBYTE)0x00444740, (PBYTE)&BG_GetWeaponVariantDef);
+	Detours::X86::DetourFunction((PBYTE)0x00595AC0, (PBYTE)&BG_GetMaxPickupableAmmo);
+	Detours::X86::DetourFunction((PBYTE)0x004B7D10, (PBYTE)&Com_FreeWeaponInfoMemory);
+	Detours::X86::DetourFunction((PBYTE)0x00506E80, (PBYTE)&DB_ExternalInitAssets);
 
 	//
 	// PM (Player Movement) hooks for infinite ammo and weapon jamming
 	//
-	*(PBYTE *)&PM_WeaponUseAmmo = Detours::X86::DetourFunction((PBYTE)0x006979B0, (PBYTE)&hk_PM_WeaponUseAmmo);
+	Detours::X86::DetourFunction((PBYTE)0x006979B0, (PBYTE)&PM_WeaponUseAmmo);
 	Detours::X86::DetourFunction((PBYTE)0x00766CF0, (PBYTE)&PM_Weapon_Jam);
-
 	Detours::X86::DetourFunction((PBYTE)0x007951E0, (PBYTE)&hk_StartWeaponAnim);
 	Detours::X86::DetourFunction((PBYTE)0x007694A0, (PBYTE)&PM_Weapon_WeaponTimeAdjust);
 

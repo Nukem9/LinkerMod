@@ -1,5 +1,7 @@
 #pragma once
 
+#define CMD_MAX_NESTING 8
+
 struct __declspec(align(4)) cmd_function_s
 {
 	cmd_function_s *next;
@@ -26,6 +28,8 @@ struct CmdArgs
 	int totalUsedTextPool;
 };
 
+static CmdArgs& sv_cmd_args = *(CmdArgs *)0x0243D208;
+
 typedef void (__cdecl* Cmd_AddCommandInternal_t)(const char *cmdName, void(__cdecl *function)(), cmd_function_s *allocedCmd);
 static Cmd_AddCommandInternal_t Cmd_AddCommandInternal = (Cmd_AddCommandInternal_t)0x00661400;
 
@@ -43,3 +47,13 @@ CmdArgs *__cdecl Cmd_Args();
 int __cdecl Cmd_Argc();
 const char *__cdecl Cmd_Argv(int argIndex);
 
+static const char *SV_Cmd_Argv(int argIndex)
+{
+	ASSERT(sv_cmd_args.nesting < CMD_MAX_NESTING);
+	ASSERT(argIndex >= 0);
+
+	if (argIndex >= sv_cmd_args.argc[sv_cmd_args.nesting])
+		return "";
+
+	return sv_cmd_args.argv[sv_cmd_args.nesting][argIndex];
+}

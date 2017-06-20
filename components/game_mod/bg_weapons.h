@@ -113,22 +113,49 @@ struct pml_t
 };
 STATIC_ASSERT_OFFSET(pml_t, msec, 0x28);
 
-extern void(*PM_WeaponUseAmmo)(int ps, int wp, int amount);
-
-void hk_PM_WeaponUseAmmo(int ps, int wp, int amount);
-void PM_Weapon_Jam(int ps);
-void PM_Weapon_FinishRechamber(playerState_s *ps);
-int PM_WeaponAmmoAvailable(playerState_s *ps);
-
 void PM_StartWeaponAnim(playerState_s *ps, int anim, int leftAnim);
 void PM_ContinueWeaponAnim(playerState_s *ps, int anim, int leftAnim);
 int *BG_GetWeaponState(playerState_s *ps, bool leftGun);
 int *BG_GetWeaponTime(playerState_s *ps, bool leftGun);
 int *BG_GetWeaponDelay(playerState_s *ps, bool leftGun);
 unsigned int *BG_GetWeaponShotCount(playerState_s *ps, bool leftGun);
+void PM_Weapon_FinishRechamber(playerState_s *ps);
 unsigned int PM_GetWeaponIndexForHand(playerState_s *ps);
 bool BG_CanFastSwitch(WeaponDef *weapDef, int weaponState);
 bool ShotLimitReached(playerState_s *ps, WeaponDef *weapDef);
 bool BurstFirePending(playerState_s *ps);
 bool WeaponUsesBurstCooldown(unsigned int weaponIdx);
 int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml);
+void PM_Weapon_Jam(/*playerState_s *ps*/);
+WeaponVariantDef *BG_LoadWeaponVariantDef(const char *name);
+const char *BG_WeaponName(int weapon);
+
+// /bgame/bg_weapons.h:300
+static int BG_GetHeldWeaponSlot(playerState_s *ps, int weapon)
+{
+	ASSERT(ps);
+
+	for (int i = 0; i < ARRAYSIZE(ps->heldWeapons); i++)
+	{
+		if (ps->heldWeapons[i].weapon == weapon)
+			return i;
+	}
+
+	return -1;
+}
+
+// /bgame/bg_weapons.h:???
+static PlayerHeldWeapon *BG_GetHeldWeapon(playerState_s *ps, int weapon)
+{
+	ASSERT(ps);
+
+	if (weapon == 0)
+		return nullptr;
+
+	int index = BG_GetHeldWeaponSlot(ps, weapon);
+
+	if (index == -1)
+		return nullptr;
+
+	return &ps->heldWeapons[index];
+}

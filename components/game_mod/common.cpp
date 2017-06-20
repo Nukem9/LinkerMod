@@ -52,6 +52,33 @@ void Com_ToolError(int channel, const char* fmt, ...)
 	Com_Error(channel, "%s", msg);
 }
 
+void Com_DPrintf(int channel, const char *fmt, ...)
+{
+	// Allow the developer check to be bypassed through code
+#if _USE_COM_DPRINTF == 0
+	if (!com_developer || !com_developer->current.integer)
+		return;
+#endif
+
+	if (channel > 31)
+		return;
+
+	va_list va;
+	char msg[4096];
+
+	va_start(va, fmt);
+	_vsnprintf_s(msg, _TRUNCATE, fmt, va);
+	va_end(va);
+
+	msg[4095] = '\0';
+	Com_Printf(channel, "%s", msg);
+}
+
+int StringTable_HashString(const char *string)
+{
+	return ((int (__cdecl *)(const char *))0x005F4650)(string);
+}
+
 bool Com_IsMenuLevel(const char *name)
 {
 	if (!name)
@@ -320,4 +347,22 @@ void Com_LoadLevelFastFiles(const char *mapName)
 	R_BeginRemoteScreenUpdate();
 	DB_LoadXAssets(zoneInfo, zoneCount, 0);
 	R_EndRemoteScreenUpdate(nullptr);
+}
+
+void Com_FreeWeaponInfoMemory(int source)
+{
+	if (weaponInfoSource == source)
+	{
+		weaponInfoSource = 0;
+
+		if (!useFastFile->current.enabled)
+		{
+			BG_ClearWeaponDefInternal();
+			BG_FreeWeaponDefStrings();
+		}
+
+		bg_lastParsedWeaponIndex = 0;
+		bg_firstWeaponTableIndex = 0;
+		bg_lastWeaponTableIndex = 0;
+	}
 }

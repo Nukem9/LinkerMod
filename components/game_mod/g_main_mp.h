@@ -1,5 +1,7 @@
 #pragma once
 
+#define MAX_GENTITIES 1024
+
 struct gentity_s;
 struct gclient_s;
 struct scr_vehicle_s;
@@ -28,9 +30,60 @@ struct gentity_s
 	gclient_s *client;
 	char _pad1[0x8];
 	scr_vehicle_s *vehicle;
+	char _pad2[0x200];
 };
 STATIC_ASSERT_OFFSET(gentity_s, client, 0x13C);
 STATIC_ASSERT_OFFSET(gentity_s, vehicle, 0x148);
+STATIC_ASSERT_SIZE(gentity_s, 0x34C);
+
+struct renderOptions_s
+{
+	union
+	{
+		unsigned int i;
+
+		struct
+		{
+			int _bf0;
+		};
+	};
+};
+
+struct PlayerHeldWeapon
+{
+	unsigned int weapon;
+	unsigned char model;
+	renderOptions_s options;
+
+	union
+	{
+		float heatPercent;
+		int fuelTankTime;
+	};
+
+	bool overHeating;
+	bool needsRechamber;
+	bool heldBefore;
+	bool quickReload;
+	bool blockWeaponPickup;
+};
+STATIC_ASSERT_OFFSET(PlayerHeldWeapon, weapon, 0x0);
+STATIC_ASSERT_OFFSET(PlayerHeldWeapon, needsRechamber, 0x11);
+STATIC_ASSERT_SIZE(PlayerHeldWeapon, 0x18);
+
+struct AmmoPool
+{
+	int	ammoIndex;
+	int	count;
+};
+STATIC_ASSERT_SIZE(AmmoPool, 0x8);
+
+struct AmmoClip
+{
+	int	clipIndex;
+	int	count;
+};
+STATIC_ASSERT_SIZE(AmmoClip, 0x8);
 
 struct playerState_s
 {
@@ -58,9 +111,13 @@ struct playerState_s
 	unsigned int weaponShotCountLeft;
 	char _pad8[0x48];
 	unsigned int stackFireCount;
-	char _pad9[0x348];
+	char _pad9[0x28];
+	PlayerHeldWeapon heldWeapons[15];
+	AmmoPool ammoNotInClip[15];
+	AmmoClip ammoInClip[15];
+	char _pad10[0xC8];
 	unsigned int perks[1];
-	char _pad10[0x24];
+	char _pad11[0x24];
 	int weapAnim;
 	int weapAnimLeft;
 };
@@ -80,12 +137,38 @@ STATIC_ASSERT_OFFSET(playerState_s, weaponstateLeft, 0x15C);
 STATIC_ASSERT_OFFSET(playerState_s, weaponShotCount, 0x160);
 STATIC_ASSERT_OFFSET(playerState_s, weaponShotCountLeft, 0x164);
 STATIC_ASSERT_OFFSET(playerState_s, stackFireCount, 0x1B0);
+STATIC_ASSERT_OFFSET(playerState_s, heldWeapons, 0x1DC);
+STATIC_ASSERT_OFFSET(playerState_s, ammoNotInClip, 0x344);
+STATIC_ASSERT_OFFSET(playerState_s, ammoInClip, 0x3BC);
 STATIC_ASSERT_OFFSET(playerState_s, perks, 0x4FC);
 STATIC_ASSERT_OFFSET(playerState_s, weapAnim, 0x524);
 STATIC_ASSERT_OFFSET(playerState_s, weapAnimLeft, 0x528);
+//STATIC_ASSERT_SIZE(playerState_s, 0x0);
+
+struct clientState_s
+{
+	char _pad1[0x7C];
+	unsigned int perks[1];
+	char _pad2[0x1CA8];
+};
+STATIC_ASSERT_OFFSET(clientState_s, perks, 0x7C);
+STATIC_ASSERT_SIZE(clientState_s, 0x1D28);
+
+struct clientSession_t
+{
+};
 
 struct gclient_s
 {
 	playerState_s ps;
+	//clientSession_t sess;
 };
 STATIC_ASSERT_OFFSET(gclient_s, ps, 0x0);
+
+struct client_t
+{
+	char _pad1[0x101B0];
+};
+STATIC_ASSERT_SIZE(client_t, 0x101B0);
+
+static gentity_s *g_entities = (gentity_s *)0x01A796F8;

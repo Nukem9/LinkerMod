@@ -11,9 +11,6 @@ struct BuiltinFunctionDef
 typedef unsigned int(__cdecl* Scr_GetNumParam_t)(scriptInstance_t inst);
 static Scr_GetNumParam_t Scr_GetNumParam = (Scr_GetNumParam_t)0x005C6DA0;
 
-typedef const char *(__cdecl* Scr_GetString_t)(unsigned int index, scriptInstance_t inst);
-static Scr_GetString_t Scr_GetString = (Scr_GetString_t)0x00567CB0;
-
 typedef int (__cdecl* Scr_GetInt_t)(unsigned int index, scriptInstance_t inst);
 static Scr_GetInt_t Scr_GetInt = (Scr_GetInt_t)0x004C1BB0;
 

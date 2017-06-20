@@ -24,6 +24,8 @@ enum errorParm_t
 	ERR_LOCALIZATION = 0x6,
 };
 
+static int& weaponInfoSource = *(int *)0x024817D8;
+
 extern void (__cdecl * Com_Init)(char *commandLine);
 
 void hk_Com_Init(char *commandLine);
@@ -40,6 +42,7 @@ static Com_Printf_t Com_Error = (Com_Printf_t)0x00651D90;
 //
 void Com_ToolPrintf(int channel, const char* fmt, ...);
 void Com_ToolError(int channel, const char* fmt, ...);
+void Com_DPrintf(int channel, const char *fmt, ...);
 
 typedef char *va_t(const char *format, ...);
 static va_t* va = (va_t*)0x0057CDD0;
@@ -88,6 +91,7 @@ struct LevelDependency
 	char required[64];	// FF required for loading the map
 };
 
+int StringTable_HashString(const char *string);
 bool Com_IsMenuLevel(const char *name);
 bool Com_IsSpecopLevel(const char *name);
 void Com_GetLevelSharedFastFiles(const char *mapName);
@@ -96,3 +100,4 @@ bool DB_IsLevelDependency(const char *name);
 bool DB_IsZoneLoaded(const char *name);
 void Com_LoadCommonFastFile();
 void Com_LoadLevelFastFiles(const char *mapName);
+void Com_FreeWeaponInfoMemory(int source);

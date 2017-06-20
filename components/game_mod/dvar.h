@@ -115,6 +115,8 @@ VANILLA_DVAR(uiscript_debug, 0x02562A20);
 
 VANILLA_DVAR(cl_ingame, 0x02910158);
 VANILLA_DVAR(com_sv_running, 0x0243FD3C);
+VANILLA_DVAR(com_maxclients, 0x02481720);
+VANILLA_DVAR(com_developer, 0x0243FCA0);
 VANILLA_DVAR(sv_mapname, 0x02899CEC);
 
 VANILLA_DVAR(developer, 0x0243FCA0);
@@ -144,6 +146,7 @@ VANILLA_DVAR(bg_forceExplosiveBullets, 0x00BCD1E8);
 VANILLA_DVAR(vehicle_selfCollision, 0x00BCAFCC);
 VANILLA_DVAR(player_sustainAmmo, 0x00BCD250);
 VANILLA_DVAR(player_burstFireCooldown, 0x00BCD110);
+VANILLA_DVAR(player_clipSizeMultiplier, 0x00BCAF84);
 
 VANILLA_DVAR(perk_weapRateMultiplier, 0x00BDF35C);
 VANILLA_DVAR(perk_weapReloadMultiplier, 0x00BDF358);
@@ -217,7 +220,7 @@ static Dvar_RegisterEnum_t* Dvar_RegisterEnum = (Dvar_RegisterEnum_t*)0x0051BD00
 
 void mfh_R_RegisterDvars();
 
-typedef void (__cdecl* CG_RegisterDvars_t)();
+typedef void(__cdecl* CG_RegisterDvars_t)();
 extern CG_RegisterDvars_t CG_RegisterDvars_o;
 
 void __cdecl CG_RegisterDvars();

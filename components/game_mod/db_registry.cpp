@@ -236,3 +236,13 @@ void __cdecl DB_ListAssetPool_f(void)
 		Com_Printf(0, "%d %s\n", i, name);
 	}
 }
+
+bool DB_IsXAssetDefault(XAssetType type, const char *name)
+{
+	return ((bool (__cdecl *)(XAssetType, const char *))0x0062DDD0)(type, name);
+}
+
+void DB_ExternalInitAssets()
+{
+	BG_FillInAllWeaponItems();
+}
