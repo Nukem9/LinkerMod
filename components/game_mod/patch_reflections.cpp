@@ -84,7 +84,7 @@ BOOL ReflectionMod_Init()
 	//
 	// Prevent overwriting the config file
 	//
-	Patch_Disable_WriteToConfig();
+	com_cfg_readOnly_default = true;
 
 	//
 	// Always force the cursor to be shown

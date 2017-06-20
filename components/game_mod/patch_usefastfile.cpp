@@ -14,9 +14,9 @@ void PatchUseFF()
 		return;
 
 	//
-	// Prevent overwriting the config file with launch args
+	// Prevent overwriting the config file
 	//
-	Patch_Disable_WriteToConfig();
+	com_cfg_readOnly_default = true;
 
 	//
 	// Live_Init

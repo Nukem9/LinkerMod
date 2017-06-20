@@ -139,6 +139,7 @@
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_reflection_probe.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
+    <ClCompile Include="scr_cmds.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="sv_main_mp.cpp" />
     <ClCompile Include="sys_cmds.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="r_rendercmds.h" />
     <ClInclude Include="r_scene.h" />
     <ClInclude Include="r_screenshot.h" />
+    <ClInclude Include="scr_cmds.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv_ccmds_mp.h" />
     <ClInclude Include="sv_main_mp.h" />

@@ -1,5 +1,10 @@
 #include "stdafx.h"
 
+static_assert(GENERIC_READ == 0x80000000, "GENERIC_READ must have a value of 0x80000000");
+static_assert((FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING) == 0x60000000, "(FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING) must have a value of 0x60000000");
+static_assert(FILE_SHARE_READ == 0x1, "FILE_SHARE_READ must have a value of 0x1");
+static_assert(OPEN_EXISTING == 0x3, "OPEN_EXISTING must have a value of 0x3");
+
 XAssetEntry *DB_LinkXAssetEntry(XAssetEntry *newEntry, int allowOverride)
 {
 	// If yes, skip loading certain assets in this FF
@@ -91,20 +96,20 @@ void DB_LoadGraphicsAssetsForPC()
 	DB_SyncXAssets();
 
 	zoneInfo[0].name = "patch";
-	zoneInfo[0].allocFlags = 8;
-	zoneInfo[0].freeFlags = 0;
+	zoneInfo[0].allocFlags = DB_ZONE_PATCH;
+	zoneInfo[0].freeFlags = DB_FLAG_NULL;
 
 	//Add frontend_patch to the zone list (enable mods button)
 	zoneInfo[zoneCount].name = "frontend_patch";
-	zoneInfo[zoneCount].allocFlags = 32;
-	zoneInfo[zoneCount].freeFlags = 0;
+	zoneInfo[zoneCount].allocFlags = DB_ZONE_MOD;
+	zoneInfo[zoneCount].freeFlags = DB_FLAG_NULL;
 	zoneCount++;
 
 	if(DB_ModFileExists())
 	{
 		zoneInfo[zoneCount].name = "mod";
-		zoneInfo[zoneCount].allocFlags = 32;
-		zoneInfo[zoneCount].freeFlags = 0;
+		zoneInfo[zoneCount].allocFlags = DB_ZONE_MOD;
+		zoneInfo[zoneCount].freeFlags = DB_FLAG_NULL;
 		zoneCount++;
 	}
 

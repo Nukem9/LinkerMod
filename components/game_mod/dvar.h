@@ -74,6 +74,20 @@ union DvarLimits
 	} vector;
 };
 
+enum dvarFlags_t
+{
+	DVAR_ARCHIVED = 0x1, //seta
+	DVAR_UPDATE = 0x2, //setu
+	DVAR_S = 0x4, //sets
+	DVAR_CHEAT = 0x80,
+	DVAR_CHANGEABLE_RESET = 0x200,
+	DVAR_SERVER_INFO = 0x500,
+	DVAR_SAVED = 0x1000,
+	DVAR_EXTERNAL = 0x4000,
+	DVAR_AUTOEXEC = 0x8000,
+	DVAR_ADMIN = 0x10000,
+};
+
 struct dvar_s
 {
 	const char *name;
@@ -160,6 +174,8 @@ VANILLA_DVAR(sys_sysMB, 0x0276DAEC);
 VANILLA_DVAR(sys_gpu, 0x0276D9E4);
 VANILLA_DVAR(sys_configSum, 0x0276F558);
 
+VANILLA_DVAR(showVisionSetDebugInfo, 0x00C23D40);
+
 extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;
 extern dvar_s* radiant_liveDebug;
@@ -175,7 +191,8 @@ extern dvar_s* r_renderSun;
 extern dvar_s* r_renderReflected;
 extern dvar_s* r_renderCloakHDR;
 
-VANILLA_DVAR(showVisionSetDebugInfo, 0x00C23D40);
+extern bool com_cfg_readOnly_default;
+extern dvar_s* com_cfg_readOnly;
 
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;

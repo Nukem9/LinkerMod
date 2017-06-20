@@ -62,6 +62,7 @@
 #include "r_draw_xmodel.h"
 #include "rb_tess.h"
 #include "cscr_vm.h"
+#include "scr_cmds.h"
 #include "cscr_parser.h"
 #include "threads.h"
 #include "ragdoll.h"
