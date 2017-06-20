@@ -198,16 +198,16 @@ void __cdecl UI_GetModInfo(const int localClientNum, struct itemDef_s *item, Ope
 		str = sharedUiInfo_modList[sharedUiInfo_modIndex].modName;
 	else if (_stricmp(src, "modDescr") == 0)
 	{
-		str = sharedUiInfo_modList[sharedUiInfo_modIndex].modDescr;
-		if (str != NULL)
+		FS_ModDesc* desc = (FS_ModDesc*)sharedUiInfo_modList[sharedUiInfo_modIndex].modDescr;
+		if (desc != NULL)
 		{
-			switch (*str)
+			switch (desc->type)
 			{
 			case DESC_DESC:
-				str++;
+				str = desc->data;
 				break;
 			case DESC_JSON:
-				str = UI_GetModInfo_GetDescription(str + 1);
+				str = UI_GetModInfo_GetDescription(desc->data);
 				break;
 			default:
 				str = "";
@@ -217,13 +217,13 @@ void __cdecl UI_GetModInfo(const int localClientNum, struct itemDef_s *item, Ope
 	}
 	else if (_stricmp(src, "modCompat") == 0)
 	{
-		str = sharedUiInfo_modList[sharedUiInfo_modIndex].modDescr;
-		if (str != NULL)
+		FS_ModDesc* desc = (FS_ModDesc*)sharedUiInfo_modList[sharedUiInfo_modIndex].modDescr;
+		if (desc != NULL)
 		{
-			switch (*str)
+			switch (desc->type)
 			{
 			case DESC_JSON:
-				str = UI_GetModInfo_GetCompatibilityInfo(str + 1);
+				str = UI_GetModInfo_GetCompatibilityInfo(desc->data);
 				break;
 			case DESC_DESC:
 				// We just assume that legacy mods are compatible for now

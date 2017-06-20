@@ -27,6 +27,23 @@ enum DESC_TYPE
 
 extern char dirList[DIRLIST_LEN];
 
+struct FS_ModDesc
+{
+	// The size of the description data buffer
+	// Must be MODDESC_LEN minus the size of 'type'
+	static const unsigned int bufLen = MODDESC_LEN - 1;
+
+	BYTE type;
+	char data[bufLen];
+
+	FS_ModDesc(void);
+	void Clear(void);
+
+	// Logical length
+	size_t Length(void) const;
+};
+STATIC_ASSERT_SIZE(FS_ModDesc, MODDESC_LEN);
+
 typedef int (__cdecl* FS_FOpenFileRead_t)(const char *filename, int *file);
 static FS_FOpenFileRead_t FS_FOpenFileRead = (FS_FOpenFileRead_t)0x004C6E20;
 
