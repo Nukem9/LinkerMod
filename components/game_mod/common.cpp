@@ -200,7 +200,7 @@ void Com_LoadCommonFastFile()
 	{
 		zoneInfo[zoneCount].name = nullptr;
 		zoneInfo[zoneCount].allocFlags = 0;
-		zoneInfo[zoneCount++].freeFlags = 0x100;
+		zoneInfo[zoneCount++].freeFlags = DB_ZONE_COMMON;
 
 		DB_LoadXAssets(zoneInfo, zoneCount, 0);
 		return;
@@ -283,7 +283,7 @@ void Com_LoadLevelFastFiles(const char *mapName)
 	if (Com_IsMenuLevel(mapName))
 	{
 		zoneInfo[zoneCount].name = "patch_ui";
-		zoneInfo[zoneCount].allocFlags = DB_ZONE_FRONTEND;
+		zoneInfo[zoneCount].allocFlags = DB_ZONE_PATCH_UI;
 		zoneInfo[zoneCount++].freeFlags = 0;
 	}
 	else
