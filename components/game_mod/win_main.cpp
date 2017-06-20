@@ -31,7 +31,7 @@ void Sys_OutOfMemErrorInternal(const char *filename, int line)
 	for (int i = 0; i < frameCount; i++)
 	{
 		char buf[256];
-		sprintf_s(buf, "frame[%s%d]: %08x%s", i < 10 ? " " : "", i, frame[i], i % 2 ? "\n" : "\t");
+		sprintf_s(buf, "frame[%s%d]: %0*p%s", i < 10 ? " " : "", i, 10, frame[i], i % 2 ? "\n" : "\t");
 		strcat_s(msg, buf);
 	}
 
