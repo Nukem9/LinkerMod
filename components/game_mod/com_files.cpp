@@ -85,7 +85,7 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize)
 		{
 			_iobuf* file = FS_FileForHandle(descHandle);
 			desc.Clear();
-			int nDescLen = FS_ReadModDescription(&desc, desc.bufLen, file);
+			int nDescLen = FS_ReadModDescription(desc.data, desc.bufLen, file);
 
 			// Ensure that the string is null terminated
 			if (nDescLen >= 0)
@@ -106,7 +106,7 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize)
 			{
 				_iobuf* file = FS_FileForHandle(descHandle);
 				desc.Clear();
-				int nDescLen = FS_ReadModDescription(&desc, desc.bufLen, file);
+				int nDescLen = FS_ReadModDescription(desc.data, desc.bufLen, file);
 				
 				// Ensure that the string is null terminated
 				if (nDescLen >= 0)
