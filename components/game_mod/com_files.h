@@ -48,7 +48,8 @@ static FS_Read_t FS_Read = (FS_Read_t)0x004CFB60;
 typedef unsigned int (__cdecl* FS_FileRead_t)(void *ptr, unsigned int len, struct _iobuf *stream);
 static FS_FileRead_t FS_FileRead = (FS_FileRead_t)0x0047F210;
 
-typedef int (__cdecl* FS_SV_FOpenFileRead_t)(const char *filename, const char *dir, int *fp);
+// If pResult is NULL, no result value is written
+typedef int(__cdecl* FS_SV_FOpenFileRead_t)(const char *filename, const char *dir, int *fp, int* pResult);
 static FS_SV_FOpenFileRead_t FS_SV_FOpenFileRead = (FS_SV_FOpenFileRead_t)0x00464020;
 
 typedef _iobuf *(__cdecl* FS_FileForHandle_t)(int f);

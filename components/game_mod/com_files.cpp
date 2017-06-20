@@ -67,7 +67,7 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize)
 		char* descData = descPath + 1;
 
 		int descHandle = 0;
-		if (FS_SV_FOpenFileRead(descPath, "mods", &descHandle) > 0 && descHandle)
+		if (FS_SV_FOpenFileRead(descPath, "mods", &descHandle, NULL) > 0 && descHandle)
 		{
 			_iobuf* file = FS_FileForHandle(descHandle);
 			memset(descData, 0, bufLen - 1);
@@ -86,7 +86,7 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize)
 			strncat_s(descPath, "/description.txt", bufLen);
 
 			int descHandle = 0;
-			if (FS_SV_FOpenFileRead(descPath, "mods", &descHandle) > 0 && descHandle)
+			if (FS_SV_FOpenFileRead(descPath, "mods", &descHandle, NULL) > 0 && descHandle)
 			{
 				_iobuf* file = FS_FileForHandle(descHandle);
 				memset(descData, 0, bufLen - 1);
