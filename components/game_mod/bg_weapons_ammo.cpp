@@ -23,7 +23,7 @@ void BG_SetupWeaponDefAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef, We
 
 	// Check if this weapon was dual-wield
 	if (weapVarDef->iAmmoIndex < 0
-		|| weapVarDef->iAmmoIndex >= bg_numAmmoTypes
+		|| weapVarDef->iAmmoIndex >= (int)bg_numAmmoTypes
 		|| bg_weapAmmoTypes[weapVarDef->iAmmoIndex] != weapVarDef)
 	{
 		WeaponVariantDef *dwWeaponVarDef;
@@ -32,7 +32,7 @@ void BG_SetupWeaponDefAmmoIndexes(unsigned int weapIndex, WeaponDef *weapDef, We
 		if (weapDef->bDualWield
 			&& (dwIndex = BG_GetWeaponIndexForName(weapDef->szDualWieldWeaponName)) != 0
 			&& (dwWeaponVarDef = BG_GetWeaponVariantDef(dwIndex), dwWeaponVarDef->iAmmoIndex >= 0)
-			&& dwWeaponVarDef->iAmmoIndex < bg_numAmmoTypes
+			&& dwWeaponVarDef->iAmmoIndex < (int)bg_numAmmoTypes
 			&& bg_weapAmmoTypes[dwWeaponVarDef->iAmmoIndex] == dwWeaponVarDef)
 		{
 			weapVarDef->iAmmoIndex = dwWeaponVarDef->iAmmoIndex;
@@ -128,7 +128,7 @@ void BG_SetupWeaponDefClipIndexes(WeaponDef *weapDef, WeaponVariantDef *weapVarD
 
 	// Add a new entry if this was a new clip type
 	if (weapVarDef->iClipIndex < 0
-		|| weapVarDef->iClipIndex >= bg_numWeapClips
+		|| weapVarDef->iClipIndex >= (int)bg_numWeapClips
 		|| bg_weapClips[weapVarDef->iClipIndex] != weapVarDef)
 	{
 		ASSERT_MSG(bg_numWeapClips < ARRAYSIZE(bg_weapClips), "bg_numWeapClips doesn't index ARRAY_COUNT(bg_weapClips)");
