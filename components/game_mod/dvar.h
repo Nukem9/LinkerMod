@@ -111,6 +111,11 @@ VANILLA_DVAR(fs_usermapDir, 0x025FADE4);
 VANILLA_DVAR(fs_homepath, 0x025FBF0C);
 VANILLA_DVAR(fs_basepath, 0x025FBF04);
 
+VANILLA_DVAR(cg_fov, 0x02FF6888);
+VANILLA_DVAR(cg_fov_default, 0x02FF669C);
+VANILLA_DVAR(cg_fov_default_thirdperson, 0x02F67B9C);
+VANILLA_DVAR(cg_fovScale, 0x02FF66A8);
+
 VANILLA_DVAR(uiscript_debug, 0x02562A20);
 
 VANILLA_DVAR(cl_ingame, 0x02910158);

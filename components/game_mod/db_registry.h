@@ -170,13 +170,13 @@ enum XZoneFlags
 	DB_FLAG_STRICTFREE			= 1 << 31,	// 0x80000000,
 };
 
-static volatile unsigned int& g_zoneInfoCount = *(volatile unsigned int *)0x00E72984;
+VANILLA_VALUE(g_zoneInfoCount, volatile unsigned int, 0x00E72984);
 static XZoneInfoInternal *g_zoneInfo = (XZoneInfoInternal *)0x00C84308;
 static XZoneName *g_zoneNames = (XZoneName *)0x010C6608;
 static void **DB_XAssetPool = (void **)0x00B741B8;
 static DWORD *g_poolSize = (DWORD *)0x00B73EF8;
 static char **g_assetNames = (char **)0x00B73BB0;
-static char*& g_load_filename = *(char **)0x00C7934C;
+VANILLA_VALUE(g_load_filename, char*, 0x00C7934C);
 
 static auto DB_XAssetGetNameHandler = (const char *(__cdecl **)(XAssetHeader *))0x00B73C60;
 
