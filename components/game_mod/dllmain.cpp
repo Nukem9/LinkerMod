@@ -197,15 +197,6 @@ BOOL GameMod_Init()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0060F7D0, (PBYTE)&Com_DPrintf);
 
-#if _DEBUG || _USE_COM_DPRINTF
-	PatchMemory_WithNOP(0x007A499B, 5); // "Redundant asset: '%s','%s'\n"
-	PatchMemory_WithNOP(0x007A2E82, 5); // "Could not load %s \"%s\".\n"
-	PatchMemory_WithNOP(0x007A2E9B, 5); // "Could not load %s \"%s\".\n"
-	PatchMemory_WithNOP(0x007A2EC6, 5); // "Could not load %s \"%s\".\n"
-	PatchMemory_WithNOP(0x004775E7, 5); // Scr_LoadScriptInternal
-	PatchMemory_WithNOP(0x00477602, 5); // Scr_LoadScriptInternal
-#endif
-
 	//
 	// Allow joining in-game (set party_joinInProgressAllowed)
 	//
