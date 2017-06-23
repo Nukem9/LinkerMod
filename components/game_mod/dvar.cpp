@@ -84,7 +84,7 @@ void R_RegisterCustomDvars()
 		NULL
 	};
 
-	com_developer_print = Dvar_RegisterEnum("developer_print", com_dprintf_options, 0, 0x80, "Modify Com_DPrintf() behavior")
+	com_developer_print = Dvar_RegisterEnum("developer_print", com_dprintf_options, 0, 0x80, "Modify Com_DPrintf() behavior");
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;
