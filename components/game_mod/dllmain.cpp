@@ -93,7 +93,7 @@ BOOL GameMod_Init()
 	//
 	// Detour GScr_NewDebugHudElem to GScr_NewHudElem
 	//
-	Detours::X86::DetourFunction((PBYTE)0x00600BF0, (PBYTE)0x006707C0);
+	Detours::X86::DetourFunction((PBYTE)0x00600BF0, (PBYTE)&GScr_NewDebugHudElem);
 	//
 	// Patch openfile, closefile
 	//
