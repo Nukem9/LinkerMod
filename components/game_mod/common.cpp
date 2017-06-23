@@ -54,11 +54,15 @@ void Com_ToolError(int channel, const char* fmt, ...)
 
 void Com_DPrintf(int channel, const char *fmt, ...)
 {
-	// Allow the developer check to be bypassed through code
-#if _USE_COM_DPRINTF == 0
-	if (!com_developer || !com_developer->current.integer)
+	if (com_developer_print && com_developer_print->current.integer == 2)
 		return;
-#endif
+	
+	if (com_developer_print == NULL
+		|| (com_developer_print && com_developer_print->current.integer == 0))
+	{
+		if (!com_developer || !com_developer->current.integer)
+			return;
+	}
 
 	if (channel > 31)
 		return;

@@ -14,6 +14,8 @@ dvar_s* scr_useFastFileOnly = NULL;
 dvar_s* scr_suppressErrors = NULL;
 dvar_s* perk_weapRateEnhanced = NULL;
 
+dvar_s* com_developer_print = NULL;
+
 dvar_s* radiant_live = NULL;
 dvar_s* radiant_livePort = NULL;
 dvar_s* radiant_liveDebug = NULL;
@@ -73,6 +75,16 @@ void R_RegisterCustomDvars()
 
 	r_showTess = Dvar_RegisterEnum("r_showTess", r_showTessNames, 0, 0x80u, "Show details for each surface");
 	com_cfg_readOnly = Dvar_RegisterInt("com_cfg_readOnly", com_cfg_readOnly_default ? 1 : 0, 0, 1, DVAR_AUTOEXEC, "Prevent writing to the config"); // Old flags were 0x2001
+	
+	static const char* com_dprintf_options[] =
+	{
+		"default",
+		"always",
+		"never",
+		NULL
+	};
+
+	com_developer_print = Dvar_RegisterEnum("developer_print", com_dprintf_options, 0, 0x80, "Modify Com_DPrintf() behavior")
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;

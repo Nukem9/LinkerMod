@@ -181,6 +181,8 @@ VANILLA_DVAR(sys_configSum, 0x0276F558);
 
 VANILLA_DVAR(showVisionSetDebugInfo, 0x00C23D40);
 
+extern dvar_s* com_developer_print
+
 extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;
 extern dvar_s* radiant_liveDebug;
@@ -210,6 +212,9 @@ static Dvar_SetStringByName_t* Dvar_SetStringByName = (Dvar_SetStringByName_t*)0
 
 typedef void __cdecl Dvar_SetBool_t(dvar_s *dvar, bool value);
 static Dvar_SetBool_t* Dvar_SetBool = (Dvar_SetBool_t*)0x004B0C10;
+
+typedef void __cdecl Dvar_SetFloat_t(dvar_s *dvar, float value);
+static Dvar_SetFloat_t* Dvar_SetFloat = (Dvar_SetFloat_t*)0x0061F7A9;
 
 typedef dvar_s *__cdecl Dvar_RegisterString_t(const char *dvarName, const char *value, unsigned __int16 flags, const char *description);
 static Dvar_RegisterString_t* Dvar_RegisterString = (Dvar_RegisterString_t*)0x0059B3B0;
