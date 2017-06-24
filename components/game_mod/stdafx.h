@@ -41,6 +41,7 @@
 #include "bg_weapons_load_obj.h"
 #include "g_items.h"
 #include "sv_ccmds_mp.h"
+#include "sv_client_mp.h"
 #include "cl_main_mp.h"
 #include "cl_console.h"
 #include "db_registry.h"

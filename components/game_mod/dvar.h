@@ -123,6 +123,7 @@ VANILLA_DVAR(com_sv_running, 0x0243FD3C);
 VANILLA_DVAR(com_maxclients, 0x02481720);
 VANILLA_DVAR(com_developer, 0x0243FCA0);
 VANILLA_DVAR(sv_mapname, 0x02899CEC);
+VANILLA_DVAR(sv_floodProtect, 0x02866FE4);
 
 VANILLA_DVAR(developer, 0x0243FCA0);
 VANILLA_DVAR(developer_script, 0x02481714);

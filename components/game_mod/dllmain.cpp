@@ -537,6 +537,11 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x007694A0, (PBYTE)&PM_Weapon_WeaponTimeAdjust);
 
 	//
+	// Hook reliable command handling
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0087D940, (PBYTE)&hk_SV_ClientCommand);
+
+	//
 	// Increase default sv_network_fps to 200
 	//
 	//PatchMemory(0x00698BFA, (PBYTE)"\xC8", 1);

@@ -141,6 +141,7 @@
     <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="scr_cmds.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
+    <ClCompile Include="sv_client_mp.cpp" />
     <ClCompile Include="sv_main_mp.cpp" />
     <ClCompile Include="sys_cmds.cpp" />
     <ClCompile Include="threads.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="scr_cmds.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv_ccmds_mp.h" />
+    <ClInclude Include="sv_client_mp.h" />
     <ClInclude Include="sv_main_mp.h" />
     <ClInclude Include="sys_cmds.h" />
     <ClInclude Include="threads.h" />

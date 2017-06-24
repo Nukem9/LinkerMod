@@ -157,6 +157,7 @@ STATIC_ASSERT_SIZE(clientState_s, 0x1D28);
 struct clientSession_t
 {
 };
+//STATIC_ASSERT_SIZE(clientSession_t, 0x0);
 
 struct gclient_s
 {
@@ -164,11 +165,47 @@ struct gclient_s
 	//clientSession_t sess;
 };
 STATIC_ASSERT_OFFSET(gclient_s, ps, 0x0);
+//STATIC_ASSERT_SIZE(gclient_s, 0x0);
+
+struct clientHeader_t
+{
+	int state;
+	char _pad1[0x20];
+	struct
+	{
+		struct
+		{
+			int type;
+		} remoteAddress;
+	} netchan;
+	char _pad2[0x6F0];
+};
+STATIC_ASSERT_OFFSET(clientHeader_t, state, 0x0);
+//STATIC_ASSERT_OFFSET(clientHeader_t, netchan, 0x24);
+STATIC_ASSERT_SIZE(clientHeader_t, 0x718);
 
 struct client_t
 {
-	char _pad1[0x101B0];
+	clientHeader_t header;
+	const char *dropReason;
+	BYTE gap28[0x10850];
+	int lastClientCommand;
+	char lastClientCommandString[1024];
+	gentity_s *gentity;
+	char name[32];
+	BYTE gap11394[184];
+	int nextReliableTime;
+	int nextReliableCount;
+	char _pad1[0x2F26C];
 };
-STATIC_ASSERT_SIZE(client_t, 0x101B0);
+STATIC_ASSERT_OFFSET(client_t, header, 0x0);
+STATIC_ASSERT_OFFSET(client_t, dropReason, 0x718);
+STATIC_ASSERT_OFFSET(client_t, lastClientCommand, 0x10F6C);
+STATIC_ASSERT_OFFSET(client_t, lastClientCommandString, 0x10F70);
+STATIC_ASSERT_OFFSET(client_t, gentity, 0x11370);
+STATIC_ASSERT_OFFSET(client_t, name, 0x11374);
+STATIC_ASSERT_OFFSET(client_t, nextReliableTime, 0x1144C);
+STATIC_ASSERT_OFFSET(client_t, nextReliableCount, 0x11450);
+STATIC_ASSERT_SIZE(client_t, 0x406C0);
 
 static gentity_s *g_entities = (gentity_s *)0x01A796F8;
