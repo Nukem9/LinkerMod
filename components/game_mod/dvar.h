@@ -222,6 +222,9 @@ static Dvar_RegisterString_t* Dvar_RegisterString = (Dvar_RegisterString_t*)0x00
 typedef dvar_s *__cdecl Dvar_RegisterInt_t(const char *dvarName, int value, int min, int max, unsigned __int16 flags, const char *description);
 static Dvar_RegisterInt_t* Dvar_RegisterInt = (Dvar_RegisterInt_t*)0x00651910;
 
+typedef dvar_s *(__cdecl* Dvar_RegisterFloat_t)(const char *dvarName, float value, float min, float max, unsigned __int16 flags, const char *description);
+static Dvar_RegisterFloat_t Dvar_RegisterFloat = (Dvar_RegisterFloat_t)0x00679020;
+
 typedef dvar_s *(__cdecl* Dvar_RegisterBool_t)(const char *dvarName, bool value, unsigned __int16 flags, const char *description);
 static Dvar_RegisterBool_t Dvar_RegisterBool = (Dvar_RegisterBool_t)0x0045BB20;
 
