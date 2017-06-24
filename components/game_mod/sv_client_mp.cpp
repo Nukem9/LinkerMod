@@ -101,7 +101,7 @@ void __declspec(naked) hk_SV_ClientCommand()
 	__asm
 	{
 		push 0
-		push[esp + 4]
+		push[esp + 8]
 		push eax
 		call SV_ClientCommand
 		add esp, 0xC
