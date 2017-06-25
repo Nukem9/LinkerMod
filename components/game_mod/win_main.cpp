@@ -1,5 +1,10 @@
 #include "stdafx.h"
 
+int Sys_Milliseconds()
+{
+	return ((int (__cdecl *)())0x0062EF60)();
+}
+
 void Sys_GetEvent(sysEvent_t *event)
 {
 	((void(__cdecl *)(sysEvent_t *))0x0068BB40)(event);

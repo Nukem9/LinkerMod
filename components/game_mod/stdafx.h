@@ -47,6 +47,8 @@
 #include "db_registry.h"
 #include "ui_main_pc.h"
 #include "live_win.h"
+#include "live_steam_client.h"
+#include "dwlogon_pc.h"
 #include "cg_scoreboard.h"
 #include "cg_draw_debug.h"
 #include "sys_cmds.h"

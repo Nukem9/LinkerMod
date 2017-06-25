@@ -301,6 +301,12 @@ BOOL GameMod_Init()
 	PatchMemory_WithNOP(0x004521EE, 0x13);
 
 	//
+	// Cache the steam encrypted app ticket on disk (Fix API rate limits)
+	//
+	Detours::X86::DetourFunctionClass((PBYTE)0x004FB6D0, &LiveSteamClient::OnRequestEncryptedAppTicket);
+	Detours::X86::DetourFunctionClass((PBYTE)0x0048E0A0, &LiveSteamClient::GetRetrievedEncryptedAppTicket);
+
+	//
 	// Prevent joining a public (vanilla) lobby
 	//
 	Detours::X86::DetourFunction((PBYTE)0x008B3250, (PBYTE)&SV_UpdateCategory);

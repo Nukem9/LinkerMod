@@ -114,8 +114,10 @@
     <ClCompile Include="db_registry.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dvar.cpp" />
+    <ClCompile Include="dwlogon_pc.cpp" />
     <ClCompile Include="g_client_script_cmd_mp.cpp" />
     <ClCompile Include="g_items.cpp" />
+    <ClCompile Include="live_steam_client.cpp" />
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_misc.cpp" />
@@ -177,9 +179,11 @@
     <ClInclude Include="d3d9ex.h" />
     <ClInclude Include="db_registry.h" />
     <ClInclude Include="dvar.h" />
+    <ClInclude Include="dwlogon_pc.h" />
     <ClInclude Include="g_client_script_cmd_mp.h" />
     <ClInclude Include="g_items.h" />
     <ClInclude Include="g_main_mp.h" />
+    <ClInclude Include="live_steam_client.h" />
     <ClInclude Include="live_win.h" />
     <ClInclude Include="patch_common.h" />
     <ClInclude Include="patch_usefastfile.h" />

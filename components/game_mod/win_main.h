@@ -18,6 +18,7 @@ struct sysEvent_t
 	void *evPtr;
 };
 
+int Sys_Milliseconds();
 void Sys_GetEvent(sysEvent_t *event);
 void Sys_NormalExit();
 void Sys_OutOfMemErrorInternal(const char *filename, int line);
