@@ -154,26 +154,7 @@ void Dvar_SetFromStringByName(const char *dvarName, const char *string)
 	if (dvarName && string)
 	{
 		if (!_stricmp(dvarName, "cg_fov") && !_stricmp(string, "65"))
-		{
-			if (cg_fov == NULL || cg_fov_default == NULL)
-				return;
-
-#if _DEBUG
-			Com_Printf(0, "CG_FOV_DEFAULT: %p\n", cg_fov_default);
-			Com_Printf(0, "CG_FOV_DEFAULT: %f\n", cg_fov_default->current.value);
-#endif
-
-			//
-			// Note: If we run Dvar_SetFloat *every* time the game crashes
-			//
-			if (cg_fov->current.value != cg_fov_default->current.value)
-			{
-				Dvar_SetFloat(cg_fov, cg_fov_default->current.value);
-				return;
-			}
-
 			return;
-		}
 
 		if (!_stricmp(dvarName, "cg_default_fov") && !_stricmp(string, "65"))
 			return;
