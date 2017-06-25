@@ -1,3 +1,4 @@
+#define G_VERSION 1, 2, 0
 #include "stdafx.h"
 
 void strcpy_safe(char *Dest, const char *Src)
@@ -35,13 +36,8 @@ void __declspec(naked) hk_Com_Printf()
 	}
 }
 
-bool g_Initted = false;
-
 BOOL RadiantMod_Init()
 {
-	if (g_Initted)
-		return FALSE;
-
 	//
 	// Disable STDOUT buffering
 	//
@@ -67,14 +63,52 @@ BOOL RadiantMod_Init()
 #endif
 
 	//
-	// Hook any needed functions
+	// Use D3D9Ex when available to prevent lost devices
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0051B75A, (PBYTE)&hk_Direct3DCreate9, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0051B5CC, (PBYTE)&hk_CreateDevice, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0054F34F, (PBYTE)&hk_GetSwapChain, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0051B891, (PBYTE)&hk_CreateAdditionalSwapChain, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0051C25E, (PBYTE)&hk_CreateAdditionalSwapChain, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x0056AC60, (PBYTE)&Image_Setup);
+	PatchMemory(0x0053E492, (PBYTE)"\xEB", 1); // (Present() patch when focus is lost)
+
+	//
+	// Redirect all resource (resx) loading to this dll first
+	//
+	void *ptr = hk_LoadResource;
+	PatchMemory(0x006414F0, (PBYTE)&ptr, 4);
+
+	ptr = hk_SizeofResource;
+	PatchMemory(0x006414F8, (PBYTE)&ptr, 4);
+
+	ptr = hk_FindResourceA;
+	PatchMemory(0x006414EC, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadMenuA;
+	PatchMemory(0x0064183C, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadCursorA;
+	PatchMemory(0x006418B4, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadAcceleratorsA;
+	PatchMemory(0x00641678, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadIconA;
+	PatchMemory(0x0064180C, (PBYTE)&ptr, 4);
+
+	ptr = hk_LoadBitmapA;
+	PatchMemory(0x00641828, (PBYTE)&ptr, 4);
+
+	//
+	// Enable com_printf again
 	//
 	FixupFunction(0x004683F0, (ULONG_PTR)&hk_Com_Printf);
 
 	//
 	// Hook CWinApp::Run to allow for automatic map loading via command line arguments
 	//
-	//Detours::X86::DetourClassFunction((PBYTE)0x005BF26E, &CWinApp::Run);
+	//Detours::X86::DetourFunctionClass((PBYTE)0x005BF26E, &CWinApp::Run);
 
 	//
 	// FS_ReadFile Hook - Set Up Fallback Location for Techsets and Techniques
@@ -119,16 +153,12 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0053519E, (PBYTE)&mfh_XModelReadSurface); // 4 byte xmodelsurfs file adjustment (MagicNumber)
 
 	//
-	// FixRegistryEntries to prevent collision with CoDWAWRadiant
+	// Re-brand CoDWAWRadiant to CoDBORadiant
 	//
 	strcpy_safe((char *)0x006F8688, "Software\\iw\\CoDBORadiantModTool\\CoDBORadiantModTool");
 	strcpy_safe((char *)0x006F0CD0, "Software\\iw\\CoDBORadiantModTool\\IniPrefs");
 	strcpy_safe((char *)0x006EC300, "Software\\iw\\CoDBORadiantModTool\\MRU");
 	strcpy_safe((char *)0x006F0D08, "iw\\CoDBORadiantModTool");
-
-	//
-	// More BO Radiant re-branding of names
-	//
 	strcpy_safe((char *)0x006F7984, "CoDBORadiantModTool");
 	strcpy_safe((char *)0x006ECA30, "You will need to restart CoDBORadiantModTool for the view changes to take place.");
 	strcpy_safe((char *)0x006EC5CC, "CoDBORadiantModTool Project files( *.prj )|*.prj||");
@@ -158,6 +188,9 @@ BOOL RadiantMod_Init()
 	DO_NOT_USE(0x0052F6B0);// Material_CopyTextToDXBuffer
 	DO_NOT_USE(0x0052FE70);// Material_SetPassShaderArguments_DX
 	DO_NOT_USE(0x00567450);// Image_LoadFromData
+	DO_NOT_USE(0x0052B160);// Image_CreateCubeTexture_PC
+	DO_NOT_USE(0x0052B040);// Image_Create3DTexture_PC
+	DO_NOT_USE(0x0052AF20);// Image_Create2DTexture_PC
 #undef DO_NOT_USE
 #endif
 
@@ -174,9 +207,9 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004D70DB, (PBYTE)&mfh3_Sys_ListFiles);
 
 	//
-	// Leak pointfile compatibility fix
+	// (Deprecated): Leak pointfile compatibility fix
 	//
-	PatchMemory(0x006F7378, (PBYTE)".pts", 4);
+	//PatchMemory(0x006F7378, (PBYTE)".pts", 4);
 
 	//
 	// Fix for misleading (incorrect) assertion message
@@ -230,7 +263,7 @@ BOOL RadiantMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004A814E, (PBYTE)&mfh_Ent_Connect); // Generate the new default spotLight KVs when creating a spotLight
 
 #if RADIANT_USE_AFX_OVERRIDES
-	CWnd::OnCtlColor_o = (OnCtlColor_t)Detours::X86::DetourClassFunction((PBYTE)0x0059B96E, &CWnd::OnCtlColor);
+	CWnd::OnCtlColor_o = (OnCtlColor_t)Detours::X86::DetourFunctionClass((PBYTE)0x0059B96E, &CWnd::OnCtlColor);
 #endif
 
 #if RADIANT_USE_SPLASH
@@ -260,10 +293,46 @@ BOOL RadiantMod_Init()
 	PatchMemory(0x0042F882, (PBYTE)&ppfn, 4); // Main Window
 	//PatchMemory(0x004B36DF, (PBYTE)&ppfn, 4); // Entity Window (Doesn't work)
 	//PatchMemory(0x004018B0, (PBYTE)&ppfn, 4); // Advanced Curve Dialog (Doesn''t work)
-
 #endif
 
-	g_Initted = true;
+	//
+	// Fix the grid block coordinates
+	//
+	PatchMemory(0x004827E9, (PBYTE)"\x84", 1);
+	PatchMemory(0x004827D3, (PBYTE)"\x84", 1);
+
+	//
+	// Fix Crash when opening maps that don't have a valid skybox
+	//	(Prevent attempting to use the default model as a skybox)
+	//
+	PatchCall(0x0040309F, (PBYTE)&R_RegisterSkyboxModel);
+
+	//
+	// Add Maps Loaded via Launcher (Args) to the MRU
+	//
+	PatchCall(0x0042DD2E, (PBYTE)&hk_HandleLaunchArgs);
+
+	//
+	// Live game update hooks
+	//
+	*(PBYTE *)&CCamWnd::ctor_o = Detours::X86::DetourFunction((PBYTE)0x00402B90, (PBYTE)&CCamWnd::ctor);
+
+	*(PBYTE *)&Entity_Clone_o = Detours::X86::DetourFunction((PBYTE)0x0049E7C0, (PBYTE)&hk_Entity_Clone);
+	*(PBYTE *)&Entity_Free_o = Detours::X86::DetourFunction((PBYTE)0x0049D3D0, (PBYTE)&hk_Entity_Free);
+
+	*(PBYTE *)&Undo_Start_o = Detours::X86::DetourFunction((PBYTE)0x004769D0, (PBYTE)&hk_Undo_Start);
+	*(PBYTE *)&Undo_End_o = Detours::X86::DetourFunction((PBYTE)0x00476E30, (PBYTE)&hk_Undo_End);
+
+	*(PBYTE *)&SetEntityKeyValue_o = Detours::X86::DetourFunction((PBYTE)0x0049CE00, (PBYTE)&hk_SetEntityKeyValue);
+	*(PBYTE *)&SetKeyValue_o = Detours::X86::DetourFunction((PBYTE)0x0049CD20, (PBYTE)&hk_SetKeyValue);
+
+	*(PBYTE *)&Map_LoadFile_o = Detours::X86::DetourFunction((PBYTE)0x0049FF90, (PBYTE)&hk_Map_LoadFile);
+	*(PBYTE *)&Map_SaveFile_o = Detours::X86::DetourFunction((PBYTE)0x004A07E0, (PBYTE)&hk_Map_SaveFile);
+
+	*(PBYTE *)&MoveSelection_o = Detours::X86::DetourFunction((PBYTE)0x00498AE0, (PBYTE)&hk_MoveSelection);
+
+	CreateThread(nullptr, 0, RemoteNet_Thread, nullptr, 0, nullptr);
+
 	return TRUE;
 }
 

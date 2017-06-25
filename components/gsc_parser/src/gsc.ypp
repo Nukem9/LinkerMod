@@ -1,0 +1,620 @@
+%{
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <iostream>
+	
+	#include "../symbols/symbol.h"
+	#include "gsc.tab.hpp"
+	#include "gsc.yy.h"
+
+	int yylex(YYSTYPE *yylval_param, YYLTYPE *yylloc_param, void* yyscanner);
+	extern void yyerror(YYLTYPE* loc, Symbol** yyAST_out, void* scanner, const char* err);
+%}
+
+%define api.pure full
+%lex-param { void* scanner }
+%parse-param { Symbol** yyAST_out } { void* scanner }
+
+%define parse.error verbose
+
+%locations
+%initial-action
+{
+	#if VSCODE_COMPATIBLE_LOCATION
+		@$.first_line = @$.last_line = 0;
+		@$.first_column = @$.last_column = 0;
+	#endif
+}
+
+%code requires
+{
+	#include "../sys/sys_platform.h"
+	#include "../symbols/operator_enum.h"
+	
+	//
+	// Forward declarations for any custom classes used in YYSTYPE
+	//
+	class Symbol;
+	class Include;
+	
+	class Literal;
+	class Identifier;
+	
+	class Conditional;
+	
+	class Animtree;
+	class Expression;
+	class Member;
+	class Reference;
+	class Pointer;
+	
+	class Function;
+	class Call;
+	
+	class Return;
+	class Wait;
+}
+
+%union {
+	OPERATOR_TYPE	op; //operator
+	
+	int			literal_int;
+	float		literal_float;
+	char*		literal_string;
+	
+	char*		t_identifier;
+	
+	Symbol*		symbol;
+	Include*	include;
+	Animtree*	animtree;
+	
+	Literal*	literal;
+	
+	Member*		member;
+	
+	Expression*	expression;
+	Reference*	reference;
+	Pointer*	pointer;
+	
+	Function*	function;
+	Call*		call;
+	
+	Return*		retn;
+}
+
+%token<literal_string> T_STRING
+%token<literal_string> T_FLOAT
+%token<literal_string> T_INT
+
+%token INCLUDE
+%token USING_ANIMTREE
+%token ANIMTREE
+
+%token OP_LPAREN
+%token OP_RPAREN
+%token FUNC_POINTER_BEGIN
+
+%token OP_LBRACE
+%token OP_RBRACE
+%token OP_COMMA
+%token OP_INC
+%token OP_DEC
+
+%token OP_COLON_DOUBLE
+%token OP_COLON
+%token OP_COLON_SEMI
+%token OP_QMARK
+%token OP_HASH
+
+%token T_IF
+%token T_ELSE
+%token T_SWITCH
+%token T_CASE
+%token T_DEFAULT
+%token T_BREAK
+%token T_FOR
+%token T_WHILE
+%token T_CONTINUE
+%token T_RETURN
+%token T_THREAD
+%token T_WAIT
+%token<literal_string> T_FILEPATH
+%token<t_identifier> T_IDENTIFIER
+
+// Define Token
+%token OP_LBRACKET OP_RBRACKET OP_DOT
+%token OP_NOT OP_BW_NOT
+%token OP_MULT OP_DIV OP_MOD
+%token OP_ADD OP_SUB
+%token OP_LSHIFT OP_RSHIFT
+%token OP_CMP_LT OP_CMP_LE OP_CMP_GT OP_CMP_GE
+%token OP_CMP_EQ OP_CMP_NEQ
+%token OP_BW_AND
+%token OP_BW_XOR
+%token OP_BW_OR
+%token OP_CMP_AND
+%token OP_CMP_OR
+//ternary
+%token OP_ASSIGN
+%token OP_ASSIGN_ADD OP_ASSIGN_SUB OP_ASSIGN_MULT OP_ASSIGN_DIV OP_ASSIGN_BW_AND OP_ASSIGN_BW_XOR OP_ASSIGN_BW_OR
+
+%token T_INVALID
+%token T_EOF 0
+
+// Special Operators & Operator-Like Tokens
+%nonassoc T_THREAD T_FILEPATH T_IDENTIFIER
+%left OP_COLON_DOUBLE FUNC_POINTER_BEGIN
+
+// Operator Precedence ( highest line number = highest precedence )
+%right OP_ASSIGN OP_ASSIGN_ADD OP_ASSIGN_SUB OP_ASSIGN_MULT OP_ASSIGN_DIV OP_ASSIGN_BW_AND OP_ASSIGN_BW_XOR OP_ASSIGN_BW_OR
+//ternary
+%left OP_CMP_OR
+%left OP_CMP_AND
+%left OP_BW_OR
+%left OP_BW_XOR
+%left OP_BW_AND
+%left OP_CMP_EQ OP_CMP_NEQ
+%left OP_CMP_LT OP_CMP_LE OP_CMP_GT OP_CMP_GE
+%left OP_LSHIFT OP_RSHIFT
+%left OP_ADD OP_SUB
+%left OP_MULT OP_DIV OP_MOD
+%right OP_INC_PRE OP_DEC_PRE OP_POSITIVE OP_NEGATIVE OP_NOT OP_BW_NOT
+%left OP_INC_POST OP_DEC_POST OP_LBRACKET OP_RBRACKET OP_DOT
+
+%type<symbol> 		IncludeDirective;
+%type<symbol> 		AnimtreeDirective;
+%type<symbol> 		FunctionDeclaration;
+		
+%type<symbol> 		FormalParameterList;
+		
+%type<symbol> 		SourceElements;
+%type<symbol> 		SourceElement;
+		
+%type<literal> 		StringLiteral;
+%type<literal> 		NumericLiteral;
+%type<symbol> 		Block;
+%type<symbol> 		FunctionParameterList;
+%type<call>			FunctionCall;
+%type<symbol>		FunctionExpression;
+%type<pointer>		PointerExpression;
+%type<reference>	ReferenceExpression;
+%type<symbol> 		AnimReferenceExpression;
+%type<symbol> 		MemberExpression;
+%type<symbol> 		ElementList;
+%type<symbol> 		ListExpression;
+%type<symbol> 		ObjectExpression;
+%type<symbol>		ModifiableExpression;
+%type<literal> 		LiteralExpression;
+%type<expression> 	OptionalExpression;
+%type<expression>	BasicExpression;
+%type<expression>	e;
+%type<expression> 	Expression;
+%type<symbol> 		ExpressionStatement;
+%type<symbol> 		ReturnStatement;
+%type<symbol> 		WaitStatement;
+%type<symbol> 		EmptyStatement;
+%type<symbol> 		IfStatement;
+%type<symbol> 		SwitchStatement;
+%type<symbol> 		CaseStatement;
+%type<symbol> 		LoopStatement;
+%type<symbol> 		Statement;
+%type<symbol> 		StatementList;
+
+%destructor { delete $$; } <*>
+%destructor { free($$); } T_FILEPATH T_IDENTIFIER T_STRING T_FLOAT T_INT
+
+%start Program
+
+%%
+
+IncludeDirective:
+	INCLUDE T_FILEPATH OP_COLON_SEMI
+		{
+			$$ = new Include(new Literal($2, @2, S_TYPE_LITERAL_FILEPATH), @$); 
+		};
+		
+AnimtreeDirective:
+	USING_ANIMTREE OP_LPAREN T_STRING OP_RPAREN OP_COLON_SEMI
+		{
+			$$ = new Animtree(new Literal($3, @3, S_TYPE_LITERAL_STRING), @$); 
+		};
+
+FunctionDeclaration:
+	T_IDENTIFIER OP_LPAREN FormalParameterList OP_RPAREN Block
+	{
+		$$ = new Function(new Identifier($1, @1), @$);
+		$$->AddChild(new Group($3, @3));
+		$$->AddChild($5);
+	};
+
+FormalParameterList
+	: FormalParameterList OP_COMMA T_IDENTIFIER
+		{
+			$1->AddToEnd( new Identifier($3, @3) );
+			$$ = $1;
+		}
+	| T_IDENTIFIER
+		{ $$ = new Identifier($1, @1); }
+	|
+		{ $$ = NULL; };
+
+SourceElement:
+	IncludeDirective
+	| AnimtreeDirective
+	| FunctionDeclaration
+
+SourceElements:
+	SourceElements SourceElement
+		{
+			$1->AddToEnd($2);
+			$$ = $1;
+		}
+	| SourceElement
+	;
+
+Program: SourceElements T_EOF
+	{
+		*yyAST_out = new Group($1, @1);
+	}
+	
+StringLiteral
+	: T_STRING 
+		{ $$ = new Literal($1, @1, S_TYPE_LITERAL_STRING); }
+	| OP_BW_AND T_STRING 
+		{ $$ = new Literal($2, @$, S_TYPE_LITERAL_STRING); }
+	| OP_HASH T_STRING 
+		{ $$ = new Literal($2, @$, S_TYPE_LITERAL_STRING); }
+	;
+
+NumericLiteral
+	: T_INT 
+		{ $$ = new Literal($1, @1, S_TYPE_LITERAL_INT); }
+	| T_FLOAT 
+		{ $$ = new Literal($1, @1, S_TYPE_LITERAL_FLOAT); }
+	;
+
+Block
+	: OP_LBRACE StatementList OP_RBRACE 
+		{ $$ = new Group($2, @2); }
+	;
+
+FunctionParameterList
+	: FunctionParameterList OP_COMMA Expression 
+		{
+			$1->AddToEnd($3);
+			$$ = $1;
+		}
+	| Expression 
+		{ $$ = $1; }
+	|  
+		{ $$ = NULL; }
+	;
+
+FunctionCall
+	: T_IDENTIFIER OP_LPAREN FunctionParameterList OP_RPAREN 
+		{
+			$$ = new Call(@$, CALL_FLAG_IDENTIFIER);
+			$$->AddChild(new Identifier($1,@1));
+			$$->AddChild(new Group($3, @3));
+		}
+	| T_THREAD T_IDENTIFIER OP_LPAREN FunctionParameterList OP_RPAREN 
+		{
+			$$ = new Call(@$, CALL_FLAG_THREAD | CALL_FLAG_IDENTIFIER);
+			$$->AddChild(new Identifier($2,@2));
+			$$->AddChild(new Group($4, @4));
+		}
+	| PointerExpression OP_LPAREN FunctionParameterList OP_RPAREN 
+		{
+			$$ = new Call(@$, CALL_FLAG_POINTER);
+			$$->AddChild($1);
+			$$->AddChild(new Group($3, @3));
+		}
+	| T_THREAD PointerExpression OP_LPAREN FunctionParameterList OP_RPAREN 
+		{
+			$$ = new Call(@$, CALL_FLAG_THREAD | CALL_FLAG_POINTER);
+			$$->AddChild($2);
+			$$->AddChild(new Group($4, @4));
+		}
+	| ReferenceExpression OP_LPAREN FunctionParameterList OP_RPAREN 
+		{
+			$$ = new Call(@$, CALL_FLAG_REFERENCE);
+			$$->AddChild($1);
+			$$->AddChild(new Group($3, @3));
+		}
+	| T_THREAD ReferenceExpression OP_LPAREN FunctionParameterList OP_RPAREN 
+		{
+			$$ = new Call(@$, CALL_FLAG_THREAD | CALL_FLAG_REFERENCE);
+			$$->AddChild($2);
+			$$->AddChild(new Group($4, @4));
+		}
+	;
+
+FunctionExpression
+	: ObjectExpression FunctionCall 
+		{
+			$2->SetCaller($<expression>1);
+			$$ = $2;
+		}
+	| FunctionCall 
+		{ $$ = $1; }
+	;
+
+PointerExpression
+	: FUNC_POINTER_BEGIN ObjectExpression OP_RBRACKET OP_RBRACKET 
+		{ $$ = new Pointer($<expression>2, @$); }
+	| FUNC_POINTER_BEGIN ReferenceExpression OP_RBRACKET OP_RBRACKET 
+		{ $$ = new Pointer($<expression>2, @$); }
+	;
+
+ReferenceExpression
+	: T_FILEPATH OP_COLON_DOUBLE T_IDENTIFIER 
+		{
+			Literal* file = new Literal($1, @1, S_TYPE_LITERAL_FILEPATH);
+			Identifier* identifier = new Identifier($3, @3);
+			$$ = new Reference(file, identifier, @$);
+		}
+	| OP_COLON_DOUBLE T_IDENTIFIER 
+		{
+			Identifier* identifier = new Identifier($2, @2);
+			$$ = new Reference(NULL, identifier, @$);
+		}
+	;
+
+AnimReferenceExpression
+	: OP_MOD T_IDENTIFIER 
+		{ $$ = new Identifier($2, @2); }
+	;
+
+MemberExpression
+	: ObjectExpression OP_LBRACKET Expression OP_RBRACKET 
+		{ $$ = new Member($<expression>1, $<expression>3, @$, S_TYPE_MEMBER_ARRAY_ELEMENT); }
+	| ObjectExpression OP_DOT ObjectExpression
+		{ $$ = new Member($<expression>1, $<expression>3, @$, S_TYPE_MEMBER_OBJECT_PROPERTY); }
+	| OP_LBRACKET OP_RBRACKET 
+		{ $$ = new Member(NULL, NULL, @$, S_TYPE_MEMBER_ARRAY_EMPTY); }
+	;
+
+ElementList
+	: Expression OP_COMMA Expression //Lists must have at least two elements 
+		{
+			$1->AddToEnd($3);
+			$$ = $1;
+		}
+	| ElementList OP_COMMA Expression 
+		{
+			$1->AddToEnd($3);
+			$$ = $1;
+		}
+	;
+
+ListExpression
+	: OP_LPAREN ElementList OP_RPAREN 
+		{ $$ = $2; }
+	;
+
+ObjectExpression
+	: ModifiableExpression
+	| FunctionExpression
+	/*| OP_LPAREN ObjectExpression OP_RPAREN // DEPRECATED
+		{ $$ = $2; }*/
+	;
+	
+LiteralExpression
+	: NumericLiteral 
+	| StringLiteral 
+	;
+
+OptionalExpression
+	: Expression 
+	| 
+		{ $$ = NULL; }
+	;
+
+BasicExpression
+	: ObjectExpression 
+		{ $$ = $<expression>1; }
+	| LiteralExpression 
+		{ $$ = $<expression>1; }
+	| ListExpression //used for things like vectors 
+		{ $$ = $<expression>1; }
+	| ReferenceExpression 
+		{ $$ = $<expression>1; }
+	| ANIMTREE 
+		{ $$ = new Expression(@$); }
+	;
+
+ModifiableExpression
+	: T_IDENTIFIER 
+		{ $$ = new Identifier($1, @1); }
+	| MemberExpression 
+	/*| OP_LPAREN ModifiableExpression OP_RPAREN // DEPRECATED
+		{ $$ = $2; }*/
+
+e
+	: BasicExpression
+		{ $$ = (Expression*)new Group($1, @1); }
+	
+	/* PREFIX OPERATORS */
+	| OP_INC ModifiableExpression %prec OP_INC_PRE
+		{ $$ = new Expression(OP_TYPE_INC, $<expression>2, @$); };
+	| OP_DEC ModifiableExpression %prec OP_DEC_PRE
+		{ $$ = new Expression(OP_TYPE_DEC, $<expression>2, @$); };
+	| OP_ADD e %prec OP_POSITIVE
+		{ $$ = new Expression(OP_TYPE_ADD, $2, @$); };
+	| OP_SUB e %prec OP_NEGATIVE
+		{ $$ = new Expression(OP_TYPE_SUB, $2, @$); };
+	| OP_BW_NOT e
+		{ $$ = new Expression(OP_TYPE_BW_NOT, $2, @$); };
+	| OP_NOT e
+		{ $$ = new Expression(OP_TYPE_NOT, $2, @$); };
+	
+	/* POSTFIX OPERATORS */
+	| ModifiableExpression OP_INC %prec OP_INC_POST
+		{ $$ = new Expression($<expression>1, OP_TYPE_INC, @$); };
+	| ModifiableExpression OP_DEC %prec OP_DEC_POST
+		{ $$ = new Expression($<expression>1, OP_TYPE_INC, @$); };
+	
+	/* MID OPERATORS */
+	| e OP_MULT e 
+		{ $$ = new Expression($1, OP_TYPE_MULT, $3, @$); };
+	| e OP_DIV e
+		{ $$ = new Expression($1, OP_TYPE_DIV, $3, @$); };
+	| e OP_MOD e
+		{ $$ = new Expression($1, OP_TYPE_MOD, $3, @$); };
+	| e OP_ADD e
+		{ $$ = new Expression($1, OP_TYPE_ADD, $3, @$); };
+	| e OP_SUB e
+		{ $$ = new Expression($1, OP_TYPE_SUB, $3, @$); };
+	| e OP_LSHIFT e
+		{ $$ = new Expression($1, OP_TYPE_LSHIFT, $3, @$); };
+	| e OP_RSHIFT e
+		{ $$ = new Expression($1, OP_TYPE_RSHIFT, $3, @$); };
+	| e OP_CMP_LT e
+		{ $$ = new Expression($1, OP_TYPE_CMP_LT, $3, @$); };
+	| e OP_CMP_LE e
+		{ $$ = new Expression($1, OP_TYPE_CMP_LE, $3, @$); };
+	| e OP_CMP_GT e
+		{ $$ = new Expression($1, OP_TYPE_CMP_GT, $3, @$); };
+	| e OP_CMP_GE e
+		{ $$ = new Expression($1, OP_TYPE_CMP_GE, $3, @$); };
+	| e OP_CMP_EQ e
+		{ $$ = new Expression($1, OP_TYPE_CMP_EQ, $3, @$); };
+	| e OP_CMP_NEQ e
+		{ $$ = new Expression($1, OP_TYPE_CMP_NEQ, $3, @$); };
+	| e OP_BW_AND e
+		{ $$ = new Expression($1, OP_TYPE_BW_AND, $3, @$); };
+	| e OP_BW_OR e
+		{ $$ = new Expression($1, OP_TYPE_BW_OR, $3, @$); };
+	| e OP_CMP_AND e
+		{ $$ = new Expression($1, OP_TYPE_CMP_AND, $3, @$); };
+	| e OP_CMP_OR e
+		{ $$ = new Expression($1, OP_TYPE_CMP_OR, $3, @$); };
+	| e OP_ASSIGN e
+		{ $$ = new Expression($1, OP_TYPE_ASSIGN, $3, @$); };
+	| e OP_ASSIGN_ADD e
+		{ $$ = new Expression($1, OP_TYPE_ASSIGN_ADD, $3, @$); };
+	| e OP_ASSIGN_SUB e
+		{ $$ = new Expression($1, OP_TYPE_ASSIGN_SUB, $3, @$); };
+	| e OP_ASSIGN_MULT e
+		{ $$ = new Expression($1, OP_TYPE_ASSIGN_MULT, $3, @$); };
+	| e OP_ASSIGN_DIV e
+		{ $$ = new Expression($1, OP_TYPE_ASSIGN_DIV, $3, @$); };
+	| e OP_ASSIGN_BW_AND e
+		{ $$ = new Expression($1, OP_TYPE_ASSIGN_BW_AND, $3, @$); };
+	| e OP_ASSIGN_BW_XOR e
+		{ $$ = new Expression($1, OP_TYPE_ASSIGN_BW_XOR, $3, @$); };
+	| e OP_ASSIGN_BW_OR e
+		{ $$ = new Expression($1, OP_TYPE_ASSIGN_BW_OR, $3, @$); };
+	| AnimReferenceExpression 
+		{ $$ = $<expression>1; }
+	| OP_LPAREN e OP_RPAREN 
+		{ $$ = $2; }
+	;
+
+Expression
+	: e 
+	;
+	
+ExpressionStatement
+	: Expression OP_COLON_SEMI 
+		{ $$ = $1; /*new Symbol(@$);*/ }
+	;
+
+ReturnStatement
+	: T_RETURN OP_COLON_SEMI 
+		{ $$ = new Return(NULL, @$); }
+	| T_RETURN Expression OP_COLON_SEMI 
+		{ $$ = new Return($2, @$); }
+	;
+
+WaitStatement
+	: T_WAIT Expression OP_COLON_SEMI 
+		{ $$ = new Wait($2, @$); }
+	//| T_WAIT OP_LPAREN Expression OP_RPAREN OP_COLON_SEMI 
+	//	{ $$ = new Symbol(@$); }
+	;
+
+EmptyStatement
+	: OP_COLON_SEMI
+		{ $$ = new Symbol(@$); }
+	;
+
+IfStatement
+	: T_IF OP_LPAREN Expression OP_RPAREN Statement 
+		{ $$ = new Conditional($3, $5, @$, S_TYPE_CONDITIONAL_IF); }
+	| T_ELSE Statement
+		{ $$ = new Conditional(NULL, $2, @$, S_TYPE_CONDITIONAL_ELSE); }
+	;
+
+SwitchStatement
+	: T_SWITCH OP_LPAREN Expression OP_RPAREN Statement 
+		{ $$ = new Conditional($3, $5, @$, S_TYPE_CONDITIONAL_SWITCH); }
+	;
+
+CaseStatement
+	: T_CASE LiteralExpression OP_COLON 
+		{ $$ = new Conditional($<expression>2, NULL, @$, S_TYPE_CONDITIONAL_CASE);
+		}
+	| T_DEFAULT OP_COLON 
+		{ $$ = new Conditional(NULL, NULL, @$, S_TYPE_CONDITIONAL_CASE);
+		}
+	;
+
+LoopStatement
+	: T_WHILE OP_LPAREN Expression OP_RPAREN Statement 
+		{ $$ = new Conditional($3, $5, @$, S_TYPE_CONDITIONAL_WHILE); }
+	| T_FOR OP_LPAREN OptionalExpression OP_COLON_SEMI OptionalExpression OP_COLON_SEMI OptionalExpression OP_RPAREN Statement 
+		{
+			$$ = new Conditional($3, $5, $7, $9, @$, S_TYPE_CONDITIONAL_FOR);
+		}
+	;
+		
+Statement
+	: Block 
+	| WaitStatement 
+	| ExpressionStatement 
+	| IfStatement 
+	| SwitchStatement 
+	| CaseStatement 
+	| LoopStatement 
+	| ReturnStatement
+	| T_BREAK OP_COLON_SEMI 
+		{ $$ = new Symbol(@$); }
+	| T_CONTINUE OP_COLON_SEMI 
+		{ $$ = new Symbol(@$); }
+	| EmptyStatement 
+	;
+
+StatementList
+	: StatementList Statement 
+		{
+			if($1 != NULL)
+			{
+				$1->AddToEnd($2);
+				$$ = $1;
+			}
+			else
+			{
+				$$ = $2;
+			}
+		}
+	| StatementList error
+		/* Catches most errors, but also causes the next function / statement / etc. to be skipped in certain cases */
+	| 
+		{ $$ = NULL; }
+	;
+
+%%
+
+//
+// Notify the user that there was an error while parsing
+// if error recovery is impossible, YYABORT is automatically called
+// and the symbol tree is cleaned up
+//
+void yyerror(YYLTYPE* loc, Symbol** AST, yyscan_t scanner, const char* err) 
+{
+	fprintf(stderr, "PARSE ERROR AT LINE %d(%d): %s\n", loc->first_line, loc->first_column, err);
+/*#if !(_DEBUG)
+	exit(1);
+#endif*/
+}

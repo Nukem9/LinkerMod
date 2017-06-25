@@ -1,5 +1,6 @@
 # LinkerMod
 ###### Enhancements for Call of Duty: Black Ops' Mod Tools
+#### Join the [Discord Server](https://discord.gg/nukNNsP)!
 
 ## Features
 - Mod Support

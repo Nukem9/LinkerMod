@@ -1,3 +1,4 @@
+#define G_VERSION 1, 3, 0
 #include "stdafx.h"
 
 static char* techsetPath = "pimp/techsets/%s%s.techset";
@@ -14,6 +15,27 @@ LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	return EXCEPTION_CONTINUE_SEARCH;
 	//return PageGuard_Check(ExceptionInfo);
 }
+
+#if MINIMAL_MATERIALS
+int __cdecl MaterialRedirect(char* dst, const char* fmt, const char* name)
+{
+	printf("MTL: %s\n", name);
+
+	std::string n = name;
+	if (n == "$default" || n.find("sky") != std::string::npos)
+		return sprintf(dst, fmt, name);
+	else
+		return sprintf(dst, fmt, "blockout_test_asphalt");
+}
+#endif
+
+#if CUSTOM_RAND
+int getRandomNumber()
+{
+	return 4;	// chosen by fair dice roll.
+				// guaranteed to be random.
+}
+#endif
 
 const int MAX_MAP_COLLISIONVERTS = 65536 * 2;
 const int MAX_MAP_COLLISIONVERTS_SIZE = MAX_MAP_COLLISIONVERTS * 12;
@@ -50,6 +72,18 @@ BOOL cod2rad_Init()
 	PatchArguments();
 
 	//
+	// Reenable Improved Quantization in Extra Mode
+	// Disabled - Currently Corrupts LightGrid Colors
+	//
+	// PatchMemory(0x00440870, (PBYTE)"\x01", 1);
+
+	//
+	// Patch Default Gamma 2.2 -> 2.0
+	//
+	float gamma_default = 2.0f;
+	PatchMemory(0x00462ABC, (PBYTE)&gamma_default, 4);
+
+	//
 	// Increase limits for LUMP_COLLISIONVERTS
 	//
 	PatchMemory(0x00442486, (PBYTE)&MAX_MAP_COLLISIONVERTS_SIZE, 4);
@@ -61,8 +95,8 @@ BOOL cod2rad_Init()
 	//
 	// Enable Techset / Technique Path Redirection
 	//
-	PatchMemory(0x0042CA85, (PBYTE)&techiquePath, 4);
-	PatchMemory(0x0042CB4C, (PBYTE)&techsetPath, 4);
+	//PatchMemory(0x0042CA85, (PBYTE)&techiquePath, 4);
+	//PatchMemory(0x0042CB4C, (PBYTE)&techsetPath, 4);
 
 	//
 	// Patch the requested IWI version to match BO1
@@ -70,6 +104,7 @@ BOOL cod2rad_Init()
 	PatchMemory(0x00417AA7, (PBYTE)"\xEB", 1);
 	PatchMemory(0x00417B41, (PBYTE)"\x30", 1);
 	FS_FileOpen = (FS_FileOpen_t)Detours::X86::DetourFunction((PBYTE)0x004034E8, (PBYTE)&FS_ImageRedirect);
+	Detours::X86::DetourFunction((PBYTE)0x00417A50, (PBYTE)&hk_Image_GetRawPixels);
 
 	//
 	// Patch Xmodel loading functions to support Black Ops
@@ -94,6 +129,20 @@ BOOL cod2rad_Init()
 	Detours::X86::DetourFunction((PBYTE)0x004413D0, (PBYTE)&hk_FS_FOpenFileRead);
 	Detours::X86::DetourFunction((PBYTE)0x00442E97, (PBYTE)&mfh_Com_SaveBsp);
 
+#if !USE_LEGACY_HDR
+	Detours::X86::DetourFunction((PBYTE)0x00432830, (PBYTE)&hk_StoreLightBytes);
+#endif
+
+	Detours::X86::DetourFunction((PBYTE)0x0042B450, (PBYTE)&RegisterLightDef);
+	
+#if MINIMAL_MATERIALS
+	PatchCall(0x0042CD4A, (PBYTE)&MaterialRedirect);
+#endif
+
+#if CUSTOM_RAND
+	Detours::X86::DetourFunction((PBYTE)0x004047C3, (PBYTE)&getRandomNumber);
+#endif
+
 	g_initted = true;
 	return TRUE;
 }
@@ -107,6 +156,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		cod2rad_Init();
 		break;
 	case DLL_PROCESS_DETACH:
+#if VARIANCE_TRACKER
+		VARIANCE_LOG(vt_GetInitialLightingHighlightDir);
+		VARIANCE_LOG(vt_GetColorsForHighlightDir_1);
+		VARIANCE_LOG(vt_GetColorsForHighlightDir_2);
+		VARIANCE_LOG(vt_GetLightingApproximationError);
+		VARIANCE_LOG(vt_GetGradientOfLightingErrorFunctionWithRespectToDir);
+		VARIANCE_LOG(vt_ImproveLightingApproximation_1);
+		VARIANCE_LOG(vt_ImproveLightingApproximation_2);
+#endif
 		Con_Restore();
 		break;
 	}

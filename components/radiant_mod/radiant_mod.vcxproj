@@ -21,15 +21,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -95,20 +95,29 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="afx.cpp" />
+    <ClCompile Include="afx_resource.cpp" />
+    <ClCompile Include="CCamWnd.cpp" />
     <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="CWinApp.cpp" />
+    <ClCompile Include="d3d9ex.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="drag.cpp" />
+    <ClCompile Include="entity.cpp" />
     <ClCompile Include="ent_light.cpp" />
     <ClCompile Include="kvs.cpp" />
+    <ClCompile Include="map.cpp" />
     <ClCompile Include="nvidia.cpp" />
     <ClCompile Include="q_parse.cpp" />
     <ClCompile Include="q_project.cpp" />
+    <ClCompile Include="remote.cpp" />
+    <ClCompile Include="remote_net.cpp" />
     <ClCompile Include="r_draw_shadowablelight.cpp" />
     <ClCompile Include="r_image.cpp" />
     <ClCompile Include="r_image_load_common.cpp" />
     <ClCompile Include="r_image_load_obj.cpp" />
+    <ClCompile Include="r_image_wavelet.cpp" />
     <ClCompile Include="r_init.cpp" />
     <ClCompile Include="r_material.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
@@ -116,6 +125,7 @@
     <ClCompile Include="r_shade.cpp" />
     <ClCompile Include="r_utils.cpp" />
     <ClCompile Include="r_xsurface_load_obj.cpp" />
+    <ClCompile Include="undo.cpp" />
     <ClCompile Include="win_main.cpp" />
     <ClCompile Include="win_splash.cpp" />
     <ClCompile Include="xmodel_load_obj.cpp" />
@@ -123,19 +133,29 @@
   <ItemGroup>
     <ClInclude Include="afx.h" />
     <ClInclude Include="afx_colors.h" />
+    <ClInclude Include="afx_resource.h" />
+    <ClInclude Include="brush.h" />
+    <ClInclude Include="CCamWnd.h" />
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
     <ClInclude Include="CWinApp.h" />
+    <ClInclude Include="d3d9ex.h" />
+    <ClInclude Include="drag.h" />
+    <ClInclude Include="entity.h" />
     <ClInclude Include="ent_light.h" />
     <ClInclude Include="kvs.h" />
+    <ClInclude Include="map.h" />
     <ClInclude Include="nvidia.h" />
     <ClInclude Include="q_parse.h" />
     <ClInclude Include="q_project.h" />
+    <ClInclude Include="remote.h" />
+    <ClInclude Include="remote_net.h" />
     <ClInclude Include="r_draw_shadowablelight.h" />
     <ClInclude Include="r_image.h" />
     <ClInclude Include="r_image_load_common.h" />
     <ClInclude Include="r_image_load_obj.h" />
+    <ClInclude Include="r_image_wavelet.h" />
     <ClInclude Include="r_init.h" />
     <ClInclude Include="r_material.h" />
     <ClInclude Include="r_material_load_obj.h" />
@@ -145,18 +165,15 @@
     <ClInclude Include="r_xsurface_load_obj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />
+    <ClInclude Include="undo.h" />
     <ClInclude Include="win_main.h" />
     <ClInclude Include="win_splash.h" />
     <ClInclude Include="xmodel_load_obj.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="techset_override.csv">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <FileType>Text</FileType>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-    </Text>
+    <ProjectReference Include="..\shared\semver\semver.vcxproj">
+      <Project>{5fb372dd-a7e1-4a4b-9a28-3ac02543e9e8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

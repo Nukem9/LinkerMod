@@ -5,7 +5,8 @@
 #include "cmd.h"
 #include "common/llist.h"
 #include "platform.h"
-#include "common\io.h"
+#include "common/io.h"
+#include "shared_assert.h"
 
 Argument* g_shortcut[255] = { NULL };
 

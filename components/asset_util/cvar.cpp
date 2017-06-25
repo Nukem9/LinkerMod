@@ -36,7 +36,6 @@ REGISTER_GLOBAL_CVAR(fs_overwrite, "overwrite", 'o', "Overwrite existing files",
 #if _DEBUG
 REGISTER_GLOBAL_CVAR(g_dumpCVars, "dumpCVars", 'd', "Print all cvar values to the console", false);
 #endif
-REGISTER_GLOBAL_CVAR(g_outPath, "outPath", NULL, "Target directory for file output", "/");
 
 //
 // Register Standard CVars
@@ -46,6 +45,19 @@ REGISTER_CVAR(g_extractAll, "all", NULL, "Extract all supported files", false);
 REGISTER_CVAR(g_extractImages, "images", NULL, "Extract image files", false);
 REGISTER_CVAR(g_extractSounds, "sounds", NULL, "Extract audio files", false);
 REGISTER_CVAR(g_useLocalized, "includeLocalized", NULL, "Extract from localized files as well", false);
+
+REGISTER_CVAR(ents_useLabels, "labels", NULL, "Write entity number in a comment above each entity", false);
+REGISTER_CVAR(ents_genBrushes, "dummyBrushes", NULL, "Generate dummy brushes for script/trigger brush models", true);
+
+REGISTER_CVAR(csvgen_aitypes, "aitype", NULL, "Regenerate all aitype CSVs", false);
+REGISTER_CVAR(csvgen_characters, "character", NULL, "Regenerate all character CSVs", false);
+REGISTER_CVAR(csvgen_xmodelaliases, "xmodelalias", NULL, "Regenerate all xmodelalias CSVs", false);
+
+REGISTER_CVAR(rip_waitForProcess, "waitForProcess", NULL, "Wait for a supported process to launch", false);
+REGISTER_CVAR(rip_waitForMap, "waitForMap", NULL, "Wait for a map to load before continuing", false);
+REGISTER_CVAR(rip_killProcess, "killProcess", NULL, "Terminate the game process when ripping is compeleted", false);
+
+REGISTER_CVAR(fs_outdir, "outdir", NULL, "Target directory for file output (default is the game's raw directory)", "");
 
 #undef REGISTER_GLOBAL_CVAR
 #undef REGISTER_CVAR

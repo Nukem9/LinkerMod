@@ -14,14 +14,13 @@ unsigned int Image_GetUsage(int imageFlags, D3DFORMAT imageFormat)
 		if (imageFormat != D3DFMT_D24S8
 			&& imageFormat != D3DFMT_D24X8
 			&& imageFormat != D3DFMT_D16)
-			return 1;
+			return D3DUSAGE_RENDERTARGET;
 
-		return 2;
+		return D3DUSAGE_DEPTHSTENCIL;
 	}
-	else if (imageFlags & 0x10000)
-	{
-		return 512;
-	}
+
+	if (imageFlags & 0x10000)
+		return D3DUSAGE_DYNAMIC;
 
 	return 0;
 }
@@ -31,33 +30,33 @@ void Image_Create2DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned 
 {
 	ASSERT(image != nullptr);
 	ASSERT(!image->texture.basemap);
+	// ASSERT(Sys_IsRenderThread());
 
 	image->width	= width;
 	image->height	= height;
 	image->depth	= 1;
 	image->mapType	= 3;
 
-	D3DPOOL memPool		= D3DPOOL_DEFAULT;
-	unsigned int usage	= Image_GetUsage(imageFlags, imageFormat);
+	D3DPOOL memPool	= D3DPOOL_DEFAULT;
+	DWORD usage		= Image_GetUsage(imageFlags, imageFormat);
 
-	if (imageFlags & 0x40000)
+	if (imageFlags & 0x40000 || imageFlags & 0x100)
 		memPool = D3DPOOL_SYSTEMMEM;
 	else
 		memPool = (usage == 0) ? D3DPOOL_MANAGED : D3DPOOL_DEFAULT;
 
-	if (imageFlags & 0x100)
-		memPool = D3DPOOL_SYSTEMMEM;
+	// D3D9Ex does not allow D3DPOOL_MANAGED
+	if (IsD3D9ExAvailable())
+	{
+		usage	= (usage == 0) ? D3DUSAGE_DYNAMIC : usage;
+		memPool = (memPool == D3DPOOL_MANAGED) ? D3DPOOL_DEFAULT : memPool;
+	}
 
-	// ASSERT(Sys_IsRenderThread());
-
-	// if (r_logFile && r_logFile->current.integer)
-	// 	RB_LogPrint("dx.device->CreateTexture(width, height, mipmapCount, usage, imageFormat, memPool, &image->texture.map, nullptr)\n");
-	
-	HRESULT hr = (*dx_device)->CreateTexture(width, height, mipmapCount, usage, imageFormat, memPool, &image->texture.map, nullptr);
+	HRESULT hr = dx_device->CreateTexture(width, height, mipmapCount, usage, imageFormat, memPool, &image->texture.map, nullptr);
 
 	if (FAILED(hr))
 	{
-		(*g_disableRendering)++;
+		g_disableRendering++;
 		Com_Error(ERR_FATAL, "dx.device->CreateTexture(width, height, mipmapCount, usage, imageFormat, memPool, &image->texture.map, nullptr) failed: %s\n", R_ErrorDescription(hr));
 	}
 }
@@ -67,25 +66,23 @@ void Image_Create3DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned 
 {
 	ASSERT(image != nullptr);
 	ASSERT(!image->texture.basemap);
+	// ASSERT(Sys_IsRenderThread());
 
 	image->width	= width;
 	image->height	= height;
 	image->depth	= depth;
 	image->mapType	= 4;
 
-	Image_GetUsage(imageFlags, imageFormat);
+	// D3D9Ex does not allow D3DPOOL_MANAGED
+	DWORD usage		= (IsD3D9ExAvailable()) ? D3DUSAGE_DYNAMIC : 0;
+	D3DPOOL memPool = (IsD3D9ExAvailable()) ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 
-	// ASSERT(Sys_IsRenderThread());
-
-	// if (r_logFile && r_logFile->current.integer)
-	//	RB_LogPrint("dx.device->CreateVolumeTexture(width, height, depth, mipmapCount, 0, imageFormat, D3DPOOL_MANAGED, &image->texture.volmap, nullptr)\n");
-	
-	HRESULT hr = (*dx_device)->CreateVolumeTexture(width, height, depth, mipmapCount, 0, imageFormat, D3DPOOL_MANAGED, &image->texture.volmap, nullptr);
+	HRESULT hr = dx_device->CreateVolumeTexture(width, height, depth, mipmapCount, usage, imageFormat, memPool, &image->texture.volmap, nullptr);
 
 	if (FAILED(hr))
 	{
-		(*g_disableRendering)++;
-		Com_Error(ERR_FATAL, "dx.device->CreateVolumeTexture(width, height, depth, mipmapCount, 0, imageFormat, D3DPOOL_MANAGED, &image->texture.volmap, nullptr) failed: %s\n", R_ErrorDescription(hr));
+		g_disableRendering++;
+		Com_Error(ERR_FATAL, "dx.device->CreateVolumeTexture(width, height, depth, mipmapCount, usage, imageFormat, memPool, &image->texture.volmap, nullptr) failed: %s\n", R_ErrorDescription(hr));
 	}
 }
 
@@ -94,6 +91,7 @@ void Image_CreateCubeTexture_PC(GfxImage *image, unsigned __int16 edgeLen, int m
 {
 	ASSERT(image != nullptr);
 	ASSERT(!image->texture.basemap);
+	// ASSERT(Sys_IsRenderThread());
 
 	image->width	= edgeLen;
 	image->height	= edgeLen;
@@ -101,20 +99,19 @@ void Image_CreateCubeTexture_PC(GfxImage *image, unsigned __int16 edgeLen, int m
 	image->mapType	= 5;
 
 	// D3DDeviceCaps support for mipping
-	if (!*(bool *)0x13ACAD6)
+	if (!r_supportCubedMipMaps)
 		mipmapCount = 1;
 
-	// ASSERT(Sys_IsRenderThread());
-	
-	//if (r_logFile && r_logFile->current.integer)
-	//	RB_LogPrint("dx.device->CreateCubeTexture(edgeLen, mipmapCount, 0, imageFormat, D3DPOOL_MANAGED, &image->texture.cubemap, nullptr)\n");
+	// D3D9Ex does not allow D3DPOOL_MANAGED
+	DWORD usage		= (IsD3D9ExAvailable()) ? D3DUSAGE_DYNAMIC : 0;
+	D3DPOOL memPool = (IsD3D9ExAvailable()) ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 
-	HRESULT hr = (*dx_device)->CreateCubeTexture(edgeLen, mipmapCount, 0, imageFormat, D3DPOOL_MANAGED, &image->texture.cubemap, nullptr);
+	HRESULT hr = dx_device->CreateCubeTexture(edgeLen, mipmapCount, usage, imageFormat, memPool, &image->texture.cubemap, nullptr);
 	
 	if (FAILED(hr))
 	{
-		(*g_disableRendering)++;
-		Com_Error(ERR_FATAL, "dx.device->CreateCubeTexture(edgeLen, mipmapCount, 0, imageFormat, D3DPOOL_MANAGED, &image->texture.cubemap, nullptr) failed: %s\n", R_ErrorDescription(hr));
+		g_disableRendering++;
+		Com_Error(ERR_FATAL, "dx.device->CreateCubeTexture(edgeLen, mipmapCount, usage, imageFormat, memPool, &image->texture.cubemap, nullptr) failed: %s\n", R_ErrorDescription(hr));
 	}
 }
 

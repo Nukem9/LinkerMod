@@ -84,7 +84,7 @@ BOOL ReflectionMod_Init()
 	//
 	// Prevent overwriting the config file
 	//
-	Patch_Disable_WriteToConfig();
+	com_cfg_readOnly_default = true;
 
 	//
 	// Always force the cursor to be shown
@@ -101,16 +101,24 @@ BOOL ReflectionMod_Init()
 	PatchMemory(0x006CF382, (PBYTE)"\x90\x90", 2);
 	PatchMemory(0x006CF388, (PBYTE)"\x90\x90", 2);
 
-	Detours::X86::DetourFunction((PBYTE)0x006CF150, (PBYTE)&hk_R_GenerateReflectionRawDataAll);
-	Detours::X86::DetourFunction((PBYTE)0x006CEE30, (PBYTE)R_GenerateReflectionRawData);
+	//
+	// Hide console spam from script errors
+	//
+	PatchMemory(0x008A5C10, (PBYTE)"\xC3", 1); // RuntimeErrorInternal
 
 	//
-	// Check g_reflectionsUpdated for ReflectionExit (mov [g_reflectionsUpdate], 1)
+	// Fake the return value of G_ExitAfterToolComplete (return false) when injecting reflections or
+	// using fastfiles to prevent a crash
 	//
-	BYTE buf[7] = {0xC6,0x05,0xFF,0xFF,0xFF,0xFF,0x01};
-	bool* pTmp = &g_reflectionsUpdated;
-	memcpy(buf+2,&pTmp,4);
-	PatchMemory(0x006CF383, buf, 7);
+	if (IsInjectionMode() || !LaunchArg_NoFF())
+		PatchMemory(0x0049EF60, (PBYTE)"\xB8\x00\x00\x00\x00\xC3", 6);
+
+	//
+	// Change each cubemap shot delay to 16ms (Disabled - Causes some cubemap sides to fail to be saved)
+	//
+	//PatchMemory(0x006E4F52, (PBYTE)"\x6A\x16", 2);				// R_Resolve
+	//PatchMemory(0x00708AD8, (PBYTE)"\x68\x16\x00\x00\x00", 5);	// R_CreateReflectionRawDataFromCubemapShot
+	//PatchMemory(0x00707146, (PBYTE)"\x68\x40\x00\x00\x00", 5);	// R_GetBackBufferDataHDR
 
 	return TRUE;
 }
@@ -141,118 +149,6 @@ char* formatTime(int seconds)
 	}
 
 	return str[index];
-}
-
-void __cdecl R_GenerateReflectionRawDataAll(DiskGfxReflectionProbe *probeRawData, int probeCount, bool *generateProbe)
-{
-	Com_ToolPrintf(0, "----------------------------------------\n");
-	Com_ToolPrintf(0, "Compiling reflections...\n");
-
-	g_probeCount = probeCount;
-
-	time_t initTime;
-	time_t cTime;
-	time(&initTime);
-
-	for (int probeIndex = 0; probeIndex < probeCount; probeIndex++)
-	{
-		if (generateProbe[probeIndex])
-			R_GenerateReflectionRawData(&probeRawData[probeIndex]);
-
-		time(&cTime);
-		float percentComplete = (float)(probeIndex + 1) / (float)probeCount;
-		float elapsedTime = (float)difftime(cTime, initTime);
-		float remainingTime = elapsedTime / percentComplete - elapsedTime;
-
-		Com_ToolPrintf(0, "%.1f%% complete, %s done, %s remaining\r", percentComplete * 100.0f, formatTime((int)elapsedTime), formatTime((int)remainingTime));
-	}
-
-	Com_ToolPrintf(0, "Finished in %s.\n", formatTime((int)difftime(cTime, initTime)));
-	printf("----------------------------------------\n");
-
-	g_reflectionsUpdated = true;
-}
-
-void __declspec(naked) hk_R_GenerateReflectionRawDataAll()
-{
-	__asm
-	{
-		push[esp + 8]	//generateProbe
-		push[esp + 8]	//probeCount
-		push eax		//probeRawData
-		call R_GenerateReflectionRawDataAll
-		add esp, 12
-		retn
-	}
-}
-
-void __cdecl R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData)
-{
-	if (!*g_ffDir)
-	{
-		sprintf_s(g_ffDir, "%s/%s/", Dvar_GetString("fs_basepath"), Dvar_GetString("fs_game"));
-	}
-
-	refdef_s refdef;
-	char* ptr = *((char**)0x02FF5354);
-	refdef_s* refsrc = (refdef_s*)(ptr + 0x8C100);
-	memcpy(&refdef, refsrc, sizeof(refdef_s));
-
-	refdef.vieworg[1] = probeRawData->origin[0];
-	refdef.vieworg[2] = probeRawData->origin[1];
-	refdef.yaw = probeRawData->origin[2];
-
-	R_InitPrimaryLights(refdef.primaryLights[0].dir);
-
-	for (int cubemapShot = 1; cubemapShot < 7; cubemapShot++)
-	{
-		R_BeginCubemapShot(256, 0);
-		R_BeginFrame();
-
-		GfxCmdArray* s_cmdList = *(GfxCmdArray**)0x03B370C0;
-		GfxBackEndData* frontEndDataOut = *(GfxBackEndData**)0x03B3708C;
-		frontEndDataOut->cmds = &s_cmdList->cmds[s_cmdList->usedTotal];
-		frontEndDataOut->viewInfo[frontEndDataOut->viewInfoCount].cmds = NULL;
-
-		R_ClearScene(0);
-		FX_BeginUpdate(0);
-		R_CalcCubeMapViewValues(&refdef, cubemapShot, 256);
-
-		float* vec = (float*)0x3AC3060;
-		vec[0] = refdef.vieworg[0];
-		vec[1] = refdef.vieworg[1];
-		vec[2] = refdef.vieworg[2];
-
-		int* unk1 = (int*)0x3AC3058;		*unk1 = refdef.time;
-		float* unk2 = (float*)0x3AC305C;	*unk2 = refdef.time * 0.001f;
-
-		R_UpdateFrameFog(refdef.localClientNum);
-		R_UpdateFrameSun();
-
-		float zFar = R_GetFarPlaneDist();
-		FxCameraUpdate fxUpdateCmd;
-		memset(&fxUpdateCmd, 0, sizeof(FxCameraUpdate));
-		FxCmd cmd;
-		memset(&cmd, 0, sizeof(FxCmd));
-
-		FX_GetCameraUpdateFromRefdefAndZFar(&fxUpdateCmd, &refdef, zFar);
-		FX_SetNextUpdateCamera(0, &fxUpdateCmd);
-		FX_FillUpdateCmd(0, &cmd);
-		Sys_ResetUpdateSpotLightEffectEvent();
-		Sys_AddWorkerCmdInternal((void*)0x00BA5420, &cmd, 0);
-		Sys_ResetUpdateNonDependentEffectsEvent();
-		Sys_AddWorkerCmdInternal((void*)0x00BA52E0, &cmd, 0);
-		Sys_AddWorkerCmdInternal((void*)0x00BA5300, &cmd, 0);
-		Sys_AddWorkerCmdInternal((void*)0x00BA5330, &cmd, 0);
-
-		R_RenderScene(&refdef, 0);
-		R_EndFrame();
-
-		R_IssueRenderCommands(3);
-		R_EndCubemapShot(cubemapShot);
-	}
-
-	R_CreateReflectionRawDataFromCubemapShot(probeRawData);
 }
 
 unsigned int padded(unsigned int i)

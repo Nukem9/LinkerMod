@@ -11,16 +11,20 @@ enum LOGFILE_MODE
 	LOGFILE_UPDATE_APPEND
 };
 
-int Con_Init(void);
-int Con_Init(const char* logfilePath, LOGFILE_MODE mode);
-int Log_Init(const char* logfilePath, LOGFILE_MODE mode);
-int Con_Printf(const char* fmt, ...);
-int Con_Warning(const char* fmt, ...);
-int Con_Error(const char* fmt, ...);
-int Log_Printf(const char* fmt, ...);
-DWORD Con_ErrorCount(void);
-DWORD Con_WarningCount(void);
-int Con_Restore(void);
+namespace D3DBSP_Lib
+{
+
+	int Con_Init(void);
+	int Con_Init(const char* logfilePath, LOGFILE_MODE mode);
+	int Log_Init(const char* logfilePath, LOGFILE_MODE mode);
+	int Con_Printf(const char* fmt, ...);
+	int Con_Warning(const char* fmt, ...);
+	int Con_Error(const char* fmt, ...);
+	int Log_Printf(const char* fmt, ...);
+	DWORD Con_ErrorCount(void);
+	DWORD Con_WarningCount(void);
+	int Con_Restore(void);
+}
 
 class Lump
 {

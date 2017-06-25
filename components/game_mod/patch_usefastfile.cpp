@@ -11,14 +11,12 @@ void PatchUseFF()
 	// Only apply patch if 'useFastFile 0' was present at launch
 	//
 	if (!LaunchArg_NoFF())
-	{
 		return;
-	}
 
 	//
-	// Prevent overwriting the config file with launch args
+	// Prevent overwriting the config file
 	//
-	Patch_Disable_WriteToConfig();
+	com_cfg_readOnly_default = true;
 
 	//
 	// Live_Init
@@ -36,9 +34,9 @@ void PatchUseFF()
 	PatchMemory_WithNOP(0x005FEC99, 5);												// LiveSteam_Client_SteamDisconnect
 	Detours::X86::DetourFunction((PBYTE)0x00501320, (PBYTE)LiveSteam_GetUid);		// LiveSteam_GetUid, nullptr crash fix
 
-	BYTE data[] = "\xB8\x00\x00\x00\x00";
-	PatchMemory(0x0057362A, data, 5);	// nullptr fix
-	PatchMemory(0x00866C92, data, 5);	// ^
+	BYTE data[] = "\xB8\x00\x00\x00\x00";											// SteamApps() nullptr crash fix
+	PatchMemory(0x0057362A, data, 5);
+	PatchMemory(0x00866C92, data, 5);
 
 	//
 	// Shaders
@@ -72,9 +70,7 @@ bool LaunchArg_NoFF(void)
 	for (int i = 0; i < argc - 1; i++)
 	{
 		if (_wcsicmp(argv[i], L"useFastFile") == 0 && wcscmp(argv[i + 1], L"0") == 0)
-		{
 			return true;
-		}
 	}
 
 	return false;

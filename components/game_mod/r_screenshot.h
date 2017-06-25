@@ -1,4 +1,5 @@
 #pragma once
+#include "r_reflection_probe.h"
 
 static_assert(sizeof(D3DFORMAT) == sizeof(DWORD), "D3DFORMAT must be 4 bytes!");
 
@@ -23,6 +24,7 @@ struct GfxMetrics
 };
 
 void R_BeginCubemapShot(const int pixelWidthHeight, const int pixelBorder);
+void R_CreateReflectionRawDataFromCubemapShot(DiskGfxReflectionProbe *probeRawData);
 
 typedef int __cdecl R_CubemapShotSetInitialState_t(void);
 static R_CubemapShotSetInitialState_t* R_CubemapShotSetInitialState = (R_CubemapShotSetInitialState_t*)0x00708710;

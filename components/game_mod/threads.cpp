@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#define THREAD_CONTEXT_COUNT 15
-
 auto threadFunc			= (void(__cdecl **)(unsigned int))0x0251CB44;
 HANDLE *threadHandle	= (HANDLE *)0x0251CADC;
 DWORD *threadId			= (DWORD *)0x0251CA98;
@@ -11,7 +9,7 @@ void Sys_ConsoleThread(unsigned int index)
 	// Loop forever until someone enables this
 	while (true)
 	{
-		if (con_extcon && con_extcon->current.value)
+		if (con_extcon && con_extcon->current.enabled)
 			break;
 
 		Sleep(50);
@@ -48,5 +46,15 @@ void Sys_CreateThread(void(__cdecl * function)(unsigned int index), unsigned int
 
 DWORD WINAPI Sys_ThreadMain(LPVOID Arg)
 {
-	return ((DWORD(WINAPI *)(LPVOID))0x0082FDE0)(Arg);
+	return ((LPTHREAD_START_ROUTINE)0x0082FDE0)(Arg);
+}
+
+bool Sys_IsMainThread()
+{
+	return true;
+}
+
+bool Sys_IsRenderThread()
+{
+	return true;
 }

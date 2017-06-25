@@ -8,3 +8,8 @@ static Hunk_FreeTempMemory_t* Hunk_FreeTempMemory = (Hunk_FreeTempMemory_t*)0x00
 void *Hunk_Alloc(int size, const char *name, int type);
 void Z_Free(void *ptr);
 void *Z_Malloc(int size);
+
+void *__cdecl Hunk_FindDataForFile(int type, const char *name);
+void *__cdecl Hunk_FindDataForFileInternal(int type, const char *name, int hash);
+
+const char *__cdecl Hunk_SetDataForFile(int type, const char *name, void *data, void *(__cdecl *alloc)(int));

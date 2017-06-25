@@ -6,10 +6,8 @@ void (__cdecl * CL_Vid_Restart_Complete_f)();
 
 void hk_CL_Vid_Restart_Complete_f()
 {
-	//
 	// If the server is currently running, kill it first
-	//
-	if ((*com_sv_running)->current.enabled)
+	if (com_sv_running->current.enabled)
 		SV_KillServer_f();
 
 	CL_Vid_Restart_Complete_f();
@@ -25,9 +23,23 @@ CL_GetServerIPAddress_t CL_GetServerIPAddress_o = 0x0;
 const char *__cdecl CL_GetServerIPAddress()
 {
 	if (cg_showServerInfo->current.enabled)
-	{
 		return CL_GetServerIPAddress_o();
-	}
 
 	return "";
+}
+
+char *CG_GetLocalClientGlobals(int localClientNum)
+{
+	ASSERT(localClientNum == 0);
+
+	// cgArray
+	return *(char **)0x02FF5354;
+}
+
+ViewModelInfo *CG_GetLocalClientViewModelInfo(int localClientNum)
+{
+	ASSERT(localClientNum == 0);
+
+	// cg_viewModelArray
+	return *(ViewModelInfo **)0x00C1C6D8;
 }

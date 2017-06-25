@@ -13,9 +13,17 @@
   <ItemGroup>
     <ClCompile Include="arg.cpp" />
     <ClCompile Include="cmd.cpp" />
+    <ClCompile Include="cmds\cmd_csvgen.cpp" />
+    <ClCompile Include="cmds\cmd_bsp.cpp" />
     <ClCompile Include="cmds\cmd_ents.cpp" />
     <ClCompile Include="cmds\cmd_extract.cpp" />
     <ClCompile Include="cmds\cmd_help.cpp" />
+    <ClCompile Include="cmds\cmd_rip.cpp" />
+    <ClCompile Include="cmds\cmd_search.cpp" />
+    <ClCompile Include="cmds\ripper\db_registry.cpp" />
+    <ClCompile Include="cmds\ripper\process_info.cpp" />
+    <ClCompile Include="cmds\ripper\snd_csv_enum.cpp" />
+    <ClCompile Include="cmds\ripper\snd_ripper.cpp" />
     <ClCompile Include="common\ff.cpp" />
     <ClCompile Include="common\fs.cpp" />
     <ClCompile Include="common\io.cpp" />
@@ -37,6 +45,14 @@
     <ClInclude Include="arg.h" />
     <ClInclude Include="cmd.h" />
     <ClInclude Include="cmds\cmd_common.h" />
+    <ClInclude Include="cmds\ripper\db_registry.h" />
+    <ClInclude Include="cmds\ripper\foreign_ptr.h" />
+    <ClInclude Include="cmds\ripper\process_info.h" />
+    <ClInclude Include="cmds\ripper\snd_alias_db.h" />
+    <ClInclude Include="cmds\ripper\snd_csv_enum.h" />
+    <ClInclude Include="cmds\ripper\snd_driver_db.h" />
+    <ClInclude Include="cmds\ripper\snd_ripper.h" />
+    <ClInclude Include="cmds\search\handler.h" />
     <ClInclude Include="common\ff.h" />
     <ClInclude Include="common\fs.h" />
     <ClInclude Include="common\io.h" />
@@ -66,15 +82,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120_xp</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -101,6 +117,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;</PreprocessorDefinitions>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,6 +138,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

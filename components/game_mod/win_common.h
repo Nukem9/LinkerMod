@@ -10,5 +10,3 @@ static Sys_EnterCriticalSection_t Sys_EnterCriticalSection = (Sys_EnterCriticalS
 
 typedef void(__cdecl* Sys_LeaveCriticalSection_t)(CriticalSection critSect);
 static Sys_LeaveCriticalSection_t Sys_LeaveCriticalSection = (Sys_LeaveCriticalSection_t)0x0056D400;
-
-void __cdecl Sys_OutOfMemErrorInternal(const char *filename, int line);
