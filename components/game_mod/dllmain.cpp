@@ -359,6 +359,12 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x006D98F0, (PBYTE)&hk_R_Cinematic_BinkOpen);
 
 	//
+	// Enable Custom / Updated Commands
+	//
+	ptr = (PBYTE)&Cmd_Vstr_f;
+	PatchMemory(0x00602CCD, (PBYTE)&ptr, 4);
+
+	//
 	// Enable Custom Dvars
 	//
 	Detours::X86::DetourFunction((PBYTE)0x006CA27B, (PBYTE)&mfh_R_RegisterDvars);

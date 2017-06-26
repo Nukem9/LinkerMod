@@ -70,3 +70,30 @@ const char *__cdecl Cmd_Argv(int argIndex)
 	
 	return cmd_args->argv[cmd_args->nesting][argIndex];
 }
+
+void __cdecl Cmd_Vstr_f()
+{
+	if (Cmd_Argc() != 2)
+	{
+		Com_Printf(0, "vstr <variablename> : execute a variable command\n");
+		return;
+	}
+
+	const char* dvarName = Cmd_Argv(1);
+	dvar_s* dvar = Dvar_FindVar(dvarName);
+	
+	if (!dvar)
+	{
+		Com_Printf(0, "%s doesn't exist\n", dvarName);
+		return;
+	}
+
+	if (dvar->type == DVAR_TYPE_STRING || dvar->type == DVAR_TYPE_ENUM)
+	{
+		Cbuf_InsertText(0, va("%s\n", dvar->current.string));
+	}
+	else
+	{
+		Com_Printf(0, "%s is not a string-based dvar\n", dvar->name);
+	}
+}

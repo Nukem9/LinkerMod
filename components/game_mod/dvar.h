@@ -1,7 +1,5 @@
 #pragma once
-
-#define VANILLA_DVAR(NAME, ADDRESS) static dvar_s*& NAME = *(dvar_s **)ADDRESS;
-#define VANILLA_VALUE(NAME, TYPE, ADDRESS) static TYPE& NAME = *(TYPE*)ADDRESS;
+#include "vanilla.h"
 
 enum dvarType_t
 {
@@ -231,6 +229,8 @@ static Dvar_RegisterBool_t Dvar_RegisterBool = (Dvar_RegisterBool_t)0x0045BB20;
 
 typedef dvar_s *__cdecl Dvar_RegisterEnum_t(const char *dvarName, const char **valueList, int defaultIndex, unsigned int flags, const char *description);
 static Dvar_RegisterEnum_t* Dvar_RegisterEnum = (Dvar_RegisterEnum_t*)0x0051BD00;
+
+VANILLA_FUNC(Dvar_FindVar, dvar_s *(__cdecl*)(const char *dvarName), 0x005AE810);
 
 void mfh_R_RegisterDvars();
 

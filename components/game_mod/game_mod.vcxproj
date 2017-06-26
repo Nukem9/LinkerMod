@@ -215,6 +215,7 @@
     <ClInclude Include="sys_cmds.h" />
     <ClInclude Include="threads.h" />
     <ClInclude Include="ui_main_pc.h" />
+    <ClInclude Include="vanilla.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="win_common.h" />
     <ClInclude Include="win_exception.h" />

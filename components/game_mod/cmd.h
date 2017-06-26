@@ -1,4 +1,5 @@
 #pragma once
+#include "vanilla.h"
 
 #define CMD_MAX_NESTING 8
 
@@ -40,7 +41,9 @@ void mfh_Cmd_Exec_f();
 
 extern void(__cdecl * Cmd_ExecuteSingleCommandInternal)(int localClientNum, int controllerIndex, void *item, const char *text, bool restrict);
 void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex, void *item, const char *text, bool restrict);
+
 void Cbuf_AddText(int localClientNum, const char *text);
+VANILLA_FUNC(Cbuf_InsertText, void(__cdecl*)(int localClientNum, const char *text), 0x005B3EB0);
 
 CmdArgs *__cdecl Cmd_Args();
 
@@ -57,3 +60,5 @@ static const char *SV_Cmd_Argv(int argIndex)
 
 	return sv_cmd_args.argv[sv_cmd_args.nesting][argIndex];
 }
+
+void __cdecl Cmd_Vstr_f();
