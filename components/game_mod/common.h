@@ -1,4 +1,5 @@
 #pragma once
+#include "vanilla.h"
 
 typedef void* ParseThreadInfo;
 
@@ -69,6 +70,8 @@ static Com_BeginParseSession_t Com_BeginParseSession = (Com_BeginParseSession_t)
 typedef ParseThreadInfo *(__cdecl* Com_EndParseSession_t)();
 static Com_EndParseSession_t Com_EndParseSession = (Com_EndParseSession_t)0x005C11C0;
 
+VANILLA_FUNC(Com_SafeMode, int(__cdecl*)(void), 0x00599D80);
+VANILLA_FUNC(Com_LocalClient_GetControllerIndex, int(__cdecl*)(int localClientNum), 0x004F3C70);
 
 typedef int (__cdecl* I_strcmp_t)(const char *s0, const char *s1);
 static I_strcmp_t I_strcmp = (I_strcmp_t)0x0063E630;
@@ -101,3 +104,6 @@ bool DB_IsZoneLoaded(const char *name);
 void Com_LoadCommonFastFile();
 void Com_LoadLevelFastFiles(const char *mapName);
 void Com_FreeWeaponInfoMemory(int source);
+
+void __cdecl Com_RunAutoExec(int localClientNum, int controllerIndex);
+void __cdecl Com_ExecStartupConfigs(int localClientNum, const char *configFile);

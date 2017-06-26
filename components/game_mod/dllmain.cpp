@@ -183,6 +183,11 @@ BOOL GameMod_Init()
 	Patch_WriteToConfig();
 
 	//
+	// Add Support for autoexec_dev.cfg
+	//
+	PatchCall(0x0082CE40, (PBYTE)&Com_ExecStartupConfigs);
+
+	//
 	// Don't allow `openmenu main` unless the one following conditions are met:
 	// 1: The player is not in a server
 	// 2: The player is on a server with no map loaded

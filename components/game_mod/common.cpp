@@ -370,3 +370,35 @@ void Com_FreeWeaponInfoMemory(int source)
 		bg_lastWeaponTableIndex = 0;
 	}
 }
+
+inline void __cdecl Com_RunAutoExec(int localClientNum, int controllerIndex)
+{
+	if (localClientNum >= 0)
+	{
+		Dvar_SetInAutoExec(1);
+		if (com_developer && com_developer->current.enabled)
+			Cmd_ExecuteSingleCommand(localClientNum, controllerIndex, "exec autoexec_dev.cfg");
+		Dvar_SetInAutoExec(0);
+	}
+}
+
+void __cdecl Com_ExecStartupConfigs(int localClientNum, const char *configFile)
+{
+	Cbuf_AddText(localClientNum, "exec default.cfg\n");
+	Cbuf_AddText(localClientNum, "exec language.cfg\n");
+
+	if (configFile)
+		Cbuf_AddText(localClientNum, va("exec %s\n", configFile));
+
+	int controllerIndex = Com_LocalClient_GetControllerIndex(localClientNum);
+	Cbuf_Execute(localClientNum, controllerIndex);
+
+	Com_LocalClient_GetControllerIndex(localClientNum);
+	Com_RunAutoExec(localClientNum, controllerIndex);
+
+	if (Com_SafeMode())
+		Cbuf_AddText(localClientNum, "exec safemode.cfg\n");
+	
+	controllerIndex = Com_LocalClient_GetControllerIndex(localClientNum);
+	Cbuf_Execute(localClientNum, controllerIndex);
+}

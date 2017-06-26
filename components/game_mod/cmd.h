@@ -34,6 +34,8 @@ static CmdArgs& sv_cmd_args = *(CmdArgs *)0x0243D208;
 typedef void (__cdecl* Cmd_AddCommandInternal_t)(const char *cmdName, void(__cdecl *function)(), cmd_function_s *allocedCmd);
 static Cmd_AddCommandInternal_t Cmd_AddCommandInternal = (Cmd_AddCommandInternal_t)0x00661400;
 
+VANILLA_FUNC(Cmd_ExecuteSingleCommand, void (__cdecl*)(int localClientNum, int controllerIndex, const char *text), 0x00619D00);
+
 typedef void (__cdecl* Cmd_RemoveCommand_t)(const char *cmdName);
 static Cmd_RemoveCommand_t Cmd_RemoveCommand = (Cmd_RemoveCommand_t)0x005F1A90;
 
@@ -44,6 +46,7 @@ void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex
 
 void Cbuf_AddText(int localClientNum, const char *text);
 VANILLA_FUNC(Cbuf_InsertText, void(__cdecl*)(int localClientNum, const char *text), 0x005B3EB0);
+VANILLA_FUNC(Cbuf_Execute, void(__cdecl*)(int localClientNum, int controllerIndex), 0x00639930);
 
 CmdArgs *__cdecl Cmd_Args();
 

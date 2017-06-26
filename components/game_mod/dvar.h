@@ -200,6 +200,8 @@ extern dvar_s* r_renderCloakHDR;
 extern bool com_cfg_readOnly_default;
 extern dvar_s* com_cfg_readOnly;
 
+VANILLA_FUNC(Dvar_SetInAutoExec, void (__cdecl*)(bool inAutoExec), 0x0053D190);
+
 typedef const char* Dvar_GetString_t(const char* dvarName);
 static Dvar_GetString_t* Dvar_GetString = (Dvar_GetString_t*)0x0057FF80;
 
