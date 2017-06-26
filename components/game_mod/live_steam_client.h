@@ -28,6 +28,5 @@ public:
 	void RequestEncryptedAppTicket(const void *data, const unsigned int size);
 	bool GetRetrievedEncryptedAppTicket(void *ticketBuf, const unsigned int ticketBufSize, unsigned int *ticketSize);
 	void OnRequestEncryptedAppTicket(EncryptedAppTicketResponse_t* pEncryptedAppTicketResponse, bool bIOFailure);
-	bool UseCachedTicket(const char *Path, void *Buffer, unsigned int BufferSize, bool ReadOnly = true, unsigned int *ReadSize = nullptr);
 };
 STATIC_ASSERT_OFFSET(LiveSteamClient, resultOnRequestEncryptedAppTicket, 0x0);
