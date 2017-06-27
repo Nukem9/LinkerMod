@@ -228,8 +228,9 @@ void __cdecl CL_PlayDemo_f()
 
 	const char* servername = Cmd_Argv(1);
 	I_strncpyz(cls_servername, servername, 256);
-
-	Cbuf_ExecuteBuffer(0, 0, "selectStringTableEntryInDvar mp/didyouknow.csv 0 didyouknow");
+	
+	// Disabled because it always throws an error regardless of which csv you use
+	//Cbuf_ExecuteBuffer(0, 0, "selectStringTableEntryInDvar mp/didyouknow.csv 0 didyouknow");
 	
 	if (useFastFile->current.enabled)
 		DB_ResetZoneSize(0);
