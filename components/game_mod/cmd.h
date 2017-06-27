@@ -47,6 +47,7 @@ void hk_Cmd_ExecuteSingleCommandInternal(int localClientNum, int controllerIndex
 void Cbuf_AddText(int localClientNum, const char *text);
 VANILLA_FUNC(Cbuf_InsertText, void(__cdecl*)(int localClientNum, const char *text), 0x005B3EB0);
 VANILLA_FUNC(Cbuf_Execute, void(__cdecl*)(int localClientNum, int controllerIndex), 0x00639930);
+VANILLA_FUNC(Cbuf_ExecuteBuffer, void (__cdecl*)(int localClientNum, int controllerIndex, const char *buffer), 0x00480A00);
 
 CmdArgs *__cdecl Cmd_Args();
 
@@ -65,3 +66,4 @@ static const char *SV_Cmd_Argv(int argIndex)
 }
 
 void __cdecl Cmd_Vstr_f();
+void __cdecl CL_PlayDemo_f();

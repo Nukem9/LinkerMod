@@ -217,6 +217,8 @@ static Dvar_SetBool_t* Dvar_SetBool = (Dvar_SetBool_t*)0x004B0C10;
 typedef void __cdecl Dvar_SetFloat_t(dvar_s *dvar, float value);
 static Dvar_SetFloat_t* Dvar_SetFloat = (Dvar_SetFloat_t*)0x0061F7A9;
 
+VANILLA_FUNC(Dvar_SetIntByName, void (__cdecl*)(const char *dvarName, int value), 0x00500100);
+
 typedef dvar_s *__cdecl Dvar_RegisterString_t(const char *dvarName, const char *value, unsigned __int16 flags, const char *description);
 static Dvar_RegisterString_t* Dvar_RegisterString = (Dvar_RegisterString_t*)0x0059B3B0;
 

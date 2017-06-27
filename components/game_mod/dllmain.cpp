@@ -395,6 +395,11 @@ BOOL GameMod_Init()
 	PatchMemory(0x0082D0D5, (PBYTE)&version, 4);
 
 	//
+	// Demo fixes
+	//
+	Patch_Demos();
+
+	//
 	// Misc Bug Fixes
 	//
 	Detours::X86::DetourFunction((PBYTE)0x007D9590, (PBYTE)&nullsub);

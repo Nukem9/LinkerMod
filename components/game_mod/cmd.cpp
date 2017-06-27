@@ -97,3 +97,73 @@ void __cdecl Cmd_Vstr_f()
 		Com_Printf(0, "%s is not a string-based dvar\n", dvar->name);
 	}
 }
+
+void __cdecl CL_PlayDemo_f()
+{
+	if (Cmd_Argc() != 2)
+	{
+		Com_Printf(14, "%s <demoname>\n", Cmd_Argv(0));
+		return;
+	}
+
+	if (com_sv_running->current.enabled)
+	{
+		Com_Printf(14, "listen server cannot play a demo.\n");
+		return;
+	}
+
+	int localClientNum = 0;
+	CL_Disconnect(0, 1);
+
+	char name[256];
+	char extension[32];
+	sprintf_s(extension, 32, ".dm_%d", 7);
+
+	const char* demo = Cmd_Argv(1);
+	if (_stricmp(&demo[strlen(demo)] - strlen(extension), extension))
+		sprintf_s(name, 256, "%s.dm_%d", demo, 7);
+	else
+		sprintf_s(name, 256, "%s", demo);
+
+	int demofile = NULL;
+	FS_SV_FOpenFileRead(name, "demos", &demofile, NULL);
+
+	if (!demofile)
+	{
+		Com_Error(ERR_DROP, va("EXE_ERR_NOT_FOUND\x15%s", name));
+		return;
+	}
+
+	CL_AllocatePerLocalClientMemory(0, 0);
+
+	const char* demoname = Cmd_Argv(1);
+	I_strncpyz(clc_demoName, demoname, 64);
+
+	Con_Close(localClientNum);
+
+	VANILLA_VALUE(localClientConnectionState, int, 0x02910164);
+	localClientConnectionState = 6;
+
+	clc_demofile = demofile;
+	clc_demoplaying = 1;
+
+	const char* timedemo = Cmd_Argv(0);
+	clc_isTimeDemo = (_stricmp(timedemo, "timedemo") == 0);
+
+	clc_lastClientArchiveIndex = 0;
+
+	const char* servername = Cmd_Argv(1);
+	I_strncpyz(cls_servername, servername, 256);
+
+	Cbuf_ExecuteBuffer(0, 0, "selectStringTableEntryInDvar mp/didyouknow.csv 0 didyouknow");
+	
+	if (useFastFile->current.enabled)
+		DB_ResetZoneSize(0);
+
+	while (localClientConnectionState >= 6 && localClientConnectionState < 9)
+		CL_ReadDemoMessage(localClientNum);
+
+	clc_firstDemoFrameSkipped = 0;
+	clc_demoPrevServerTime = 0;
+	Dvar_SetIntByName("cl_demoFFSpeed", 0);
+}

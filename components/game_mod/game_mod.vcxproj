@@ -120,6 +120,7 @@
     <ClCompile Include="live_steam_client.cpp" />
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="patch_common.cpp" />
+    <ClCompile Include="patch_demo.cpp" />
     <ClCompile Include="patch_misc.cpp" />
     <ClCompile Include="patch_usefastfile.cpp" />
     <ClCompile Include="patch_reflections.cpp" />
