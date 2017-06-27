@@ -44,6 +44,9 @@ struct FS_ModDesc
 };
 STATIC_ASSERT_SIZE(FS_ModDesc, MODDESC_LEN);
 
+VANILLA_FUNC(FS_BuildOSPath, void (__cdecl*)(const char *base, const char *game, const char *qpath, char *ospath), 0x00472030);
+VANILLA_FUNC(FS_OSFPathExists, int (__cdecl*)(const char *file), 0x0046C380);
+
 typedef int (__cdecl* FS_FOpenFileRead_t)(const char *filename, int *file);
 static FS_FOpenFileRead_t FS_FOpenFileRead = (FS_FOpenFileRead_t)0x004C6E20;
 
@@ -68,6 +71,8 @@ static FS_FileRead_t FS_FileRead = (FS_FileRead_t)0x0047F210;
 // If pResult is NULL, no result value is written
 typedef int(__cdecl* FS_SV_FOpenFileRead_t)(const char *filename, const char *dir, int *fp, int* pResult);
 static FS_SV_FOpenFileRead_t FS_SV_FOpenFileRead = (FS_SV_FOpenFileRead_t)0x00464020;
+
+VANILLA_FUNC(FS_SV_FOpenFileWrite, int(__cdecl*)(const char *filename, const char *dir), 0x00472DC0);
 
 typedef _iobuf *(__cdecl* FS_FileForHandle_t)(int f);
 static FS_FileForHandle_t FS_FileForHandle = (FS_FileForHandle_t)0x00516DA0;

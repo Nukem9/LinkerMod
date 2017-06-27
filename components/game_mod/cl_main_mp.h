@@ -24,6 +24,8 @@ struct ViewModelInfo
 STATIC_ASSERT_OFFSET(ViewModelInfo, anims, 0xC);
 STATIC_ASSERT_OFFSET(ViewModelInfo, hand, 0x24);
 
+VANILLA_VALUE(localClientConnectionState, int, 0x02910164);
+
 static char* clc_demoName = (char*)0x028F9F3C;
 static char* cls_servername = (char*)0x02B10B64;
 
@@ -33,6 +35,13 @@ VANILLA_VALUE(clc_isTimeDemo, int, 0x028F9F84);
 VANILLA_VALUE(clc_lastClientArchiveIndex, int, 0x028F9F38);
 VANILLA_VALUE(clc_firstDemoFrameSkipped, int, 0x028F9F8C);
 VANILLA_VALUE(clc_demoPrevServerTime, int, 0x028F9F98);
+
+VANILLA_VALUE(clc_demorecording, int, 0x028F9F7C);
+VANILLA_VALUE(clc_demoLiveStream, int, 0x028F9F94);
+VANILLA_VALUE(clc_demowaiting, int, 0x028F9F88);
+ 
+VANILLA_VALUE(clc_reliableSequence, int, 0x028D9F20);
+VANILLA_VALUE(clc_serverCommandSequence, int, 0x028E9F2C);
 
 VANILLA_FUNC(CL_ReadDemoMessage, void(__cdecl*)(int localClientNum), 0x00621560);
 VANILLA_FUNC(CL_AllocatePerLocalClientMemory, void(__cdecl*)(const char *mapname, unsigned int flags), 0x004B73A0);
@@ -50,3 +59,5 @@ const char *__cdecl CL_GetServerIPAddress();
 
 char *CG_GetLocalClientGlobals(int localClientNum);
 ViewModelInfo *CG_GetLocalClientViewModelInfo(int localClientNum);
+
+void __cdecl CL_WriteUncompressedDemoInfo(int localClientNum);

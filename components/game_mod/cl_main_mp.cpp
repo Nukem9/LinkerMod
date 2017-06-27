@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "com_constantconfigstrings.h"
 
 char* szServerIPAddress = (char*)0x02EFCDA8;
 
@@ -42,4 +43,23 @@ ViewModelInfo *CG_GetLocalClientViewModelInfo(int localClientNum)
 
 	// cg_viewModelArray
 	return *(ViewModelInfo **)0x00C1C6D8;
+}
+
+void __cdecl CL_WriteUncompressedDemoInfo(int localClientNum)
+{
+	char bufData[0x10000];
+	msg_t buf;
+
+	MSG_Init(&buf, bufData, 0x10000);
+	MSG_WriteLong(&buf, clc_reliableSequence);
+	MSG_WriteByte(&buf, 1);
+	MSG_WriteLong(&buf, clc_serverCommandSequence);
+	const char* mapname = Dvar_GetString("mapname");
+	MSG_WriteString(&buf, mapname);
+	const char*gametype = Dvar_GetString("g_gametype");
+	MSG_WriteString(&buf, gametype);
+	int checksum = CCS_GetChecksum();
+	MSG_WriteLong(&buf, checksum);
+	//v10 = CL_GetLocalClientGlobals(localClientNum);
+	//MSG_WriteByte(&buf, 2);
 }

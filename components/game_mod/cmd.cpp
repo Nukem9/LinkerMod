@@ -98,6 +98,81 @@ void __cdecl Cmd_Vstr_f()
 	}
 }
 
+void __cdecl CL_Record_f()
+{
+	if (Cmd_Argc() > 2)
+	{
+		Com_Printf(0, "record <demoname>\n");
+		return;
+	}
+
+	const int localClientNum = 0;
+	if (localClientConnectionState != 10)
+	{
+		Com_Printf(0, "You must be in a level to record.\n");
+		return;
+	}
+
+	if (clc_demorecording)
+	{
+		Com_Printf(0, "Already recording.\n");
+		return;
+	}
+
+	char demoName[64];
+	char name[256];
+	char nameLiveStream[256];
+	if (Cmd_Argc() == 2)
+	{
+		const char* demo_name = Cmd_Argv(1);
+		I_strncpyz(demoName, demo_name, 64);
+		sprintf_s(name, 256, "%s.dm_%d", demoName, 7);
+		sprintf_s(nameLiveStream, 256, "%s.txt", demoName);
+	}
+	else
+	{
+		for (int number = 0; number <= 9999; ++number)
+		{
+			sprintf_s(demoName, 64, "demo%04i", number);
+			sprintf_s(name, 256, "%s.dm_%d", demoName, 7);
+			sprintf_s(nameLiveStream, 256, "%s.txt", demoName);
+			
+			const char* baspath = fs_homepath->current.string;
+
+			char ospath[256];
+			FS_BuildOSPath(baspath, "demos", name, ospath);
+			if (!FS_OSFPathExists(ospath))
+				break;
+		}
+	}
+
+	Com_Printf(0, "recording to %s.\n", name);
+	clc_demofile = FS_SV_FOpenFileWrite(name, "demos");
+	if (!clc_demofile)
+	{
+		Com_PrintError(0, "ERROR: couldn't open.\n");
+		return;
+	}
+
+	if (!cl_demoLiveStreaming->current.integer
+		|| (clc_demoLiveStream = FS_SV_FOpenFileWrite(nameLiveStream, "demos")) != 0)
+	{
+		clc_demorecording = 1;
+		clc_demowaiting = 1;
+
+		//clc_demoRecordStartTime = Sys_Milliseconds();
+		//clc_demoUseMemoryBuffer = 0;
+
+		I_strncpyz(clc_demoName, demoName, 64);
+		CL_WriteUncompressedDemoInfo(localClientNum);
+	}
+	else
+	{
+		Com_PrintError(0, "ERROR: couldn't open to write %s.\n", nameLiveStream);
+	}
+
+}
+
 void __cdecl CL_PlayDemo_f()
 {
 	if (Cmd_Argc() != 2)
@@ -141,7 +216,6 @@ void __cdecl CL_PlayDemo_f()
 
 	Con_Close(localClientNum);
 
-	VANILLA_VALUE(localClientConnectionState, int, 0x02910164);
 	localClientConnectionState = 6;
 
 	clc_demofile = demofile;

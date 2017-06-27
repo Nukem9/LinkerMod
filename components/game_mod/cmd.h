@@ -66,4 +66,5 @@ static const char *SV_Cmd_Argv(int argIndex)
 }
 
 void __cdecl Cmd_Vstr_f();
+void __cdecl CL_Record_f();
 void __cdecl CL_PlayDemo_f();

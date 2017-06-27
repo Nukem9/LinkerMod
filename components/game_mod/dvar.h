@@ -116,6 +116,8 @@ VANILLA_DVAR(cg_fovScale, 0x02FF66A8);
 
 VANILLA_DVAR(uiscript_debug, 0x02562A20);
 
+VANILLA_DVAR(cl_demoLiveStreaming, 0x028D9DD0);
+
 VANILLA_DVAR(cl_ingame, 0x02910158);
 VANILLA_DVAR(com_sv_running, 0x0243FD3C);
 VANILLA_DVAR(com_maxclients, 0x02481720);
