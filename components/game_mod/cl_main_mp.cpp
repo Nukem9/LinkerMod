@@ -45,21 +45,114 @@ ViewModelInfo *CG_GetLocalClientViewModelInfo(int localClientNum)
 	return *(ViewModelInfo **)0x00C1C6D8;
 }
 
+typedef void(__cdecl* WriteGameState_f)(msg_t *msg);
+static WriteGameState_f DynEnt_WriteGameState = (WriteGameState_f)0x0068E2B0;
+static WriteGameState_f Destructible_WriteGameState = (WriteGameState_f)0x00641AF0;
+static WriteGameState_f Rope_WriteGameState = (WriteGameState_f)0x00401DD0;
+
+void __cdecl CL_WriteInitialStateToDemo(int demoFile, char type, int serverMessageSequence, char *compressedBuf, int compressedBufSize)
+{
+	FS_WriteToDemo(&type, 1, demoFile);
+	int len = serverMessageSequence;
+	FS_WriteToDemo(&len, 4, demoFile);
+	len = compressedBufSize;
+	FS_WriteToDemo(&len, 4, demoFile);
+	for (len = 0; len < compressedBufSize; len += 1024)
+	{
+		int writeSize = (compressedBufSize - len > 1024) ? 1024 : compressedBufSize - len;
+		FS_WriteToDemo(&compressedBuf[len], writeSize, demoFile);
+	}
+}
+
 void __cdecl CL_WriteUncompressedDemoInfo(int localClientNum)
 {
 	char bufData[0x10000];
 	msg_t buf;
 
 	MSG_Init(&buf, bufData, 0x10000);
+	//MSG_ClearLastReferencedEntity(&buf);
+
+	// These two arent actually visible in CL_ParseGameState but theyre there
 	MSG_WriteLong(&buf, clc_reliableSequence);
-	MSG_WriteByte(&buf, 1);
+
+	//
+	// Server metadata
+	//
+	MSG_WriteByte(&buf, 1); // message chunk header
 	MSG_WriteLong(&buf, clc_serverCommandSequence);
 	const char* mapname = Dvar_GetString("mapname");
 	MSG_WriteString(&buf, mapname);
-	const char*gametype = Dvar_GetString("g_gametype");
+	const char* gametype = Dvar_GetString("g_gametype");
 	MSG_WriteString(&buf, gametype);
+
+	// ???
+	MSG_WriteLong(&buf, 0);
+	MSG_WriteLong(&buf, 0);
+	MSG_WriteLong(&buf, 0);
+
+	// Used to debug where the configstring checksum is
+	//for (int i = 0; i < 64 ; i++)
+	//	MSG_WriteLong(&buf, i + 1);
+
+#if CCS_ALLOW_CHECKSUM
 	int checksum = CCS_GetChecksum();
+#else
+	int checksum = NULL;
+#endif
 	MSG_WriteLong(&buf, checksum);
-	//v10 = CL_GetLocalClientGlobals(localClientNum);
-	//MSG_WriteByte(&buf, 2);
+
+	//
+	// Start the configstring message chunk
+	//
+	MSG_WriteByte(&buf, 2);
+	
+	// Count the number of config strings
+	int configStringCount = 0;
+	for (int i = 0; i < 3112; i++)
+	{
+		if (reinterpret_cast<int*>(0x02EE9CF0)[i])
+			configStringCount++;
+	}
+
+	MSG_WriteShort(&buf, configStringCount);
+
+	// Write each config string
+	for (int i = 0; i < 3112; i++)
+	{
+		int v = reinterpret_cast<int*>(0x02EE9CEC)[i];
+		if (v)
+		{
+			char* s = (char*)(0x02EECD8C + v);
+			MSG_WriteBit0(&buf);
+			MSG_WriteBits(&buf, i, 12);
+			MSG_WriteBigString(&buf, s);
+		}
+	}
+
+	//
+	// ...
+	//
+
+	// ~151:
+	MSG_WriteByte(&buf, 14);
+	MSG_WriteLong(&buf, clc_clientNum);
+	MSG_WriteLong(&buf, clc_checksumFeed);
+	MSG_WriteByte(&buf, 6);
+	DynEnt_WriteGameState(&buf);
+	MSG_WriteByte(&buf, 7);
+	Destructible_WriteGameState(&buf);
+	MSG_WriteByte(&buf, 8);
+	Rope_WriteGameState(&buf);
+	MSG_WriteByte(&buf, 14);
+
+	//
+	// Compress the data & save it
+	//
+	char compressedBuf[65536];
+	*(DWORD*)compressedBuf = *(DWORD*)buf.data;
+	int compressedSize = MSG_WriteBitsCompress(0, (const char *)buf.data + 4, buf.cursize - 4, compressedBuf + 4, 65532) + 4;
+	CL_WriteInitialStateToDemo(clc_demofile, 0, clc_serverMessageSequence, (char *)compressedBuf, compressedSize);
+	CL_WriteAllDemoClientArchive();
+
+	clc_lastClientArchiveIndex = *(int*)0x02996854;
 }

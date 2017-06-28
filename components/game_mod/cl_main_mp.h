@@ -43,9 +43,15 @@ VANILLA_VALUE(clc_demowaiting, int, 0x028F9F88);
 VANILLA_VALUE(clc_reliableSequence, int, 0x028D9F20);
 VANILLA_VALUE(clc_serverCommandSequence, int, 0x028E9F2C);
 
+VANILLA_VALUE(clc_clientNum, int, 0x028D9DF4);
+VANILLA_VALUE(clc_checksumFeed, int, 0x028D9F1C);
+VANILLA_VALUE(clc_serverMessageSequence, int, 0x028E9F28);
+
 VANILLA_FUNC(CL_ReadDemoMessage, void(__cdecl*)(int localClientNum), 0x00621560);
 VANILLA_FUNC(CL_AllocatePerLocalClientMemory, void(__cdecl*)(const char *mapname, unsigned int flags), 0x004B73A0);
 VANILLA_FUNC(CL_Disconnect, void(__cdecl*)(int localClientNum, bool deactivateClient), 0x005FEC50);
+
+VANILLA_FUNC(CL_WriteAllDemoClientArchive, void (__cdecl*)(void), 0x00882560);
 
 extern void (__cdecl * CL_Vid_Restart_Complete_f)();
 
