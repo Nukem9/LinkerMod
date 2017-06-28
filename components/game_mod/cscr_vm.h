@@ -24,3 +24,5 @@ typedef void (__cdecl* GScr_NewHudElem_t)();
 static GScr_NewHudElem_t GScr_NewHudElem = (GScr_NewHudElem_t)0x006707C0;
 
 void __cdecl GScr_NewDebugHudElem();
+
+void __cdecl Scr_GetChecksumNoAsserts(int *checksum, scriptInstance_t inst);

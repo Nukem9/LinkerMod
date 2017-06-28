@@ -85,10 +85,12 @@ void __cdecl CL_WriteUncompressedDemoInfo(int localClientNum)
 	const char* gametype = Dvar_GetString("g_gametype");
 	MSG_WriteString(&buf, gametype);
 
-	// ???
-	MSG_WriteLong(&buf, 0);
-	MSG_WriteLong(&buf, 0);
-	MSG_WriteLong(&buf, 0);
+	// Script checksums
+	int scr_checksum[3];
+	Scr_GetChecksumNoAsserts(scr_checksum, SCRIPTINSTANCE_SERVER);
+	MSG_WriteLong(&buf, scr_checksum[0]);
+	MSG_WriteLong(&buf, scr_checksum[1]);
+	MSG_WriteLong(&buf, scr_checksum[2]);
 
 	// Used to debug where the configstring checksum is
 	//for (int i = 0; i < 64 ; i++)
