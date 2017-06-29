@@ -24,6 +24,17 @@ struct ViewModelInfo
 STATIC_ASSERT_OFFSET(ViewModelInfo, anims, 0xC);
 STATIC_ASSERT_OFFSET(ViewModelInfo, hand, 0x24);
 
+struct  SnapshotInfo_s
+{
+	int clientNum;
+	clientHeader_t *client;
+	int snapshotDeltaTime;
+	int unk;
+	BYTE pad[0x1C];
+};
+STATIC_ASSERT_SIZE(SnapshotInfo_s, 0x2C);
+
+
 VANILLA_VALUE(localClientConnectionState, int, 0x02910164);
 
 static char* clc_demoName = (char*)0x028F9F3C;

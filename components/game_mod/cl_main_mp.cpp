@@ -131,11 +131,57 @@ void __cdecl CL_WriteUncompressedDemoInfo(int localClientNum)
 		}
 	}
 
+#if _EXPERIMENTAL
 	//
-	// ...
+	// Entities
 	//
+	DWORD* unk_old = (DWORD*)0x02B10CCC;
+	DWORD* unk_new = (DWORD*)0x028C4F70;
+	unk_new[0] = unk_old[0];
+	unk_new[1] = unk_old[1];
+	unk_new[2] = unk_old[2];
 
-	// ~151:
+	SnapshotInfo_s snapInfo;
+	char nullState[0xD8];
+
+	memset(&snapInfo, 0, sizeof(snapInfo));
+	memset(nullState, 0, ARRAYSIZE(nullState));
+
+	for (int i = 0; i < 400; i++)
+	{
+		int* ent = reinterpret_cast<int*>(0x029B0E98) + (i * 0x36);
+		if (*ent)
+		{
+			MSG_WriteByte(&buf, 4);
+			snapInfo.clientNum = clc_clientNum;
+			snapInfo.snapshotDeltaTime = -1;
+			snapInfo.unk = 2;
+			MSG_WriteEntity(&snapInfo, &buf, 0, (entityState_s*)&nullState, (entityState_s*)ent, 4096);
+			snapInfo.unk = 0;
+		}
+	}
+
+	buf.lastEntityRef = -1;
+	MSG_ClearLastReferencedEntity(&buf);
+
+	for (int i = 0; i < 350; i++)
+	{
+		int* ent = reinterpret_cast<int*>(0x029E6E98) + (i * 0x36);
+		if (*ent)
+		{
+			MSG_WriteByte(&buf, 4);
+			snapInfo.clientNum = clc_clientNum;
+			snapInfo.snapshotDeltaTime = -1;
+			snapInfo.unk = 2;
+			MSG_WriteEntity(&snapInfo, &buf, 0, (entityState_s*)&nullState, (entityState_s*)ent, 4096);
+			snapInfo.unk = 0;
+		}
+	}
+#endif
+
+	//
+	// Additional gamestate data
+	//
 	MSG_WriteByte(&buf, 14);
 	MSG_WriteLong(&buf, clc_clientNum);
 	MSG_WriteLong(&buf, clc_checksumFeed);

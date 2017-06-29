@@ -24,6 +24,8 @@ struct msg_t
 	netsrc_t targetLocalNetID;
 };
 
+struct entityState_s;
+
 VANILLA_FUNC(MSG_Init, void(__cdecl*)(msg_t *buf, char *data, int length), 0x00622700);
 VANILLA_FUNC(MSG_WriteBit0, void(__cdecl*)(msg_t *msg), 0x004475B0);
 VANILLA_FUNC(MSG_WriteBit1, void(__cdecl*)(msg_t *msg), 0x004244D0);
@@ -37,3 +39,6 @@ VANILLA_FUNC(MSG_WriteString, void(__cdecl*)(msg_t *sb, const char *s), 0x004304
 
 VANILLA_FUNC(MSG_WriteBigString, void(__cdecl*)(msg_t *sb, const char *s), 0x006465B0);
 VANILLA_FUNC(MSG_WriteBitsCompress, int(__cdecl*)(bool trainHuffman, const char *from, int fromSizeBytes, char *to, int toSizeBytes), 0x00403110);
+
+VANILLA_FUNC(MSG_ClearLastReferencedEntity, void(__cdecl*)(msg_t *msg), 0x0063A210)
+VANILLA_FUNC(MSG_WriteEntity, int(__cdecl*)(struct SnapshotInfo_s *snapInfo, msg_t *msg, const int time, struct entityState_s *from, struct entityState_s *to, int flags), 0x00531680);
