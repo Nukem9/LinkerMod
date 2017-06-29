@@ -42,7 +42,7 @@ int SV_ClientCommand(client_t *cl, msg_t *msg, int fromOldServer)
 	if (cl->lastClientCommand >= seq)
 		return 1;
 
-	// if (sv_showCommands->current.enabled)
+	if (sv_showCommands->current.enabled)
 	 	Com_Printf(15, "clientCommand: %i : %s\n", seq, s);
 
 	// Check if the client skipped/dropped commands on their end (behind server)
