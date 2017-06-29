@@ -184,6 +184,8 @@ VANILLA_DVAR(showVisionSetDebugInfo, 0x00C23D40);
 
 extern dvar_s* com_developer_print;
 
+extern dvar_s* sv_showCommands;
+
 extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;
 extern dvar_s* radiant_liveDebug;

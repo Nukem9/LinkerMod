@@ -16,6 +16,8 @@ dvar_s* perk_weapRateEnhanced = NULL;
 
 dvar_s* com_developer_print = NULL;
 
+dvar_s* sv_showCommands = NULL;
+
 dvar_s* radiant_live = NULL;
 dvar_s* radiant_livePort = NULL;
 dvar_s* radiant_liveDebug = NULL;
@@ -85,6 +87,7 @@ void R_RegisterCustomDvars()
 	};
 
 	com_developer_print = Dvar_RegisterEnum("developer_print", com_dprintf_options, 0, 0x80, "Modify Com_DPrintf() behavior");
+	sv_showCommands = Dvar_RegisterBool("sv_showCommands", 0, 0, "Print client commands in the log file");
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;
