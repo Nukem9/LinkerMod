@@ -1,0 +1,177 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( -38 6 0 ) ( -38 -6 0 ) ( 36 -6 0 ) traverse 64 64 -12 28 -90 0 lightmap_gray 16384 16384 0 0 -90 0
+ ( -38 -6 40 ) ( -38 6 40 ) ( 36 6 40 ) traverse 64 64 -12 28 -90 0 lightmap_gray 16384 16384 0 0 -90 0
+ ( -36 -6 0 ) ( -36 6 0 ) ( -36 6 40 ) traverse 64 -64 -12 -56 180 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 36 -6 0 ) ( -38 -6 0 ) ( -38 -6 40 ) traverse 64 64 -28 56 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 36 6 0 ) ( 36 -6 0 ) ( 36 -6 40 ) traverse 64 -64 -12 -56 180 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( -38 6 0 ) ( 36 6 0 ) ( 36 6 40 ) traverse 64 64 -28 56 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+}
+// entity 1
+{
+"script_noteworthy" "6"
+"script_team" "new_barricade"
+"script_parameters" "barricade_vents"
+"targetname" "auto1"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -32 -7 43.5 ) ( -31.5 -7 43.5 ) ( -31.5 -7 43 ) rus_metal_trim 128 32 -6 0 90 0 lightmap_gray 16384 16384 -32 -43 0 0
+ ( 32 -1.5 43.5 ) ( 32 -1 43.5 ) ( 32 -1 43 ) rus_metal_trim 128 -32 -6 64 90 0 lightmap_gray 16383.615 16383.871 -7 -43 0 0
+ ( -31.5 0 43.5 ) ( -32 0 43.5 ) ( -32 0 43 ) rus_metal_trim 128 32 -6 0 90 0 lightmap_gray 16384 16384 -32 -43 0 0
+ ( -32 -6.5 44 ) ( -32 -7 44 ) ( -32 -7 43.5 ) rus_metal_trim 128 -32 -6 64 90 0 lightmap_gray 16386.477 16383.75 -7 -43 0 0
+ ( -32 -7 43 ) ( -32 0 48 ) ( 0 -7 43 ) rus_metal_trim 128 32 0 -64 0 0 lightmap_gray 16384 16384 -32 7 0 0
+ ( -32 0 47 ) ( -32 -7 42 ) ( 0 0 47 ) rus_metal_trim 128 32 0 -64 0 0 lightmap_gray 16384 16384.072 -32 7 0 0
+}
+}
+// entity 2
+{
+"script_noteworthy" "5"
+"script_team" "new_barricade"
+"script_parameters" "barricade_vents"
+"targetname" "auto1"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -32 -7 53.5 ) ( -31.5 -7 53.5 ) ( -31.5 -7 53 ) rus_metal_trim01 128 32 -4 0 90 0 lightmap_gray 16384 16384 -32 -53 0 0
+ ( 32 -1.5 53.5 ) ( 32 -1 53.5 ) ( 32 -1 53 ) rus_metal_trim01 128 -32 -4 64 90 0 lightmap_gray 16383.631 16384.012 -7 -53 0 0
+ ( -31.5 0 53.5 ) ( -32 0 53.5 ) ( -32 0 53 ) rus_metal_trim01 128 32 -4 0 90 0 lightmap_gray 16384 16384 -32 -53 0 0
+ ( -32 -6.5 54 ) ( -32 -7 54 ) ( -32 -7 53.5 ) rus_metal_trim01 128 -32 -4 64 90 0 lightmap_gray 16386.477 16383.75 -7 -53 0 0
+ ( -32 -7 53 ) ( -32 0 58 ) ( 0 -7 53 ) rus_metal_trim01 128 32 0 -64 0 0 lightmap_gray 16384 16384 -32 7 0 0
+ ( -32 0 57 ) ( -32 -7 52 ) ( 0 0 57 ) rus_metal_trim01 128 32 0 -64 0 0 lightmap_gray 16384 16384.072 -32 7 0 0
+}
+}
+// entity 3
+{
+"script_noteworthy" "4"
+"script_team" "new_barricade"
+"script_parameters" "barricade_vents"
+"targetname" "auto1"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -32 -7 63.5 ) ( -31.5 -7 63.5 ) ( -31.5 -7 63 ) rus_metal_trim02 128 32 -2 0 90 0 lightmap_gray 16384 16384 -32 -63 0 0
+ ( 32 -1.5 63.5 ) ( 32 -1 63.5 ) ( 32 -1 63 ) rus_metal_trim02 128 -32 -2.0010872 64 90 0 lightmap_gray 16383.744 16383.99 -7 -63 0 0
+ ( -31.5 0 63.5 ) ( -32 0 63.5 ) ( -32 0 63 ) rus_metal_trim02 128 32 -2 0 90 0 lightmap_gray 16384 16384 -32 -63 0 0
+ ( -32 -6.5 64 ) ( -32 -7 64 ) ( -32 -7 63.5 ) rus_metal_trim02 128 -32 -2 64 90 0 lightmap_gray 16386.352 16383.752 -7 -63 0 0
+ ( -32 -7 63 ) ( -32 0 68 ) ( 0 -7 63 ) rus_metal_trim02 128 32 0 -64 0 0 lightmap_gray 16384 16384 -32 7 0 0
+ ( -32 0 67 ) ( -32 -7 62 ) ( 0 0 67 ) rus_metal_trim02 128 32 0 -64 0 0 lightmap_gray 16384 16384.072 -32 7 0 0
+}
+}
+// entity 4
+{
+"script_noteworthy" "3"
+"script_team" "new_barricade"
+"script_parameters" "barricade_vents"
+"targetname" "auto1"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -32 -7 73.5 ) ( -31.5 -7 73.5 ) ( -31.5 -7 73 ) rus_metal_trim 128 32 0 0 90 0 lightmap_gray 16384 16384 -32 -73 0 0
+ ( 32 -1.5 73.5 ) ( 32 -1 73.5 ) ( 32 -1 73 ) rus_metal_trim 127.9982 -32 0 64 90 0 lightmap_gray 16383.75 16383.969 -7 -73 0 0
+ ( -31.5 0 73.5 ) ( -32 0 73.5 ) ( -32 0 73 ) rus_metal_trim 128 32 0 0 90 0 lightmap_gray 16384 16384 -32 -73 0 0
+ ( -32 -6.5 74 ) ( -32 -7 74 ) ( -32 -7 73.5 ) rus_metal_trim 128 -32 0 64 90 0 lightmap_gray 16385.664 16383.752 -7 -73 0 0
+ ( -32 -7 73 ) ( -32 0 78 ) ( 0 -7 73 ) rus_metal_trim 128 32 0 -64 0 0 lightmap_gray 16384 16384 -32 7 0 0
+ ( -32 0 77 ) ( -32 -7 72 ) ( 0 0 77 ) rus_metal_trim 128 32 0 -64 0 0 lightmap_gray 16384 16384.072 -32 7 0 0
+}
+}
+// entity 5
+{
+"script_noteworthy" "2"
+"script_team" "new_barricade"
+"script_parameters" "barricade_vents"
+"targetname" "auto1"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -32 -7 83.5 ) ( -31.5 -7 83.5 ) ( -31.5 -7 83 ) rus_metal_trim01 128 32 2 0 90 0 lightmap_gray 16384 16384 -32 -83 0 0
+ ( 32 -1.5 83.5 ) ( 32 -1 83.5 ) ( 32 -1 83 ) rus_metal_trim01 128 -32 2 64 90 0 lightmap_gray 16383.756 16384.021 -7 -83 0 0
+ ( -31.5 0 83.5 ) ( -32 0 83.5 ) ( -32 0 83 ) rus_metal_trim01 128 32 2 0 90 0 lightmap_gray 16384 16384 -32 -83 0 0
+ ( -32 -6.5 84 ) ( -32 -7 84 ) ( -32 -7 83.5 ) rus_metal_trim01 128 -32 2 64 90 0 lightmap_gray 16385.227 16383.752 -7 -83 0 0
+ ( -32 -7 83 ) ( -32 0 88 ) ( 0 -7 83 ) rus_metal_trim01 128 32 0 -64 0 0 lightmap_gray 16384 16384 -32 7 0 0
+ ( -32 0 87 ) ( -32 -7 82 ) ( 0 0 87 ) rus_metal_trim01 128 32 0 -64 0 0 lightmap_gray 16384 16384.072 -32 7 0 0
+}
+}
+// entity 6
+{
+"script_noteworthy" "1"
+"script_team" "new_barricade"
+"script_parameters" "barricade_vents"
+"targetname" "auto1"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -32 -7 93.5 ) ( -31.5 -7 93.5 ) ( -31.5 -7 93 ) rus_metal_trim02 128 32 0 -5 0 0 lightmap_gray 16384 16384 -32 -93 0 0
+ ( 32 -1.5 93.5 ) ( 32 -1 93.5 ) ( 32 -1 93 ) rus_metal_trim02 127.99797 -32 4.0014548 65 90 0 lightmap_gray 16383.75 16383.959 -7 -93 0 0
+ ( -31.5 0 93.5 ) ( -32 0 93.5 ) ( -32 0 93 ) rus_metal_trim02 128 32 4 -1 90 0 lightmap_gray 16384 16384 -32 -93 0 0
+ ( -32 -6.5 94 ) ( -32 -7 94 ) ( -32 -7 93.5 ) rus_metal_trim02 128 -32 4 65 90 0 lightmap_gray 16385.102 16383.752 -7 -93 0 0
+ ( -32 -7 93 ) ( -32 0 98 ) ( 0 -7 93 ) rus_metal_trim02 128 32 0 -65 0 0 lightmap_gray 16384 16384 -32 7 0 0
+ ( -32 0 97 ) ( -32 -7 92 ) ( 0 0 97 ) rus_metal_trim02 128 32 0 -65 0 0 lightmap_gray 16384 16384.072 -32 7 0 0
+}
+}
+// entity 7
+{
+"classname" "script_brushmodel"
+"origin" "159 -1503 136"
+"spawnflags" "1"
+"targetname" "auto1"
+"script_noteworthy" "clip"
+// brush 0
+{
+ ( -59 -20 0 ) ( 13 -20 0 ) ( 13 44 0 ) clip_ai 64 64 -13 -4 -90 0 lightmap_gray 16384 16384 -196 -1458.9972 -180 0
+ ( 69 44 128 ) ( 69 -20 128 ) ( -3 -20 128 ) clip_ai 64 64 -13 -4 -90 0 lightmap_gray 16384 16384.063 -196 -1459.0062 180 0
+ ( 48 4 48 ) ( -24 4 48 ) ( -24 4 40 ) clip_ai 64 64 4 128 0 0 lightmap_gray 16384 -16383.969 -196 -96 180 0
+ ( -44 44 -8 ) ( -44 -20 -8 ) ( -44 -20 -16 ) clip_ai 64 -64 -13 -128 180 0 lightmap_gray 16383.971 -16383.949 1458.9961 -96 -180 1.5204556e-005
+ ( -27 -4 48 ) ( 45 -4 48 ) ( 45 -4 40 ) clip_ai 64 64 4 128 0 0 lightmap_gray 16384 -16384 -196 -96 180 0
+ ( 44 -20 88 ) ( 44 44 88 ) ( 44 44 80 ) clip_ai 64 -64 -13 -128 -180 0 lightmap_gray 16383.863 -16383.938 1458.9875 -96 180 -4.6941284e-005
+}
+}
+// entity 8
+{
+"target" "pf40_auto2108"
+"spawnflags" "-32766"
+"animscript" "zombie_mantle_over_40"
+"classname" "node_negotiation_begin"
+"angles" "0 270 0"
+"origin" "0.0 44.0 16.1"
+}
+// entity 9
+{
+"targetname" "pf40_auto2108"
+"spawnflags" "-32766"
+"classname" "node_negotiation_end"
+"angles" "0 270 0"
+"origin" "0.0 -36.0 16.1"
+}
+// entity 10
+{
+"height" "64"
+"targetname" "auto1"
+"radius" "36"
+"angles" "0 270 0"
+"origin" "0.0 -1.0 38.0"
+"classname" "script_struct"
+}
+// entity 11
+{
+"classname" "script_struct"
+"origin" "0.0 47.0 42.0"
+"angles" "0 270 0"
+"target" "auto1"
+"targetname" "exterior_goal"
+}
+// entity 12
+{
+"classname" "script_struct"
+"origin" "0.0 47.0 42.0"
+"angles" "0 270 0"
+"target" "auto1"
+"targetname" "exterior_goal"
+}

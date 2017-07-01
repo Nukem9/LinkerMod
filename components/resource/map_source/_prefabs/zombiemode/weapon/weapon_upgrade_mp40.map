@@ -1,0 +1,78 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"origin" "-404 1216 -640"
+"spawnflags" "1024"
+"waterdirection " "80"
+"classname" "worldspawn"
+"northyaw" "225"
+"sundirection" "-40.5026 38.2786 0"
+"suncolor" "1 0.9254 0.8627"
+"sunlight" "1"
+"sundiffusecolor" "0.255 0.34078 0.427451"
+"diffusefraction" "0.175"
+"_color" "0.245 0.231 0.2135"
+"ambient" "0.15"
+"sunradiosity" "1.3"
+"radiosityscale" ".75"
+"contrastgain" ".8"
+}
+// entity 1
+{
+"classname" "trigger_use"
+"origin" "-390 -1265 136"
+"target" "auto1"
+"targetname" "weapon_upgrade"
+"zombie_weapon_upgrade" "mp40_zm"
+// brush 0
+{
+ ( -40 48 -8 ) ( -40 -24 -8 ) ( 24 -24 -8 ) trigger 64 -64 -374 1241 -90 0 lightmap_gray 16384 16383.875 374 -1240.9893 90 0
+ ( 24 -24 8 ) ( -40 -24 8 ) ( -40 48 8 ) trigger 64 -64 -374 1241.0027 -90 0 lightmap_gray 16384 16383.938 374 -1240.9976 90 0
+ ( 16 -24 -8 ) ( 16 48 -8 ) ( 16 48 -16 ) trigger 64 -64 -374 -152 180 0 lightmap_gray 16383.924 16384 374 152 0 0
+ ( 23 0 -8 ) ( -41 0 -8 ) ( -41 0 -16 ) trigger 64 64 -1241 152 0 0 lightmap_gray 16383.844 -16383.969 1240.9894 -152 -180 1.525876e-005
+ ( -16 51 -8 ) ( -16 -21 -8 ) ( -16 -21 -16 ) trigger 64 -64 -374 -152 -180 0 lightmap_gray 16384 16384.125 374 152 0 0
+ ( -40 -8 -8 ) ( 24 -8 -8 ) ( 24 -8 -16 ) trigger 64 64 -1241 152 0 0 lightmap_gray 16384 -16384.063 1241 -152 180 -6.1035389e-005
+}
+}
+// entity 2
+{
+"origin" "0 0 0"
+"angles" "0 0 0"
+"targetname" "mp40_chalk"
+"classname" "script_brushmodel"
+// brush 0
+ {
+  curve
+  {
+   chalk_weapon_mp40
+   lightmap_gray
+   3 3 16 8
+   (
+	v 16.499996 0 6.5 t 0 -1024 1.5 -0.1875
+	v 16.499996 0 -2.25 t 0 -512 1.5 0.125
+	v 16.499996 0 -11 t 0 -0 1.5 0.4375
+   )
+   (
+	v -1.5000029 0 6.5 t 512 -1024 0 -0.1875
+	v -1.5000029 0 -2.25 t 512 -512 0 0.125
+	v -1.5000029 0 -11 t 512 -0 0 0.4375
+   )
+   (
+	v -19.500008 0 6.5 t 1024 -1024 -1.5 -0.1875
+	v -19.500008 0 -2.25 t 1024 -512 -1.5 0.125
+	v -19.500008 0 -11 t 1024 -0 -1.5 0.4375
+   )
+  }
+ }
+}
+// entity 3
+{
+"classname" "script_model"
+"model" "weapon_mp_mp40_smg"
+"origin" "0.0 0.0 1.0"
+"angles" "0 2.50448e-006 0"
+"targetname" "auto1"
+"target" "mp40_chalk"
+}

@@ -1,0 +1,19 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+}
+// entity 1
+{
+"origin" "0.0 -8.0 16.0"
+"model" "_prefabs/zombiemode/power_lever_handle.map"
+"classname" "misc_prefab"
+}
+// entity 2
+{
+"origin" "0.0 0.0 0.0"
+"model" "zombie_power_lever"
+"classname" "misc_model"
+}

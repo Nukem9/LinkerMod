@@ -1,0 +1,183 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( -6 -38 0 ) ( 6 -38 0 ) ( 6 36 0 ) traverse 64 64 -12 28 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 6 -38 40 ) ( -6 -38 40 ) ( -6 36 40 ) traverse 64 64 -12 28 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 6 -36 0 ) ( -6 -36 0 ) ( -6 -36 40 ) traverse 64 64 -12 56 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 6 36 0 ) ( 6 -38 0 ) ( 6 -38 40 ) traverse 64 64 -28 56 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -6 36 0 ) ( 6 36 0 ) ( 6 36 40 ) traverse 64 64 -12 56 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -6 -38 0 ) ( -6 36 0 ) ( -6 36 40 ) traverse 64 64 -28 56 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+}
+// entity 1
+{
+"classname" "script_brushmodel"
+"origin" "159 -1503 136"
+"spawnflags" "1"
+"targetname" "auto1"
+"script_noteworthy" "clip"
+// brush 0
+{
+ ( 33 -63 0 ) ( 33 9 0 ) ( -31 9 0 ) clip_ai 64 64 0 0 0 0 lightmap_gray 16384 16384.014 -192 -1471.9984 -90 0
+ ( -31 65 128 ) ( 33 65 128 ) ( 33 -7 128 ) clip_ai 64 64 0 0 0 0 lightmap_gray 16384 16384.072 -192 -1472.0071 -90 0
+ ( -15 41 48 ) ( -15 -31 48 ) ( -15 -31 40 ) clip_ai 64 64 0 128 0 0 lightmap_gray 16384 -16384 -192 -96 -180 0
+ ( -31 -47 -8 ) ( 33 -47 -8 ) ( 33 -47 -16 ) clip_ai 64 64 0 128 0 0 lightmap_gray 16384.088 16384 1472.0076 96 0 3.1150903e-005
+ ( 17 -31 48 ) ( 17 41 48 ) ( 17 41 40 ) clip_ai 64 64 0 128 0 0 lightmap_gray 16384 -16383.988 -192 -96 -180 0
+ ( 33 41 88 ) ( -31 41 88 ) ( -31 41 80 ) clip_ai 64 64 0 128 0 0 lightmap_gray 16383.84 16383.938 1471.9854 96 0 -4.8284212e-005
+}
+}
+// entity 2
+{
+"classname" "script_brushmodel"
+"origin" "163 -1508 162"
+"targetname" "auto1"
+"script_noteworthy" "1"
+"script_parameters" "bar"
+"script_team" "bar_board_variant5"
+// brush 0
+{
+ ( 28 -35 82 ) ( 28 37 82 ) ( -36 37 82 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16383.973 -192 -1471.9955 -90 0
+ ( -36 37 114 ) ( 28 37 114 ) ( 28 -35 114 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384.031 -192 -1472.0026 -90 0
+ ( -20 37 74 ) ( -20 -35 74 ) ( -20 -35 66 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16384.064 -192 -96 180 0
+ ( -36 -19 74 ) ( 28 -19 74 ) ( 28 -19 66 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16383.777 16384.068 1471.9791 96 0 0
+ ( 12 -35 74 ) ( 12 37 74 ) ( 12 37 66 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16384.063 -192 -96 180 0
+ ( 28 13 74 ) ( -36 13 74 ) ( -36 13 66 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384.215 16384.063 1472.0166 96 0 0
+}
+}
+// entity 3
+{
+"classname" "script_brushmodel"
+"origin" "151 -1506 133"
+"targetname" "auto1"
+"script_noteworthy" "2"
+"script_parameters" "bar"
+"script_team" "bar_board_variant5"
+// brush 0
+{
+ ( 30 -23 53 ) ( 30 49 53 ) ( -34 49 53 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384.154 -192 -1472.0126 -90 0
+ ( -34 49 85 ) ( 30 49 85 ) ( 30 -23 85 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384 -192 -1471.9988 -90 0
+ ( -18 49 45 ) ( -18 -23 45 ) ( -18 -23 37 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16383.992 -192 -96 -180 0
+ ( -34 -7 45 ) ( 30 -7 45 ) ( 30 -7 37 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384 1471.9984 96 0 0
+ ( 14 -23 45 ) ( 14 49 45 ) ( 14 49 37 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16383.936 -192 -96 180 0
+ ( 30 25 45 ) ( -34 25 45 ) ( -34 25 37 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384.115 16384 1472.0098 96 0 0
+}
+}
+// entity 4
+{
+"classname" "script_brushmodel"
+"origin" "177 -1506 136"
+"targetname" "auto1"
+"script_noteworthy" "3"
+"script_parameters" "bar"
+"script_team" "bar_board_variant5"
+// brush 0
+{
+ ( 30 -49 56 ) ( 30 23 56 ) ( -34 23 56 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384.066 -192 -1472.0043 -90 0
+ ( -34 23 88 ) ( 30 23 88 ) ( 30 -49 88 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384.066 -192 -1472.0043 -90 0
+ ( -18 23 48 ) ( -18 -49 48 ) ( -18 -49 40 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16384.188 -192 -96 180 0
+ ( -34 -33 48 ) ( 30 -33 48 ) ( 30 -33 40 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384 1471.996 96 0 2.8789613e-005
+ ( 14 -49 48 ) ( 14 23 48 ) ( 14 23 40 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16384.154 -192 -96 -180 0
+ ( 30 -1 48 ) ( -34 -1 48 ) ( -34 -1 40 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384 1471.9973 96 0 0
+}
+}
+// entity 5
+{
+"classname" "script_brushmodel"
+"origin" "161 -1502 121"
+"targetname" "auto1"
+"script_noteworthy" "6"
+"script_parameters" "bar"
+"script_team" "bar_board_variant5"
+// brush 0
+{
+ ( 34 -33 41 ) ( 34 39 41 ) ( -30 39 41 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384.049 -192 -1472.0045 -90 0
+ ( -30 39 73 ) ( 34 39 73 ) ( 34 -33 73 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16383.938 -192 -1471.9979 -90 0
+ ( -14 39 33 ) ( -14 -33 33 ) ( -14 -33 25 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16384.025 -192 -96 180 0
+ ( -30 -17 33 ) ( 34 -17 33 ) ( 34 -17 25 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384.064 1471.998 96 0 1.5945634e-005
+ ( 18 -33 33 ) ( 18 39 33 ) ( 18 39 25 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16383.982 -192 -96 -180 0
+ ( 34 15 33 ) ( -30 15 33 ) ( -30 15 25 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384.025 1472 96 0 0
+}
+}
+// entity 6
+{
+"classname" "script_brushmodel"
+"origin" "159 -1504 148"
+"targetname" "auto1"
+"script_noteworthy" "5"
+"script_parameters" "bar"
+"script_team" "bar_board_variant5"
+// brush 0
+{
+ ( 32 -31 68 ) ( 32 41 68 ) ( -32 41 68 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16383.994 16384.016 -192 -1472.004 -90 0
+ ( -32 41 100 ) ( 32 41 100 ) ( 32 -31 100 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16383.945 -192 -1471.9979 -90 0
+ ( -16 41 60 ) ( -16 -31 60 ) ( -16 -31 52 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16384 -192 -96 180 0
+ ( -32 -15 60 ) ( 32 -15 60 ) ( 32 -15 52 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384 1472.005 96 0 0
+ ( 16 -31 60 ) ( 16 41 60 ) ( 16 41 52 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16383.99 -192 -96 180 0
+ ( 32 17 60 ) ( -32 17 60 ) ( -32 17 52 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384.063 16384 1472.006 96 0 0
+}
+}
+// entity 7
+{
+"classname" "script_brushmodel"
+"origin" "159 -1502 160"
+"targetname" "auto1"
+"script_noteworthy" "4"
+"script_parameters" "bar"
+"script_team" "bar_board_variant5"
+// brush 0
+{
+ ( 34 -31 80 ) ( 34 41 80 ) ( -30 41 80 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384.141 -192 -1472.0142 -90 0
+ ( -30 41 112 ) ( 34 41 112 ) ( 34 -31 112 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384.01 -192 -1472.0017 -90 0
+ ( -14 41 72 ) ( -14 -31 72 ) ( -14 -31 64 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16384 -192 -96 180 0
+ ( -30 -15 72 ) ( 34 -15 72 ) ( 34 -15 64 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16384 1471.998 96 0 0
+ ( 18 -31 72 ) ( 18 41 72 ) ( 18 41 64 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 -16384 -192 -96 180 0
+ ( 34 17 72 ) ( -30 17 72 ) ( -30 17 64 ) blockout_test_wood 128 128 0 0 0 0 lightmap_gray 16384 16383.994 1472.0054 96 0 -6.1232306e-005
+}
+}
+// entity 8
+{
+"target" "pf40_auto2108"
+"spawnflags" "-32766"
+"animscript" "zombie_mantle_over_40"
+"classname" "node_negotiation_begin"
+"angles" "0 2.50448e-006 0"
+"origin" "-44.0 0.0 16.1"
+}
+// entity 9
+{
+"targetname" "pf40_auto2108"
+"spawnflags" "-32766"
+"classname" "node_negotiation_end"
+"angles" "0 2.50448e-006 0"
+"origin" "36.0 0.0 16.1"
+}
+// entity 10
+{
+"height" "64"
+"targetname" "auto1"
+"radius" "36"
+"angles" "0 2.50448e-006 0"
+"origin" "1.0 0.0 38.0"
+"classname" "script_struct"
+}
+// entity 11
+{
+"classname" "script_struct"
+"origin" "-47.0 0.0 42.0"
+"angles" "0 2.50448e-006 0"
+"target" "auto1"
+"targetname" "exterior_goal"
+}
+// entity 12
+{
+"classname" "script_struct"
+"origin" "-47.0 0.0 42.0"
+"angles" "0 2.50448e-006 0"
+"target" "auto1"
+"targetname" "exterior_goal"
+}

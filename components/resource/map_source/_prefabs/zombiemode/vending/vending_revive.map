@@ -1,0 +1,124 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+}
+// entity 1
+{
+"classname" "trigger_use"
+"origin" "527 -1261 106"
+"target" "vending_revive"
+"targetname" "zombie_vending"
+"script_noteworthy" "specialty_quickrevive"
+"script_sound" "mus_perks_revive_jingle"
+"script_label" "mus_perks_revive_sting"
+"script_string" "revive_perk"
+// brush 0
+{
+ ( -32 12 0 ) ( -32 -60 0 ) ( 32 -60 0 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16384.096 -579 -1229.0059 90 0
+ ( 32 -60 64 ) ( -32 -60 64 ) ( -32 12 64 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16384 -579 -1229 90 0
+ ( 25 -60 8 ) ( 25 12 8 ) ( 25 12 0 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16384.068 -579 106 0 0
+ ( 33 0 8 ) ( -31 0 8 ) ( -31 0 0 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 -16384.188 1229.0021 -106 180 0
+ ( -25 12 8 ) ( -25 -60 8 ) ( -25 -60 0 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16384 -579 106 0 0
+ ( -32 -24 8 ) ( 32 -24 8 ) ( 32 -24 0 ) trigger 64 64 0 0 0 0 lightmap_gray 16384.063 -16384.063 1229.0026 -106 180 0
+}
+}
+// entity 2
+{
+"classname" "script_model"
+"model" "zombie_vending_revive"
+"origin" "0.0 0.0 0.0"
+"angles" "0 2.50448e-006 0"
+"targetname" "vending_revive"
+"script_string" "revive_perk"
+}
+// entity 3
+{
+"classname" "trigger_multiple"
+"origin" "523 -1260 112"
+"targetname" "audio_bump_trigger"
+"script_sound" "fly_bump_bottle"
+"script_string" "revive_perk"
+// brush 0
+{
+ ( -33 16 0 ) ( -33 -56 0 ) ( 31 -56 0 ) sound_trigger 64 -64 571 1229.0045 -90 0 lightmap_gray 16384 16383.979 -571 -1229.0011 90 0
+ ( 31 -56 64 ) ( -33 -56 64 ) ( -33 16 64 ) sound_trigger 64 -64 571 1229 -90 0 lightmap_gray 16384 16384 -571 -1228.9939 90 0
+ ( 28 -56 8 ) ( 28 16 8 ) ( 28 16 0 ) sound_trigger 64 -64 571 -112 180 0 lightmap_gray 16384 16383.947 -571 112 0 0
+ ( 31 16 8 ) ( -33 16 8 ) ( -33 16 0 ) sound_trigger 64 64 -1229 112 0 0 lightmap_gray 16384.064 -16383.984 1229.0024 -112 180 0
+ ( -28 16 8 ) ( -28 -56 8 ) ( -28 -56 0 ) sound_trigger 64 -64 571 -112 180 0 lightmap_gray 16383.799 16383.971 -571 112 0 0
+ ( -33 -28 8 ) ( 31 -28 8 ) ( 31 -28 0 ) sound_trigger 64 64 -1229.0066 112 0 0 lightmap_gray 16383.758 -16383.855 1228.984 -112 180 0
+}
+}
+// entity 4
+{
+"classname" "script_brushmodel"
+"origin" "528 -1261 106"
+"spawnflags" "1"
+"targetname" "vending_revive"
+"script_noteworthy" "clip"
+// brush 0
+{
+ ( -28 32 -2 ) ( -28 -40 -2 ) ( 36 -40 -2 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384.127 -560 -1241.0048 90 0
+ ( 20 -40 86 ) ( -44 -40 86 ) ( -44 32 86 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16383.781 -560 -1240.9827 90 0
+ ( 24 -40 -6 ) ( 24 32 -6 ) ( 24 32 -14 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384.094 -560 64 0 0
+ ( 20 12 50 ) ( -44 12 50 ) ( -44 12 42 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384.061 -16384.111 1241.0087 -64 180 0
+ ( -24 32 50 ) ( -24 -40 50 ) ( -24 -40 42 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384.158 -560 64 0 0
+ ( -29 -24 50 ) ( 35 -24 50 ) ( 35 -24 42 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384.457 -16384 1241.0322 -64 180 0
+}
+}
+// entity 5
+{
+"classname" "script_struct"
+"origin" "-24.0 -32.0 8.0"
+"angles" "0 90 0"
+"script_int" "1"
+"script_noteworthy" "cosmo_monkey_revive"
+"target" "vending_revive"
+}
+// entity 6
+{
+"classname" "script_struct"
+"origin" "0.0 -40.0 8.0"
+"angles" "0 90 0"
+"script_int" "2"
+"script_noteworthy" "cosmo_monkey_revive"
+"target" "vending_revive"
+}
+// entity 7
+{
+"classname" "script_struct"
+"origin" "24.0 -32.0 8.0"
+"angles" "0 90 0"
+"script_int" "3"
+"script_noteworthy" "cosmo_monkey_revive"
+"target" "vending_revive"
+}
+// entity 8
+{
+"classname" "script_struct"
+"origin" "-24.0 -32.0 8.0"
+"angles" "0 90 0"
+"script_int" "1"
+"script_noteworthy" "cosmo_monkey_revive"
+"target" "vending_revive"
+}
+// entity 9
+{
+"classname" "script_struct"
+"origin" "0.0 -40.0 8.0"
+"angles" "0 90 0"
+"script_int" "2"
+"script_noteworthy" "cosmo_monkey_revive"
+"target" "vending_revive"
+}
+// entity 10
+{
+"classname" "script_struct"
+"origin" "24.0 -32.0 8.0"
+"angles" "0 90 0"
+"script_int" "3"
+"script_noteworthy" "cosmo_monkey_revive"
+"target" "vending_revive"
+}

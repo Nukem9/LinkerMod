@@ -1,0 +1,106 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( 12 12 0 ) ( -12 12 0 ) ( -12 -12 0 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -8 -12 92 ) ( -8 12 92 ) ( 16 12 92 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -12 -12 64 ) ( 12 -12 64 ) ( 12 -12 16 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 12 -12 64 ) ( 12 12 64 ) ( 12 12 16 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 12 12 64 ) ( -12 12 64 ) ( -12 12 16 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -12 12 64 ) ( -12 -12 64 ) ( -12 -12 16 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+}
+// entity 1
+{
+"classname" "trigger_use"
+"origin" "-262 8344 27"
+"target" "vending_divetonuke"
+"targetname" "zombie_vending"
+"script_noteworthy" "specialty_flakjacket"
+"script_sound" "mus_perks_phd_jingle"
+"script_label" "mus_perks_phd_sting"
+"script_string" "divetonuke_perk"
+// brush 0
+{
+ ( 50 12 16 ) ( -22 12 16 ) ( -22 -52 16 ) trigger 64 64 16 -20 0 0 lightmap_gray 16383.982 16383.076 247.99239 8395.5137 0 3.0222436e-005
+ ( -14 -52 64 ) ( -14 12 64 ) ( 58 12 64 ) trigger 64 64 16 -20 0 0 lightmap_gray 16383.982 16384.615 247.98192 8396.3193 0 6.7089837e-005
+ ( -24 -16 3 ) ( 48 -16 3 ) ( 48 -16 -5 ) trigger 64 64 16 0 0 0 lightmap_gray 16383.814 16383.98 248 32 0 0
+ ( 8 -47 3 ) ( 8 17 3 ) ( 8 17 -5 ) trigger 64 64 20 0 0 0 lightmap_gray 16384 16384 -8396 32 0 -0.00045340392
+ ( 46 0 3 ) ( -26 0 3 ) ( -26 0 -5 ) trigger 64 64 16 0 0 0 lightmap_gray 16384.252 16383.965 248 32 0 0
+ ( -8 16 3 ) ( -8 -48 3 ) ( -8 -48 -5 ) trigger 64 64 20 0 0 0 lightmap_gray 16384.334 16384 -8396.1709 32 0 -0.00024414063
+}
+}
+// entity 2
+{
+"classname" "script_model"
+"model" "zombie_vending_nuke"
+"origin" "0.0 0.0 0.0"
+"angles" "0 2.50448e-006 0"
+"target" "pf1339_auto1"
+"targetname" "vending_divetonuke"
+"script_string" "tap_perk"
+}
+// entity 3
+{
+"target" "vending_divetonuke"
+"script_int" "2"
+"script_noteworthy" "cosmo_monkey_divetonuke"
+"targetname" "pf1339_auto1"
+"angles" "0 90 0"
+"origin" "0.0 -32.0 8.0"
+"classname" "script_struct"
+}
+// entity 4
+{
+"target" "vending_divetonuke"
+"script_int" "1"
+"script_noteworthy" "cosmo_monkey_divetonuke"
+"targetname" "auto2"
+"angles" "0 90 0"
+"origin" "-24.0 -24.0 8.0"
+"classname" "script_struct"
+}
+// entity 5
+{
+"target" "vending_divetonuke"
+"script_int" "3"
+"script_noteworthy" "cosmo_monkey_divetonuke"
+"targetname" "auto3"
+"angles" "0 90 0"
+"origin" "24.0 -24.0 8.0"
+"classname" "script_struct"
+}
+// entity 6
+{
+"target" "vending_divetonuke"
+"script_int" "2"
+"script_noteworthy" "cosmo_monkey_divetonuke"
+"targetname" "auto5"
+"angles" "0 90 0"
+"origin" "0.0 -32.0 8.0"
+"classname" "script_struct"
+}
+// entity 7
+{
+"target" "vending_divetonuke"
+"script_int" "1"
+"script_noteworthy" "cosmo_monkey_divetonuke"
+"targetname" "auto6"
+"angles" "0 90 0"
+"origin" "-24.0 -24.0 8.0"
+"classname" "script_struct"
+}
+// entity 8
+{
+"target" "vending_divetonuke"
+"script_int" "3"
+"script_noteworthy" "cosmo_monkey_divetonuke"
+"targetname" "auto7"
+"angles" "0 90 0"
+"origin" "24.0 -24.0 8.0"
+"classname" "script_struct"
+}

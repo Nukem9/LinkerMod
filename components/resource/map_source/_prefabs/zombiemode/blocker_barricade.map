@@ -1,0 +1,183 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( -38 6 0 ) ( -38 -6 0 ) ( 36 -6 0 ) traverse 64 64 -12 28 -90 0 lightmap_gray 16384 16384 0 0 -90 0
+ ( -38 -6 40 ) ( -38 6 40 ) ( 36 6 40 ) traverse 64 64 -12 28 -90 0 lightmap_gray 16384 16384 0 0 -90 0
+ ( -36 -6 0 ) ( -36 6 0 ) ( -36 6 40 ) traverse 64 -64 -12 -56 180 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 36 -6 0 ) ( -38 -6 0 ) ( -38 -6 40 ) traverse 64 64 -28 56 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 36 6 0 ) ( 36 -6 0 ) ( 36 -6 40 ) traverse 64 -64 -12 -56 180 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( -38 6 0 ) ( 36 6 0 ) ( 36 6 40 ) traverse 64 64 -28 56 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+}
+// entity 1
+{
+"classname" "script_brushmodel"
+"origin" "159 -1503 136"
+"spawnflags" "1"
+"targetname" "auto1"
+"script_noteworthy" "clip"
+// brush 0
+{
+ ( -59 -20 0 ) ( 13 -20 0 ) ( 13 44 0 ) clip_ai 64 64 -13 -4 -90 0 lightmap_gray 16384 16384 -196 -1458.9972 -180 0
+ ( 69 44 128 ) ( 69 -20 128 ) ( -3 -20 128 ) clip_ai 64 64 -13 -4 -90 0 lightmap_gray 16384 16384.063 -196 -1459.0062 180 0
+ ( 48 4 48 ) ( -24 4 48 ) ( -24 4 40 ) clip_ai 64 64 4 128 0 0 lightmap_gray 16384 -16383.969 -196 -96 180 0
+ ( -44 44 -8 ) ( -44 -20 -8 ) ( -44 -20 -16 ) clip_ai 64 -64 -13 -128 180 0 lightmap_gray 16383.971 -16383.949 1458.9961 -96 -180 1.5204556e-005
+ ( -27 -4 48 ) ( 45 -4 48 ) ( 45 -4 40 ) clip_ai 64 64 4 128 0 0 lightmap_gray 16384 -16384 -196 -96 180 0
+ ( 44 -20 88 ) ( 44 44 88 ) ( 44 44 80 ) clip_ai 64 -64 -13 -128 -180 0 lightmap_gray 16383.863 -16383.938 1458.9875 -96 180 -4.6941284e-005
+}
+}
+// entity 2
+{
+"target" "auto2"
+"spawnflags" "-32766"
+"animscript" "zombie_mantle_over_40"
+"classname" "node_negotiation_begin"
+"angles" "0 270 0"
+"origin" "0.0 44.0 16.1"
+}
+// entity 3
+{
+"targetname" "auto2"
+"spawnflags" "-32766"
+"classname" "node_negotiation_end"
+"angles" "0 270 0"
+"origin" "0.0 -36.0 16.1"
+}
+// entity 4
+{
+"height" "64"
+"targetname" "auto1"
+"radius" "36"
+"angles" "0 270 0"
+"origin" "0.0 -1.0 38.0"
+"classname" "script_struct"
+}
+// entity 5
+{
+"classname" "script_struct"
+"origin" "0.0 47.0 42.0"
+"angles" "0 270 0"
+"target" "auto1"
+"targetname" "exterior_goal"
+}
+// entity 6
+{
+"classname" "script_struct"
+"origin" "0.0 47.0 42.0"
+"angles" "0 270 0"
+"target" "auto1"
+"targetname" "exterior_goal"
+}
+// entity 7
+{
+"script_team" "classic_boards"
+"script_parameters" "board"
+"script_noteworthy" "1"
+"targetname" "auto1"
+"spawnflags" "0"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -42 8 91.25 ) ( 35 8 66 ) ( 35 10 66 ) eb_art_floor_wood_hardwood02 63.978622 -121.57401 29.237986 -548.59558 91.592857 0.0050345268 lightmap_gray 15602.765 16382.051 -549.35687 263.71378 0 -0.00082393381
+ ( -40 10 99 ) ( 37 10 73.75 ) ( 37 8 73.75 ) eb_art_floor_wood_hardwood02 64.004433 -121.57616 29.179176 -545.86816 91.57328 0.0057115112 lightmap_gray 15602.648 16385.5 -547.41992 263.77164 0 -6.1040744e-005
+ ( -40 8 99 ) ( 37 8 73.75 ) ( 35 8 66 ) eb_art_floor_wood_hardwood02 64 128 -51.584846 604.19366 -109.89923 -0.00017690682 lightmap_gray 16383.799 16384.418 -595.4837 -114.47588 -13.896373 -1.7614071e-005
+ ( 35 8 66 ) ( 37 8 73.75 ) ( 37 10 73.75 ) eb_art_floor_wood_hardwood02 64 123.68377 -265.76038 -106.57699 0 0 lightmap_gray 16386.75 15831.25 -263.7963 -106.55523 0 0
+ ( -41 10 95.25 ) ( 36 10 69.75 ) ( 38 10 77.5 ) eb_art_floor_wood_hardwood02 64 128 51.888191 -599.64966 70.095932 -0.00038701278 lightmap_gray 16384.396 16384.205 -595.51331 -114.48625 -13.900213 3.1799875e-005
+ ( -42 10 91.25 ) ( -40 10 99 ) ( -40 8 99 ) eb_art_floor_wood_hardwood02 63.998245 123.68435 -265.75 -126.07263 0 0 lightmap_gray 16383.551 15831.342 -263.73944 -126.07172 0 0
+}
+}
+// entity 8
+{
+"script_team" "classic_boards"
+"script_parameters" "board"
+"script_noteworthy" "2"
+"targetname" "auto1"
+"spawnflags" "0"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -1 6 108 ) ( 13 6 -1 ) ( 13 8 -1 ) eb_art_floor_wood_hardwood02 64 -128 -62.851868 635.55994 -176 0.0012763109 lightmap_gray 16285.984 16386.418 -636.28705 265.78967 -90 0.0003052208
+ ( 7 8 109 ) ( 20 8 1 ) ( 20 6 1 ) eb_art_floor_wood_hardwood02 64 -127.08338 -27.201466 634.06671 -179.25 7.2164643e-005 lightmap_gray 16294.602 16386.25 -637.99023 265.79745 -90.005272 2.9438366e-005
+ ( 7 6 109 ) ( 20 6 1 ) ( 13 6 -1 ) eb_art_floor_wood_hardwood02 64.003738 128 21.570349 639.17407 -175.8967 1.1503712e-005 lightmap_gray 16384.619 16384.195 -637.84784 -45.336609 -79.909515 0.00018491292
+ ( 13 8 -1 ) ( 13 6 -1 ) ( 20 6 1 ) eb_art_floor_wood_hardwood02 64.003174 -126.01941 -267.75586 43.605106 90 0.00018906593 lightmap_gray 16383.688 -16130.545 -265.73029 43.611717 90 0
+ ( -1 8 108 ) ( 13 8 -1 ) ( 20 8 1 ) eb_art_floor_wood_hardwood02 64 128 0.82061803 -636.59277 6.108326 -0.00031514457 lightmap_gray 16384.641 16383.84 -637.85828 -45.329468 -79.909485 -6.8901616e-005
+ ( 7 8 109 ) ( 7 6 109 ) ( -1 6 108 ) eb_art_floor_wood_hardwood02 64 -126.01243 -267.70377 26.103199 90 0.00024709795 lightmap_gray 16381.063 -16129.833 -265.67654 26.049406 90 2.6207736e-005
+}
+}
+// entity 9
+{
+"script_team" "classic_boards"
+"script_parameters" "board"
+"script_noteworthy" "3"
+"targetname" "auto1"
+"spawnflags" "0"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -18 6 110 ) ( -23 6 4 ) ( -23 8 4 ) eb_art_floor_wood_hardwood02 64 127.8583 -3.805629 -638.85461 -1.2931706 -7.4140211e-005 lightmap_gray 16384.16 16387.668 -641.49811 265.81161 -90 0.0011599275
+ ( -10 8 110 ) ( -16 8 4 ) ( -16 6 4 ) eb_art_floor_wood_hardwood02 63.99292 -127.79536 -26.75 637.66656 -179.25 0.00031322241 lightmap_gray 16384 16384.313 -641.50903 265.75104 -90 0.00042725424
+ ( -10 6 110 ) ( -16 6 4 ) ( -23 6 4 ) eb_art_floor_wood_hardwood02 64 128 57.36372 639.04645 174 -0.0003194212 lightmap_gray 16384.367 16383.727 -641.50757 -9.75 -90 0
+ ( -23 8 4 ) ( -23 6 4 ) ( -16 6 4 ) eb_art_floor_wood_hardwood02 64.007813 -128 -267.78375 9.75 90 3.7102203e-005 lightmap_gray 16383.584 -16384.514 -265.7406 9.7528725 90 0
+ ( -18 8 110 ) ( -23 8 4 ) ( -16 8 4 ) eb_art_floor_wood_hardwood02 64.003906 128 -34.94595 -637.75464 -4 -0.00031961501 lightmap_gray 16383.943 16384.271 -641.5 -9.75 -90 0
+ ( -10 8 110 ) ( -10 6 110 ) ( -18 6 110 ) eb_art_floor_wood_hardwood02 64 -128 -267.72998 9.6666069 90 -0.00010753813 lightmap_gray 16383 -16384.488 -265.72592 9.75 90 0
+}
+}
+// entity 10
+{
+"script_team" "classic_boards"
+"script_parameters" "board"
+"script_noteworthy" "6"
+"targetname" "auto1"
+"spawnflags" "0"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -41 4 30 ) ( 40 4 45 ) ( 40 6 45 ) eb_art_floor_wood_hardwood02 64 -125.86734 -141.3414 -531.15277 88.520576 -0.0022559024 lightmap_gray 16384.223 16381.5 -573.78088 267.69992 0 0.0008033943
+ ( -41 6 38 ) ( 40 6 53 ) ( 40 4 53 ) eb_art_floor_wood_hardwood02 64 -125.86671 -141.34018 -531.13977 88.5 -0.0015713123 lightmap_gray 16383.877 16383 -573.75635 267.72705 0 -0.00029498528
+ ( -41 4 38 ) ( 40 4 53 ) ( 40 4 45 ) eb_art_floor_wood_hardwood02 64 128.00885 -182.10619 532.2699 -78 -0.00044065848 lightmap_gray 16383.865 16384.375 -573.75 -66 0 0
+ ( 40 4 45 ) ( 40 4 53 ) ( 40 6 53 ) eb_art_floor_wood_hardwood02 64.002281 128 -269.77533 -65.996597 0 0 lightmap_gray 16383.75 16383.986 -267.7467 -65.997108 0 0
+ ( -41 6 30 ) ( 40 6 45 ) ( 40 6 53 ) eb_art_floor_wood_hardwood02 64 128 163.59343 -536.53943 100 -0.0005402565 lightmap_gray 16384.219 16384.096 -573.75 -66 0 0
+ ( -41 6 30 ) ( -41 6 38 ) ( -41 4 38 ) eb_art_floor_wood_hardwood02 64.017906 128 -269.82001 -66 0 0 lightmap_gray 16386.334 16384 -267.78751 -66 0 0
+}
+}
+// entity 11
+{
+"script_team" "classic_boards"
+"script_parameters" "board"
+"script_noteworthy" "5"
+"targetname" "auto1"
+"spawnflags" "0"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( -40.5 4 66.5 ) ( 42.5 4 62.5 ) ( 42.5 6 62.5 ) eb_art_floor_wood_hardwood02 63.997025 -127.85658 34.863899 -569.27826 97 0.00051109504 lightmap_gray 16384.045 16384.5 -572.26227 267.74881 0 -0.00047812334
+ ( -40.5 6 74.5 ) ( 42.5 6 70.5 ) ( 42.5 4 70.5 ) eb_art_floor_wood_hardwood02 64 -127.85368 34.75 -569.27356 97 0.00022193627 lightmap_gray 16384.049 16385.5 -572.22729 267.76987 0 1.0173458e-005
+ ( -40.5 4 74.5 ) ( 42.5 4 70.5 ) ( 42.5 4 62.5 ) eb_art_floor_wood_hardwood02 64 128 -33.272324 577.25916 -92 0.00028779343 lightmap_gray 16384.188 16383.904 -572.25372 -93.5 0 0
+ ( 42.5 4 62.5 ) ( 42.5 4 70.5 ) ( 42.5 6 70.5 ) eb_art_floor_wood_hardwood02 64 128 -269.77155 -93.5 0 0 lightmap_gray 16384.5 16384.018 -267.75806 -93.5 0 0
+ ( -40.5 6 66.5 ) ( 42.5 6 62.5 ) ( 42.5 6 70.5 ) eb_art_floor_wood_hardwood02 64 128 53.488541 -574.53992 86 -3.0055671e-005 lightmap_gray 16383.859 16384.133 -572.25 -93.5 0 0
+ ( -40.5 6 66.5 ) ( -40.5 6 74.5 ) ( -40.5 4 74.5 ) eb_art_floor_wood_hardwood02 64.008789 128 -269.78384 -93.5 0 0 lightmap_gray 16383.5 16384 -267.74298 -93.5 0 0
+}
+}
+// entity 12
+{
+"script_team" "classic_boards"
+"script_parameters" "board"
+"script_noteworthy" "4"
+"targetname" "auto1"
+"spawnflags" "0"
+"classname" "script_brushmodel"
+// brush 0
+{
+ ( 46 4 77.75 ) ( 46 6 77.75 ) ( -41.75 6 75.25 ) eb_art_floor_wood_hardwood02 64 -127.9492 35.56982 -571.31134 88.84169 -0.00058086647 lightmap_gray 16508.113 -16384 -574.47498 -277.7475 0 0.00011189779
+ ( 44.75 6 85.75 ) ( 44.75 4 85.75 ) ( -43 4 83.25 ) eb_art_floor_wood_hardwood02 64 -127.94878 35.534607 -571.30963 88.823036 6.1779167e-005 lightmap_gray 16508.354 -16384.668 -575.68317 -277.75458 0 0.00017283601
+ ( 46 6 77.75 ) ( 44.75 6 85.75 ) ( -43 6 83.25 ) eb_art_floor_wood_hardwood02 64 128 -54.799568 567.2821 -87.192467 2.1196924e-005 lightmap_gray 16383.592 16383.688 -558.42737 -113.82055 8.8006535 -0.00010497468
+ ( 44.75 4 85.75 ) ( 44.75 6 85.75 ) ( 46 6 77.75 ) eb_art_floor_wood_hardwood02 64 -126.49388 -279.77573 121.24623 -180 -0.00026566649 lightmap_gray 16382.25 -16191.263 -277.72037 121.23468 -180 0
+ ( 44.75 4 85.75 ) ( 46 4 77.75 ) ( -41.75 4 75.25 ) eb_art_floor_wood_hardwood02 64 128 15.116501 -569.72626 88.798042 9.3012968e-005 lightmap_gray 16384.35 16384.539 -558.47241 -113.83401 8.7946997 0
+ ( -43 6 83.25 ) ( -43 4 83.25 ) ( -41.75 4 75.25 ) eb_art_floor_wood_hardwood02 64.007492 -126.49424 -279.77487 107.94002 180 0 lightmap_gray 16383.75 -16191.054 -277.74503 107.93725 180 0
+}
+}

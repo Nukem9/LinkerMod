@@ -1,0 +1,55 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+}
+// entity 1
+{
+"targetname" "auto1"
+"origin" "0.0 -1.0 -1.0"
+"model" "zombie_treasure_box"
+"classname" "script_model"
+}
+// entity 2
+{
+"target" "auto2"
+"classname" "trigger_use"
+"origin" "-1 -775 285"
+"targetname" "treasure_chest_use"
+"script_noteworthy" "auto2_chest"
+"zombie_cost" "950"
+// brush 0
+{
+ ( 31 77 -3 ) ( -41 77 -3 ) ( -41 13 -3 ) trigger 64 -64 32 788 180 0 lightmap_gray 16384 16383.986 -32 -788 0 0
+ ( -41 13 61 ) ( -41 77 61 ) ( 31 77 61 ) trigger 64 -64 32 788 -180 0 lightmap_gray 16384 16384.064 -32 -788 0 0
+ ( -41 13 5 ) ( 31 13 5 ) ( 31 13 -3 ) trigger 64 -64 32 -288 180 0 lightmap_gray 16384 16383.982 -32 288 0 0
+ ( 31 13 5 ) ( 31 77 5 ) ( 31 77 -3 ) trigger 64 -64 -787.99347 -288 180 0 lightmap_gray 16383.969 16383.953 787.99219 287.99869 0 0
+ ( 31 77 5 ) ( -41 77 5 ) ( -41 77 -3 ) trigger 64 -64 32 -288 180 0 lightmap_gray 16384 16383.92 -32 288 0 0
+ ( -33 77 5 ) ( -33 13 5 ) ( -33 13 -3 ) trigger 64 -64 -788 -288 180 0 lightmap_gray 16384 16383.959 787.98975 287.99899 0 0
+}
+}
+// entity 3
+{
+"classname" "script_model"
+"model" "zombie_coast_bearpile"
+"origin" "22.0 -7.0 12.0"
+"angles" "0 135 0"
+}
+// entity 4
+{
+"origin" "0.0 -13.0 17.0"
+"model" "zombie_treasure_box_lid"
+"classname" "script_model"
+"targetname" "auto2"
+"target" "auto3"
+}
+// entity 5
+{
+"angles" "0 90 0"
+"origin" "0.0 -1.0 2.0"
+"classname" "script_origin"
+"target" "auto1"
+"targetname" "auto3"
+}

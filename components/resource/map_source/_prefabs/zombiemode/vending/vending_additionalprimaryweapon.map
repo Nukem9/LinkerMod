@@ -1,0 +1,44 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( -19 22 0 ) ( -32 22 0 ) ( -32 13 0 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -34 13 117 ) ( -34 22 117 ) ( -21 22 117 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 21 -22 80 ) ( 34 -22 80 ) ( 34 -22 32 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 34 -39 80 ) ( 34 -30 80 ) ( 34 -30 32 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -21 22 80 ) ( -34 22 80 ) ( -34 22 32 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -34 22 80 ) ( -34 13 80 ) ( -34 13 32 ) clip_player 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+}
+// entity 1
+{
+"classname" "trigger_use"
+"origin" "0 0 0"
+"target" "vending_additionalprimaryweapon"
+"targetname" "zombie_vending"
+"script_noteworthy" "specialty_additionalprimaryweapon"
+"script_sound" "mus_perks_additionalprimaryweapon_jingle"
+"script_label" "mus_perks_additionalprimaryweapont_sting"
+"script_string" "tap_additionalprimaryweapon"
+// brush 0
+{
+ ( 23 40 32 ) ( -49 40 32 ) ( -49 -24 32 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16384 -56 1088 0 0
+ ( -49 -24 80 ) ( -49 40 80 ) ( 23 40 80 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16384 -56 1087.9982 0 0
+ ( -49 -24 48 ) ( 23 -24 48 ) ( 23 -24 40 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16383.26 -56 862.95844 0 0
+ ( 23 -24 48 ) ( 23 40 48 ) ( 23 40 40 ) trigger 64 64 0 0 0 0 lightmap_gray 16383.9 16384.25 -1087.9939 863.01416 0 0
+ ( 23 0 48 ) ( -49 0 48 ) ( -49 0 40 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16384.248 -56 863.01477 0 0
+ ( -25 40 48 ) ( -25 -24 48 ) ( -25 -24 40 ) trigger 64 64 0 0 0 0 lightmap_gray 16384 16384.117 -1087.9948 863.00494 0 -2.5030804e-005
+}
+}
+// entity 2
+{
+"origin" "0.0 0.0 0.0"
+"classname" "script_model"
+"model" "zombie_vending_three_gun"
+"targetname" "vending_additionalprimaryweapon"
+"script_string" "tap_perk"
+}
