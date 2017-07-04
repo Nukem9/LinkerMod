@@ -154,14 +154,15 @@ dvar_s *Dvar_SetFromStringByNameFromSource(const char *dvarName, const char *str
 void Dvar_SetFromStringByName(const char *dvarName, const char *string)
 {
 	// Do not allow the default FOV to be set. Generally sent with CG_DeployServerCommand.
-	if (dvarName && string)
+	// Doesn't work as intended currently.
+	/*if (dvarName && string)
 	{
 		if (!_stricmp(dvarName, "cg_fov") && !_stricmp(string, "65"))
 			return;
 
 		if (!_stricmp(dvarName, "cg_default_fov") && !_stricmp(string, "65"))
 			return;
-	}
+	}*/
 
 	Dvar_SetFromStringByNameFromSource(dvarName, string, DVAR_SOURCE_INTERNAL, 0);
 }
