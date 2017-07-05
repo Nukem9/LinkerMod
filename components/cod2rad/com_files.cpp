@@ -52,6 +52,35 @@ void __declspec(naked) hk_FS_FOpenFileRead()
 	}
 }
 
+int __cdecl FS_ReadFile(const char *qpath, void **buffer)
+{
+	int result = 0;
+
+	_asm
+	{
+		pushad
+		push buffer
+		mov eax, qpath
+		mov ebx, 0x00423E80
+		call ebx
+		add esp, 4
+		mov result, eax
+		popad
+	}
+}
+
+void __cdecl FS_FreeFile(void *buffer)
+{
+	_asm
+	{
+		pushad
+		mov eax, buffer
+		mov ebx, 0x004232D0
+		call ebx
+		popad
+	}
+}
+
 const char* strlastof(const char* str, const char* delims)
 {
 	int delimCount = strlen(delims);

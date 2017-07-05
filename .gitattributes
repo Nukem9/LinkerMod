@@ -1,0 +1,8 @@
+# Normalize line endings to CRLF on checkout
+* text eol=crlf
+
+# Git kept corrupting binary files
+# by trying to convert them to CRLF
+*.iwi binary
+*.lib binary
+*.ttf binary

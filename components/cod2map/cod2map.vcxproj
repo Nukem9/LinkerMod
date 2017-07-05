@@ -87,21 +87,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="arg.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="kvs.cpp" />
     <ClCompile Include="libqhull_geom.cpp" />
     <ClCompile Include="lights.cpp" />
     <ClCompile Include="PageGuard.cpp" />
+    <ClCompile Include="probe.cpp" />
     <ClCompile Include="vec.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="arg.h" />
+    <ClInclude Include="common.h" />
     <ClInclude Include="com_files.h" />
     <ClInclude Include="kvs.h" />
     <ClInclude Include="libqhull_geom.h" />
     <ClInclude Include="lights.h" />
     <ClInclude Include="PageGuard.h" />
+    <ClInclude Include="probe.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="vec.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\shared\semver\semver.vcxproj">
+      <Project>{5fb372dd-a7e1-4a4b-9a28-3ac02543e9e8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

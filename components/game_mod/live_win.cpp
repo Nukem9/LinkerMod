@@ -11,6 +11,11 @@ void* Live_AcceptInviteAsyncComplete_Continue = (void*)0x0046B31C;
 
 Session_Modify_t* Session_Modify = (Session_Modify_t*)0x00611930;
 
+bool Com_SessionMode_IsZombiesGame()
+{
+	return zombiemode->current.enabled;
+}
+
 void __cdecl Session_Modify_Fix(const int localControllerIndex, void *session, const int flags, const int publicSlots, const int privateSlots)
 {
 	MatchMakingInfo* g_matchmakingInfo = *(MatchMakingInfo**)0x03879A24;

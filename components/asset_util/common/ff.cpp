@@ -6,24 +6,56 @@
 #include <Windows.h>
 #include "../sys/AppInfo.h"
 #include "zlib\zlib.h"
+#include <vector>
+#include <algorithm>
+#include <ppl.h>
 
-char* FindRawfileString(BYTE* start, BYTE* end)
+enum class RAWFILE_TYPE
 {
+	COMPRESSED,
+	UNCOMPRESSED,
+	SOUND,
+
+	NONE = -1,
+};
+
+RAWFILE_TYPE FindRawfileString(BYTE* start, BYTE* end, char** result)
+{
+	RAWFILE_TYPE type = RAWFILE_TYPE::NONE;
+
 	while (start < end - 5)
 	{
-		if (strncmp(".atr", (char*)start, 4) == 0 ||
-			strncmp(".gsc", (char*)start, 4) == 0 ||
-			strncmp(".csc", (char*)start, 4) == 0 ||
-			strncmp(".vision", (char*)start, 4) == 0 ||
-			strncmp(".wav", (char*)start, 4) == 0)
+		if (strncmp(".gsc", (char*)start, 4) == 0 ||
+			strncmp(".csc", (char*)start, 4) == 0)
 		{
-			return (char*)start;
+			type = RAWFILE_TYPE::COMPRESSED;
+		}
+		else if (strncmp(".atr", (char*)start, 4) == 0 ||
+				strncmp(".sun", (char*)start, 4) == 0 ||
+				strncmp(".xpo", (char*)start, 4) == 0 )
+		{
+			type = RAWFILE_TYPE::UNCOMPRESSED;
+		}
+		else if (strncmp(".wav", (char*)start, 4) == 0)
+		{
+			type = RAWFILE_TYPE::SOUND;
+		}
+		else if (start < end - 8 && strncmp(".vision", (char*)start, 7) == 0)
+		{
+			type = RAWFILE_TYPE::UNCOMPRESSED;
+		}
+
+		if (type != RAWFILE_TYPE::NONE)
+		{
+			*result = (char*)start;
+			return type;
 		}
 
 		start++;
 	}
 
-	return nullptr;
+	*result = nullptr;
+	return RAWFILE_TYPE::NONE;
 }
 
 char* FindRawfileStringReverseLookup(BYTE* start)
@@ -49,7 +81,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	Con_Print_v("Extracting file: \"%s\"...	", rawfilePath);
 
 	char qpath[1024] = "";
-	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
+	sprintf_s(qpath, "%s/%s", AppInfo_OutDir(), rawfilePath);
 
 	//
 	// If not in overwrite mode AND the file exists
@@ -110,7 +142,19 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 	Con_Print_v("Extracting file: \"%s\"...	", rawfilePath);
 
 	char qpath[1024] = "";
-	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), rawfilePath);
+	sprintf_s(qpath, "%s/%s", AppInfo_OutDir(), rawfilePath);
+
+	int* pHeader = (int*)rawfilePath;
+	int len = pHeader[-2];
+
+	//
+	// Catch incorrect rawfile data to prevent massive allocations
+	//
+	if (len > 1024 * 1024 * 16)
+	{
+		Con_Print_v("IGNORED\n");
+		return 0;
+	}
 
 	//
 	// If not in overwrite mode AND the file exists
@@ -129,26 +173,18 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 
 	if (FS_CreatePath(rawfilePath) != 0)
 	{
+		printf("%s\n", rawfilePath);
 		Con_Error_v("PATH ERROR\n");
 		return 0;
 	}
-
-	//
-	// Catch incorrect rawfile data to prevent massive allocations
-	//
-	if (strlen(rawfileData) > 1024 * 1024 * 16)
-	{
-		Con_Print_v("IGNORED\n");
-		return 0;
-	}
-
+	
 	if (FILE* h = fopen(qpath, "wb"))
 	{
-		fwrite(rawfileData, 1, strlen(rawfileData), h);
+		fwrite(rawfileData, 1, len, h);
 		fclose(h);
 
 		Con_Print_v("SUCCESS\n");
-		return strlen(rawfileData);
+		return len;
 	}
 
 	Con_Error_v("ERROR\n");
@@ -167,7 +203,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 #if _DEBUG
 	sprintf_s(qpath, "%s", sndfilePath);
 #else
-	sprintf_s(qpath, "%s/%s", AppInfo_RawDir(), sndfilePath);
+	sprintf_s(qpath, "%s/%s", AppInfo_OutDir(), sndfilePath);
 #endif
 	
 	
@@ -198,7 +234,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	//
 	if (snd_header->format != 6 && snd_header->format != 7)
 	{
-		Con_Print_v("IGNORED\n");
+		Con_Print_v("IGNORED (fmt %d)\n", snd_header->format);
 		return 0;
 	}
 	
@@ -242,91 +278,105 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	return 0;
 }
 
-int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
+void PerformLookup(BYTE *Buffer, std::vector<BYTE>& Data, std::vector<BYTE>& Signature)
 {
-	int extractedFileCount = 0;
-
-	BYTE* endofBuffer = searchData + searchSize;
-
-	BYTE* lastSearchLoc = 0;
-	while (searchData < searchData + searchSize)
+	for (auto scanStart = Data.begin();;)
 	{
-		char* rawfileString = FindRawfileString(searchData, endofBuffer);
+		// Search for the pattern
+		auto ret = std::search(scanStart, Data.end(), Signature.begin(), Signature.end());
 
-		if (!rawfileString)
-		{
-			return extractedFileCount;
-		}
+		// If we didn't find a match, exit
+		if (ret == Data.end())
+			break;
 
+		// Convert match index to a real address
+		BYTE *asset = std::distance(Data.begin(), ret) + Buffer;
+
+		// Parse the asset (reverse string scan for the name)
+		char *rawfileString = (char *)asset;
 		char* tmpString = FindRawfileStringReverseLookup((BYTE*)rawfileString);
+		int moveLen = 0;
 
 		if (!tmpString)
-		{
-			return extractedFileCount;
-		}
+			return;
 
-		if ((BYTE*)tmpString < searchData || !IsCharAlphaNumericA(*tmpString))
+		if ((BYTE*)tmpString < Buffer || !IsCharAlphaNumericA(*tmpString))
 		{
-			searchData += strlen(rawfileString) + 1;
+			scanStart = ret + strlen(rawfileString) + 1;
 			continue;
 		}
 
 		rawfileString = tmpString;
 
-		if (Str_EndsWith(rawfileString, ".wav"))
-		{
-			if (!g_extractSounds.ValueBool())
-			{
-				searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
-				continue;
-			}
+		char assetExt[32];
+		memset(assetExt, 0, sizeof(assetExt));
+		memcpy(assetExt, asset, Signature.size());
 
-			Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
-			FF_FFExtractSoundFile(snd_info, rawfileString);
-			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
-		}
-
-		//
-		// ARG_FLAG_FF Should never been false if this function is running
-		//
-		/*
-		if (!ARG_FLAG_FF)
+		// Dump
+		if (strstr(assetExt, ".gsc") ||
+			strstr(assetExt, ".csc"))
 		{
-			searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
-			continue;
-		}
-		*/
-
-		if (Str_EndsWith(rawfileString, ".vision"))
-		{
-			char* rawfileData = rawfileString + strlen(rawfileString) + 1;
-			int fileLen = FF_FFExtractUncompressedRawfile(rawfileData, rawfileString);
-
-			if (!fileLen)
-			{
-				searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
-				continue;
-			}
-			
-			searchData = (BYTE*)rawfileData + fileLen + 1;
-		}
-		else
-		{
+			// GameScripts are compressed
 			XAssetRawfileHeader* rawfileHeader = (XAssetRawfileHeader*)(rawfileString + strlen(rawfileString) + 1);
-			if (!FF_FFExtractCompressedRawfile(rawfileHeader, rawfileString))
+			if (FF_FFExtractCompressedRawfile(rawfileHeader, rawfileString))
+				moveLen = rawfileHeader->compressedSize;
+		}
+		else if (strstr(assetExt, ".atr") ||
+			strstr(assetExt, ".sun") ||
+			strstr(assetExt, ".xpo") ||
+			strstr(assetExt, ".txt") ||
+			strstr(assetExt, ".cfg") ||
+			strstr(assetExt, ".vision"))
+		{
+			// Ignore menu .txt files stored in /ui/ or /ui_mp/
+			if (!(strstr(assetExt, ".txt") && (!_strnicmp(rawfileString, "ui/", 3) || !_strnicmp(rawfileString, "ui_mp/", 6))))
 			{
-				searchData = (BYTE*)rawfileString + strlen(rawfileString) + 1;
-				continue;
+				// Random uncompressed types
+				char* rawfileData = rawfileString + strlen(rawfileString) + 1;
+				moveLen = FF_FFExtractUncompressedRawfile(rawfileData, rawfileString);
 			}
-
-			
-			searchData = (BYTE*)rawfileHeader + rawfileHeader->compressedSize;
+		}
+		else if (strstr(assetExt, ".wav"))
+		{
+			// Audio files
+			Snd_Header* snd_info = (Snd_Header*)(rawfileString - sizeof(Snd_Header));
+			moveLen = FF_FFExtractSoundFile(snd_info, rawfileString);
+		}
+		else if (strstr(assetExt, ".hlsl"))
+		{
+			// Shaders (ignored for now)
 		}
 
-		extractedFileCount++;
+		scanStart = (ret + moveLen + 1);
 	}
+}
 
-	return extractedFileCount;
+int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
+{
+	auto data = std::vector<BYTE>(searchData, searchData + searchSize);
+	auto scanList = std::vector<std::vector<BYTE>>();
+
+	scanList.push_back(std::vector<BYTE>({ '.', 'g', 's', 'c' }));
+	scanList.push_back(std::vector<BYTE>({ '.', 'c', 's', 'c' }));
+	scanList.push_back(std::vector<BYTE>({ '.', 'a', 't', 'r' }));
+	scanList.push_back(std::vector<BYTE>({ '.', 's', 'u', 'n' }));
+	scanList.push_back(std::vector<BYTE>({ '.', 'x', 'p', 'o' }));
+	scanList.push_back(std::vector<BYTE>({ '.', 'w', 'a', 'v' }));
+	scanList.push_back(std::vector<BYTE>({ '.', 'c', 'f', 'g' }));
+	scanList.push_back(std::vector<BYTE>({ '.', 't', 'x', 't' }));
+	scanList.push_back(std::vector<BYTE>({ '.', 'v', 'i', 's', 'i', 'o', 'n' }));
+	// scanList.push_back(std::vector<BYTE>({ '.', 'h', 'l', 's', 'l' }));
+
+	if (g_extractSounds.ValueBool())
+		scanList.push_back(std::vector<BYTE>({ '.', 'w', 'a', 'v' }));
+
+	concurrency::parallel_for(size_t(0), scanList.size(), [&](size_t i)
+	{
+		PerformLookup(searchData, data, scanList[i]);
+	});
+
+	// Return value is never used as of this time
+	return 0;
 }
 
 int FF_FFExtract(const char* filepath, const char* filename)
@@ -336,7 +386,7 @@ int FF_FFExtract(const char* filepath, const char* filename)
 	FILE* h = nullptr;
 	if (fopen_s(&h, filepath, "r+b") != 0)
 	{
-		Con_Error("ERROR: Fastfile '%s' could not be found\n\n", filepath);
+		Con_Error("ERROR: Fastfile '%s' could not be found\n", filepath);
 		return FALSE;
 	}
 	rewind(h);

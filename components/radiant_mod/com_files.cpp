@@ -58,3 +58,41 @@ void FS_Init_TechsetOverride(void)
 		fclose(h);
 	}
 }
+
+int __cdecl FS_HashFileName(const char *fname, int hashSize)
+{
+	int hash = 0;
+	for (int i = 0; fname[i]; ++i)
+	{
+		int letter = tolower(fname[i]);
+		if (letter == '.')
+			break;
+		if (letter == '\\')
+			letter = '/';
+		hash += letter * (i + 119);
+	}
+
+	return ((hash >> 20) ^ hash ^ (hash >> 10)) & (hashSize - 1);
+}
+
+const char* FS_GetExtensionSubString(const char* filename)
+{
+	if (filename == '\0')
+		return NULL;
+
+	const char* substr = 0;
+	while (*filename)
+	{
+		if (*filename == '.')
+			substr = filename;
+		else if (*filename == '/' || *filename == '\\')
+			substr = 0;
+
+		++filename;
+	}
+
+	if (!substr)
+		substr = filename;
+
+	return substr;
+}

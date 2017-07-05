@@ -68,7 +68,6 @@ int app_main(int argc, char** argv)
 	}
 	else
 #endif
-		Con_Print("\n");
 	
 	AppInfo_Init();
 	return cmd_info.Cmd()->Exec(cmd_info.Argc(), cmd_info.Argv());

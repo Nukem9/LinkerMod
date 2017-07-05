@@ -16,6 +16,7 @@
 // Shared files
 //
 #include "../shared/shared_utility.h"
+#include "../shared/shared_version.h"
 
 #include "PageGuard.h"
 
@@ -28,9 +29,13 @@
 #pragma comment(lib, "../../build/Release/D3DBSP_Lib.lib")
 #endif
 
+using namespace D3DBSP_Lib;
 
+#include "arg.h"
 #include "vec.h"
 #include "kvs.h"
+#include "probe.h"
 #include "lights.h"
+#include "common.h"
 #include "libqhull_geom.h"
 #include "com_files.h"

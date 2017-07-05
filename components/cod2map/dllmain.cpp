@@ -1,3 +1,4 @@
+#define G_VERSION 1, 0, 0
 #include "stdafx.h"
 
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
@@ -43,6 +44,9 @@ int __cdecl ConvertBSP_Post(FILE* h)
 	iBSP->Convert(BSPVERSION_COD_BO);
 
 	Light_FixPrimaryLightInfo(&iBSP->lumps[LUMP_PRIMARY_LIGHTS]);
+	
+	if (Probe_UseDebugSpheres())
+		Probe_AddDebugSpheres(iBSP);
 
 	len = iBSP->PotentialFileSize();
 	buf = new BYTE[len];
@@ -136,11 +140,21 @@ void Init_MapMod()
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0043D649, (PBYTE)&mfh_PrimaryLightHandler);
 
+	//
+	// Add -debugReflectionProbes launch arg
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00406D20, (PBYTE)&Arg_Handle_hk);
+
+	//
+	// (Deprecated): Replacement for the pointfile extension
+	//
+	/*
 	void* stringPatch = ".pts";
 	PatchMemory(0x0042626F, (PBYTE)&stringPatch, 4);
 	PatchMemory(0x00426514, (PBYTE)&stringPatch, 4);
 	stringPatch = "%s.pts";
 	PatchMemory(0x00406F4E, (PBYTE)&stringPatch, 4);
+	*/
 
 	//
 	// Increase (double) the max amount of curvenn/terrain collision verts

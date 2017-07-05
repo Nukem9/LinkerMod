@@ -17,6 +17,7 @@ struct RadiantCommand
 	int liveUpdateId;
 	char strCommand[512];
 };
+STATIC_ASSERT_SIZE(RadiantCommand, 0x208);
 
 struct RadaintToGameMapping
 {
@@ -25,9 +26,24 @@ struct RadaintToGameMapping
 	int gameId;
 	int cg_gameId;
 };
+STATIC_ASSERT_SIZE(RadaintToGameMapping, 0x10);
 
-static_assert(sizeof(RadiantCommand) == 520, "Size check");
-static_assert(sizeof(RadaintToGameMapping) == 16, "Size check");
+static int& savedCommandCount = *(int *)0x0251AE58;
+static auto savedCommands = (RadiantCommand *)0x02507990;
+static int& gCommandCount = *(int *)0x251AE50;
+static auto gCommands = (RadiantCommand *)0x02517D90;
+static int& gObjectMappingCount = *(int *)0x0251AE60;
+static auto gObjectMapping = (RadaintToGameMapping *)0x2507180;
+
+static pathnode_t*& g_radiant_selected_pathnode = *(pathnode_t **)0x01D04870;
 
 void RadiantRemoteInit();
-DWORD WINAPI RadiantRemoteThread(LPVOID Arg);
+void RadiantRemoteShutdown();
+void RadiantRemoteUpdate();
+bool RadiantRemoteUpdateSocket();
+
+void G_AssignGameIdMapping(int liveUpdateId, int gameId);
+int G_GetGameIdMapping(int liveUpdateId);
+pathnode_t *G_FindPathNode(SpawnVar *spawnVar, nodeType type, const int gameId);
+void G_ProcessPathnodeCommand(RadiantCommand *command, SpawnVar *spawnVar);
+void G_ClearSelectedPathNode();

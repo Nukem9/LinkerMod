@@ -92,6 +92,7 @@ public:
 REGISTER_GLOBAL_CVAR(g_verbose);
 REGISTER_GLOBAL_CVAR(g_logfile);
 REGISTER_GLOBAL_CVAR(fs_overwrite);
+
 #if _DEBUG
 REGISTER_GLOBAL_CVAR(g_dumpCVars);
 #endif
@@ -104,6 +105,19 @@ REGISTER_CVAR(g_extractAll);
 REGISTER_CVAR(g_extractImages);
 REGISTER_CVAR(g_extractSounds);
 REGISTER_CVAR(g_useLocalized);
+
+REGISTER_CVAR(ents_useLabels);
+REGISTER_CVAR(ents_genBrushes);
+
+REGISTER_CVAR(csvgen_aitypes);
+REGISTER_CVAR(csvgen_characters);
+REGISTER_CVAR(csvgen_xmodelaliases);
+
+REGISTER_CVAR(rip_waitForProcess);
+REGISTER_CVAR(rip_waitForMap);
+REGISTER_CVAR(rip_killProcess);
+
+REGISTER_CVAR(fs_outdir);
 
 #undef REGISTER_GLOBAL_CVAR
 #undef REGISTER_CVAR

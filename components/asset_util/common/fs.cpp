@@ -28,12 +28,16 @@ bool FS_FileExists(const char* qpath)
 	return false;
 }
 
-size_t FS_FileSize(const char* qpath)
+/*
+// This is now defined in gsc_lib
+
+long int FS_FileSize(const char* qpath)
 {
 	struct stat st_buf;
 	int r = stat(qpath, &st_buf);
 	return r == 0 ? st_buf.st_size : -1;
 }
+*/
 
 const char* FS_GetExtensionSubString(const char* filename)
 {
@@ -76,6 +80,26 @@ const char* FS_GetFilenameSubString(const char* pathname)
 	return last;
 }
 
+const wchar_t* FS_GetFilenameSubStringW(wchar_t* pathname)
+{
+	wchar_t* last = pathname;
+	while (*pathname)
+	{
+		if (*pathname == '/' || *pathname == '\\')
+			last = pathname + 1;
+		++pathname;
+	}
+	return last;
+}
+
+void FS_StripFilename(const char* in, char* out)
+{
+	const char* extension = FS_GetFilenameSubString(in);
+	while (in != extension)
+		*out++ = *in++;
+	*out = 0;
+}
+
 int FS_FileCount(const char* path, const char* pattern)
 {
 	HANDLE dir;
@@ -83,7 +107,6 @@ int FS_FileCount(const char* path, const char* pattern)
 
 	char spath[MAX_PATH];
 	sprintf_s(spath, "%s/%s", path, pattern);
-	Con_Print("%s\n", spath);
 
 	if ((dir = FindFirstFileA(spath, &file_data)) == INVALID_HANDLE_VALUE)
 	{
@@ -105,7 +128,7 @@ int FS_FileCount(const char* path, const char* pattern)
 	return count;
 }
 
-int FS_FileIterator(const char* path, const char* pattern, int(__cdecl* FS_FileHandlerCallback)(const char* filePath, const char* fileName))
+int FS_FileIterator(const char* path, const char* pattern, FS_FileHandlerCallback_t FS_FileHandlerCallback)
 {
 	HANDLE dir;
 	WIN32_FIND_DATAA file_data;
@@ -137,7 +160,7 @@ int FS_FileIterator(const char* path, const char* pattern, int(__cdecl* FS_FileH
 	return count;
 }
 
-int FS_DirectoryIterator(const char* path, int(__cdecl* FS_DirectoryHandlerCallback)(const char* path))
+int FS_DirectoryIterator(const char* path, FS_DirectoryHandlerCallback_t FS_DirectoryHandlerCallback)
 {
 	HANDLE dir;
 	WIN32_FIND_DATAA file_data;
@@ -172,25 +195,38 @@ int FS_DirectoryIterator(const char* path, int(__cdecl* FS_DirectoryHandlerCallb
 	return count;
 }
 
-int FS_CreatePath(const char* targetPath)
+int FS_CreatePath(const char* _targetPath)
 {
+	char targetPath[1024];
+	if (strchr(_targetPath, ':') != NULL)
+		strcpy_s(targetPath, _targetPath);
+	else
+		sprintf_s(targetPath, "%s/%s", AppInfo_OutDir(), _targetPath);
+
 	int len = strlen(targetPath);
 	for (int i = 0; i < len; i++)
 	{
-		if (targetPath[i] == '/' || targetPath[i] == '\\')
+		bool skip = false;
+		if (i > 0 && targetPath[i-1] == ':')
+			skip = true;
+
+		if (!skip && (targetPath[i] == '/' || targetPath[i] == '\\'))
 		{
 			char buf[1024] = "";
 			strncpy(buf + strlen(buf), targetPath, i);
 
-			char qpath[1024] = "";
-			sprintf_s(qpath, "%s/%s/", AppInfo_RawDir(), buf);
+			char* qpath = buf;
+			if (strlen(qpath) == 0)
+				continue;
 
+			FS_SanitizePath(qpath);
 #if _DEBUG
 			if (!CreateDirectoryA(buf, 0) && GetLastError() != ERROR_ALREADY_EXISTS)
 #else
 			if (!CreateDirectoryA(qpath, 0) && GetLastError() != ERROR_ALREADY_EXISTS)
 #endif
 			{
+				
 				return GetLastError();
 			}
 		}
@@ -245,3 +281,28 @@ int FS_CopyDirectory(char* srcPath, char* destPath, bool overwriteFiles)
 	return 0;
 }
 
+void FS_SanitizePath(char* path)
+{
+	if (path[0] == '/')
+		path[0] = '\\';
+
+	//
+	// Cleanup double / or \
+	//
+	int len = strlen(path);
+	for (int i = 1; i < len; i++)
+	{
+		if (path[i] == '/')
+			path[i] = '\\';
+
+		if (path[i] == '\\' && path[i - 1] == '\\')
+			strcpy(&path[i - 1], &path[i]);
+	}
+
+	//
+	// Trim any leading / or \
+	//
+	const char* c = path;
+	for (; *c == '/' || *c == '\\'; c++);
+	strcpy(path, c);
+}

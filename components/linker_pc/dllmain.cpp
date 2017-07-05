@@ -1,4 +1,8 @@
+#define G_VERSION 1, 0, 0
 #include "stdafx.h"
+#include "r_material_load_obj.h"
+
+#define FIND_STATEMAPS 1
 
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 {
@@ -29,7 +33,7 @@ BOOL LinkerMod_Init()
 
 	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
 
-	Detours::X86::DetourFunction((PBYTE)0x004C3D30, (PBYTE)shared_assert);
+	Detours::X86::DetourFunction((PBYTE)0x004C3D30, (PBYTE)Assert_MyHandler);
 	Detours::X86::DetourFunction((PBYTE)0x00401940, (PBYTE)Com_LoadBsp);
 	Detours::X86::DetourFunction((PBYTE)0x004A6D20, (PBYTE)Path_LoadPaths);
 
@@ -51,6 +55,25 @@ BOOL LinkerMod_Init()
 	//
 	const char* msg_assertion = "expected 'constant' or 'material', found '%s' instead\n";
 	PatchMemory(0x00480D10, (PBYTE)&msg_assertion, 4);
+
+	//
+	// Prevent "_acess" spam
+	//
+	PatchMemory_WithNOP(0x004C6F9B, 5);
+
+	//
+	// Prevent dropping pathnodes if a custom ents file is loaded
+	//
+	Detours::X86::DetourFunction((PBYTE)0x00420493, (PBYTE)&mfh_MapEnts_ParseEntities);
+
+#if FIND_STATEMAPS
+	//
+	// Custom material loading code for bruteforcing statemaps for missing techniques
+	//
+	Detours::X86::DetourFunction((PBYTE)0x004853C0, (PBYTE)&Material_LoadRaw);
+
+	PatchCall(0x0047FA0E, (PBYTE)&hk_Material_RegisterStateMap);
+#endif
 
 	g_initted = TRUE;
 	return TRUE;

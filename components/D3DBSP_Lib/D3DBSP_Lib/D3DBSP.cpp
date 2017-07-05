@@ -28,8 +28,8 @@ int D3DBSP::Load(const char* filepath)
 	struct stat* results = new struct stat;
 	if (stat(filepath, results) != 0)
 	{
-		Con_Printf("\n");
-		Con_Error("File not found\n");
+		D3DBSP_Lib::Con_Printf("\n");
+		D3DBSP_Lib::Con_Error("File not found\n");
 		delete results;
 		return 1;// ERR_FILE_NOT_FOUND;
 	}
@@ -85,7 +85,7 @@ int D3DBSP::Load(BYTE* pBuf)
 	memcpy(&magicValue,pBuf,sizeof(DWORD));
 	if(magicValue != 'PSBI')
 	{
-		Con_Error("Buffer does not contain D3DBSP data\n");
+		D3DBSP_Lib::Con_Error("Buffer does not contain D3DBSP data\n");
 		return 2; //ERR_NOT_A_D3DBSP_FILE
 	}
 
@@ -159,8 +159,8 @@ int D3DBSP::Write(const char* filepath)
 		if(!pLump->isEmpty)
 		{
 #if _DEBUG
-			Log_Printf("Writing Lump [0x%X] %s\n", this->diskLumpOrder[i], LUMP_NAMES[this->diskLumpOrder[i]]);
-			Log_Printf("	Start: 0x%X (Size: 0x%X)\n", (DWORD)ofile.tellp(), pLump->size);
+			D3DBSP_Lib::Log_Printf("Writing Lump [0x%X] %s\n", this->diskLumpOrder[i], LUMP_NAMES[this->diskLumpOrder[i]]);
+			D3DBSP_Lib::Log_Printf("	Start: 0x%X (Size: 0x%X)\n", (DWORD)ofile.tellp(), pLump->size);
 #endif
 			ofile.write((char*)pLump->content, pLump->size);
 			if(padding_size(pLump->size))
@@ -169,7 +169,7 @@ int D3DBSP::Write(const char* filepath)
 				ofile.write((char*)&pad, padding_size(pLump->size));
 			}
 #if _DEBUG
-			Log_Printf("	End: 0x%X\n", (DWORD)ofile.tellp());
+			D3DBSP_Lib::Log_Printf("	End: 0x%X\n", (DWORD)ofile.tellp());
 #endif
 		}
 	}

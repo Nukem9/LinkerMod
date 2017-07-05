@@ -1,4 +1,4 @@
-#include "cg_scoreboard.h"
+#include "stdafx.h"
 
 CG_RegisterScoreboardDvars_t CG_RegisterScoreboardDvars_o = 0x0;
 dvar_s* cg_showServerInfo = 0x0;

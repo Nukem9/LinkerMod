@@ -63,6 +63,7 @@ extern Session_Modify_t* Session_Modify;
 
 int SV_UpdateCategory();
 
+bool Com_SessionMode_IsZombiesGame();
 void __cdecl Session_Modify_Fix(const int localControllerIndex, void *session, const int flags, const int publicSlots, const int privateSlots);
 void Live_JoinSessionInProgressComplete_CheckMod();
 void Live_AcceptInviteAsyncComplete_CheckMod();

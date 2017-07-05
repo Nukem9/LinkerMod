@@ -2,7 +2,7 @@
 
 void __declspec(naked) hk_R_Cinematic_BinkOpen(void)
 {
-	_asm
+	__asm
 	{
 		push[esp + 8]
 		push[esp + 8]
@@ -32,13 +32,9 @@ bool __cdecl R_Cinematic_BinkOpen(const char *filename, unsigned int playbackFla
 	}
 
 	if (playbackFlags & 8)
-	{
 		_snprintf_s(filepath, _TRUNCATE, "bik/%s.bik", filename);
-	}
 	else
-	{
 		_snprintf_s(filepath, _TRUNCATE, "%s\\main\\video\\%s.bik", cwd, filename);
-	}
 
 	if (R_Cinematic_BinkOpenPath(filepath, playbackFlags, errText))
 		return true;
