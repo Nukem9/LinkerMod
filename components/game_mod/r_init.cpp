@@ -195,6 +195,7 @@ void __cdecl R_StoreWindowSettings(GfxWindowParms *wndParms)
 			monitorHeight = dx.adapterNativeHeight;
 		}
 
+#if _USE_LEGACY_ASPECT_RATIO_MODE
 		// Calculate the height part of the aspect ratio and
 		//  set the window's aspect ratio based on that
 		int r = (int)(((float)monitorHeight * 16.0f) / (float)monitorWidth);
@@ -204,6 +205,10 @@ void __cdecl R_StoreWindowSettings(GfxWindowParms *wndParms)
 			vidConfig.aspectRatioWindow = ASPECT_RATIO(4, 3);
 		else
 			vidConfig.aspectRatioWindow = ASPECT_RATIO(16, 9);
+#else
+		vidConfig.aspectRatioWindow = (float)monitorWidth / (float)monitorHeight;
+#endif
+
 		break;
 	}
 

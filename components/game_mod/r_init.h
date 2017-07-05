@@ -57,7 +57,7 @@ struct __declspec(align(4)) vidConfig_t
 	bool deviceSupportsGamma;
 };
 
-#define ASPECT_RATIO(W, H) ((float)W) / ((float)H)
+#define ASPECT_RATIO(W, H) (((float)W) / ((float)H))
 
 enum /*r_aspectRatio*/
 {
