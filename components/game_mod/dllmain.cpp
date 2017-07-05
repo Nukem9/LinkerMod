@@ -55,6 +55,11 @@ BOOL GameMod_Init()
 	PatchMemory(0x00616628, (PBYTE)"\xEB", 1);// Runframe
 
 	//
+	// Patch Aspect Ratio
+	//
+	Detours::X86::DetourFunction((PBYTE)0x006B68D0, (PBYTE)&hk_R_StoreWindowSettings);
+
+	//
 	// "com_introPlayed"
 	// "com_startupIntroPlayed"
 	// "cg_fov_default"  (max 165.0)

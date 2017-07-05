@@ -139,6 +139,9 @@ VANILLA_DVAR(r_reflectionProbeGenerate, 0x03B35038);
 VANILLA_DVAR(r_reflectionProbeGenerateExit, 0x03B3503C);
 VANILLA_DVAR(r_reflectionProbeRegenerateAll, 0x03B20030);
 
+VANILLA_DVAR(r_aspectRatio, 0x03B1FF88);
+VANILLA_DVAR(com_wideScreen, 0x024817A8);
+
 VANILLA_DVAR(cg_drawVersion, 0x02F67B14);
 VANILLA_DVAR(cg_drawMaterial, 0x02FF676C);
 
