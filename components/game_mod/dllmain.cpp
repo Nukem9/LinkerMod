@@ -396,6 +396,11 @@ BOOL GameMod_Init()
 	PatchMemory_WithNOP(0x0068ABFA, 6);
 
 	//
+	// Add support for mod specific frontend levels (needs to be tested if coop lobbies work!)
+	//
+	Mod_Frontend_Init();
+
+	//
 	// Add Game_Mod Version info to the 'version' dvar
 	//	can be viewed via 'cg_drawVersion 1'
 	//
