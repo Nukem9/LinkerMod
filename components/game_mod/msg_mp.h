@@ -24,8 +24,6 @@ struct msg_t
 	netsrc_t targetLocalNetID;
 };
 
-struct entityState_s;
-
 VANILLA_FUNC(MSG_Init, void(__cdecl*)(msg_t *buf, char *data, int length), 0x00622700);
 VANILLA_FUNC(MSG_WriteBit0, void(__cdecl*)(msg_t *msg), 0x004475B0);
 VANILLA_FUNC(MSG_WriteBit1, void(__cdecl*)(msg_t *msg), 0x004244D0);

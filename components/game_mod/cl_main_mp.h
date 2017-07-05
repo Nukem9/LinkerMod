@@ -34,7 +34,6 @@ struct  SnapshotInfo_s
 };
 STATIC_ASSERT_SIZE(SnapshotInfo_s, 0x2C);
 
-
 VANILLA_VALUE(localClientConnectionState, int, 0x02910164);
 
 static char* clc_demoName = (char*)0x028F9F3C;
