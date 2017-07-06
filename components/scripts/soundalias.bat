@@ -28,7 +28,7 @@ set MAP=
 	call :export
 ))
 
-(for %%m in (%SP_MAPS%) do (
+(for %%m in (%MP_MAPS%) do (
 	set MAP=%%m
 	call :export
 ))
