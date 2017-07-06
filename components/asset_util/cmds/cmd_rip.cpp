@@ -1,4 +1,5 @@
 #include "cmd_common.h"
+#include "../sys/AppInfo.h"
 
 #include "../sys/process.h"
 #include "ripper\process_info.h"
@@ -10,8 +11,40 @@ bool wait = true;
 
 int Cmd_Rip_f(int argc, char** argv)
 {
-	unsigned int timeoutDelay = rip_waitForProcess.ValueBool() ? UINT_MAX : 0;
-	if (processId_t pid = Process_FindSupportedProcess(timeoutDelay))
+	processId_t pid = NULL;
+
+	//
+	// The user wants to launch a specific map
+	// So asset_util handles launching the game
+	//
+	if (rip_targetMap.ValueString()[0] != '\0')
+	{
+		rip_waitForMap.Enable();
+		rip_waitForProcess.Enable();
+		rip_killProcess.Enable();
+
+		if (!AppInfo_MapExists(rip_targetMap.ValueString()))
+		{
+			Con_Error("ERROR: Map '%s' is not a valid map!\n", rip_targetMap.ValueString());
+			return 1;
+		}
+
+		char cmdLine[1024];
+		sprintf_s(cmdLine, "+devmap %s", rip_targetMap.ValueString());
+
+		// TODO figure out a way to do this without the cheaty timer
+		pid = Process_LaunchGame(cmdLine);
+	}
+	else
+	{
+		//
+		// No map was specified, so we wait for the first supported process and use that
+		//
+		unsigned int timeoutDelay = rip_waitForProcess.ValueBool() ? UINT_MAX : 0;
+		pid = Process_FindSupportedProcess(timeoutDelay);
+	}
+
+	if (pid)
 	{
 		if (int err = ProcessInfo_Init(pid))
 		{

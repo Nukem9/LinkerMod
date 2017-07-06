@@ -18,6 +18,8 @@ int Process_ExecuteConverter(void)
 	char szCmdLine[MAX_PATH] = "\0";
 	sprintf_s(szCmdLine, "%s/converter.exe -nopause", wd);
 
+	Con_Print_v("Launching Process:\n %s\n", szCmdLine);
+
 	PROCESS_INFORMATION processInfo;
 	STARTUPINFOA startupInfo;
 	memset(&startupInfo, 0, sizeof(STARTUPINFOA));
@@ -33,6 +35,47 @@ int Process_ExecuteConverter(void)
 	}
 
 	return 1;
+}
+
+processId_t Process_LaunchGame(const char* cmdLine)
+{
+	// Wait 200 ms for the game to launch before making sure launcher_ldr didnt die
+	const unsigned int dwWaitInterval = 200;
+
+	char wd[MAX_PATH];
+	sprintf_s(wd, "%s", AppInfo_AppDir());
+
+	char szCmdLine[2048] = "\0";
+	sprintf_s(szCmdLine, "%s\\bin\\launcher_ldr.exe bin\\game_mod.dll BlackOps.exe %s", wd, cmdLine);
+
+	Con_Print_v("Launching Process:\n %s\n", szCmdLine);
+
+	PROCESS_INFORMATION processInfo;
+	STARTUPINFOA startupInfo;
+	memset(&startupInfo, 0, sizeof(STARTUPINFOA));
+	startupInfo.cb = sizeof(STARTUPINFOA);
+
+	if (CreateProcessA(NULL, szCmdLine, NULL, NULL, NULL, NULL, NULL, wd, &startupInfo, &processInfo))
+	{
+		// Wait for launcher_ldr start the game
+		do
+		{
+			if(processId_t pid = Process_FindSupportedProcess(dwWaitInterval, true))
+			{
+				CloseHandle(processInfo.hThread);
+				CloseHandle(processInfo.hProcess);
+				return pid;
+			}
+		} while (WaitForSingleObject(processInfo.hProcess, 0) == WAIT_TIMEOUT);
+		
+		//
+		// Launcher_LDR exited without launching the game...
+		//
+		CloseHandle(processInfo.hThread);
+		CloseHandle(processInfo.hProcess);
+	}
+
+	return 0;
 }
 
 LPCWSTR processStringTable[] =
@@ -105,7 +148,7 @@ processId_t Process_FindSupportedProcess_Launched(void)
 	return NULL;
 }
 
-processId_t Process_FindSupportedProcess(unsigned int timeoutDelay)
+processId_t Process_FindSupportedProcess(unsigned int timeoutDelay, bool quiet)
 {
 	_ASSERT(timeoutDelay < UINT_MAX);
 
@@ -115,7 +158,7 @@ processId_t Process_FindSupportedProcess(unsigned int timeoutDelay)
 	LARGE_INTEGER start;
 	QueryPerformanceCounter(&start);
 
-	if (timeoutDelay > 0)
+	if (timeoutDelay > 0 && !quiet)
 		Con_Print("Waiting for supported process to launch...\n");
 
 	for (bool had_to_wait = false;; had_to_wait = true)
@@ -143,10 +186,13 @@ processId_t Process_FindSupportedProcess(unsigned int timeoutDelay)
 
 		if (elapsed_ms.QuadPart > timeoutDelay || elapsed_ms.QuadPart > UINT_MAX)
 		{
-			const char* reason = "";
-			if (timeoutDelay)
-				reason = " - timeout reached";
-			Con_Error("Could not find supported running process%s.\n", reason);
+			if (!quiet)
+			{
+				const char* reason = "";
+				if (timeoutDelay)
+					reason = " - timeout reached";
+				Con_Error("Could not find supported running process%s.\n", reason);
+			}
 			return NULL;
 		}
 	}

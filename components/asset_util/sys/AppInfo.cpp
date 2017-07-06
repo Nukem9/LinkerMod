@@ -83,3 +83,106 @@ const char* AppInfo_OutDir()
 
 	return fs_outdir.ValueString();
 }
+
+bool AppInfo_MapExists(const char* mapname)
+{
+	const char* whitelist[] =
+	{
+		"frontend",
+
+		// Campaign
+		"cuba",
+		"vorkuta",
+		"pentagon",
+		"flashpoint",
+		"khe_sanh",
+		"hue_city",
+		"kowloon",
+		"fullahead",
+		"creek_1",
+		"river",
+		"wmd_sr71",
+		"wmd",
+		"pow",
+		"rebirth",
+		"int_escape",
+		"underwaterbase",
+		"outro",
+
+		// Narrative
+		"so_narrative1_frontend",
+		"so_narrative2_frontend",
+		"so_narrative3_frontend",
+		"so_narrative4_frontend",
+		"so_narrative5_frontend",
+		"so_narrative6_frontend",
+
+		// Zombies
+		"zombie_theater",
+		"zombie_pentagon",
+		"zombietron",
+		"zombie_cod5_prototype",	// DLC1, DLC5
+		"zombie_cod5_asylum",		// DLC1, DLC5
+		"zombie_cod5_sumpf",		// DLC1, DLC5
+		"zombie_cod5_factory",		// DLC1, DLC5
+		"zombie_cosmodrome",		// DLC2
+		"zombie_coast",				// DLC3
+		"zombie_temple",			// DLC4
+		"zombie_moon",				// DLC5
+
+#if _APP_INFO_WHITELIST_MP_MAPS
+		// Multiplayer Maps
+		"mp_array",
+		"mp_cairo",
+		"mp_cosmodrome",
+		"mp_cracked",
+		"mp_crisis",
+		"mp_duga",
+		"mp_firingrange",
+		"mp_hanoi",
+		"mp_havoc",
+		"mp_mountain",
+		"mp_nuked",
+		"mp_radiation",
+		"mp_russianbase",
+		"mp_villa",
+
+		// DLC2
+		"mp_berlinwall2",
+		"mp_discovery",
+		"mp_kowloon",
+		"mp_stadium",
+
+		//DLC3
+		"mp_gridlock",
+		"mp_hotel",
+		"mp_outskirts",
+		"mp_zoo",
+
+		// DLC4
+		"mp_area51",
+		"mp_drivein",
+		"mp_golfcourse",
+		"mp_silo",
+#endif
+	};
+
+	// Ensure the map is whitelisted
+	bool isValidMap = false;
+	for (int i = 0; i < ARRAYSIZE(whitelist); i++)
+	{
+		if (_stricmp(mapname, whitelist[i]) == 0)
+		{
+			isValidMap = true;
+			break;
+		}
+	}
+
+	if (!isValidMap)
+		return false;
+
+	// Check if the map's fastfile is present
+	char path[1024];
+	sprintf_s(path, "%s\\%s.ff", AppInfo_FFDir(), mapname);
+	return FS_FileExists(path);
+}

@@ -1,4 +1,5 @@
 #pragma once
+#include <Windows.h>
 
 enum PROCESS_TYPE
 {
@@ -10,6 +11,7 @@ enum PROCESS_TYPE
 typedef unsigned int processId_t;
 
 int Process_ExecuteConverter(void);
+processId_t Process_LaunchGame(const char* cmdLine = "");
 
 //
 // Resolve a process' PROCESS_TYPE from the pid
@@ -20,7 +22,7 @@ PROCESS_TYPE Process_GetProcessType(processId_t pid);
 // Searches the active process list for a supported process, and returns the processId
 // Returns NULL if no supported process is found withing the given number of ms
 //
-processId_t Process_FindSupportedProcess(unsigned int timeoutDelay=0);
+processId_t Process_FindSupportedProcess(unsigned int timeoutDelay=0, bool quiet = false);
 
 //
 // Suspend all threads for a given processId
