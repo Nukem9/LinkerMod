@@ -63,7 +63,11 @@ int Cmd_Rip_f(int argc, char** argv)
 
 		if (rip_waitForMap.ValueBool())
 		{
-			DB_WaitForMapToLoad();
+			if (DB_WaitForMapToLoad() != 0)
+			{
+				Con_Error("Could not load map - game process is unavailable...\n");
+				return 2;
+			}
 		}
 
 		Process_SuspendThreads(pid);

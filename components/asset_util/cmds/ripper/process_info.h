@@ -19,6 +19,8 @@ struct ProcessInfo
 	ForeignPointer<XZoneName> db_zoneNames;
 
 	ForeignPointer<dvar_s*> cl_ingame;
+
+	bool IsRunning(void);
 };
 
 extern ProcessInfo g_process;

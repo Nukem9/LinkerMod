@@ -3,9 +3,15 @@
 
 ProcessInfo g_process = { 0 };
 
+bool ProcessInfo::IsRunning(void)
+{
+	return WaitForSingleObject(this->handle, 0) != 0;
+}
+
 int ProcessInfo_Init(processId_t pid)
 {
-	g_process.handle = OpenProcess(PROCESS_VM_READ, FALSE, pid);
+	// SYNCHRONIZE access is required for using WaitForSingleObject() on g_process.handle
+	g_process.handle = OpenProcess(PROCESS_VM_READ | SYNCHRONIZE, FALSE, pid);
 	g_process.pid = pid;
 
 	switch (PROCESS_TYPE type = Process_GetProcessType(pid))
