@@ -39,7 +39,7 @@ goto:eof
 set MAP=so_dummy_%MAP%
 
 :export
-echo Ripping Soundaliases for %MAP% ...
+echo Ripping soundaliases for %MAP% ...
 :: Launch Asset Util
 :: Automatically launches the game with the target map and terminates on completion
 %ASSET_UTIL% rip --targetMap %MAP%
