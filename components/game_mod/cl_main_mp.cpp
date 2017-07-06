@@ -131,7 +131,7 @@ void __cdecl CL_WriteUncompressedDemoInfo(int localClientNum)
 		}
 	}
 
-#if _EXPERIMENTAL
+#if 1 //_EXPERIMENTAL
 	//
 	// Entities
 	//
@@ -149,7 +149,8 @@ void __cdecl CL_WriteUncompressedDemoInfo(int localClientNum)
 
 	for (int i = 0; i < 400; i++)
 	{
-		int* ent = reinterpret_cast<int*>(0x029B0E98) + (i * 0x36);
+		int* ent = reinterpret_cast<int*>(0x027F9710) + (i * 0x168);
+		//int* ent = reinterpret_cast<int*>(0x029B0E98) + (i * 0x36);
 		if (*ent)
 		{
 			MSG_WriteByte(&buf, 4);
@@ -161,15 +162,15 @@ void __cdecl CL_WriteUncompressedDemoInfo(int localClientNum)
 		}
 	}
 
-	buf.lastEntityRef = -1;
 	MSG_ClearLastReferencedEntity(&buf);
 
 	for (int i = 0; i < 350; i++)
 	{
-		int* ent = reinterpret_cast<int*>(0x029E6E98) + (i * 0x36);
+		int* ent = reinterpret_cast<int*>(0x027F9710 + 0x59FF8) + (i * 0x36);
+		//int* ent = reinterpret_cast<int*>(0x029E6E98) + (i * 0x36);
 		if (*ent)
 		{
-			MSG_WriteByte(&buf, 4);
+			MSG_WriteByte(&buf, 5);
 			snapInfo.clientNum = clc_clientNum;
 			snapInfo.snapshotDeltaTime = -1;
 			snapInfo.unk = 2;
