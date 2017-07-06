@@ -101,6 +101,14 @@ int Cmd_Rip_f(int argc, char** argv)
 		if (rip_killProcess.ValueBool())
 		{
 			Process_KillProcess(pid);
+
+			//
+			// Kill any lingering supported processes to prevent conflicts in the batch script
+			//
+			while (pid = Process_FindSupportedProcess(0, true))
+			{
+				Process_KillProcess(pid);
+			}
 		}
 
 		return 0;

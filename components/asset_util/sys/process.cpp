@@ -117,7 +117,7 @@ PROCESS_TYPE Process_GetProcessType(processId_t pid)
 	return type;
 }
 
-processId_t Process_FindSupportedProcess_Launched(void)
+processId_t Process_FindSupportedProcess_Launched(bool quiet = false)
 {
 	PROCESSENTRY32 entry;
 	entry.dwSize = sizeof(PROCESSENTRY32);
@@ -135,7 +135,8 @@ processId_t Process_FindSupportedProcess_Launched(void)
 				{
 				case PROCESS_BLACK_OPS:
 				case PROCESS_BLACK_OPS_MP:
-					wprintf(L"Supported process found! ('%s')\n", entry.szExeFile);
+					if (!quiet)
+						wprintf(L"Supported process found! ('%s')\n", entry.szExeFile);
 					return entry.th32ProcessID;
 				default:
 					return NULL;
@@ -166,7 +167,7 @@ processId_t Process_FindSupportedProcess(unsigned int timeoutDelay, bool quiet)
 		LARGE_INTEGER split;
 		QueryPerformanceCounter(&split);
 
-		if (processId_t pid = Process_FindSupportedProcess_Launched())
+		if (processId_t pid = Process_FindSupportedProcess_Launched(quiet))
 		{
 			//
 			// If we had to wait for the process to launch - and *just* found the process
