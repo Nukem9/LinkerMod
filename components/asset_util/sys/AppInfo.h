@@ -1,5 +1,7 @@
 #pragma once
 
+#define _APPINFO_ALLOW_MP_MAPS 1
+
 bool AppInfo_Init();
 const char* AppInfo_AppDir();
 const char* AppInfo_FFDir();

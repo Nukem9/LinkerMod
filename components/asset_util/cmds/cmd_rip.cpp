@@ -29,8 +29,17 @@ int Cmd_Rip_f(int argc, char** argv)
 			return 1;
 		}
 
+		char mapname[256];
+		const char* prefix = "";
+
+#if _APPINFO_ALLOW_MP_MAPS
+		if (_strnicmp(rip_targetMap.ValueString(), "mp_", 3) == 0)
+			prefix = "so_dummy_";
+#endif
+		sprintf_s(mapname, "%s%s", prefix, rip_targetMap.ValueString());
+
 		char cmdLine[1024];
-		sprintf_s(cmdLine, "+devmap %s", rip_targetMap.ValueString());
+		sprintf_s(cmdLine, "+set g_loadScripts 0 +devmap %s", mapname);
 
 		// TODO figure out a way to do this without the cheaty timer
 		pid = Process_LaunchGame(cmdLine);

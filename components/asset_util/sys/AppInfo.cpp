@@ -130,7 +130,7 @@ bool AppInfo_MapExists(const char* mapname)
 		"zombie_temple",			// DLC4
 		"zombie_moon",				// DLC5
 
-#if _APP_INFO_WHITELIST_MP_MAPS
+#if _APPINFO_ALLOW_MP_MAPS
 		// Multiplayer Maps
 		"mp_array",
 		"mp_cairo",
