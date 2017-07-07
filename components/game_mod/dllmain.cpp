@@ -180,7 +180,7 @@ BOOL GameMod_Init()
 	//
 	// Add scr_supressErrors to disable error message boxes with developer_script
 	//
-	Detours::X86::DetourFunction((PBYTE)0x005A1732, (PBYTE)&mfh_RuntimeError);
+	Detours::X86::DetourFunction((PBYTE)0x005A1680, (PBYTE)&RuntimeError);
 	
 	//
 	// Add com_cfg_readOnly dvar - to allow prevention of writing to the config

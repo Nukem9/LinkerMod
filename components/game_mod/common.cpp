@@ -402,3 +402,8 @@ void __cdecl Com_ExecStartupConfigs(int localClientNum, const char *configFile)
 	controllerIndex = Com_LocalClient_GetControllerIndex(localClientNum);
 	Cbuf_Execute(localClientNum, controllerIndex);
 }
+
+void Com_PrintMessage(int channel, const char *msg, int error)
+{
+	((void (__cdecl *)(int, const char *, int))0x0043C520)(channel, msg, error);
+}

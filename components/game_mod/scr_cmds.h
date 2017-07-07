@@ -1,5 +1,4 @@
 #pragma once
-#include "cscr_parser.h"
 
 struct BuiltinFunctionDef
 {

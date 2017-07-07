@@ -109,7 +109,10 @@
     <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
+    <ClCompile Include="cscr_main.cpp" />
     <ClCompile Include="cscr_parser.cpp" />
+    <ClInclude Include="cscr_variable.h" />
+    <ClCompile Include="cscr_variable.cpp" />
     <ClCompile Include="cscr_vm.cpp" />
     <ClCompile Include="db_registry.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -176,6 +179,8 @@
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
+    <ClInclude Include="cscr_compiler.h" />
+    <ClInclude Include="cscr_main.h" />
     <ClInclude Include="cscr_parser.h" />
     <ClInclude Include="cscr_vm.h" />
     <ClInclude Include="d3d9ex.h" />
