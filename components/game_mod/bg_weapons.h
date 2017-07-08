@@ -82,7 +82,7 @@ struct usercmd_s
 	int serverTime;
 	bitarray<51> buttons;
 	int angles[3];
-	unsigned __int16 weapon;
+	unsigned char weapon;
 
 	// The rest omitted
 };

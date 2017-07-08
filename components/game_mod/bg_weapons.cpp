@@ -228,47 +228,40 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			else
 				holdingFireBtn = pm->cmd.buttons.testBit(0) != 0;
 
-			if (*weaponState >= WEAPON_OFFHAND_INIT && *weaponState <= WEAPON_OFFHAND_END || !pausedAfterFiring && !holdingGrenadeBtn)
-				goto LABEL_105;
-			if (!holdingFireBtn)
-				goto LABEL_97;
-			if (ps->weapon == pm->cmd.weapon || !PM_WeaponAmmoAvailable(ps) && !weapDef->unlimitedAmmo)
+			if ((*weaponState < WEAPON_OFFHAND_INIT || *weaponState > WEAPON_OFFHAND_END)
+				&& (pausedAfterFiring || holdingGrenadeBtn)
+				&& holdingFireBtn
+				&& ps->weapon == pm->cmd.weapon
+				&& (PM_WeaponAmmoAvailable(ps) || weapDef->unlimitedAmmo))
 			{
-			LABEL_105:
-				if (holdingFireBtn && !(ps->weapFlags & 0x400))
+				*weaponTime = 1;
+
+				if (IS_WEAPONSTATE_RELOAD(*weaponState))
 				{
 					*weaponTime = 0;
-					goto LABEL_100;
+					*weaponShotCount = 0;
 				}
-			LABEL_97:
-				if (!BurstFirePending(ps))
+				else if (*weaponState == WEAPON_RECHAMBERING)
+				{
+					PM_Weapon_FinishRechamber(ps);
+				}
+				else if (IS_WEAPONSTATE_FIRE(*weaponState))
+				{
+					// Bugfix? BO2 uses ps->bRunLeftGun
+					PM_ContinueWeaponAnim(ps, 0, ps->bRunLeftGun);
+					*weaponState = WEAPON_READY;
+				}
+			}
+			else
+			{
+				if ((!holdingFireBtn || ps->weapFlags & 0x400) && !BurstFirePending(ps))
 					*weaponShotCount = 0;
 
 				*weaponTime = 0;
-				goto LABEL_100;
-			}
-
-			*weaponTime = 1;
-
-			if (IS_WEAPONSTATE_RELOAD(*weaponState))
-			{
-				*weaponTime = 0;
-				*weaponShotCount = 0;
-			}
-			else if (*weaponState == WEAPON_RECHAMBERING)
-			{
-				PM_Weapon_FinishRechamber(ps);
-			}
-			else if (IS_WEAPONSTATE_FIRE(*weaponState))
-			{
-				// Bugfix? BO2 uses ps->bRunLeftGun
-				PM_ContinueWeaponAnim(ps, 0, ps->bRunLeftGun);
-				*weaponState = WEAPON_READY;
 			}
 		}
 	}
 
-LABEL_100:
 	if (!*weaponDelay)
 		return 0;
 
