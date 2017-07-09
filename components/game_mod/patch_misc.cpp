@@ -29,21 +29,21 @@ void PatchMisc()
 	mov ecx, ebx
 	sar eax, cl			// No longer needed
 	*/
-	//PatchMemory(0x0071F1E8, (PBYTE)
-	//	"\x31\xDB" // xor ebx, ebx : set ebx (picmip) to 0
-	//	"\x89\xD9", // mov ecx, ebx
-	//	4);
+	PatchMemory(0x0071F1E8, (PBYTE)
+		"\x31\xDB" // xor ebx, ebx : set ebx (picmip) to 0
+		"\x89\xD9", // mov ecx, ebx
+		4);
+
+	// Overwrite the second shift just to be safe
+	PatchMemory_WithNOP(0x0071F1FB, 2);
+
 	//
-	//// Overwrite the second shift just to be safe
-	//PatchMemory_WithNOP(0x0071F1FB, 2);
+	// Change Composite Rendertarget Res
 	//
-	////
-	//// Change Composite Rendertarget Res
-	////
-	//const int rt_composite_res = 1024; // 256
-	//PatchMemory(0x0071F277, (PBYTE)&rt_composite_res, 4);
-	//PatchMemory(0x0071F27C, (PBYTE)&rt_composite_res, 4);
-	//PatchMemory(0x0071F2A2, (PBYTE)&rt_composite_res, 4);
+	const int rt_composite_res = 1024; // 256
+	PatchMemory(0x0071F277, (PBYTE)&rt_composite_res, 4);
+	PatchMemory(0x0071F27C, (PBYTE)&rt_composite_res, 4);
+	PatchMemory(0x0071F2A2, (PBYTE)&rt_composite_res, 4);
 	
 }
 
