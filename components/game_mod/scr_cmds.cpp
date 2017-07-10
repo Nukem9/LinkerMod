@@ -426,3 +426,56 @@ void GScr_FPrintFields()
 	Scr_FPrint_internal(1);
 }
 
+VANILLA_VALUE(g_changingLevels, int, 0x01C07014);
+VANILLA_VALUE(g_persistent, int, 0x01C0532C);
+VANILLA_VALUE(g_exitTime, int, 0x01C07020);
+
+static char* g_nextMap = (char*)0x01C018B0;
+
+void G_SetNextMap(const char *mapname)
+{
+	I_strncpyz(g_nextMap, mapname, 64);
+}
+
+/*
+	ChangeLevel( <mapname>, <persistent>, <exitTime> )
+	
+	Required Args:
+		1 : <mapname> The name of the map to change to.
+	
+	Optional Args
+		1 : <persistent> Flag allowing player to keep their inventory through the transition.
+		2 : <exitTime> Time in seconds of the exit fade.
+*/
+void GScr_ChangeLevel(void)
+{
+	extern int sv_allowMapPreload;
+
+	gentity_s* player = G_Find(0, 348, *reinterpret_cast<unsigned __int16*>(0x023A562C));
+	if (player->health > 0 && !g_reloading->current.integer)
+	{
+		int argc = Scr_GetNumParam(SCRIPTINSTANCE_SERVER) - 1;
+		if (argc)
+		{
+			if (argc != 1)
+			{
+				float exitTime = Scr_GetFloat(2, SCRIPTINSTANCE_SERVER) * 1000.0f;
+				g_exitTime = (int)exitTime;
+				if (g_exitTime < 0)
+					Scr_ParamError(1, "exitTime cannot be negative", SCRIPTINSTANCE_SERVER);
+			}
+
+			g_persistent = Scr_GetInt(1, SCRIPTINSTANCE_SERVER);
+		}
+
+		const char* mapname = Scr_GetString(0, SCRIPTINSTANCE_SERVER);
+		if (Scr_GetNumParam(SCRIPTINSTANCE_SERVER) < 3)
+			g_exitTime = (int)(g_changelevel_time->current.value * 1000.0f);
+
+		// Disable server map preloading when changing levels
+		sv_allowMapPreload = 0;
+
+		g_changingLevels = 1;
+		G_SetNextMap(mapname);
+	}
+}

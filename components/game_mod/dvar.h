@@ -114,6 +114,12 @@ VANILLA_DVAR(cg_fov_default, 0x02FF669C);
 VANILLA_DVAR(cg_fov_default_thirdperson, 0x02F67B9C);
 VANILLA_DVAR(cg_fovScale, 0x02FF66A8);
 
+VANILLA_DVAR(g_changelevel_time, 0x01C018AC);
+VANILLA_DVAR(g_reloading, 0x01C0186C);
+
+VANILLA_DVAR(useSvMapPreloading, 0x02481784);
+VANILLA_DVAR(useMapPreloading, 0x02481740);
+
 VANILLA_DVAR(uiscript_debug, 0x02562A20);
 
 VANILLA_DVAR(cl_demoLiveStreaming, 0x028D9DD0);
