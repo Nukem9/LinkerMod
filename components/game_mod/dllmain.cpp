@@ -156,8 +156,8 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x007FBBB0, (PBYTE)GScr_ChangeLevel);
 
 	// Add Support for Custom Server / Client Commands
-	Detours::X86::DetourFunction((PBYTE)0x0078E76A, (PBYTE)&mfh_CG_DeployServerCommand);	// SERVERSIDE
-	Detours::X86::DetourFunction((PBYTE)0x004AFBC7, (PBYTE)&mfh_ClientCommand);				// CLIENTSIDE
+	Detours::X86::DetourFunction((PBYTE)0x004AFBC7, (PBYTE)&mfh_ClientCommand);				// SERVERSIDE
+	Detours::X86::DetourFunction((PBYTE)0x0078E76A, (PBYTE)&mfh_CG_DeployServerCommand);	// CLIENTSIDE
 
 	//
 	// Unrestrict Dvar_ForEachConsoleAccessName,
