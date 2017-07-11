@@ -98,6 +98,7 @@
     <ClCompile Include="CEG.cpp" />
     <ClCompile Include="cg_draw_debug.cpp" />
     <ClCompile Include="cg_scoreboard.cpp" />
+    <ClCompile Include="cg_servercmds_mp.cpp" />
     <ClCompile Include="cg_weapons.cpp" />
     <ClCompile Include="cl_debugdata.cpp" />
     <ClCompile Include="cl_keys.cpp" />
@@ -111,6 +112,7 @@
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="cscr_main.cpp" />
     <ClCompile Include="cscr_parser.cpp" />
+    <ClInclude Include="cg_servercmds_mp.h" />
     <ClInclude Include="cscr_variable.h" />
     <ClCompile Include="cscr_variable.cpp" />
     <ClCompile Include="cscr_vm.cpp" />

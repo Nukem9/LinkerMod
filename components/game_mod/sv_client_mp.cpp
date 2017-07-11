@@ -108,3 +108,53 @@ void __declspec(naked) hk_SV_ClientCommand()
 		retn
 	}
 }
+
+void __declspec(naked) mfh_ClientCommand(void)
+{
+	static const DWORD dwDefault = 0x004AFBE1;
+	static const DWORD dwMemset = 0x00965480;
+	_asm
+	{
+		// note esp == -0x44C
+
+		// eax = &cmd[0] (safe)
+		lea eax, [esp + 0x50] 
+
+		pushad
+		push eax	// cmd
+		push edi	// clientNum
+		call ClientCommand_HandleUserCommand
+		cmp eax, 0
+		add esp, 8
+		popad
+
+		jz HANDLED_CASE
+
+	// UNHANDLED CASE
+		push 0x3F
+		lea ecx, [esp + 0x10 + 1]
+		push 0
+		push ecx
+		mov[esp+0x18], 0
+		call dwMemset
+		lea edx, [esp + 0x58] // edx = cmd
+		push edx
+		push 0x65
+		
+		jmp dwDefault
+
+	HANDLED_CASE:
+
+		pop edi
+		pop esi
+		add esp, 0x444
+		retn
+	}
+}
+
+// [SERVERSIDE]: Handle any custom commands from the clients
+int __cdecl ClientCommand_HandleUserCommand(int clientNum, char* cmd)
+{
+	Com_Printf(0, "[CLIENT COMMAND]: %d %s\n", clientNum, cmd);
+	return 1;
+}
