@@ -12,10 +12,10 @@ void __declspec(naked) mfh_CG_DeployServerCommand(void)
 		// push ecx (immediately before this func is called)
 		// auto popped shortly after the parent function is called, or by our return case
 
-		pushad // just to be safe
-		push ecx
+		pushad		// save registers, just to be safe
 
 		// returns 0 if the case was successfully handled
+		push eax	// cmd
 		call CG_DeployServerCommand_HandleCase
 
 		add esp, 4
@@ -32,7 +32,7 @@ void __declspec(naked) mfh_CG_DeployServerCommand(void)
 
 		jmp dwUnhandledCase
 
-	HANDLED_CASE :
+	HANDLED_CASE:
 		// Remove the value that was pushed before this function was called
 		//  we don't need it anymore
 		add esp, 4
