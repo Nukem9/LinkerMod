@@ -118,7 +118,7 @@ void __declspec(naked) mfh_ClientCommand(void)
 		// note esp == -0x44C
 
 		// eax = &cmd[0] (safe)
-		lea eax, [esp + 0x50] 
+		lea eax, [esp + 0x4C] 
 
 		pushad
 		push eax	// cmd
