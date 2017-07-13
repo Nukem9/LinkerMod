@@ -287,7 +287,7 @@ int Rip_Sound_Alias_Callback_f(ForeignPointer<snd_alias_t>& alias, snd_ripper_in
 	int file_size_xenon = 0;
 	const char* file_ps3 = "";
 	int file_size_ps3 = 0;
-	const char* file_pc = "";
+	const char* file_pc = file.c_str();
 	int file_size_pc = 0;
 	const char* file_wii = "";
 	int file_size_wii = 0;

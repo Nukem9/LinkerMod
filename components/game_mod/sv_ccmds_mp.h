@@ -11,5 +11,4 @@ extern PartyClient_CheckMapExists_t PartyClient_CheckMapExists_o;
 
 bool __cdecl PartyClient_CheckMapExists(const char *map);
 
-playerState_s *SV_GameClientNum(int num);
 void SV_SetPerk_f();

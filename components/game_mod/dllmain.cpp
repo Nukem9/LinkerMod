@@ -149,6 +149,17 @@ BOOL GameMod_Init()
 	PartyClient_CheckMapExists_o = (PartyClient_CheckMapExists_t)Detours::X86::DetourFunction((PBYTE)0x0061B480, (PBYTE)&PartyClient_CheckMapExists);
 
 	//
+	// Automatically disable server map preloading when doing ChangeLevel()
+	//
+	Detours::X86::DetourFunction((PBYTE)0x005A30FD, (PBYTE)mfh_PartyHost_StartMatch);
+	Detours::X86::DetourFunction((PBYTE)0x0050F06B, (PBYTE)mfh_SV_SpawnServer);
+	Detours::X86::DetourFunction((PBYTE)0x007FBBB0, (PBYTE)GScr_ChangeLevel);
+
+	// Add Support for Custom Server / Client Commands
+	Detours::X86::DetourFunction((PBYTE)0x004AFBC7, (PBYTE)&mfh_ClientCommand);				// SERVERSIDE
+	Detours::X86::DetourFunction((PBYTE)0x0078E76A, (PBYTE)&mfh_CG_DeployServerCommand);	// CLIENTSIDE
+
+	//
 	// Unrestrict Dvar_ForEachConsoleAccessName,
 	// Cmd_ForEachConsoleAccessName, and Dvar_ListSingle
 	//

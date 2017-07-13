@@ -7,3 +7,6 @@ void SV_ExecuteClientCommand(client_t *cl, const char *s, int clientOK, int from
 int SV_ClientCommand(client_t *cl, msg_t *msg, int fromOldServer);
 
 void hk_SV_ClientCommand();
+
+void mfh_ClientCommand(void);
+int ClientCommand_HandleUserCommand(int clientNum, char* cmd);

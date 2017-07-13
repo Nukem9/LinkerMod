@@ -30,10 +30,15 @@ struct gentity_s
 	gclient_s *client;
 	char _pad1[0x8];
 	scr_vehicle_s *vehicle;
-	char _pad2[0x200];
+	char _pad2[0x38];
+	int health;
+	int maxHealth;
+	char _pad3[0x1C0];
 };
 STATIC_ASSERT_OFFSET(gentity_s, client, 0x13C);
 STATIC_ASSERT_OFFSET(gentity_s, vehicle, 0x148);
+STATIC_ASSERT_OFFSET(gentity_s, health, 0x184);
+STATIC_ASSERT_OFFSET(gentity_s, maxHealth, 0x188);
 STATIC_ASSERT_SIZE(gentity_s, 0x34C);
 
 struct renderOptions_s
