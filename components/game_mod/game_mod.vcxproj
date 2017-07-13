@@ -120,6 +120,7 @@
     <ClCompile Include="dwlogon_pc.cpp" />
     <ClCompile Include="g_client_script_cmd_mp.cpp" />
     <ClCompile Include="g_items.cpp" />
+    <ClCompile Include="g_main_mp.cpp" />
     <ClCompile Include="live_steam_client.cpp" />
     <ClCompile Include="live_win.cpp" />
     <ClCompile Include="patch_common.cpp" />

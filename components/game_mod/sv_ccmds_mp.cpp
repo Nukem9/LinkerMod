@@ -55,11 +55,6 @@ playerState_s *SV_GameClientNum(int num)
 	return ((playerState_s *(__cdecl *)(int))0x0068FAB0)(num);
 }
 
-clientState_s *G_GetClientState(int clientNum)
-{
-	return ((clientState_s *(__cdecl *)(int))0x005DA470)(clientNum);
-}
-
 client_t *SV_GetPlayerByName()
 {
 	return ((client_t *(__cdecl *)())0x0087C350)();
