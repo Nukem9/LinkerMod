@@ -31,6 +31,6 @@ void SL_RemoveRefToString(scriptInstance_t inst, unsigned int stringValue)
 
 void __cdecl GScr_NewDebugHudElem()
 {
-	if (developer->current.enabled)
+	if (com_developer->current.enabled)
 		GScr_NewHudElem();
 }

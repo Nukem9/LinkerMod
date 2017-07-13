@@ -131,7 +131,6 @@ VANILLA_DVAR(com_developer, 0x0243FCA0);
 VANILLA_DVAR(sv_mapname, 0x02899CEC);
 VANILLA_DVAR(sv_floodProtect, 0x02866FE4);
 
-VANILLA_DVAR(developer, 0x0243FCA0);
 VANILLA_DVAR(developer_script, 0x02481714);
 VANILLA_DVAR(zombietron, 0x0247FDE8);
 VANILLA_DVAR(zombiemode, 0x0243FDD4);

@@ -44,7 +44,7 @@ void Scr_PatchFunctions()
 
 void CScr_OpenFile()
 {
-	if (!developer->current.enabled || !developer_script->current.enabled)
+	if (!com_developer->current.enabled || !developer_script->current.enabled)
 	{
 		Scr_AddInt(-1, SCRIPTINSTANCE_CLIENT);
 	}
@@ -137,7 +137,7 @@ void CScr_OpenFile()
 
 void GScr_OpenFile()
 {
-	if (!developer->current.enabled || !developer_script->current.enabled)
+	if (!com_developer->current.enabled || !developer_script->current.enabled)
 	{
 		Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
 	}
@@ -230,7 +230,7 @@ void GScr_OpenFile()
 
 void CScr_CloseFile()
 {
-	if (!developer->current.enabled || !developer_script->current.enabled)
+	if (!com_developer->current.enabled || !developer_script->current.enabled)
 	{
 		Scr_AddInt(-1, SCRIPTINSTANCE_CLIENT);
 	}
@@ -272,7 +272,7 @@ void CScr_CloseFile()
 
 void GScr_CloseFile()
 {
-	if (!developer->current.enabled || !developer_script->current.enabled)
+	if (!com_developer->current.enabled || !developer_script->current.enabled)
 	{
 		Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
 	}
@@ -314,7 +314,7 @@ void GScr_CloseFile()
 
 void __cdecl CScr_FPrint_internal(bool commaBetweenFields)
 {
-	if (!developer->current.enabled || !developer_script->current.enabled)
+	if (!com_developer->current.enabled || !developer_script->current.enabled)
 	{
 		Scr_AddInt(-1, SCRIPTINSTANCE_CLIENT);
 	}
@@ -361,7 +361,7 @@ void __cdecl CScr_FPrint_internal(bool commaBetweenFields)
 
 void __cdecl Scr_FPrint_internal(bool commaBetweenFields)
 {
-	if (!developer->current.enabled || !developer_script->current.enabled)
+	if (!com_developer->current.enabled || !developer_script->current.enabled)
 	{
 		Scr_AddInt(-1, SCRIPTINSTANCE_SERVER);
 	}
