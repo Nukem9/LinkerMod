@@ -313,6 +313,11 @@ BOOL RadiantMod_Init()
 	PatchCall(0x0042DD2E, (PBYTE)&hk_HandleLaunchArgs);
 
 	//
+	// Misc
+	//
+	Detours::X86::DetourFunction((PBYTE)0x0042E960, (PBYTE)&CMainFrame::hk_PreCreateWindow);
+
+	//
 	// Live game update hooks
 	//
 	*(PBYTE *)&CCamWnd::ctor_o = Detours::X86::DetourFunction((PBYTE)0x00402B90, (PBYTE)&CCamWnd::ctor);

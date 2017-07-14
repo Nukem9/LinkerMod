@@ -44,6 +44,21 @@ void __declspec(naked) CMainFrame::hk_RoutineProcessing(void)
 	}
 }
 
+BOOL __stdcall CMainFrame::hk_PreCreateWindow(CREATESTRUCTA *cs)
+{
+	AfxGetModuleState();
+	struct AFX_MODULE_STATE *ms = AfxGetModuleState();
+	HICON hIcon = LoadIconA(*((HINSTANCE *)ms + 3), (LPCSTR)0x6F);
+	AfxGetModuleState();
+
+	HCURSOR hCursor = LoadCursorA(NULL, (LPCSTR)IDC_ARROW);
+	HBRUSH hBrush = CreateSolidBrush(*(COLORREF*)0x008C8C8C);
+
+	cs->lpszClass = AfxRegisterWndClass(0xBu, hCursor, hBrush, hIcon);
+
+	return CFrameWnd::PreCreateWindow(cs);
+}
+
 void CMainFrame::RoutineProcessing()
 {
 	if (!this->m_bDoLoop)

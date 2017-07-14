@@ -25,7 +25,9 @@ private:
 	bool m_bDoLoop;
 
 	static void hk_RoutineProcessing(void);
+	static BOOL __stdcall hk_PreCreateWindow(CREATESTRUCTA* cs);
 public:
 	void RoutineProcessing(void);
 	void UpdateWindows(int nBits);
+
 };

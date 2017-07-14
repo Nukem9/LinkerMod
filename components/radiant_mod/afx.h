@@ -1,9 +1,18 @@
 #pragma once
 #include "stdafx.h"
+#include "../game_mod/vanilla.h"
 
 typedef HBRUSH(__thiscall * OnCtlColor_t)(void *thisptr, class CDC *pDC, class CWnd *pWnd, UINT nCtlColor);
 typedef void(__thiscall * SetTextColor_t)(void *, COLORREF);
 typedef COLORREF(__thiscall * SetBkColor_t)(void *, COLORREF);
+
+VANILLA_FUNC(AfxGetModuleState, struct AFX_MODULE_STATE *(__stdcall*)(void), 0x005A9F59);
+VANILLA_FUNC(AfxRegisterWndClass, const char *(__stdcall*)(unsigned int, HICON, HBRUSH, HICON), 0x0059E196);
+
+namespace CFrameWnd
+{
+	VANILLA_FUNC(PreCreateWindow, int(__stdcall*)(CREATESTRUCTA *cs), 0x005B3A8C);
+}
 
 class CDC
 {
