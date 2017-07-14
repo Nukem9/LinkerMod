@@ -32,6 +32,8 @@ CWnd::CWnd()
 
 HBRUSH CWnd::OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor)
 {
+	STATIC_ASSERT_OFFSET(CWnd, m_hWnd, 0x20);
+
 	HBRUSH brush = CWnd::OnCtlColor_o(this, pDC, pWnd, nCtlColor);
 
 	switch (nCtlColor)
@@ -43,4 +45,30 @@ HBRUSH CWnd::OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor)
 	}
 
 	return brush;
+}
+
+class CGdiObject
+{
+private:
+	DWORD unk;
+	DWORD m_hObject;
+
+	// Do not allow this class to be instanced
+	CGdiObject() = delete;
+	~CGdiObject() = delete;
+public:
+
+	inline void* GetSafeHandle(void)
+	{
+		if (this)
+			return (void*)&this->m_hObject;
+		else
+			return NULL;
+	}
+};
+
+BOOL CWnd::RedrawWindow(LPCRECT lpRectUpdate, struct CRgn* prgnUpdate, UINT flags)
+{
+	HRGN hrgnUpdate = (HRGN)reinterpret_cast<CGdiObject*>(prgnUpdate)->GetSafeHandle();
+	return ::RedrawWindow(this->m_hWnd, lpRectUpdate, hrgnUpdate, flags);
 }

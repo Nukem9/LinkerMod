@@ -99,4 +99,4 @@
 #include "afx_colors.h"
 #include "afx_resource.h"
 
-#include "CCamWnd.h"
+#include "MainFrm.h"

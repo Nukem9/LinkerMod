@@ -96,7 +96,7 @@
   <ItemGroup>
     <ClCompile Include="afx.cpp" />
     <ClCompile Include="afx_resource.cpp" />
-    <ClCompile Include="CCamWnd.cpp" />
+    <ClCompile Include="CamWnd.cpp" />
     <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
@@ -107,6 +107,7 @@
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="ent_light.cpp" />
     <ClCompile Include="kvs.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="map.cpp" />
     <ClCompile Include="nvidia.cpp" />
     <ClCompile Include="q_parse.cpp" />
@@ -135,7 +136,7 @@
     <ClInclude Include="afx_colors.h" />
     <ClInclude Include="afx_resource.h" />
     <ClInclude Include="brush.h" />
-    <ClInclude Include="CCamWnd.h" />
+    <ClInclude Include="CamWnd.h" />
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
@@ -145,6 +146,7 @@
     <ClInclude Include="entity.h" />
     <ClInclude Include="ent_light.h" />
     <ClInclude Include="kvs.h" />
+    <ClInclude Include="MainFrm.h" />
     <ClInclude Include="map.h" />
     <ClInclude Include="nvidia.h" />
     <ClInclude Include="q_parse.h" />
@@ -165,10 +167,13 @@
     <ClInclude Include="r_xsurface_load_obj.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="T5.h" />
+    <ClInclude Include="TexWnd.h" />
     <ClInclude Include="undo.h" />
     <ClInclude Include="win_main.h" />
     <ClInclude Include="win_splash.h" />
     <ClInclude Include="xmodel_load_obj.h" />
+    <ClInclude Include="XYWnd.h" />
+    <ClInclude Include="ZWnd.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\shared\semver\semver.vcxproj">
