@@ -173,8 +173,9 @@ void __declspec(naked) hk_HandleLaunchArgs(void)
 		push edi // window
 		push eax // cmd_line
 		call HandleLaunchArgs
-		add esp, 4
+		add esp, 8
 		popad
+		retn
 	}
 }
 
