@@ -9,7 +9,7 @@
 #include <intrin.h>
 #include <Psapi.h>
 #include <shellapi.h>
-#include <winsock.h>
+#include <winsock2.h>
 #include <time.h>
 #include <vector>
 #include <unordered_map>

@@ -7,7 +7,7 @@
 #include <intrin.h>
 #include <shellapi.h>
 #include <unordered_map>
-#include <WinSock.h>
+#include <WinSock2.h>
 #pragma comment(lib, "ws2_32.lib")
 
 
