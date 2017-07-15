@@ -54,11 +54,11 @@ BOOL __stdcall CMainFrame::hk_PreCreateWindow(CREATESTRUCTA *cs)
 	AfxGetModuleState();
 
 	HCURSOR hCursor = LoadCursorA(NULL, (LPCSTR)IDC_ARROW);
-	HBRUSH hBrush = CreateSolidBrush(*(COLORREF*)0x008C8C8C);
+	HBRUSH hBackground = CreateSolidBrush(RGB(140, 140, 140));
 
 	const char* classname = "MainFrame";
 #if !AFX_MAINFRAME_CUSTOM_WNDCLASS
-	classname = AfxRegisterWndClass(CS_VREDRAW | CS_DROPSHADOW | CS_DBLCLKS, hCursor, hBrush, hIcon);
+	classname = AfxRegisterWndClass(CS_VREDRAW | CS_DROPSHADOW | CS_DBLCLKS, hCursor, hBackground, hIcon);
 #else
 	WNDCLASSA wc;
 	if (!GetClassInfoA(*((HINSTANCE *)ms + 3), classname, &wc))
@@ -69,7 +69,7 @@ BOOL __stdcall CMainFrame::hk_PreCreateWindow(CREATESTRUCTA *cs)
 		wc.hInstance = 0;
 		wc.hIcon = hIcon;
 		wc.hCursor = hCursor;
-		wc.hbrBackground = hBrush;
+		wc.hbrBackground = hBackground;
 		wc.lpszMenuName = 0;
 		wc.style = CS_VREDRAW | CS_DROPSHADOW | CS_DBLCLKS;
 		wc.lpszClassName = classname;
