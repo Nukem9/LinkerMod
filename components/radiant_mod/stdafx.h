@@ -17,9 +17,9 @@
 #define RADIANT_USE_AFX_OVERRIDES 0
 #define RADIANT_USE_SPLASH 1
 
-#define RADIANT_DISABLE_SPAM_MSG_SCAN 1
-#define RADIANT_DISABLE_SPAM_MSG_IMAGE 1
-#define RADIANT_DISABLE_SPAM_MSG_MATERIAL 1
+#define RADIANT_DISABLE_SPAM_MSG_SCAN 0
+#define RADIANT_DISABLE_SPAM_MSG_IMAGE 0
+#define RADIANT_DISABLE_SPAM_MSG_MATERIAL 0
 
 #define RADIANT_MOD_VERBOSE 0
 #if RADIANT_MOD_VERBOSE
@@ -64,6 +64,7 @@
 #include "win_splash.h"
 
 #include "T5.h"
+#include "common.h"
 #include "com_files.h"
 #include "com_memory.h"
 #include "com_math.h"

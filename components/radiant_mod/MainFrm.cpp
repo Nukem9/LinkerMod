@@ -4,6 +4,8 @@
 
 #include "../game_mod/vanilla.h"
 
+#define AFX_MAINFRAME_CUSTOM_WNDCLASS 1
+
 VANILLA_VALUE(g_nUpdateBits,	int, 0x027C32F4);
 VANILLA_VALUE(g_bScreenUpdates,	bool, 0x0074952F);
 
@@ -54,7 +56,32 @@ BOOL __stdcall CMainFrame::hk_PreCreateWindow(CREATESTRUCTA *cs)
 	HCURSOR hCursor = LoadCursorA(NULL, (LPCSTR)IDC_ARROW);
 	HBRUSH hBrush = CreateSolidBrush(*(COLORREF*)0x008C8C8C);
 
-	cs->lpszClass = AfxRegisterWndClass(0xBu, hCursor, hBrush, hIcon);
+	const char* classname = "MainFrame";
+#if !AFX_MAINFRAME_CUSTOM_WNDCLASS
+	classname = AfxRegisterWndClass(CS_VREDRAW | CS_DROPSHADOW | CS_DBLCLKS, hCursor, hBrush, hIcon);
+#else
+	WNDCLASSA wc;
+	if (!GetClassInfoA(*((HINSTANCE *)ms + 3), classname, &wc))
+	{
+		wc.lpfnWndProc = 0;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = 0;
+		wc.hIcon = hIcon;
+		wc.hCursor = hCursor;
+		wc.hbrBackground = hBrush;
+		wc.lpszMenuName = 0;
+		wc.style = CS_VREDRAW | CS_DROPSHADOW | CS_DBLCLKS;
+		wc.lpszClassName = classname;
+		wc.hCursor = hCursor;
+		wc.lpfnWndProc = DefWindowProcA;
+
+		if (!AfxRegisterClass(&wc))
+			Error("CMainFrame RegisterClass: failed");
+	}
+
+	cs->lpszClass = classname;
+#endif
 
 	return CFrameWnd::PreCreateWindow(cs);
 }

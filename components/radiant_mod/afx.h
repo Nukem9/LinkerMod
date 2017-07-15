@@ -8,6 +8,7 @@ typedef COLORREF(__thiscall * SetBkColor_t)(void *, COLORREF);
 
 VANILLA_FUNC(AfxGetModuleState, struct AFX_MODULE_STATE *(__stdcall*)(void), 0x005A9F59);
 VANILLA_FUNC(AfxRegisterWndClass, const char *(__stdcall*)(unsigned int, HICON, HBRUSH, HICON), 0x0059E196);
+VANILLA_FUNC(AfxRegisterClass, int(__stdcall*)(WNDCLASSA *lpWndClass), 0x0059E108);
 
 namespace CFrameWnd
 {
