@@ -138,7 +138,14 @@ void CMainFrame::UpdateWindows(int nBits)
 	if (nBits & W_CAMERA || ((nBits & W_CAMERA_IFON) && this->m_bCamPreview))
 	{
 		if(this->m_pCamWnd)
+		{
+			// Redraw the camera view
 			m_pCamWnd->RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
+
+			// Attempt to update the remote camera too
+			if (CCamWnd::ActiveWindow)
+				RemoteNet_UpdateCamera(CCamWnd::ActiveWindow->cameraOrigin, CCamWnd::ActiveWindow->cameraAngles);
+		}
 	}
 
 	if (nBits & (W_Z | W_Z_OVERLAY))
