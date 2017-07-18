@@ -580,6 +580,14 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x0087D940, (PBYTE)&hk_SV_ClientCommand);
 
 	//
+	// Prevent "'sl' client command received with %i parameters instead of 3" error
+	//  from causing an error dialog to display
+	// (Should *never* happen - but apparently it occasionally does...)
+	//
+	PatchMemory(0x0053B6CE, (PBYTE)"\x00", 1); // Com_PrintError: Channel 0
+	PatchCall(0x0053B6CF, (PBYTE)Com_PrintError);
+
+	//
 	// Increase default sv_network_fps to 200
 	//
 	//PatchMemory(0x00698BFA, (PBYTE)"\xC8", 1);
