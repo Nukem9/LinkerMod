@@ -101,13 +101,9 @@ bool Com_IsSpecopLevel(const char *name)
 
 void Com_GetLevelSharedFastFiles(const char *mapName)
 {
-	static bool allDependenciesInit = false;
+	// Reload the list for every map, every time (mod.ff may override level_dependencies.csv)
 	static std::vector<LevelDependency> allDependencies;
-
-	if (!allDependenciesInit)
 	{
-		allDependenciesInit = true;
-
 		char loadBuffer[16384];
 		const char* buffer = Com_LoadInfoString("level_dependencies.csv", "level_dependency_info", "", loadBuffer);
 
@@ -129,8 +125,6 @@ void Com_GetLevelSharedFastFiles(const char *mapName)
 				strcpy_s(m.base, token);
 				token = Com_Parse(&buffer);
 				strcpy_s(m.required, token);
-
-				Com_Printf(1, "zone: %s dep: %s\n", m.base, m.required);
 
 				allDependencies.push_back(m);
 			}
@@ -200,6 +194,7 @@ void Com_LoadCommonFastFile()
 	if (useFastFile->current.enabled)
 		DB_ReleaseXAssets();
 
+	// Zombietron has everything isolated to a single FF
 	if (zombietron->current.enabled)
 	{
 		zoneInfo[zoneCount].name = nullptr;
@@ -296,21 +291,20 @@ void Com_LoadLevelFastFiles(const char *mapName)
 		Com_LoadCommonFastFile();
 	}
 	
-	//
 	// Enable the use of level_dependencies.csv
-	//
-#if _USE_LEVEL_DEPENDENCIES
 	for (auto& dependency : g_LevelDependencies)
 	{
 		if (DB_IsZoneLoaded(dependency.required))
 			continue;
 
-		// The allocFlags were originally 0x800 - but would cause a free error (these new flags appear to load / unload correctly)
+		Com_Printf(1, "Adding level dependency: %s\n", dependency.required);
+
+		// The allocFlags were originally 0x800 - but would cause a free error
+		// (these new flags appear to load / unload correctly)
 		zoneInfo[zoneCount].name = dependency.required;
 		zoneInfo[zoneCount].allocFlags = 0x4000000;
 		zoneInfo[zoneCount++].freeFlags = 0;
 	}
-#endif
 
 	char specOpsZoneName[64];
 	if (Com_IsSpecopLevel(mapName))
@@ -339,9 +333,7 @@ void Com_LoadLevelFastFiles(const char *mapName)
 	zoneInfo[zoneCount].name = mapName;
 	zoneInfo[zoneCount++].freeFlags = 0;
 
-	//
 	// Enable <mapname>_patch_override.ff for legacy mod support
-	//
 	char patchOverrideFastFile[64];
 	sprintf_s(patchOverrideFastFile, "%s_patch_override", mapName);
 	zoneInfo[zoneCount].name = patchOverrideFastFile;
