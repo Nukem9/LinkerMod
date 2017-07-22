@@ -521,6 +521,7 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x006B7780, (PBYTE)&hk_Direct3DCreate9, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x006B7597, (PBYTE)&hk_CreateDevice, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x0071F387, (PBYTE)&hk_GetSwapChain, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x00737A91, (PBYTE)&hk_CreateVertexBuffer, Detours::X86Option::USE_CALL);
 	PatchMemory(0x006EB4F1, (PBYTE)"\xEB", 1);
 
 	Detours::X86::DetourFunction((PBYTE)0x0070A050, (PBYTE)&hk_Image_Create2DTexture_PC);

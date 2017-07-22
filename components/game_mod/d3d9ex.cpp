@@ -101,3 +101,15 @@ HRESULT D3DAPI hk_CreateAdditionalSwapChain(IDirect3DDevice9 *This, D3DPRESENT_P
 	// Get a handle to the IDirect3DSwapChain9Ex interface via COM GUID
 	return (*ppSwapChain)->QueryInterface(__uuidof(IDirect3DSwapChain9Ex), (void **)ppSwapChain);
 }
+
+HRESULT D3DAPI hk_CreateVertexBuffer(IDirect3DDevice9 *This, UINT Length, DWORD Usage, DWORD FVF, D3DPOOL Pool, IDirect3DVertexBuffer9** ppVertexBuffer, HANDLE* pSharedHandle)
+{
+	// D3D9Ex does not allow D3DPOOL_MANAGED
+	if (Pool == D3DPOOL_MANAGED && IsD3D9ExAvailable())
+	{
+		Usage = D3DUSAGE_DYNAMIC;
+		Pool = D3DPOOL_DEFAULT;
+	}
+
+	return This->CreateVertexBuffer(Length, Usage, FVF, Pool, ppVertexBuffer, pSharedHandle);
+}
