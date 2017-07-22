@@ -1,5 +1,7 @@
 #pragma once
 
+#define WP_NONE 0
+
 enum weapType_t
 {
 	WEAPTYPE_BULLET = 0x0,
