@@ -125,6 +125,7 @@
     <ClCompile Include="g_main_mp.cpp" />
     <ClCompile Include="live_steam_client.cpp" />
     <ClCompile Include="live_win.cpp" />
+    <ClCompile Include="netfield.cpp" />
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_demo.cpp" />
     <ClCompile Include="patch_misc.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="live_steam_client.h" />
     <ClInclude Include="live_win.h" />
     <ClInclude Include="msg_mp.h" />
+    <ClInclude Include="netfield.h" />
     <ClInclude Include="patch_common.h" />
     <ClInclude Include="patch_usefastfile.h" />
     <ClInclude Include="patch_reflections.h" />

@@ -87,6 +87,7 @@
 #include "pathnode_load_obj.h"
 #include "radiant_remote.h"
 #include "g_client_script_cmd_mp.h"
+#include "netfield.h"
 
 #include "win_localize.h"
 #include "win_exception.h"
