@@ -2,6 +2,14 @@
 
 #define SCR_FUNC_TABLE_SIZE 1024
 
+enum
+{
+	SCR_DEV_NO = 0x0,
+	SCR_DEV_YES = 0x1,
+	SCR_DEV_IGNORE = 0x2,
+	SCR_DEV_EVALUATE = 0x3,
+};
+
 struct scrCompileGlob_t
 {
 };

@@ -16,11 +16,6 @@ const char *XModelGetName(XModel *model)
 	return model->name;
 }
 
-int G_ModelIndex(const char *name)
-{
-	return ((int(__cdecl *)(const char *))0x004294B0)(name);
-}
-
 bool XModelBad(XModel *model)
 {
 	ASSERT(model);
@@ -29,11 +24,6 @@ bool XModelBad(XModel *model)
 		return DB_IsXAssetDefault(ASSET_TYPE_XMODEL, model->name);
 
 	return model->bad;
-}
-
-void G_OverrideModel(int modelIndex, const char *defaultModelName)
-{
-	((void(__cdecl *)(int, const char *))0x0068C110)(modelIndex, defaultModelName);
 }
 
 int G_GetHintStringIndex(int *piIndex, const char *pszString)
@@ -47,7 +37,7 @@ void ClearRegisteredItems()
 	memset(itemRegistered, 0, MAX_WEAPONS * sizeof(int));
 
 	// defaultweapon is always registered
-	itemRegistered[0] = 1;
+	itemRegistered[WP_NONE] = 1;
 }
 
 // /game/g_items.cpp:1525
@@ -91,7 +81,7 @@ void G_RegisterWeapon(unsigned int weapIndex)
 // /game/g_items.cpp:1584
 int IsItemRegistered(int iItemIndex)
 {
-	ASSERT((iItemIndex >= 0) && (iItemIndex < MAX_WEAPONS));
+	ASSERT((iItemIndex >= WP_NONE) && (iItemIndex < MAX_WEAPONS));
 
 	return itemRegistered[iItemIndex];
 }

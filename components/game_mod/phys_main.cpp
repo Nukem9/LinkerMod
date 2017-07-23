@@ -1,14 +1,15 @@
 #include "stdafx.h"
-#include <float.h>
 
-void Phys_ObjAddForce(int id, const float *worldPos, const float *impulse, const bool relative)
-{
-	((void(__cdecl *)(int, const float *, const float *, const bool))0x00448900)(id, worldPos, impulse, relative);
-}
-
+// /physics/phys_main.cpp:1054
 void Phys_ObjGetCenterOfMass(int id, float *outPosition)
 {
 	((void(__cdecl *)(int, float *))0x004D9480)(id, outPosition);
+}
+
+// /physics/phys_main.cpp:1286
+void Phys_ObjAddForce(int id, const float *worldPos, const float *impulse, const bool relative)
+{
+	((void(__cdecl *)(int, const float *, const float *, const bool))0x00448900)(id, worldPos, impulse, relative);
 }
 
 int Phys_AssertValidPreset(PhysPreset* physPreset)

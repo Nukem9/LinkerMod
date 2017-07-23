@@ -5,11 +5,7 @@ bool R_CullPoint(int localClient, const float *p0, float cutoff)
 	return ((bool(__cdecl *)(int, const float *, float))0x006B63D0)(localClient, p0, cutoff);
 }
 
-bool Ragdoll_BodyNewState(RagdollBody *body, RagdollBodyState state)
-{
-	return ((bool (__cdecl *)(RagdollBody *, RagdollBodyState))0x0064A2D0)(body, state);
-}
-
+// /ragdoll/ragdoll_update.cpp:913
 void Ragdoll_GetTorsoPosition(RagdollBody *body, float *center)
 {
 	ASSERT(body && Ragdoll_BodyInUse(body));
@@ -20,6 +16,7 @@ void Ragdoll_GetTorsoPosition(RagdollBody *body, float *center)
 	center[2] = orientations[0].origin[2];
 }
 
+// /ragdoll/ragdoll_update.cpp:940
 void Ragdoll_ExplosionEvent(int localClientNum, bool isCylinder, const float *origin, float innerRadius, float outerRadius, const float *impulse, float inScale)
 {
 	ASSERT(origin);
@@ -168,4 +165,10 @@ void Ragdoll_ExplosionEvent(int localClientNum, bool isCylinder, const float *or
 			}
 		}
 	}
+}
+
+// /ragdoll/ragdoll_update.cpp:2128
+bool Ragdoll_BodyNewState(RagdollBody *body, RagdollBodyState state)
+{
+	return ((bool(__cdecl *)(RagdollBody *, RagdollBodyState))0x0064A2D0)(body, state);
 }

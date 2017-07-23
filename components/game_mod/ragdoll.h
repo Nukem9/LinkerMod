@@ -116,8 +116,26 @@ private:
 
 extern phys_free_list<RagdollBody> *g_ragdoll_body_pool;
 
-bool Ragdoll_BodyPoseValid(RagdollBody *body);
+// /ragdoll/ragdoll.h:298
+static bool Ragdoll_BodyPoseValid(RagdollBody *body)
+{
+	ASSERT(body);
+	return body->state >= BS_TUNNEL_TEST;
+}
+
+// /ragdoll/ragdoll.h:312
+static bool Ragdoll_BodyInUse(RagdollBody *body)
+{
+	ASSERT(body);
+	return body->references > 0;
+}
+
+// /ragdoll/ragdoll.h:326
+static bool Ragdoll_BodyIdle(RagdollBody *body)
+{
+	ASSERT(body);
+	return body->state == BS_IDLE;
+}
+
 void Ragdoll_BodyRootOrigin(RagdollBody *body, float *origin);
-bool Ragdoll_BodyInUse(RagdollBody *body);
-bool Ragdoll_BodyIdle(RagdollBody *body);
 BoneOrientation *Ragdoll_BodyBoneOrientations(RagdollBody *body);

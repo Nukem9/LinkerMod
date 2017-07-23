@@ -1,5 +1,11 @@
 #include "stdafx.h"
 
+// /game_mp/g_main_mp.cpp:430
+bool G_OnlyConnectingPaths()
+{
+	return g_connectpaths->current.integer >= 2;
+}
+
 // /game_mp/g_main_mp.cpp:1497
 clientState_s *G_GetClientState(int clientNum)
 {

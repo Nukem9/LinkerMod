@@ -289,5 +289,6 @@ static gentity_s *g_entities = (gentity_s *)0x01A796F8;
 static gclient_s *g_clients = (gclient_s *)0x01C08B40;
 static level_locals_t& level = *(level_locals_t *)0x01C03140;
 
+bool G_OnlyConnectingPaths();
 clientState_s *G_GetClientState(int clientNum);
 playerState_s *G_GetPlayerState(int clientNum);

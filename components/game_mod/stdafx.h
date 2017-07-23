@@ -84,9 +84,10 @@
 #include "bg_weapons.h"
 #include "cl_keys.h"
 #include "sv_main_mp.h"
+#include "g_utils_mp.h"
+#include "radiant_remote.h"
 #include "pathnode.h"
 #include "pathnode_load_obj.h"
-#include "radiant_remote.h"
 #include "g_client_script_cmd_mp.h"
 #include "netfield.h"
 
