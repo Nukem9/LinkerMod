@@ -14,10 +14,10 @@ void Ragdoll_GetTorsoPosition(RagdollBody *body, float *center)
 {
 	ASSERT(body && Ragdoll_BodyInUse(body));
 
-	BoneOrientation *orientation = Ragdoll_BodyBoneOrientations(body);
-	center[0] = orientation->origin[0];
-	center[1] = orientation->origin[1];
-	center[2] = orientation->origin[2];
+	BoneOrientation *orientations = Ragdoll_BodyBoneOrientations(body);
+	center[0] = orientations[0].origin[0];
+	center[1] = orientations[0].origin[1];
+	center[2] = orientations[0].origin[2];
 }
 
 void Ragdoll_ExplosionEvent(int localClientNum, bool isCylinder, const float *origin, float innerRadius, float outerRadius, const float *impulse, float inScale)
@@ -32,6 +32,7 @@ void Ragdoll_ExplosionEvent(int localClientNum, bool isCylinder, const float *or
 	if (outerRadius == 0.0f)
 		return;
 
+	float cutoffDistSqr = ragdoll_reactivation_cutoff->current.value * ragdoll_reactivation_cutoff->current.value;
 	float outerRadiusSqr = outerRadius * outerRadius;
 	float innerRadiusSqr = innerRadius * innerRadius;
 	float invRange = 0.0f;
@@ -42,10 +43,9 @@ void Ragdoll_ExplosionEvent(int localClientNum, bool isCylinder, const float *or
 	RagdollSortStruct hitEntsSorter[64];
 	int hitCount = 0;
 
-	for (auto i = g_ragdoll_body_pool->m_dummy_head.m_next_T_internal;
-		i != &g_ragdoll_body_pool->m_dummy_head; i = i->m_next_T_internal)
+	for (auto i = g_ragdoll_body_pool->begin(); i != g_ragdoll_body_pool->end(); i++)
 	{
-		RagdollBody * body = &((phys_free_list<RagdollBody>::T_internal *)i)->m_data;
+		RagdollBody *body = (*i);
 
 		ASSERT(Ragdoll_BodyInUse(body));
 
@@ -56,14 +56,13 @@ void Ragdoll_ExplosionEvent(int localClientNum, bool isCylinder, const float *or
 		hitEntsSorter[hitCount++].body = body;
 	}
 
-	// std::sort function
-	((void (__cdecl *)(RagdollSortStruct *, RagdollSortStruct *, int, LPVOID))0x004A2870)(
-		hitEntsSorter,
-		&hitEntsSorter[hitCount],
-		8 * hitCount >> 3,
-		(LPVOID)0x00831C70);
+	// Sort the ragdolled bodies by nearest distance
+	std::sort(hitEntsSorter, hitEntsSorter + hitCount, [](RagdollSortStruct& ent1, RagdollSortStruct& ent2)
+	{
+		return ent2.distSq > ent1.distSq;
+	});
 
-	for (int i = 0; i < 4 && i < hitCount; ++i)
+	for (int i = 0; i < hitCount; i++)
 	{
 		RagdollBody *body = hitEntsSorter[i].body;
 
@@ -78,8 +77,7 @@ void Ragdoll_ExplosionEvent(int localClientNum, bool isCylinder, const float *or
 		auto cgameGlob	= CG_GetLocalClientGlobals(localClientNum);
 		float dist		= Vec3DistanceSq((const float *)(cgameGlob + 0x8A388), torsoPos);
 
-		if (dist <= (ragdoll_reactivation_cutoff->current.value * ragdoll_reactivation_cutoff->current.value)
-			&& !R_CullPoint(localClientNum, torsoPos, -100.0f))
+		if (dist <= cutoffDistSqr && !R_CullPoint(localClientNum, torsoPos, -100.0f))
 		{
 			float delta[3];
 			if (isCylinder)
@@ -95,8 +93,7 @@ void Ragdoll_ExplosionEvent(int localClientNum, bool isCylinder, const float *or
 				delta[2] = torsoPos[2] - origin[2];
 			}
 
-			if (((delta[0] * delta[0]) + (delta[1] * delta[1]) + (delta[2] * delta[2])) < outerRadiusSqr
-				&& (!Ragdoll_BodyIdle(body) || Ragdoll_BodyNewState(body, BS_RUNNING)))
+			if ((Vec3Dot(delta, delta) < outerRadiusSqr) && (!Ragdoll_BodyIdle(body) || Ragdoll_BodyNewState(body, BS_RUNNING)))
 			{
 				body->stateMsec = 0;
 				float boneScale = 1.0f / body->numBones;
@@ -120,14 +117,14 @@ void Ragdoll_ExplosionEvent(int localClientNum, bool isCylinder, const float *or
 					delta[1] = centerOfMass[1] - origin[1];
 					delta[2] = centerOfMass[2] - origin[2];
 
-					float distSqr = (delta[0] * delta[0]) + (delta[1] * delta[1]) + (delta[2] * delta[2]);
+					float radiusSqr = Vec3Dot(delta, delta);
 
-					if (distSqr < outerRadiusSqr)
+					if (radiusSqr < outerRadiusSqr)
 					{
-						if (distSqr > innerRadiusSqr)
+						if (radiusSqr > innerRadiusSqr)
 						{
 							ASSERT(outerRadiusSqr > innerRadiusSqr);
-							scale *= ((outerRadiusSqr - distSqr) * invRange);
+							scale *= ((outerRadiusSqr - radiusSqr) * invRange);
 						}
 
 						//

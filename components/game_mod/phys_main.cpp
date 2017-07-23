@@ -8,7 +8,7 @@ void Phys_ObjAddForce(int id, const float *worldPos, const float *impulse, const
 
 void Phys_ObjGetCenterOfMass(int id, float *outPosition)
 {
-	((void(__cdecl *)(int, float *))0x0054E920)(id, outPosition);
+	((void(__cdecl *)(int, float *))0x004D9480)(id, outPosition);
 }
 
 int Phys_AssertValidPreset(PhysPreset* physPreset)
