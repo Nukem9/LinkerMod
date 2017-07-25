@@ -1,0 +1,10 @@
+{
+"basepath" ".."
+"mapspath" "..\\map_source"
+"entitypath" ".\\codbo.def"
+"autosave" "autosave.map"
+"game" ""
+"basegame" ""
+"layeredmaterials" "cod3_layered_material_library.txt"
+"defaulttexturescale" "25"
+}
