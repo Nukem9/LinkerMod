@@ -43,7 +43,7 @@ unsigned int Path_ConvertNodeToIndex(pathnode_t *node)
 	unsigned int nodeIndex = node - gameWorldCurrent->path.nodes;
 
 	ASSERT(node);
-	// ASSERT(nodeIndex < g_path_actualNodeCount);
+	ASSERT(nodeIndex < g_path.actualNodeCount);
 
 	return nodeIndex;
 }
@@ -63,7 +63,7 @@ void Path_Init(int restart)
 			Path_CreateNodes();
 	}
 
-	memset(g_path, 0, sizeof(pathlocal_t));
+	memset(&g_path, 0, sizeof(pathlocal_t));
 	ASSERT(gameWorldCurrent->path.nodes);
 
 	debugPath = nullptr;
@@ -142,7 +142,7 @@ void Path_ValidateNode(pathnode_t *node)
 {
 	int j = j = node->constant.totalLinkCount - 1;
 
-	for (; j >= node->dynamic.wLinkCount; --j)
+	for (; j >= node->dynamic.wLinkCount; j--)
 	{
 		pathlink_s *link = &node->constant.Links[j];
 		ASSERT(link->disconnectCount > 0);
@@ -150,7 +150,7 @@ void Path_ValidateNode(pathnode_t *node)
 
 	ASSERT(j == node->dynamic.wLinkCount - 1);
 
-	for (; j >= 0; --j)
+	for (; j >= 0; j--)
 	{
 		pathlink_s *link = &node->constant.Links[j];
 		ASSERT_MSG_VA(!link->disconnectCount, "%d, %d, %d", Path_ConvertNodeToIndex(node), j, link->nodeNum);
@@ -160,8 +160,8 @@ void Path_ValidateNode(pathnode_t *node)
 // /game/pathnode.cpp:5054
 void Path_ValidateAllNodes()
 {
-	// for (int i = 0; i < g_path_actualNodeCount; ++i)
-	//	Path_ValidateNode(&gameWorldCurrent->path.nodes[i]);
+	for (unsigned int i = 0; i < g_path.actualNodeCount; i++)
+		Path_ValidateNode(&gameWorldCurrent->path.nodes[i]);
 }
 
 // /game/pathnode.cpp:5996
@@ -175,7 +175,7 @@ pathnode_t *G_FindPathNode(SpawnVar *spawnVar, nodeType type, const int gameId)
 	pathnode_t *bestNode = nullptr;
 	int bestScore = 1;
 
-	for (unsigned int i = 0; i < gameWorldCurrent->path.nodeCount; ++i)
+	for (unsigned int i = 0; i < gameWorldCurrent->path.nodeCount; i++)
 	{
 		int score = 0;
 		pathnode_t *node = &gameWorldCurrent->path.nodes[i];

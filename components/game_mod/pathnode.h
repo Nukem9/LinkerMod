@@ -9,6 +9,7 @@ struct SentientHandle
 #define MAX_PATH_DYNAMIC_NODES	128
 #define MAX_SPAWN_EXIT_NODES	100
 #define MAX_NODES_IN_BRUSH		512
+#define MAX_LINKS_PER_NODE		16
 
 #define PATH_MAX_NODES			8192
 #define PATH_MAX_TOTAL_LINKS	524288
@@ -41,7 +42,6 @@ enum nodeType
 	NODE_DONTLINK = 0x15,
 };
 
-struct pathlink_s;
 struct pathnode_t;
 
 struct pathlink_s
@@ -142,7 +142,9 @@ STATIC_ASSERT_SIZE(pathstatic_t, 0xC);
 
 struct pathlocal_t
 {
-	char _pad[0x4080];
+	char _pad1[0x4004];
+	unsigned int actualNodeCount;
+	char _pad2[0x78];
 };
 STATIC_ASSERT_SIZE(pathlocal_t, 0x4080);
 
@@ -161,7 +163,7 @@ struct PathData
 };
 STATIC_ASSERT_SIZE(PathData, 0x28);
 
-static pathlocal_t *g_path = (pathlocal_t *)0x01D00400;
+static pathlocal_t& g_path = *(pathlocal_t *)0x01D00400;
 static const char*& g_pathsError = *(const char **)0x01D0496C;
 static badplace_t *g_badplaces = (badplace_t *)0x01A4C088;
 static path_t*& debugPath = *(path_t **)0x01D04484;

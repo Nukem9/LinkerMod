@@ -7,8 +7,6 @@ struct nodespawn_t
 };
 
 static nodespawn_t *nodespawns = (nodespawn_t *)0x00A55B78;
-extern int g_tempPathNodeLinksCount;
-extern char g_tempPathNodeLinks[];
 
 void Path_CreateNodes();
 void Path_InitStatic(int restart);
