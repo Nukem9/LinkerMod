@@ -231,3 +231,5 @@ void* DB_ReallocXAssetPool(XAssetType type, unsigned int size);
 void __cdecl DB_ListAssetPool_f(void);
 bool DB_IsXAssetDefault(XAssetType type, const char *name);
 void DB_ExternalInitAssets();
+unsigned int DB_GetImageIndex(GfxImage *image);
+GfxImage *DB_GetImageAtIndex(unsigned int index);

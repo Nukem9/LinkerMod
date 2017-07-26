@@ -42,6 +42,7 @@ struct GfxImage
 	const char *name;
 	unsigned int hash;
 };
+STATIC_ASSERT_SIZE(GfxImage, 0x34);
 
 enum
 {

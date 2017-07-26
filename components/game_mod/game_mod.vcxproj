@@ -151,6 +151,7 @@
     <ClCompile Include="r_reflection_probe.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="r_stream.cpp" />
+    <ClCompile Include="r_streamalloc.cpp" />
     <ClCompile Include="scr_cmds.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="sv_client_mp.cpp" />
@@ -223,6 +224,8 @@
     <ClInclude Include="r_rendercmds.h" />
     <ClInclude Include="r_scene.h" />
     <ClInclude Include="r_screenshot.h" />
+    <ClInclude Include="r_stream.h" />
+    <ClInclude Include="r_streamalloc.h" />
     <ClInclude Include="scr_cmds.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv_ccmds_mp.h" />

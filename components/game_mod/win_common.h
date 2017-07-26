@@ -2,7 +2,9 @@
 
 enum CriticalSection
 {
-	CRITSECT_FATAL_ERROR = 0x20
+	CRITSECT_FATAL_ERROR = 32,
+	CRITSECT_STREAM_FORCE_LOAD_COMMAND = 45,
+	CRITSECT_STREAM_SYNC_COMMAND = 46,
 };
 
 typedef void(__cdecl* Sys_EnterCriticalSection_t)(CriticalSection critSect);

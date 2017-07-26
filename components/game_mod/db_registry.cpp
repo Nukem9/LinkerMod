@@ -246,3 +246,19 @@ void DB_ExternalInitAssets()
 {
 	BG_FillInAllWeaponItems();
 }
+
+unsigned int DB_GetImageIndex(GfxImage *image)
+{
+	//ASSERT(&entry->entry == image);
+	//ASSERT(false, "index doesn't index ARRAY_COUNT(g_GfxImagePool.entries)");
+
+	return ((char *)image - ((char *)DB_XAssetPool[ASSET_TYPE_IMAGE] + 4)) / sizeof(GfxImage);
+}
+
+GfxImage *DB_GetImageAtIndex(unsigned int index)
+{
+	// ASSERT(index < 0x1080, "index doesn't index ARRAY_COUNT(g_GfxImagePool.entries)");
+
+	return (GfxImage *)(((char *)DB_XAssetPool[ASSET_TYPE_IMAGE] + 4) + (index * sizeof(GfxImage)));
+	//return &g_GfxImagePool.entries[index].entry;
+}

@@ -90,6 +90,8 @@
 #include "pathnode_load_obj.h"
 #include "g_client_script_cmd_mp.h"
 #include "netfield.h"
+#include "r_streamalloc.h"
+#include "r_stream.h"
 
 #include "win_localize.h"
 #include "win_exception.h"
