@@ -69,3 +69,4 @@ bool __cdecl Image_IsCodeImage(int track);
 _D3DFORMAT __cdecl R_ImagePixelFormat(GfxImage *image);
 
 void __cdecl R_ImageList_f();
+void Image_Release(GfxImage *image);

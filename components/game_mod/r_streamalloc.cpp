@@ -94,20 +94,38 @@ bool R_StreamAlloc_CanAllocate(int size, float importance, GfxImage **unloadImag
 	return R_StreamAlloc_FreeImageByImportance(size, importance, unloadImage);
 }
 
+// /gfx_d3d/r_streamalloc.cpp:1904
+char *R_StreamAlloc_FreeImage(GfxImage *image, int imagePart, bool dirty, int *freedSize)
+{
+	int imageIndex = DB_GetImageIndex(image);
+	streamFrontendGlob.imageUseBits[imageIndex >> 5] &= ~(1 << (imageIndex & 0x1F));
+
+	*freedSize = 0;
+	return nullptr;
+}
+
+// /gfx_d3d/r_streamalloc.cpp:???
+void R_StreamAlloc_Deallocate(char *imageMemory)
+{
+	// Code removed completely
+}
+
 // /gfx_d3d/r_streamalloc.cpp:1917
 void R_StreamAlloc_Flush()
 {
-	for (int index = 0; index < 132; index++)
+	for (int index = 0; index < ARRAYSIZE(streamFrontendGlob.imageUseBits); index++)
 	{
 		int useBits = streamFrontendGlob.imageUseBits[index];
 
-		if (useBits)
+		// If at least 1 bit is set...
+		if (!useBits)
+			continue;
+
+		// Reset every index in it
+		for (int bitIndex = 0; bitIndex < 32; bitIndex++)
 		{
-			for (int bitIndex = 0; bitIndex < 32; bitIndex++)
-			{
-				if (useBits & (1 << (bitIndex & 0x1F)))
-					streamFrontendGlob.imageUseBits[(bitIndex + 32 * index) >> 5] &= ~(1 << ((bitIndex + 32 * index) & 0x1F));
-			}
+			if (useBits & (1 << (bitIndex & 0x1F)))
+				streamFrontendGlob.imageUseBits[(bitIndex + 32 * index) >> 5] &= ~(1 << ((bitIndex + 32 * index) & 0x1F));
 		}
 	}
 }

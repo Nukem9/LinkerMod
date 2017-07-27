@@ -1,6 +1,16 @@
 #pragma once
 
-#if 0
+#define TOTAL_IMAGE_PARTS 0x1080
+#define MAX_IMAGE_STREAMED_PARTS 1
+
+enum
+{
+	GFX_NOT_STREAMING = 0x0,
+	GFX_STREAMING = 0x1,
+	GFX_MANUAL_STREAMING = 0x2,
+	GFX_TEMP_STREAMING = 0x3,
+};
+
 enum stream_status
 {
 	STREAM_STATUS_INVALID = 0x0,
@@ -113,6 +123,7 @@ void R_StreamUpdate_ReadTextures();
 bool R_StreamRequestImageRead(pendingRequest *request);
 bool R_StreamUpdate_ProcessFileCallbacks();
 void R_StreamUpdate_SetupInitialImageList();
+void R_Stream_ForceLoadLowDetail();
 void R_StreamUpdate_AddInitialImages(float importance);
 void R_StreamUpdate_AddForcedImages(float forceImportance, float touchImportance);
 void R_Stream_ForceLoadImage(GfxImage *image, int part);
@@ -145,7 +156,7 @@ void MultiplePointDistSqFromBounds(distance_data *distances, const float *v, con
 void R_StreamUpdateForXModel(XModel *remoteModel, float distSq);
 void R_StreamUpdateForXModelTouched(XModel *model);
 void R_StreamUpdateTouchedModels();
-void R_StreamUpdateForBModel(const float *viewPos, unsigned int frame, unsigned int surfId, GfxBrushModel *bmodel, const float *origin, float maxDistSq, Material *altMaterial, bool isVisible, float *distanceScale);
+//void R_StreamUpdateForBModel(const float *viewPos, unsigned int frame, unsigned int surfId, GfxBrushModel *bmodel, const float *origin, float maxDistSq, Material *altMaterial, bool isVisible, float *distanceScale);
 void R_StreamUpdate_AddXModelDistance(XModel *model, const float *viewPos, const float *origin, const float scale, bool visible, float *distanceScale);
 void R_StreamUpdate_AddDynamicXModelDistance(XModel *model, const float *viewPos, const float *origin, const float scale, bool visible, float *distanceScale);
 void R_StreamUpdateDynamicModels(const float *viewPos, float maxDistSq, unsigned int frame, float *distanceScale);
@@ -168,4 +179,3 @@ void R_Stream_UpdateStaticModelsCmd(void *data);
 void R_Stream_UpdateStaticSurfacesCmd(void *data);
 void R_Stream_SortCmd(void *data);
 void R_Stream_CombineCmd(void *data);
-#endif

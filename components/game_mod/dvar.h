@@ -144,6 +144,17 @@ VANILLA_DVAR(r_reflectionProbeGenerate, 0x03B35038);
 VANILLA_DVAR(r_reflectionProbeGenerateExit, 0x03B3503C);
 VANILLA_DVAR(r_reflectionProbeRegenerateAll, 0x03B20030);
 
+//VANILLA_DVAR(com_waitForStreamer, 0x03B20030);// WRONG
+VANILLA_DVAR(r_streamLog, 0x03B1FFC0);
+VANILLA_DVAR(r_streamLowDetail, 0x03B1FCA4);
+VANILLA_DVAR(r_streamClear, 0x03B1FDC0);
+VANILLA_DVAR(r_stream, 0x03B1FB54);
+VANILLA_DVAR(r_streamSize, 0x0396F9C4);
+VANILLA_DVAR(r_streamFreezeState, 0x03B1FBCC);
+//VANILLA_DVAR(r_streamCheckAabb, 0x03B20030);// WRONG
+VANILLA_DVAR(r_streamMaxDist, 0x0396F9CC);
+VANILLA_DVAR(r_streamHiddenPush, 0x03B1FD18);
+
 VANILLA_DVAR(r_aspectRatio, 0x03B1FF88);
 VANILLA_DVAR(com_wideScreen, 0x024817A8);
 

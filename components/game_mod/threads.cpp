@@ -51,10 +51,15 @@ DWORD WINAPI Sys_ThreadMain(LPVOID Arg)
 
 bool Sys_IsMainThread()
 {
-	return true;
+	return ((bool(__cdecl *)())0x005A48F0)();
 }
 
 bool Sys_IsRenderThread()
 {
-	return true;
+	return ((bool(__cdecl *)())0x005F5F00)();
+}
+
+void Sys_WakeStream()
+{
+	((void(__cdecl *)())0x00628BD0)();
 }

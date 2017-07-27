@@ -1,21 +1,5 @@
 #include "stdafx.h"
 
-struct XModel
-{
-	const char *name;
-	char _pad1[0xE4];
-	bool bad;
-};
-STATIC_ASSERT_OFFSET(XModel, name, 0x0);
-STATIC_ASSERT_OFFSET(XModel, bad, 0xE8);
-
-const char *XModelGetName(XModel *model)
-{
-	ASSERT(model);
-
-	return model->name;
-}
-
 bool XModelBad(XModel *model)
 {
 	ASSERT(model);

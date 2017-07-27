@@ -112,6 +112,7 @@
     <ClCompile Include="com_memory.cpp" />
     <ClCompile Include="cscr_main.cpp" />
     <ClCompile Include="cscr_parser.cpp" />
+    <ClCompile Include="xmodel_utils.cpp" />
     <ClInclude Include="cg_servercmds_mp.h" />
     <ClInclude Include="cscr_variable.h" />
     <ClCompile Include="cscr_variable.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="r_material.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_reflection_probe.cpp" />
+    <ClCompile Include="r_rendercmds.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
     <ClCompile Include="r_stream.cpp" />
     <ClCompile Include="r_streamalloc.cpp" />
@@ -162,6 +164,7 @@
     <ClCompile Include="win_common.cpp" />
     <ClCompile Include="win_exception.cpp" />
     <ClCompile Include="win_main.cpp" />
+    <ClInclude Include="xmodel_utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bg_perks.h" />
@@ -220,6 +223,7 @@
     <ClInclude Include="r_init.h" />
     <ClInclude Include="r_material.h" />
     <ClInclude Include="r_material_load_obj.h" />
+    <ClInclude Include="xmodel.h" />
     <ClInclude Include="r_reflection_probe.h" />
     <ClInclude Include="r_rendercmds.h" />
     <ClInclude Include="r_scene.h" />

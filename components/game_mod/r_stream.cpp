@@ -1,19 +1,24 @@
 #include "stdafx.h"
 
 #if 0
-#define BIT_INDEX_32(bits)	((bits) >> 5)
-#define BIT_MASK_32(bits)	(1 << ((bits) & 31))
-
 #define IMAGE_BIT_IS_SET(var, bits) ((var)[BIT_INDEX_32(bits)] & BIT_MASK_32(bits))
 #define IMAGE_BIT_SET(var, bits)	((var)[BIT_INDEX_32(bits)] |= BIT_MASK_32(bits));
 #define IMAGE_BIT_UNSET(var, bits)	((var)[BIT_INDEX_32(bits)] &= ~BIT_MASK_32(bits));
 
 StreamFrontendGlob streamFrontendGlob;
+
 pendingRequest s_pendingRequests[10];
+
+DObj *s_forcedLoadEntities[4];
+int s_numForcedLoadEntities;
+
 streamerHintInfo s_streamHints[4];
+int s_numStreamHintsActive;
+
 Material *s_preventMaterials[32];
 
-volatile int disableCount;
+bool streamIsInitialized;
+volatile long disableCount;
 
 // /gfx_d3d/r_stream.cpp:266
 bool R_StreamIsEnabled()
@@ -24,13 +29,13 @@ bool R_StreamIsEnabled()
 // /gfx_d3d/r_stream.cpp:271
 void R_StreamPushDisable()
 {
-	InterlockedIncrement((LONG *)&disableCount);
+	InterlockedIncrement(&disableCount);
 }
 
 // /gfx_d3d/r_stream.cpp:276
 void R_StreamPopDisable()
 {
-	int value = InterlockedDecrement((LONG *)&disableCount);
+	int value = InterlockedDecrement(&disableCount);
 
 	ASSERT_MSG(value >= 0, "disableCount >= 0");
 }
@@ -119,10 +124,9 @@ bool R_StreamRequestImageAllocation(pendingRequest *request, GfxImage *image, bo
 	ASSERT(image);
 	ASSERT(request);
 	ASSERT(image->streaming != GFX_TEMP_STREAMING);
+	ASSERT(image->streaming != GFX_NOT_STREAMING);
 
-	ASSERT(image->streaming);
-
-	if (!image->streaming)
+	if (image->streaming == GFX_NOT_STREAMING)
 		return false;
 
 	ASSERT(request->image == nullptr);
@@ -162,13 +166,14 @@ bool R_StreamRequestImageAllocation(pendingRequest *request, GfxImage *image, bo
 // /gfx_d3d/r_stream.cpp:813
 void R_StreamUpdate_ReadTextures()
 {
+	static int lastIdx = 0;
 	pendingRequest *request = nullptr;
 	int numRequests = 0;
 
 	R_StreamAlloc_Lock();
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < ARRAYSIZE(s_pendingRequests); i++)
 	{
-		int idx = (unk_ADD7110 + i) % 10;
+		int idx = (lastIdx + i) % ARRAYSIZE(s_pendingRequests);
 
 		if (s_pendingRequests[idx].status != STREAM_STATUS_QUEUED)
 			continue;
@@ -177,7 +182,7 @@ void R_StreamUpdate_ReadTextures()
 		{
 			request = &s_pendingRequests[idx];
 			request->status = STREAM_STATUS_INPROGRESS;
-			unk_ADD7110 = (idx + 1) % 10;
+			lastIdx = (idx + 1) % ARRAYSIZE(s_pendingRequests);
 		}
 
 		numRequests++;
@@ -191,7 +196,7 @@ void R_StreamUpdate_ReadTextures()
 		else
 			request->status = STREAM_STATUS_CANCELLED;
 
-		NET_Sleep(1);
+		Sleep(1);
 	}
 
 	if (numRequests > 1)
@@ -334,7 +339,7 @@ void R_StreamUpdate_SetupInitialImageList()
 	R_StreamSetDefaultConfig(true);
 
 	if (r_streamLowDetail && r_streamLowDetail->current.enabled)
-		BG_EvalVehicleName();
+		R_Stream_ForceLoadLowDetail();
 	else
 		memset(streamFrontendGlob.imageForceBits, 0, sizeof(streamFrontendGlob.imageForceBits));
 
@@ -344,10 +349,16 @@ void R_StreamUpdate_SetupInitialImageList()
 	streamFrontendGlob.preloadCancelled = true;
 }
 
+// /gfx_d3d/r_stream.cpp:???
+void R_Stream_ForceLoadLowDetail()
+{
+	// Code removed completely
+}
+
 // /gfx_d3d/r_stream.cpp:1463
 void R_StreamUpdate_AddInitialImages(float importance)
 {
-	for (int imagePartIndex = 0; imagePartIndex < 4224; imagePartIndex++)
+	for (int imagePartIndex = 0; imagePartIndex < TOTAL_IMAGE_PARTS; imagePartIndex++)
 	{
 		if (IMAGE_BIT_IS_SET(streamFrontendGlob.imageInitialBits, imagePartIndex))
 			R_Stream_AddImagePartImportance(imagePartIndex, importance);
@@ -427,7 +438,7 @@ void R_StreamUpdate_AddForcedImages(float forceImportance, float touchImportance
 // /gfx_d3d/r_stream.cpp:1583
 void R_Stream_ForceLoadImage(GfxImage *image, int part)
 {
-	if (!image || !image->streaming)
+	if (!image || image->streaming == GFX_NOT_STREAMING)
 		return;
 
 	int imageIndex = DB_GetImageIndex(image);
@@ -484,10 +495,10 @@ void R_Stream_ForceLoadModel(XModel *model, int part)
 	if (!model)
 		return;
 
-	for (int lod = 0; lod < 4; lod++)
+	for (int lod = 0; lod < MAX_LODS; lod++)
 	{
 		XSurface *surfaces = nullptr;
-		Material **material = nullptr;
+		Material * const *material = nullptr;
 
 		int surfCount = XModelGetSurfaces(model, &surfaces, lod);
 		material = XModelGetSkins(model, lod);
@@ -597,7 +608,7 @@ void R_StreamTouchMaterial(Material *material)
 // /gfx_d3d/r_stream.cpp:1794
 bool R_StreamTouchMaterialAndCheck(Material *material, int level)
 {
-	ASSERT(level >= 0 && level < 1, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
+	ASSERT(level >= 0 && level < MAX_IMAGE_STREAMED_PARTS, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
 
 	bool streamed = true;
 	int imageCount = Material_GetTextureCount(material);
@@ -611,12 +622,12 @@ bool R_StreamTouchMaterialAndCheck(Material *material, int level)
 // /gfx_d3d/r_stream.cpp:1814
 void R_StreamTouchImage(GfxImage *image)
 {
-	if (!image->streaming)
+	if (image->streaming == GFX_NOT_STREAMING)
 		return;
 
 	int imagePartIndex = DB_GetImageIndex(image);
 
-	for (int part = 0; part < 1;)
+	for (int part = 0; part < MAX_IMAGE_STREAMED_PARTS;)
 	{
 		IMAGE_BIT_SET(streamFrontendGlob.imageTouchBits[66 * streamFrontendGlob.activeImageTouchBits], imagePartIndex);
 
@@ -628,15 +639,15 @@ void R_StreamTouchImage(GfxImage *image)
 // /gfx_d3d/r_stream.cpp:1832
 bool R_StreamTouchImageAndCheck(GfxImage *image, int level)
 {
-	ASSERT(level >= 0 && level < 1, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
+	ASSERT(level >= 0 && level < MAX_IMAGE_STREAMED_PARTS, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
 
-	if (!image->streaming)
+	if (image->streaming == GFX_NOT_STREAMING)
 		return true;
 
 	int imagePartIndex = DB_GetImageIndex(image);
 	int levelPartIndex = imagePartIndex - ((level > 0) ? 0 : level);
 
-	for (int part = 0; part < 1;)
+	for (int part = 0; part < MAX_IMAGE_STREAMED_PARTS;)
 	{
 		IMAGE_BIT_SET(streamFrontendGlob.imageTouchBits[66 * streamFrontendGlob.activeImageTouchBits], imagePartIndex);
 
@@ -650,9 +661,9 @@ bool R_StreamTouchImageAndCheck(GfxImage *image, int level)
 // /gfx_d3d/r_stream.cpp:1860
 bool R_StreamImageCheck(GfxImage *image, int level)
 {
-	ASSERT(level >= 0 && level < 1, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
+	ASSERT(level >= 0 && level < MAX_IMAGE_STREAMED_PARTS, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
 
-	if (!image->streaming)
+	if (image->streaming == GFX_NOT_STREAMING)
 		return true;
 
 	int imageIndex = DB_GetImageIndex(image);
@@ -664,7 +675,7 @@ bool R_StreamImageCheck(GfxImage *image, int level)
 // /gfx_d3d/r_stream.cpp:1961
 void R_Stream_ResetHintEntities()
 {
-	unk_ADD7080 = 0;
+	s_numStreamHintsActive = 0;
 	memset(s_streamHints, 0, sizeof(s_streamHints));
 }
 
@@ -675,11 +686,11 @@ void R_StreamUpdatePreventedMaterials()
 
 	for (int i = 0; i < ARRAYSIZE(s_preventMaterials); i++)
 	{
-		if (s_preventMaterials[i])
-		{
-			int materialIndex = DB_GetMaterialIndex(s_preventMaterials[i]);
-			IMAGE_BIT_SET(streamFrontendGlob.materialPreventBits, materialIndex);
-		}
+		if (!s_preventMaterials[i])
+			continue;
+
+		int materialIndex = DB_GetMaterialIndex(s_preventMaterials[i]);
+		IMAGE_BIT_SET(streamFrontendGlob.materialPreventBits, materialIndex);
 	}
 }
 
@@ -720,7 +731,7 @@ void R_Stream_ReleaseImage(GfxImage *image, bool lock, bool delayDirty)
 {
 	ASSERT(image);
 
-	if (!image->streaming)
+	if (image->streaming == GFX_NOT_STREAMING)
 		return;
 
 	if (lock)
@@ -732,12 +743,12 @@ void R_Stream_ReleaseImage(GfxImage *image, bool lock, bool delayDirty)
 	if (freedSize > 0)
 	{
 		ASSERT(memory);
-		BG_EvalVehicleName();
+		R_StreamAlloc_Deallocate(memory);
 	}
 
 	int imageIndex = DB_GetImageIndex(image);
 
-	for (int part = 0; part < 1; part++)
+	for (int part = 0; part < MAX_IMAGE_STREAMED_PARTS; part++)
 	{
 		IMAGE_BIT_UNSET(streamFrontendGlob.imageInitialBits, imageIndex + part);
 		IMAGE_BIT_UNSET(streamFrontendGlob.imageForceBits, imageIndex + part);
@@ -777,7 +788,7 @@ void R_Stream_Sync()
 			else if (request->status == STREAM_STATUS_INPROGRESS)
 			{
 				while (request->status < STREAM_STATUS_CANCELLED || request->status > STREAM_STATUS_FINISHED)
-					NET_Sleep(1);
+					Sleep(1);
 
 				IMAGE_BIT_UNSET(streamFrontendGlob.imageLoading, DB_GetImageIndex(request->image));
 
@@ -817,10 +828,10 @@ void R_StreamSyncThenFlush(bool flushAll)
 	streamFrontendGlob.calculateTotalBytesWanted = false;
 	Sys_EnterCriticalSection(CRITSECT_STREAM_FORCE_LOAD_COMMAND);
 
-	unk_ADD7090 = 0;
+	s_numForcedLoadEntities = 0;
 
-	for (int i = 0; i < 4; i++)
-		s_forcedLoadEntities[i] = 0;
+	for (int i = 0; i < ARRAYSIZE(s_forcedLoadEntities); i++)
+		s_forcedLoadEntities[i] = nullptr;
 
 	Sys_LeaveCriticalSection(CRITSECT_STREAM_FORCE_LOAD_COMMAND);
 	R_StreamPopDisable();
@@ -934,7 +945,7 @@ void R_StreamUpdate_CompletePreload(void(__cdecl *pumpfunc)())
 		if (progress >= 1.0f || streamFrontendGlob.initialLoadAllocFailures > 0)
 			break;
 
-		NET_Sleep(10);
+		Sleep(10);
 	}
 
 	R_EndRemoteScreenUpdate(pumpfunc);
@@ -947,7 +958,7 @@ bool R_StreamUpdate(const float *viewPos)
 
 	if (r_streamClear->current.enabled || r_stream->modified)
 	{
-		R_StreamSyncThenFlush(1);
+		R_StreamSyncThenFlush(true);
 		Dvar_ClearModified(r_streamSize);
 		Dvar_ClearModified(r_stream);
 		Dvar_SetBool(r_streamClear, false);
@@ -962,7 +973,7 @@ bool R_StreamUpdate(const float *viewPos)
 	if (r_streamLowDetail->modified)
 	{
 		if (r_streamLowDetail->current.enabled)
-			BG_EvalVehicleName();
+			R_Stream_ForceLoadLowDetail();
 		else
 			memset(streamFrontendGlob.imageForceBits, 0, sizeof(streamFrontendGlob.imageForceBits));
 
@@ -982,16 +993,9 @@ bool R_StreamUpdate(const float *viewPos)
 // /gfx_d3d/r_stream.cpp:3344
 void R_Stream_AddImagePartImportance(int imagePartIndex, float importance)
 {
-	float v2; // [sp+0h] [bp-8h]@5
+	ASSERT(imagePartIndex >= 0 && imagePartIndex < TOTAL_IMAGE_PARTS, "imagePartIndex doesn't index TOTAL_IMAGE_PARTS");
 
-	ASSERT(imagePartIndex >= 0 && imagePartIndex < 0x1080, "imagePartIndex doesn't index TOTAL_IMAGE_PARTS");
-
-	if ((float)(importance - streamFrontendGlob.imageImportance[imagePartIndex]) < 0.0f)
-		v2 = streamFrontendGlob.imageImportance[imagePartIndex];
-	else
-		v2 = importance;
-
-	streamFrontendGlob.imageImportance[imagePartIndex] = v2;
+	streamFrontendGlob.imageImportance[imagePartIndex] = max(importance, streamFrontendGlob.imageImportance[imagePartIndex]);
 
 	if (!(IMAGE_BIT_IS_SET(streamFrontendGlob.imageImportanceBits, imagePartIndex)))
 	{
@@ -1010,7 +1014,7 @@ void R_StreamTouchImagesFromMaterial(Material *remoteMaterial, float importance)
 {
 	int textureCount = remoteMaterial->textureCount;
 
-	if (!remoteMaterial->textureCount)
+	if (!textureCount)
 		return;
 
 	for (int textureIter = 0; textureIter != textureCount; textureIter++)
@@ -1093,47 +1097,30 @@ void MultiplePointDistSqFromBounds(distance_data *distances, const float *v, con
 // /gfx_d3d/r_stream.cpp:3491
 void R_StreamUpdateForXModel(XModel *remoteModel, float distSq)
 {
-	__int128 v2; // xmm0@5
-	float v4; // [sp+0h] [bp-40h]@17
-	float v5; // [sp+4h] [bp-3Ch]@8
-	float v6; // [sp+10h] [bp-30h]@7
-	int bounds; // [sp+28h] [bp-18h]@5
-	float importance; // [sp+2Ch] [bp-14h]@10
-	signed int surf; // [sp+34h] [bp-Ch]@1
+	const float distNotSq = sqrt(distSq);
 
-	float distNotSq = fsqrt(distSq);
 	Material **materialHandles = remoteModel->materialHandles;
 	XModelHighMipBounds *highMipBounds = remoteModel->streamInfo.highMipBounds;
 
-	for (surf = 0; surf < remoteModel->numsurfs; surf++)
+	for (int surf = 0; surf < remoteModel->numsurfs; surf++)
 	{
 		if (!materialHandles[surf]->textureCount)
 			continue;
 
-		bounds = (int)&highMipBounds[surf];
-		v2 = LODWORD(highMipBounds[surf].himipRadiusSq);
+		XModelHighMipBounds *bounds = &highMipBounds[surf];
+		__int128 v2 = LODWORD(highMipBounds[surf].himipRadiusSq);
 		__asm { lahf }
 		if (__SETP__(_AH & 0x44, 0))
 		{
-			v6 = distNotSq - Abs(bounds->center);
+			float distanceForHimip = distNotSq - Vec3Length(bounds->center);
 
-			if ((float)((float)(v6 * v6) - 0.0) < 0.0)
-				v5 = FLOAT_0_0;
-			else
-				v5 = v6 * v6;
-
-			float importance = bounds->himipRadiusSq / (float)(v5 + 100.0);
+			float importance = bounds->himipRadiusSq / (min(distanceForHimip * distanceForHimip, 0.0f) + 100.0f);
 			int materialIndex = DB_GetMaterialIndex(materialHandles[surf]);
 
 			ASSERT(materialIndex >= 0);
 			ASSERT(materialIndex < MAX_MATERIAL_POOL_SIZE);
 
-			if ((float)(importance - streamFrontendGlob.materialImportance[materialIndex]) < 0.0)
-				v4 = streamFrontendGlob.materialImportance[materialIndex];
-			else
-				v4 = importance;
-
-			streamFrontendGlob.materialImportance[materialIndex] = v4;
+			streamFrontendGlob.materialImportance[materialIndex] = max(importance, streamFrontendGlob.materialImportance[materialIndex]);
 		}
 	}
 }
@@ -1144,10 +1131,10 @@ void R_StreamUpdateForXModelTouched(XModel *model)
 	if (!model)
 		return;
 
-	for (int lod = 0; lod < 4; lod++)
+	for (int lod = 0; lod < MAX_LODS; lod++)
 	{
 		XSurface *surfaces = nullptr;
-		Material **material = nullptr;
+		Material * const *material = nullptr;
 
 		int surfCount = XModelGetSurfaces(model, &surfaces, lod);
 		material = XModelGetSkins(model, lod);
@@ -1164,15 +1151,15 @@ void R_StreamUpdateForXModelTouched(XModel *model)
 // /gfx_d3d/r_stream.cpp:3561
 void R_StreamUpdateTouchedModels()
 {
-	for (int modelIndex = 0; modelIndex < 0x3E8; modelIndex++)
+	for (int modelIndex = 0; modelIndex < MAX_XMODEL_POOL_SIZE; modelIndex++)
 	{
-		if (IMAGE_BIT_IS_SET(streamFrontendGlob.modelTouchBits, modelIndex))
-		{
-			XModel *model = DB_GetXModelAtIndex(modelIndex);
-			ASSERT(model);
+		if (!IMAGE_BIT_IS_SET(streamFrontendGlob.modelTouchBits, modelIndex))
+			continue;
 
-			R_StreamUpdateForXModelTouched(model);
-		}
+		XModel *model = DB_GetXModelAtIndex(modelIndex);
+		ASSERT(model);
+
+		R_StreamUpdateForXModelTouched(model);
 	}
 }
 
@@ -1191,12 +1178,7 @@ void R_StreamUpdate_AddXModelDistance(XModel *model, const float *viewPos, const
 
 	if (IMAGE_BIT_IS_SET(streamFrontendGlob.modelDistanceBits, modelIndex))
 	{
-		float v6; // [sp+0h] [bp-1Ch]@3
-		if ((float)(distSq - streamFrontendGlob.modelDistance[modelIndex]) < 0.0)
-			v6 = distSq;
-		else
-			v6 = streamFrontendGlob.modelDistance[modelIndex];
-		streamFrontendGlob.modelDistance[modelIndex] = v6;
+		streamFrontendGlob.modelDistance[modelIndex] = min(distSq, streamFrontendGlob.modelDistance[modelIndex]);
 	}
 	else
 	{
@@ -1213,12 +1195,7 @@ void R_StreamUpdate_AddDynamicXModelDistance(XModel *model, const float *viewPos
 
 	if (IMAGE_BIT_IS_SET(streamFrontendGlob.dynamicModelDistanceBits, modelIndex))
 	{
-		float v6; // [sp+0h] [bp-1Ch]@3
-		if ((float)(distSq - streamFrontendGlob.dynamicModelDistance[modelIndex]) < 0.0f)
-			v6 = distSq;
-		else
-			v6 = streamFrontendGlob.dynamicModelDistance[modelIndex];
-		streamFrontendGlob.dynamicModelDistance[modelIndex] = v6;
+		streamFrontendGlob.dynamicModelDistance[modelIndex] = min(distSq, streamFrontendGlob.dynamicModelDistance[modelIndex]);
 	}
 	else
 	{
@@ -1262,60 +1239,41 @@ void R_StreamUpdateWorldSurface(int surfId, const float *viewPos, float maxDistS
 			distanceScale[isVisible]);
 
 		int materialIndex = DB_GetMaterialIndex(surface->material);
-
-		float v4;
-		if ((float)(distSq.importance - streamFrontendGlob.materialImportance[materialIndex]) < 0.0)
-			v4 = streamFrontendGlob.materialImportance[materialIndex];
-		else
-			v4 = distSq.importance;
-
-		streamFrontendGlob.materialImportance[materialIndex] = v4;
+		streamFrontendGlob.materialImportance[materialIndex] = max(distSq.importance, streamFrontendGlob.materialImportance[materialIndex]);
 	}
 }
 
 // /gfx_d3d/r_stream.cpp:3888
 void R_StreamUpdate_CombineImportance()
 {
-	__int128 v1; // xmm0@29
-	float v4; // [sp+4h] [bp-104h]@8
-
-	for (int modelIndex = 0; modelIndex < 1000; modelIndex++)
+	for (int modelIndex = 0; modelIndex < MAX_XMODEL_POOL_SIZE; modelIndex++)
 	{
 		unsigned int mask = BIT_MASK_32(modelIndex);
 		unsigned int staticBit = mask & streamFrontendGlob.modelDistanceBits[BIT_INDEX_32(modelIndex)];
 		unsigned int dynamicBit = mask & streamFrontendGlob.dynamicModelDistanceBits[BIT_INDEX_32(modelIndex)];
 
+		XModel *model = DB_GetXModelAtIndex(modelIndex);
+
 		if (dynamicBit & staticBit)
 		{
-			XModel *model = DB_GetXModelAtIndex(modelIndex);
 			ASSERT(model);
-
-			if ((float)(streamFrontendGlob.dynamicModelDistance[modelIndex] - streamFrontendGlob.modelDistance[modelIndex]) < 0.0)
-				v4 = streamFrontendGlob.dynamicModelDistance[modelIndex];
-			else
-				v4 = streamFrontendGlob.modelDistance[modelIndex];
-
-			R_StreamUpdateForXModel(model, v4);
+			R_StreamUpdateForXModel(model, min(streamFrontendGlob.dynamicModelDistance[modelIndex], streamFrontendGlob.modelDistance[modelIndex]));
 		}
 		else if (staticBit)
 		{
-			XModel *model = DB_GetXModelAtIndex(modelIndex);
 			ASSERT(model);
-
 			R_StreamUpdateForXModel(model, streamFrontendGlob.modelDistance[modelIndex]);
 		}
 		else if (dynamicBit)
 		{
-			XModel *model = DB_GetXModelAtIndex(modelIndex);
 			ASSERT(model);
-
 			R_StreamUpdateForXModel(model, streamFrontendGlob.dynamicModelDistance[modelIndex]);
 		}
 	}
 
-	for (int materialIndex = 0; materialIndex < 4096; materialIndex++)
+	for (int materialIndex = 0; materialIndex < MAX_MATERIAL_POOL_SIZE; materialIndex++)
 	{
-		v1 = LODWORD(streamFrontendGlob.materialImportance[materialIndex]);
+		__int128 v1 = LODWORD(streamFrontendGlob.materialImportance[materialIndex]);
 		__asm { lahf }
 		if (__SETP__(_AH & 0x44, 0)
 			&& !(streamFrontendGlob.materialPreventBits[materialIndex >> 5] & (1 << (materialIndex & 0x1F))))
@@ -1445,7 +1403,7 @@ void R_StreamUpdate_EndQuerySort(bool diskOrder)
 				&streamFrontendGlob.sortedImages[streamFrontendGlob.sortedImageCount],
 				4 * streamFrontendGlob.sortedImageCount >> 2,
 				0);
-			streamFrontendGlob.diskOrderImagesNeedSorting = 0;
+			streamFrontendGlob.diskOrderImagesNeedSorting = false;
 		}
 	}
 	else
@@ -1460,7 +1418,7 @@ void R_StreamUpdateForcedModels(unsigned int frame)
 	int surfCountPrevLods = 0;
 	Sys_EnterCriticalSection(CRITSECT_STREAM_FORCE_LOAD_COMMAND);
 
-	for (i = 0; i < unk_ADD7090; i++)
+	for (int i = 0; i < s_numForcedLoadEntities; i++)
 	{
 		int modelCount = DObjGetNumModels(s_forcedLoadEntities[i]);
 		float distSq = streamFrontendGlob.forcedImageImportance;
@@ -1469,12 +1427,12 @@ void R_StreamUpdateForcedModels(unsigned int frame)
 		{
 			XModel *model = DObjGetModel(s_forcedLoadEntities[i], modelIter);
 
-			for (lod = 0; lod < 4; lod++)
+			for (int lod = 0; lod < 4; lod++)
 			{
 				XSurface *surfaces = nullptr;
-				Material **material = nullptr;
+				Material * const *material = nullptr;
 
-				int surfCount = XModelGetSurfaces(model, (XSurface **)&surfaces, lod);
+				int surfCount = XModelGetSurfaces(model, &surfaces, lod);
 				material = XModelGetSkins(model, lod);
 
 				for (int surfIter = 0; surfIter != surfCount;)
@@ -1497,7 +1455,88 @@ void R_StreamUpdateForcedModels(unsigned int frame)
 // /gfx_d3d/r_stream.cpp:4300
 DWORD R_StreamUpdate_EndQuery_Internal()
 {
-	// todo
+	unsigned int v0; // eax@28
+	signed int i; // [sp+28h] [bp-24h]@7
+	int sortedIndex; // [sp+2Ch] [bp-20h]@4
+	GfxImage *image; // [sp+30h] [bp-1Ch]@31
+	signed int imagePartIndex; // [sp+38h] [bp-14h]@27
+	pendingRequest *request; // [sp+3Ch] [bp-10h]@7
+	bool movesPending; // [sp+47h] [bp-5h]@7
+	int imagePart; // [sp+48h] [bp-4h]@30
+
+	sortedIndex = 0;
+
+	if (Sys_IsRenderThread())
+		R_StreamUpdate_ProcessFileCallbacks();
+
+LABEL_6:
+	while (sortedIndex != streamFrontendGlob.sortedImageCount)
+	{
+		movesPending = CG_IsShowingZombieMap(1);
+		request = 0;
+
+		for (i = 0; i < 10; ++i)
+		{
+			if (request || s_pendingRequests[i].status || i >= 10)
+			{
+				if (s_pendingRequests[i].status == 1 && !movesPending)
+					R_StreamRequestImageRead(&s_pendingRequests[i]);
+			}
+			else
+			{
+				request = &s_pendingRequests[i];
+			}
+		}
+
+		if (!request)
+		{
+			return;
+		}
+
+		while (sortedIndex < streamFrontendGlob.sortedImageCount)
+		{
+			imagePartIndex = streamFrontendGlob.sortedImages[sortedIndex];
+
+			if (!(streamFrontendGlob.imageUseBits[imagePartIndex >> 5] & (1 << (imagePartIndex & 0x1F))))
+			{
+				imagePart = imagePartIndex & 0x80000000;
+				
+				if ((imagePartIndex & 0x80000000 & 0x80000000) != 0)
+					imagePart = 0;
+
+				if (!(streamFrontendGlob.imageLoading[imagePartIndex >> 5] & (1 << (imagePartIndex & 0x1F))))
+				{
+					image = DB_GetImageAtIndex(imagePartIndex);
+					if (image->streaming)
+					{
+						if (image->streaming != 3
+							&& image->skippedMipLevels
+							&& (imagePart <= 0
+								|| streamFrontendGlob.imageUseBits[(imagePartIndex - 1) >> 5] & (1 << ((imagePartIndex - 1) & 0x1F))))
+						{
+							if (R_StreamRequestImageAllocation(
+								request,
+								image,
+								1,
+								imagePart,
+								streamFrontendGlob.imageImportance[imagePartIndex]))
+							{
+								streamFrontendGlob.initialLoadAllocFailures = 0;
+								if (CG_IsShowingZombieMap(1) || R_StreamRequestImageRead(request))
+									goto LABEL_6;
+							}
+							else
+							{
+								++streamFrontendGlob.initialLoadAllocFailures;
+							}
+							return;
+						}
+					}
+				}
+			}
+			++sortedIndex;
+		}
+	}
 }
 
 // /gfx_d3d/r_stream.cpp:4516
@@ -1590,19 +1629,19 @@ bool R_StreamUpdate_FindImageAndOptimize(const float *viewPos)
 	updateCmd.maxDistSq = maxDistSq;
 	updateCmd.distanceScale[1] = 1.0f;
 	updateCmd.distanceScale[0] = r_streamHiddenPush->current.value;
-	Sys_AddWorkerCmdInternal(&r_stream_updateWorkerCmd, &updateCmd, 0);
+	Sys_AddWorkerCmdInternal(&r_stream_updateWorkerCmd, &updateCmd, nullptr);
 
-	for (int hint = 0; hint < 4; hint++)
+	for (int hint = 0; hint < ARRAYSIZE(s_streamHints); hint++)
 	{
-		if (s_streamHints[hint].importance > 0.0f)
-		{
-			updateCmd.distanceScale[1] = 1.0f / s_streamHints[hint].importance;
-			updateCmd.distanceScale[0] = updateCmd.distanceScale[1];
-			updateCmd.viewPos[0] = s_streamHints[hint].origin[0];
-			updateCmd.viewPos[1] = s_streamHints[hint].origin[1];
-			updateCmd.viewPos[2] = s_streamHints[hint].origin[2];
-			Sys_AddWorkerCmdInternal(&r_stream_updateWorkerCmd, &updateCmd, 0);
-		}
+		if (s_streamHints[hint].importance <= 0.0f)
+			continue;
+
+		updateCmd.distanceScale[1] = 1.0f / s_streamHints[hint].importance;
+		updateCmd.distanceScale[0] = updateCmd.distanceScale[1];
+		updateCmd.viewPos[0] = s_streamHints[hint].origin[0];
+		updateCmd.viewPos[1] = s_streamHints[hint].origin[1];
+		updateCmd.viewPos[2] = s_streamHints[hint].origin[2];
+		Sys_AddWorkerCmdInternal(&r_stream_updateWorkerCmd, &updateCmd, nullptr);
 	}
 
 	Sys_LeaveCriticalSection(CRITSECT_STREAM_SYNC_COMMAND);
@@ -1640,7 +1679,7 @@ void R_StreamUpdatePerClient(const float *viewPos)
 		updateCmd.maxDistSq = maxDistSq;
 		updateCmd.distanceScale[1] = 1.0f;
 		updateCmd.distanceScale[0] = r_streamHiddenPush->current.value;
-		Sys_AddWorkerCmdInternal(&r_stream_updateWorkerCmd, &updateCmd, 0);
+		Sys_AddWorkerCmdInternal(&r_stream_updateWorkerCmd, &updateCmd, nullptr);
 	}
 
 	float distanceScale[2];
@@ -1661,12 +1700,12 @@ void R_StreamUpdate_End()
 
 	StreamCombineCmd combineCmd;
 	combineCmd.frontend = &streamFrontendGlob;
-	Sys_AddWorkerCmdInternal(&r_stream_combineWorkerCmd, &combineCmd, 0);
+	Sys_AddWorkerCmdInternal(&r_stream_combineWorkerCmd, &combineCmd, nullptr);
 
 	StreamSortCmd sortCmd;
 	sortCmd.frontend = &streamFrontendGlob;
 	sortCmd.diskOrder = streamFrontendGlob.diskOrder;
-	Sys_AddWorkerCmdInternal(&r_stream_sortWorkerCmd, &sortCmd, 0);
+	Sys_AddWorkerCmdInternal(&r_stream_sortWorkerCmd, &sortCmd, nullptr);
 
 	streamFrontendGlob.queryClient = -1;
 	Sys_LeaveCriticalSection(CRITSECT_STREAM_SYNC_COMMAND);

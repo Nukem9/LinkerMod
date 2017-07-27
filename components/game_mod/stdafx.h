@@ -65,6 +65,8 @@
 #include "r_material.h"
 #include "r_material_load_obj.h"
 #include "r_draw_xmodel.h"
+#include "xmodel.h"
+#include "xmodel_utils.h"
 #include "rb_tess.h"
 #include "cscr_main.h"
 #include "cscr_parser.h"

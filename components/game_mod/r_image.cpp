@@ -375,3 +375,10 @@ void __cdecl R_ImageList_f()
 
 	Com_Printf(8, "Related commands: imagelist, gfx_world, cg_drawfps\n");
 }
+
+void Image_Release(GfxImage *image)
+{
+	ASSERT(image);
+
+	((void(__cdecl *)())0x00709E10)();
+}
