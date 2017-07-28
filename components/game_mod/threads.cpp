@@ -63,3 +63,26 @@ void Sys_WakeStream()
 {
 	((void(__cdecl *)())0x00628BD0)();
 }
+
+void Sys_LockWrite(FastCriticalSection *critSect)
+{
+	while (true)
+	{
+		if (!critSect->readCount)
+		{
+			if (InterlockedIncrement(&critSect->writeCount) == 1 && !critSect->readCount)
+				break;
+
+			InterlockedDecrement(&critSect->writeCount);
+		}
+
+		Sleep(0);
+	}
+}
+
+void Sys_UnlockWrite(FastCriticalSection *critSect)
+{
+	ASSERT(critSect->writeCount > 0);
+
+	InterlockedDecrement(&critSect->writeCount);
+}

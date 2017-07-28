@@ -1,10 +1,5 @@
 #pragma once
 
-struct FastCriticalSection
-{
-
-};
-
 struct StreamTempImage
 {
 	GfxImage *image;
