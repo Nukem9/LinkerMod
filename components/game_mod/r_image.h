@@ -2,6 +2,39 @@
 
 enum
 {
+	TS_2D = 0x0,
+	TS_FUNCTION = 0x1,
+	TS_COLOR_MAP = 0x2,
+	TS_UNUSED_1 = 0x3,
+	TS_UNUSED_2 = 0x4,
+	TS_NORMAL_MAP = 0x5,
+	TS_UNUSED_3 = 0x6,
+	TS_UNUSED_4 = 0x7,
+	TS_SPECULAR_MAP = 0x8,
+	TS_UNUSED_5 = 0x9,
+	TS_UNUSED_6 = 0xA,
+	TS_WATER_MAP = 0xB,
+	TS_COLOR0_MAP = 0xC,
+	TS_COLOR1_MAP = 0xD,
+	TS_COLOR2_MAP = 0xE,
+	TS_COLOR3_MAP = 0xF,
+	TS_COLOR4_MAP = 0x10,
+	TS_COLOR5_MAP = 0x11,
+	TS_COLOR6_MAP = 0x12,
+	TS_COLOR7_MAP = 0x13,
+	TS_COLOR8_MAP = 0x14,
+	TS_COLOR9_MAP = 0x15,
+	TS_COLOR10_MAP = 0x16,
+	TS_COLOR11_MAP = 0x17,
+	TS_COLOR12_MAP = 0x18,
+	TS_COLOR13_MAP = 0x19,
+	TS_COLOR14_MAP = 0x1A,
+	TS_COLOR15_MAP = 0x1B,
+	TS_THROW_MAP = 0x1C,
+};
+
+enum
+{
 	IMG_CATEGORY_UNKNOWN = 0x0,
 	IMG_CATEGORY_AUTO_GENERATED = 0x1,
 	IMG_CATEGORY_LIGHTMAP = 0x2,
@@ -82,3 +115,4 @@ void __cdecl R_ImageList_f();
 void Image_Release(GfxImage *image);
 void Image_TrackTotalMemory(GfxImage *image, int platform, int memory);
 void Image_PicmipForSemantic(char semantic, Picmip *picmip);
+void R_ImageList_Output();

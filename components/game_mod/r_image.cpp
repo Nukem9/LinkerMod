@@ -399,38 +399,40 @@ void Image_PicmipForSemantic(char semantic, Picmip *picmip)
 	{
 	default:
 		ASSERT_MSG_VA(0, "Unhandled case: %d", semantic);
-	case 0:
-	case 1:
+	case TS_2D:
+	case TS_FUNCTION:
 		picmip->platform[PICMIP_PLATFORM_USED] = 0;
 		picmip->platform[PICMIP_PLATFORM_MINSPEC] = 0;
 		return;
 
-	case 2:
-	case 11:
-	case 12:
-	case 13:
-	case 14:
-	case 15:
-	case 16:
-	case 17:
-	case 18:
-	case 19:
-	case 20:
-	case 21:
-	case 22:
-	case 23:
-	case 24:
-	case 25:
-	case 26:
-	case 27:
-	case 28:
-		picmipUsed = *(int *)0x4572D80;
-		break;
-	case 5:
+	case TS_NORMAL_MAP:
 		picmipUsed = *(int *)0x4572D84;
 		break;
-	case 8:
+
+	case TS_SPECULAR_MAP:
 		picmipUsed = *(int *)0x4572D88;
+		break;
+
+	case TS_COLOR_MAP:
+	case TS_WATER_MAP:
+	case TS_COLOR0_MAP:
+	case TS_COLOR1_MAP:
+	case TS_COLOR2_MAP:
+	case TS_COLOR3_MAP:
+	case TS_COLOR4_MAP:
+	case TS_COLOR5_MAP:
+	case TS_COLOR6_MAP:
+	case TS_COLOR7_MAP:
+	case TS_COLOR8_MAP:
+	case TS_COLOR9_MAP:
+	case TS_COLOR10_MAP:
+	case TS_COLOR11_MAP:
+	case TS_COLOR12_MAP:
+	case TS_COLOR13_MAP:
+	case TS_COLOR14_MAP:
+	case TS_COLOR15_MAP:
+	case TS_THROW_MAP:
+		picmipUsed = *(int *)0x4572D80;
 		break;
 	}
 
@@ -447,4 +449,8 @@ void Image_PicmipForSemantic(char semantic, Picmip *picmip)
 	}
 
 	picmip->platform[PICMIP_PLATFORM_USED] = picmipUsed;
+}
+
+void R_ImageList_Output()
+{
 }
