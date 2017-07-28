@@ -37,7 +37,7 @@ void Image_Create2DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned 
 	image->width	= width;
 	image->height	= height;
 	image->depth	= 1;
-	image->mapType	= 3;
+	image->mapType	= MAPTYPE_2D;
 
 	D3DPOOL memPool	= D3DPOOL_DEFAULT;
 	DWORD usage		= Image_GetUsage(imageFlags, imageFormat);
@@ -72,7 +72,7 @@ void Image_Create3DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned 
 	image->width	= width;
 	image->height	= height;
 	image->depth	= depth;
-	image->mapType	= 4;
+	image->mapType	= MAPTYPE_3D;
 
 	// D3D9Ex does not allow D3DPOOL_MANAGED
 	DWORD usage		= (IsD3D9ExAvailable()) ? D3DUSAGE_DYNAMIC : 0;
@@ -96,7 +96,7 @@ void Image_CreateCubeTexture_PC(GfxImage *image, unsigned __int16 edgeLen, int m
 	image->width	= edgeLen;
 	image->height	= edgeLen;
 	image->depth	= 1;
-	image->mapType	= 5;
+	image->mapType	= MAPTYPE_CUBE;
 
 	// D3DDeviceCaps support for mipping
 	if (!r_supportCubedMipMaps)
@@ -197,7 +197,7 @@ struct ImageList
 	GfxImage *image[4096*2]; // make sure there are enough pointers for the modified image limit
 };
 
-_D3DFORMAT __cdecl R_ImagePixelFormat(GfxImage *image)
+D3DFORMAT __cdecl R_ImagePixelFormat(GfxImage *image)
 {
 	_D3DSURFACE_DESC surfaceDesc;
 	_D3DVOLUME_DESC volumeDesc;
@@ -381,4 +381,70 @@ void Image_Release(GfxImage *image)
 	ASSERT(image);
 
 	((void(__cdecl *)())0x00709E10)();
+}
+
+// /gfx_d3d/r_image.cpp:214
+void Image_TrackTotalMemory(GfxImage *image, int platform, int memory)
+{
+	if (!Image_IsCodeImage(image->track))
+		((int *)0x4572D8C)[platform] += memory - image->cardMemory.platform[platform];
+}
+
+// /gfx_d3d/r_image.cpp:792
+void Image_PicmipForSemantic(char semantic, Picmip *picmip)
+{
+	int picmipUsed = 0;
+
+	switch (semantic)
+	{
+	default:
+		ASSERT_MSG_VA(0, "Unhandled case: %d", semantic);
+	case 0:
+	case 1:
+		picmip->platform[PICMIP_PLATFORM_USED] = 0;
+		picmip->platform[PICMIP_PLATFORM_MINSPEC] = 0;
+		return;
+
+	case 2:
+	case 11:
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+	case 16:
+	case 17:
+	case 18:
+	case 19:
+	case 20:
+	case 21:
+	case 22:
+	case 23:
+	case 24:
+	case 25:
+	case 26:
+	case 27:
+	case 28:
+		picmipUsed = *(int *)0x4572D80;
+		break;
+	case 5:
+		picmipUsed = *(int *)0x4572D84;
+		break;
+	case 8:
+		picmipUsed = *(int *)0x4572D88;
+		break;
+	}
+
+	picmip->platform[PICMIP_PLATFORM_MINSPEC] = 2;
+
+	if (picmipUsed >= 0)
+	{
+		if (picmipUsed > 3)
+			picmipUsed = 3;
+	}
+	else
+	{
+		picmipUsed = 0;
+	}
+
+	picmip->platform[PICMIP_PLATFORM_USED] = picmipUsed;
 }

@@ -94,6 +94,8 @@
 #include "netfield.h"
 #include "r_streamalloc.h"
 #include "r_stream.h"
+#include "r_image_load_common.h"
+#include "r_image_load_obj.h"
 
 #include "win_localize.h"
 #include "win_exception.h"
