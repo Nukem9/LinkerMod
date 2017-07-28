@@ -101,7 +101,7 @@ unsigned int Image_GetCardMemoryAmount(unsigned int imageFlags, D3DFORMAT format
 // /gfx_d3d/r_image_load_common.cpp:673
 void Image_Upload2D_CopyData_PC(GfxImage *image, D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
 {
-	static DWORD dwCall = 0x0;
+	static DWORD dwCall = 0x00739840;
 
 	__asm
 	{
@@ -159,8 +159,8 @@ void Image_GetPicmip(GfxImage *image, Picmip *picmip)
 
 	if (image->noPicmip)
 	{
-		picmip->platform[0] = 0;
-		picmip->platform[1] = 0;
+		picmip->platform[PICMIP_PLATFORM_USED] = 0;
+		picmip->platform[PICMIP_PLATFORM_MINSPEC] = 0;
 		return;
 	}
 

@@ -154,6 +154,7 @@ VANILLA_DVAR(r_streamFreezeState, 0x03B1FBCC);
 //VANILLA_DVAR(r_streamCheckAabb, 0x03B20030);// WRONG
 VANILLA_DVAR(r_streamMaxDist, 0x0396F9CC);
 VANILLA_DVAR(r_streamHiddenPush, 0x03B1FD18);
+VANILLA_DVAR(r_loadForRenderer, 0x03B1FCC0);
 
 VANILLA_DVAR(r_aspectRatio, 0x03B1FF88);
 VANILLA_DVAR(com_wideScreen, 0x024817A8);
