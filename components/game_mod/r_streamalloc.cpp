@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#if 0
 StreamAllocGlob s_allocGlob;
 
 // /gfx_d3d/r_streamalloc.cpp:1716
@@ -41,33 +40,36 @@ bool R_StreamAlloc_FreeImageByImportance(int size, float importance, GfxImage **
 	{
 		int imagePartIndex = streamFrontendGlob.sortedImages[sortIndex];
 
-		if (streamFrontendGlob.imageUseBits[imagePartIndex >> 5] & (1 << (imagePartIndex & 0x1F)))
+		const unsigned int imageIndex = BIT_INDEX_32(imagePartIndex);
+		const unsigned int imageMask = BIT_MASK_32(imagePartIndex);
+
+		if (!(streamFrontendGlob.imageUseBits[imageIndex] & imageMask))
+			continue;
+
+		// CHECK LAHF
+		if (importance == FLT_MAX || !(streamFrontendGlob.imageForceBits[imageIndex] & imageMask))
 		{
-			__asm { lahf }
-			if (!__SETP__(_AH & 0x44, 0)
-				|| !(streamFrontendGlob.imageForceBits[imagePartIndex >> 5] & (1 << (imagePartIndex & 0x1F))))
+			// Kill the search if we hit a higher priority image
+			if (streamFrontendGlob.imageImportance[imagePartIndex] >= importance)
+				break;
+
+			if (streamFrontendGlob.imageLoading[imageIndex] & imageMask)
+				continue;
+
+			GfxImage *image = DB_GetImageAtIndex(imagePartIndex);
+
+			if (image->streaming)
 			{
-				if (streamFrontendGlob.imageImportance[imagePartIndex] >= importance)
-					break;
-
-				if (!(streamFrontendGlob.imageLoading[imagePartIndex >> 5] & (1 << (imagePartIndex & 0x1F))))
+				if (!image->skippedMipLevels)
 				{
-					GfxImage *image = DB_GetImageAtIndex(imagePartIndex);
-
-					if (image->streaming)
+					if ((signed int)image->loadedSize >= size)
 					{
-						if (!image->skippedMipLevels)
-						{
-							if ((signed int)image->loadedSize >= size)
-							{
-								*unloadImage = image;
-								return true;
-							}
-
-							if (!sacrificeImage)
-								sacrificeImage = image;
-						}
+						*unloadImage = image;
+						return true;
 					}
+
+					if (!sacrificeImage)
+						sacrificeImage = image;
 				}
 			}
 		}
@@ -98,7 +100,7 @@ bool R_StreamAlloc_CanAllocate(int size, float importance, GfxImage **unloadImag
 char *R_StreamAlloc_FreeImage(GfxImage *image, int imagePart, bool dirty, int *freedSize)
 {
 	int imageIndex = DB_GetImageIndex(image);
-	streamFrontendGlob.imageUseBits[imageIndex >> 5] &= ~(1 << (imageIndex & 0x1F));
+	streamFrontendGlob.imageUseBits[BIT_INDEX_32(imageIndex)] &= ~BIT_MASK_32(imageIndex);
 
 	*freedSize = 0;
 	return nullptr;
@@ -124,9 +126,8 @@ void R_StreamAlloc_Flush()
 		// Reset every index in it
 		for (int bitIndex = 0; bitIndex < 32; bitIndex++)
 		{
-			if (useBits & (1 << (bitIndex & 0x1F)))
-				streamFrontendGlob.imageUseBits[(bitIndex + 32 * index) >> 5] &= ~(1 << ((bitIndex + 32 * index) & 0x1F));
+			if (useBits & BIT_MASK_32(bitIndex))
+				streamFrontendGlob.imageUseBits[BIT_INDEX_32(bitIndex + 32 * index)] &= ~BIT_MASK_32(bitIndex + 32 * index);
 		}
 	}
 }
-#endif

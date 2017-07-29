@@ -63,19 +63,19 @@ inline void R_SetLodOrigin(refdef_s *refdef)
 inline void R_UpdateSpotLightEffect(FxCmd *cmd)
 {
 	Sys_ResetUpdateSpotLightEffectEvent();
-	Sys_AddWorkerCmdInternal((void*)0x00BA5420, cmd, 0);
+	Sys_AddWorkerCmdInternal((jqWorkerCmd *)0x00BA5420, cmd, 0);
 }
 
 inline void R_UpdateNonDependentEffects(FxCmd *cmd)
 {
 	Sys_ResetUpdateNonDependentEffectsEvent();
-	Sys_AddWorkerCmdInternal((void*)0x00BA52E0, cmd, 0);
+	Sys_AddWorkerCmdInternal((jqWorkerCmd *)0x00BA52E0, cmd, 0);
 }
 
 inline void R_UpdateRemainingEffects(FxCmd *cmd)
 {
-	Sys_AddWorkerCmdInternal((void*)0x00BA5300, cmd, 0);
-	Sys_AddWorkerCmdInternal((void*)0x00BA5330, cmd, 0);
+	Sys_AddWorkerCmdInternal((jqWorkerCmd *)0x00BA5300, cmd, 0);
+	Sys_AddWorkerCmdInternal((jqWorkerCmd *)0x00BA5330, cmd, 0);
 }
 
 void R_GenerateReflectionRawData(DiskGfxReflectionProbe* probeRawData)

@@ -8,16 +8,21 @@ const char *XModelGetName(XModel *model)
 	return model->name;
 }
 
-#if 0
+int XModelNumBones(XModel *model)
+{
+	return model->numBones;
+}
+
 // /xanim/xmodel_utils.cpp:94
 int XModelGetSurfaces(XModel *model, XSurface **surfaces, int submodel)
 {
 	ASSERT(model);
 	ASSERT(surfaces);
-	ASSERT(submodel >= 0);
+	ASSERT_MSG(submodel >= 0 && submodel < MAX_LODS, "submodel doesn't index MAX_LODS");
 
-	ASSERT_MSG(submodel < MAX_LODS, "submodel doesn't index MAX_LODS");
-	ASSERT_MSG(model->lodInfo[submodel].surfIndex > 0 && model->lodInfo[submodel].surfIndex < model->numsurfs, "lodInfo->surfIndex doesn't index model->numsurfs");
+	XModelLodInfo *lodInfo = &model->lodInfo[submodel];
+
+	ASSERT_MSG(lodInfo->surfIndex > 0 && lodInfo->surfIndex < model->numsurfs, "lodInfo->surfIndex doesn't index model->numsurfs");
 	ASSERT(lodInfo->surfIndex + lodInfo->numsurfs <= model->numsurfs);
 
 	*surfaces = &model->surfs[model->lodInfo[submodel].surfIndex];
@@ -28,8 +33,7 @@ int XModelGetSurfaces(XModel *model, XSurface **surfaces, int submodel)
 Material * const *XModelGetSkins(XModel *model, int lod)
 {
 	ASSERT(model);
-	ASSERT(lod >= 0);
+	ASSERT_MSG(lod >= 0 && lod < MAX_LODS, "lod doesn't index MAX_LODS");
 
 	return &model->materialHandles[model->lodInfo[lod].surfIndex];
 }
-#endif

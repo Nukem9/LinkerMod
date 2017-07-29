@@ -108,6 +108,25 @@ struct distance_data
 	float distanceForHimip;
 };
 
+struct StreamCombineCmd
+{
+	StreamFrontendGlob *frontend;
+};
+
+struct StreamSortCmd
+{
+	StreamFrontendGlob *frontend;
+	bool diskOrder;
+};
+
+struct StreamUpdateCmd
+{
+	StreamFrontendGlob *frontend;
+	float viewPos[3];
+	float maxDistSq;
+	float distanceScale[2];
+};
+
 extern StreamFrontendGlob streamFrontendGlob;
 
 bool R_StreamIsEnabled();
@@ -118,7 +137,7 @@ void R_StreamSetDefaultConfig(bool clear);
 void R_StreamSetUIConfig(bool clear);
 float R_Stream_GetProgress();
 void R_Stream_InvalidateRequest(pendingRequest *request);
-bool R_StreamRequestImageAllocation(pendingRequest *request, GfxImage *image, bool highMip, int imagePart, float importance);
+stream_status R_StreamRequestImageAllocation(pendingRequest *request, GfxImage *image, bool highMip, float importance);
 void R_StreamUpdate_ReadTextures();
 bool R_StreamRequestImageRead(pendingRequest *request);
 bool R_StreamUpdate_ProcessFileCallbacks();
@@ -156,7 +175,7 @@ void MultiplePointDistSqFromBounds(distance_data *distances, const float *v, con
 void R_StreamUpdateForXModel(XModel *remoteModel, float distSq);
 void R_StreamUpdateForXModelTouched(XModel *model);
 void R_StreamUpdateTouchedModels();
-//void R_StreamUpdateForBModel(const float *viewPos, unsigned int frame, unsigned int surfId, GfxBrushModel *bmodel, const float *origin, float maxDistSq, Material *altMaterial, bool isVisible, float *distanceScale);
+void R_StreamUpdateForBModel(const float *viewPos, unsigned int frame, unsigned int surfId, struct GfxBrushModel *bmodel, const float *origin, float maxDistSq, Material *altMaterial, bool isVisible, float *distanceScale);
 void R_StreamUpdate_AddXModelDistance(XModel *model, const float *viewPos, const float *origin, const float scale, bool visible, float *distanceScale);
 void R_StreamUpdate_AddDynamicXModelDistance(XModel *model, const float *viewPos, const float *origin, const float scale, bool visible, float *distanceScale);
 void R_StreamUpdateDynamicModels(const float *viewPos, float maxDistSq, unsigned int frame, float *distanceScale);
@@ -170,7 +189,7 @@ bool importance_compare_func(void *a, void *b);
 void importance_merge_sort(void **list, const int list_count);
 void R_StreamUpdate_EndQuerySort(bool diskOrder);
 void R_StreamUpdateForcedModels(unsigned int frame);
-DWORD R_StreamUpdate_EndQuery_Internal();
+void R_StreamUpdate_EndQuery_Internal();
 void R_StreamUpdate_EndQuery();
 bool R_StreamUpdate_FindImageAndOptimize(const float *viewPos);
 void R_StreamUpdatePerClient(const float *viewPos);

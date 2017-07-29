@@ -1,7 +1,5 @@
 #pragma once
 
-typedef int DObj;
-typedef int XAnimTree_s;
 typedef int XAnim_s;
 
 struct ViewModelHand

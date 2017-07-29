@@ -28,10 +28,6 @@ struct FxCmd
 	int updateEffectEnd;
 };
 
-struct jqWorkerCmd
-{
-};
-
 static jqWorkerCmd& r_stream_sortWorkerCmd = *(jqWorkerCmd *)0x00BA5770;
 static jqWorkerCmd& r_stream_updateWorkerCmd = *(jqWorkerCmd *)0x00BA5740;
 static jqWorkerCmd& r_stream_combineWorkerCmd = *(jqWorkerCmd *)0x00BA5790;

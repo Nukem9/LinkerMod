@@ -110,12 +110,15 @@
     <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
+    <ClCompile Include="com_workercmds.cpp" />
     <ClCompile Include="cscr_main.cpp" />
     <ClCompile Include="cscr_parser.cpp" />
+    <ClCompile Include="dobj_utils.cpp" />
     <ClCompile Include="r_image_load_common.cpp" />
     <ClCompile Include="r_image_load_obj.cpp" />
     <ClCompile Include="xmodel_utils.cpp" />
     <ClInclude Include="cg_servercmds_mp.h" />
+    <ClInclude Include="com_workercmds.h" />
     <ClInclude Include="cscr_variable.h" />
     <ClCompile Include="cscr_variable.cpp" />
     <ClCompile Include="cscr_vm.cpp" />
@@ -166,8 +169,10 @@
     <ClCompile Include="win_common.cpp" />
     <ClCompile Include="win_exception.cpp" />
     <ClCompile Include="win_main.cpp" />
+    <ClInclude Include="dobj_utils.h" />
     <ClInclude Include="r_image_load_common.h" />
     <ClInclude Include="r_image_load_obj.h" />
+    <ClInclude Include="r_surface.h" />
     <ClInclude Include="xmodel_utils.h" />
   </ItemGroup>
   <ItemGroup>

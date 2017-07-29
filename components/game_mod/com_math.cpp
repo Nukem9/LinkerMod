@@ -15,9 +15,9 @@ float Vec3Dot(float *p1, float *p2)
 	return (p1[0] * p2[0]) + (p1[1] * p2[1]) + (p1[2] * p2[2]);
 }
 
-float Vec3Length(float *p1, float *p2)
+float Vec3Length(float *v)
 {
-	return sqrt((p1[0] * p2[0]) + (p1[1] * p2[1]) + (p1[2] * p2[2]));
+	return sqrt((v[0] * v[0]) + (v[1] * v[1]) + (v[2] * v[2]));
 }
 
 void Vec3Normalize(float *v)

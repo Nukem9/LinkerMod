@@ -44,6 +44,7 @@
 #include "g_items.h"
 #include "sv_ccmds_mp.h"
 #include "sv_client_mp.h"
+#include "dobj_utils.h"
 #include "cl_main_mp.h"
 #include "cl_console.h"
 #include "db_registry.h"
@@ -57,6 +58,7 @@
 #include "r_init.h"
 #include "r_image.h"
 #include "r_debug.h"
+#include "com_workercmds.h"
 #include "r_rendercmds.h"
 #include "r_cinematic.h"
 #include "r_screenshot.h"
@@ -96,6 +98,7 @@
 #include "r_stream.h"
 #include "r_image_load_common.h"
 #include "r_image_load_obj.h"
+#include "r_surface.h"
 
 #include "win_localize.h"
 #include "win_exception.h"

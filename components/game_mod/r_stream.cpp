@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
-#if 0
 #define IMAGE_BIT_IS_SET(var, bits) ((var)[BIT_INDEX_32(bits)] & BIT_MASK_32(bits))
 #define IMAGE_BIT_SET(var, bits)	((var)[BIT_INDEX_32(bits)] |= BIT_MASK_32(bits));
 #define IMAGE_BIT_UNSET(var, bits)	((var)[BIT_INDEX_32(bits)] &= ~BIT_MASK_32(bits));
 
-StreamFrontendGlob streamFrontendGlob;
+int& rgp = *(int *)0x0396A24C;
 
+StreamFrontendGlob streamFrontendGlob;
 pendingRequest s_pendingRequests[10];
 
 DObj *s_forcedLoadEntities[4];
@@ -19,6 +19,8 @@ Material *s_preventMaterials[32];
 
 bool streamIsInitialized;
 volatile long disableCount;
+
+float4& s_viewPos = *(float4 *)0x03E5B664;
 
 // /gfx_d3d/r_stream.cpp:266
 bool R_StreamIsEnabled()
@@ -119,7 +121,7 @@ void R_Stream_InvalidateRequest(pendingRequest *request)
 }
 
 // /gfx_d3d/r_stream.cpp:746
-bool R_StreamRequestImageAllocation(pendingRequest *request, GfxImage *image, bool highMip, int imagePart, float importance)
+stream_status R_StreamRequestImageAllocation(pendingRequest *request, GfxImage *image, bool highMip, float importance)
 {
 	ASSERT(image);
 	ASSERT(request);
@@ -127,13 +129,13 @@ bool R_StreamRequestImageAllocation(pendingRequest *request, GfxImage *image, bo
 	ASSERT(image->streaming != GFX_NOT_STREAMING);
 
 	if (image->streaming == GFX_NOT_STREAMING)
-		return false;
+		return STREAM_STATUS_EOF;
 
 	ASSERT(request->image == nullptr);
 	ASSERT(request->status == STREAM_STATUS_INVALID);
 
 	request->image = image;
-	request->imagePart = imagePart;
+	request->imagePart = 0;
 	request->importance = importance;
 	request->startTime = Sys_Milliseconds();
 	request->bufferSize = 0;
@@ -145,32 +147,32 @@ bool R_StreamRequestImageAllocation(pendingRequest *request, GfxImage *image, bo
 		Com_PrintMessage(
 			16,
 			va(
-				"-STREAM-allocation complete. bytes=%d,image=%s,imagePart=%d,importance=%f\n",
+				"-STREAM-allocation complete. bytes=%d,image=%s,importance=%f\n",
 				request->bufferSize,
 				image->name,
-				imagePart,
 				importance),
 			0);
 	}
 
 	int imageIndex = DB_GetImageIndex(image);
 
-	ASSERT(!(IMAGE_BIT_IS_SET(streamFrontendGlob.imageLoading, imageIndex)));
+	ASSERT(!IMAGE_BIT_IS_SET(streamFrontendGlob.imageLoading, imageIndex));
 
 	IMAGE_BIT_SET(streamFrontendGlob.imageLoading, imageIndex);
 	request->status = STREAM_STATUS_PRE;
 	request->id[0] = -1;
-	return true;
+	return STREAM_STATUS_INPROGRESS;
 }
 
 // /gfx_d3d/r_stream.cpp:813
 void R_StreamUpdate_ReadTextures()
 {
 	static int lastIdx = 0;
+
+	R_StreamAlloc_Lock();
 	pendingRequest *request = nullptr;
 	int numRequests = 0;
 
-	R_StreamAlloc_Lock();
 	for (int i = 0; i < ARRAYSIZE(s_pendingRequests); i++)
 	{
 		int idx = (lastIdx + i) % ARRAYSIZE(s_pendingRequests);
@@ -242,7 +244,6 @@ bool R_StreamRequestImageRead(pendingRequest *request)
 				unloadRequest,
 				unloadImage,
 				false,
-				0,
 				streamFrontendGlob.imageImportance[unloadImagePartIndex])
 				&& R_StreamRequestImageRead(unloadRequest))
 			{
@@ -294,7 +295,7 @@ bool R_StreamUpdate_ProcessFileCallbacks()
 			if (Sys_IsRenderThread())
 			{
 				GfxImageFileHeader *fileHeader = (GfxImageFileHeader *)request->buffer;
-				char *imageData = request->buffer + 48;
+				char *imageData = request->buffer + sizeof(GfxImageFileHeader);
 
 				Image_Release(image);
 
@@ -305,7 +306,8 @@ bool R_StreamUpdate_ProcessFileCallbacks()
 			}
 			else
 			{
-				RB_Resource_ReloadTexture(image, request->buffer);
+				((void(__cdecl *)(GfxImage *, char *))0x006FC1E0)(image, request->buffer);
+				// RB_Resource_ReloadTexture(image, request->buffer);
 			}
 
 			if (request->highMip)
@@ -389,8 +391,8 @@ void R_StreamUpdate_AddForcedImages(float forceImportance, float touchImportance
 		useBits = streamFrontendGlob.imageUseBits[index] & ~forceBits;
 		v2 = streamFrontendGlob.imageUseBits[index] & ~forceBits;
 
-		if (!_BitScanReverse(&v2, forceBits))
-			v2 = `CountLeadingZeros'::`2': : notFound;
+		if (!_BitScanReverse((DWORD *)&v2, forceBits))
+			v2 = 0x3F;
 		v3 = v2 ^ 0x1F;
 
 		for (int bitIndex = 31 - v3; bitIndex >= 0; bitIndex = 31 - v3)
@@ -411,13 +413,13 @@ void R_StreamUpdate_AddForcedImages(float forceImportance, float touchImportance
 			else
 				R_Stream_AddImagePartImportance(bitIndex + 32 * index, forceImportance / (float)part);
 
-			if (!_BitScanReverse((unsigned int *)&v5, forceBits))
-				v5 = `CountLeadingZeros'::`2': : notFound;
+			if (!_BitScanReverse((DWORD *)&v5, forceBits))
+				v5 = 0x3F;
 			v3 = v5 ^ 0x1F;
 		}
 
-		if (!_BitScanReverse((unsigned int *)&v3, useBits))
-			v3 = `CountLeadingZeros'::`2': : notFound;
+		if (!_BitScanReverse((DWORD *)&v3, useBits))
+			v3 = 0x3F;
 
 		for (int bitIndex = 31 - (v3 ^ 0x1F); bitIndex >= 0; bitIndex = 31 - (v6 ^ 0x1F))
 		{
@@ -427,8 +429,8 @@ void R_StreamUpdate_AddForcedImages(float forceImportance, float touchImportance
 
 			R_Stream_AddImagePartImportance(bitIndex + 32 * index, 0.0f);
 
-			if (!_BitScanReverse((unsigned int *)&v6, useBits))
-				v6 = `CountLeadingZeros'::`2': : notFound;
+			if (!_BitScanReverse((DWORD *)&v6, useBits))
+				v6 = 0x3F;
 		}
 	}
 
@@ -447,7 +449,7 @@ void R_Stream_ForceLoadImage(GfxImage *image, int part)
 	{
 		if (part >= 0)
 		{
-			for (int partIndex = 0; partIndex < part && partIndex < 1; partIndex++)
+			for (int partIndex = 0; partIndex < part && partIndex < TOTAL_IMAGE_PARTS; partIndex++)
 				IMAGE_BIT_SET(streamFrontendGlob.imageForceBits, partIndex + imageIndex);
 		}
 		else
@@ -460,7 +462,7 @@ void R_Stream_ForceLoadImage(GfxImage *image, int part)
 	}
 	else
 	{
-		for (int partIndex = 0; partIndex < 1; partIndex++)
+		for (int partIndex = 0; partIndex < TOTAL_IMAGE_PARTS; partIndex++)
 			IMAGE_BIT_UNSET(streamFrontendGlob.imageForceBits, partIndex + imageIndex);
 	}
 
@@ -481,7 +483,7 @@ void R_Stream_ForceLoadMaterial(Material *material, int part)
 
 		ASSERT(texDef);
 
-		if (texDef->semantic == 11)
+		if (texDef->semantic == TS_WATER_MAP)
 			continue;
 
 		ASSERT(texDef->u.image);
@@ -517,9 +519,9 @@ bool R_StreamTouchDObjAndCheck(DObj *obj, int level)
 {
 	ASSERT(obj);
 	ASSERT(Sys_IsMainThread());
-	ASSERT(IsFastFileLoad());
+	ASSERT(useFastFile->current.enabled);
 
-	char streamed = 1;
+	bool streamed = true;
 	int boneIndex = 0;
 	int modelCount = DObjGetNumModels(obj);
 
@@ -542,7 +544,7 @@ bool R_StreamTouchDObjAndCheck(DObj *obj, int level)
 
 		ASSERT(model);
 
-		Material **materials = XModelGetSkins(model, 0);
+		Material * const *materials = XModelGetSkins(model, 0);
 		int boneCount = XModelNumBones(model);
 
 		XSurface *surfaces;
@@ -551,7 +553,7 @@ bool R_StreamTouchDObjAndCheck(DObj *obj, int level)
 		ASSERT(surfaces);
 		ASSERT(surfaceCount);
 
-		unsigned int targBoneIndexHigh = BIT_INDEX_32(boneIndex);
+		unsigned int targBoneIndexHigh = boneIndex >> 5;
 		unsigned int targBoneIndexLow = boneIndex & 0x1F;
 		unsigned int invTargBoneIndexLow = 32 - (boneIndex & 0x1F);
 
@@ -608,7 +610,7 @@ void R_StreamTouchMaterial(Material *material)
 // /gfx_d3d/r_stream.cpp:1794
 bool R_StreamTouchMaterialAndCheck(Material *material, int level)
 {
-	ASSERT(level >= 0 && level < MAX_IMAGE_STREAMED_PARTS, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
+	ASSERT_MSG(level >= 0 && level < MAX_IMAGE_STREAMED_PARTS, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
 
 	bool streamed = true;
 	int imageCount = Material_GetTextureCount(material);
@@ -639,7 +641,7 @@ void R_StreamTouchImage(GfxImage *image)
 // /gfx_d3d/r_stream.cpp:1832
 bool R_StreamTouchImageAndCheck(GfxImage *image, int level)
 {
-	ASSERT(level >= 0 && level < MAX_IMAGE_STREAMED_PARTS, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
+	ASSERT_MSG(level >= 0 && level < MAX_IMAGE_STREAMED_PARTS, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
 
 	if (image->streaming == GFX_NOT_STREAMING)
 		return true;
@@ -661,7 +663,7 @@ bool R_StreamTouchImageAndCheck(GfxImage *image, int level)
 // /gfx_d3d/r_stream.cpp:1860
 bool R_StreamImageCheck(GfxImage *image, int level)
 {
-	ASSERT(level >= 0 && level < MAX_IMAGE_STREAMED_PARTS, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
+	ASSERT_MSG(level >= 0 && level < MAX_IMAGE_STREAMED_PARTS, "level doesn't index MAX_IMAGE_STREAMED_PARTS");
 
 	if (image->streaming == GFX_NOT_STREAMING)
 		return true;
@@ -787,9 +789,6 @@ void R_Stream_Sync()
 			}
 			else if (request->status == STREAM_STATUS_INPROGRESS)
 			{
-				while (request->status < STREAM_STATUS_CANCELLED || request->status > STREAM_STATUS_FINISHED)
-					Sleep(1);
-
 				IMAGE_BIT_UNSET(streamFrontendGlob.imageLoading, DB_GetImageIndex(request->image));
 
 				Z_VirtualFree(request->buffer, 20);
@@ -887,42 +886,47 @@ void R_CheckHighmipAabbs()
 	maxs[1] = 131072.0f;
 	maxs[2] = 131072.0f;
 
-	R_CheckHighmipAabbs_r(rgp, 0, mins, maxs);
+	ASSERT(false);
+	//R_CheckHighmipAabbs_r(rgp, 0, mins, maxs);
 }
 
 // /gfx_d3d/r_stream.cpp:2816
 bool R_StreamUpdate_TryBeginQuery()
 {
-	if (!streamFrontendGlob.queryInProgress && R_StreamIsEnabled())
-	{
-		if (streamFrontendGlob.outputImageList)
-		{
-			R_ImageList_Output();
-			streamFrontendGlob.outputImageList = false;
-		}
+	// Streaming must be enabled by user
+	if (!R_StreamIsEnabled())
+		return false;
 
-		memset(streamFrontendGlob.materialImportance, 0, sizeof(streamFrontendGlob.materialImportance));
-		memset(streamFrontendGlob.materialImportanceBits, 0, sizeof(streamFrontendGlob.materialImportanceBits));
-		memset(streamFrontendGlob.modelDistance, 0, sizeof(streamFrontendGlob.modelDistance));
-		memset(streamFrontendGlob.modelDistanceBits, 0, sizeof(streamFrontendGlob.modelDistanceBits));
-		memset(streamFrontendGlob.imageImportance, 0, sizeof(streamFrontendGlob.imageImportance));
-		memset(streamFrontendGlob.imageImportanceBits, 0, sizeof(streamFrontendGlob.imageImportanceBits));
-		memset(streamFrontendGlob.dynamicModelDistance, 0, sizeof(streamFrontendGlob.dynamicModelDistance));
-		memset(streamFrontendGlob.dynamicModelDistanceBits, 0, sizeof(streamFrontendGlob.dynamicModelDistanceBits));
-		return true;
+	// Can't have another query already happening
+	if (streamFrontendGlob.queryInProgress)
+		return false;
+
+	// Debug dump image list to console
+	if (streamFrontendGlob.outputImageList)
+	{
+		R_ImageList_Output();
+		streamFrontendGlob.outputImageList = false;
 	}
 
-	return false;
+	memset(streamFrontendGlob.materialImportance, 0, sizeof(streamFrontendGlob.materialImportance));
+	memset(streamFrontendGlob.materialImportanceBits, 0, sizeof(streamFrontendGlob.materialImportanceBits));
+	memset(streamFrontendGlob.modelDistance, 0, sizeof(streamFrontendGlob.modelDistance));
+	memset(streamFrontendGlob.modelDistanceBits, 0, sizeof(streamFrontendGlob.modelDistanceBits));
+	memset(streamFrontendGlob.imageImportance, 0, sizeof(streamFrontendGlob.imageImportance));
+	memset(streamFrontendGlob.imageImportanceBits, 0, sizeof(streamFrontendGlob.imageImportanceBits));
+	memset(streamFrontendGlob.dynamicModelDistance, 0, sizeof(streamFrontendGlob.dynamicModelDistance));
+	memset(streamFrontendGlob.dynamicModelDistanceBits, 0, sizeof(streamFrontendGlob.dynamicModelDistanceBits));
+	return true;
 }
 
 // /gfx_d3d/r_stream.cpp:2895
 void R_StreamUpdate_Idle()
 {
-	if (DB_FinishedLoadingAssets())
-	{
-		if (R_StreamUpdate(nullptr))
-			R_StreamUpdate_EndQuery();
-	}
+	if (!DB_FinishedLoadingAssets())
+		return;
+
+	if (R_StreamUpdate(nullptr))
+		R_StreamUpdate_EndQuery();
 }
 
 // /gfx_d3d/r_stream.cpp:2909
@@ -993,15 +997,15 @@ bool R_StreamUpdate(const float *viewPos)
 // /gfx_d3d/r_stream.cpp:3344
 void R_Stream_AddImagePartImportance(int imagePartIndex, float importance)
 {
-	ASSERT(imagePartIndex >= 0 && imagePartIndex < TOTAL_IMAGE_PARTS, "imagePartIndex doesn't index TOTAL_IMAGE_PARTS");
+	ASSERT_MSG(imagePartIndex >= 0 && imagePartIndex < TOTAL_IMAGE_PARTS, "imagePartIndex doesn't index TOTAL_IMAGE_PARTS");
 
 	streamFrontendGlob.imageImportance[imagePartIndex] = max(importance, streamFrontendGlob.imageImportance[imagePartIndex]);
 
-	if (!(IMAGE_BIT_IS_SET(streamFrontendGlob.imageImportanceBits, imagePartIndex)))
+	if (!IMAGE_BIT_IS_SET(streamFrontendGlob.imageImportanceBits, imagePartIndex))
 	{
 		IMAGE_BIT_SET(streamFrontendGlob.imageImportanceBits, imagePartIndex);
 
-		if (!(IMAGE_BIT_IS_SET(streamFrontendGlob.imageInSortedListBits, imagePartIndex)))
+		if (!IMAGE_BIT_IS_SET(streamFrontendGlob.imageInSortedListBits, imagePartIndex))
 		{
 			IMAGE_BIT_SET(streamFrontendGlob.imageInSortedListBits, imagePartIndex);
 			streamFrontendGlob.sortedImages[streamFrontendGlob.sortedImageCount++] = (signed __int16)imagePartIndex;
@@ -1022,7 +1026,7 @@ void R_StreamTouchImagesFromMaterial(Material *remoteMaterial, float importance)
 		MaterialTextureDef *texDef = &remoteMaterial->textureTable[textureIter];
 		ASSERT(texDef);
 
-		if (texDef->semantic == 11)
+		if (texDef->semantic == TS_WATER_MAP)
 			continue;
 
 		GfxImage *image = texDef->u.image;
@@ -1039,40 +1043,15 @@ void R_StreamTouchImagesFromMaterial(Material *remoteMaterial, float importance)
 // /gfx_d3d/r_stream.cpp:3454
 float FastPointDistSqFromBounds(float4 mins, float4 maxs)
 {
-	float v3; // [sp+4h] [bp-120h]@17
-	float v4; // [sp+8h] [bp-11Ch]@14
-	float v5; // [sp+Ch] [bp-118h]@11
-	float v6; // [sp+14h] [bp-110h]@8
-	float v7; // [sp+18h] [bp-10Ch]@5
-	float v8; // [sp+1Ch] [bp-108h]@2
+	float4 rvec;
+	rvec.v[0] = min(maxs.v[0], max(s_viewPos.v[0], mins.v[0]));
+	rvec.v[1] = min(maxs.v[1], max(s_viewPos.v[1], mins.v[1]));
+	rvec.v[2] = min(maxs.v[2], max(s_viewPos.v[2], mins.v[2]));
 
-	if ((float)(s_viewPos.v[0] - mins.v[0]) < 0.0)
-		v8 = mins.v[0];
-	else
-		v8 = s_viewPos.v[0];
-	if ((float)(s_viewPos.v[1] - mins.v[1]) < 0.0)
-		v7 = mins.v[1];
-	else
-		v7 = s_viewPos.v[1];
-	if ((float)(s_viewPos.v[2] - mins.v[2]) < 0.0)
-		v6 = mins.v[2];
-	else
-		v6 = s_viewPos.v[2];
-	if ((float)(maxs.v[0] - v8) < 0.0)
-		v5 = maxs.v[0];
-	else
-		v5 = v8;
-	if ((float)(maxs.v[1] - v7) < 0.0)
-		v4 = maxs.v[1];
-	else
-		v4 = v7;
-	if ((float)(maxs.v[2] - v6) < 0.0)
-		v3 = maxs.v[2];
-	else
-		v3 = v6;
-	return (float)((float)((float)(v5 - s_viewPos.v[0]) * (float)(v5 - s_viewPos.v[0]))
-		+ (float)((float)(v4 - s_viewPos.v[1]) * (float)(v4 - s_viewPos.v[1])))
-		+ (float)((float)(v3 - s_viewPos.v[2]) * (float)(v3 - s_viewPos.v[2]));
+	return
+		(((rvec.v[0] - s_viewPos.v[0]) * (rvec.v[0] - s_viewPos.v[0])) +
+		((rvec.v[1] - s_viewPos.v[1]) * (rvec.v[1] - s_viewPos.v[1]))) +
+		((rvec.v[2] - s_viewPos.v[2]) * (rvec.v[2] - s_viewPos.v[2]));
 }
 
 // /gfx_d3d/r_stream.cpp:3461
@@ -1108,9 +1087,9 @@ void R_StreamUpdateForXModel(XModel *remoteModel, float distSq)
 			continue;
 
 		XModelHighMipBounds *bounds = &highMipBounds[surf];
-		__int128 v2 = LODWORD(highMipBounds[surf].himipRadiusSq);
-		__asm { lahf }
-		if (__SETP__(_AH & 0x44, 0))
+		
+		// CHECK LAHF
+		if (highMipBounds[surf].himipRadiusSq != 0.0f)
 		{
 			float distanceForHimip = distNotSq - Vec3Length(bounds->center);
 
@@ -1221,12 +1200,12 @@ void R_StreamUpdateStaticModel(int staticModelIndex, const float *viewPos, float
 // /gfx_d3d/r_stream.cpp:3824
 void R_StreamUpdateWorldSurface(int surfId, const float *viewPos, float maxDistSq, float *distanceScale)
 {
-	ASSERT(surfId >= 0 && surfId < rgp.world->surfaceCount);
+	//ASSERT(surfId >= 0 && surfId < rgp.world->surfaceCount);
 
-	GfxSurface *surface = &rgp->dpvs.surfaces[surfId];
-	bool isVisible = rgp->dpvs.surfaceVisDataCameraSaved[surfId] != 0;
+	GfxSurface *surface = (GfxSurface *)(*(DWORD *)(rgp + 0x39C) + 0x50 * surfId);
+	bool isVisible = *(BYTE *)(surfId + *(DWORD *)(rgp + 0x38C));
 
-	if (!dword_A868184 || isVisible)
+	if (!*(DWORD *)0x396EE10 || isVisible)
 	{
 		distance_data distSq;
 
@@ -1273,10 +1252,9 @@ void R_StreamUpdate_CombineImportance()
 
 	for (int materialIndex = 0; materialIndex < MAX_MATERIAL_POOL_SIZE; materialIndex++)
 	{
-		__int128 v1 = LODWORD(streamFrontendGlob.materialImportance[materialIndex]);
-		__asm { lahf }
-		if (__SETP__(_AH & 0x44, 0)
-			&& !(streamFrontendGlob.materialPreventBits[materialIndex >> 5] & (1 << (materialIndex & 0x1F))))
+		// CHECK LAHF
+		if (streamFrontendGlob.materialImportance[materialIndex] != 0.0f
+			&& !IMAGE_BIT_IS_SET(streamFrontendGlob.materialPreventBits, materialIndex))
 		{
 			Material *material = DB_GetMaterialAtIndex(materialIndex);
 			ASSERT(material);
@@ -1319,6 +1297,8 @@ bool importance_compare_func(void *a, void *b)
 // /gfx_d3d/r_stream.cpp:4099
 void importance_merge_sort(void **list, const int list_count)
 {
+	static void *aux_buffer[8000];
+
 	void **t; // [sp+0h] [bp-14h]@7
 	void **b; // [sp+8h] [bp-Ch]@6
 	void **ba; // [sp+8h] [bp-Ch]@11
@@ -1398,11 +1378,7 @@ void R_StreamUpdate_EndQuerySort(bool diskOrder)
 	{
 		if (streamFrontendGlob.diskOrderImagesNeedSorting || streamFrontendGlob.forceDiskOrder)
 		{
-			std::_Sort<int *, int, importance_and_offset_pred>(
-				streamFrontendGlob.sortedImages,
-				&streamFrontendGlob.sortedImages[streamFrontendGlob.sortedImageCount],
-				4 * streamFrontendGlob.sortedImageCount >> 2,
-				0);
+			((void(__cdecl *)(int *, int *, int, bool))0x006FB8D0)(streamFrontendGlob.sortedImages, &streamFrontendGlob.sortedImages[streamFrontendGlob.sortedImageCount], 4 * streamFrontendGlob.sortedImageCount >> 2, diskOrder);
 			streamFrontendGlob.diskOrderImagesNeedSorting = false;
 		}
 	}
@@ -1427,7 +1403,7 @@ void R_StreamUpdateForcedModels(unsigned int frame)
 		{
 			XModel *model = DObjGetModel(s_forcedLoadEntities[i], modelIter);
 
-			for (int lod = 0; lod < 4; lod++)
+			for (int lod = 0; lod < MAX_LODS; lod++)
 			{
 				XSurface *surfaces = nullptr;
 				Material * const *material = nullptr;
@@ -1453,89 +1429,86 @@ void R_StreamUpdateForcedModels(unsigned int frame)
 }
 
 // /gfx_d3d/r_stream.cpp:4300
-DWORD R_StreamUpdate_EndQuery_Internal()
+void R_StreamUpdate_EndQuery_Internal()
 {
-	unsigned int v0; // eax@28
-	signed int i; // [sp+28h] [bp-24h]@7
-	int sortedIndex; // [sp+2Ch] [bp-20h]@4
-	GfxImage *image; // [sp+30h] [bp-1Ch]@31
-	signed int imagePartIndex; // [sp+38h] [bp-14h]@27
-	pendingRequest *request; // [sp+3Ch] [bp-10h]@7
-	bool movesPending; // [sp+47h] [bp-5h]@7
-	int imagePart; // [sp+48h] [bp-4h]@30
-
-	sortedIndex = 0;
+	bool v4 = false;
+	int sortedIndex = 0;
 
 	if (Sys_IsRenderThread())
 		R_StreamUpdate_ProcessFileCallbacks();
 
-LABEL_6:
-	while (sortedIndex != streamFrontendGlob.sortedImageCount)
+	if (streamFrontendGlob.sortedImageCount)
 	{
-		movesPending = CG_IsShowingZombieMap(1);
-		request = 0;
-
-		for (i = 0; i < 10; ++i)
+		do
 		{
-			if (request || s_pendingRequests[i].status || i >= 10)
+			// Find the next applicate stream load request
+			pendingRequest *request = nullptr;
+
+			for (int i = 0; i < ARRAYSIZE(s_pendingRequests); i++)
 			{
-				if (s_pendingRequests[i].status == 1 && !movesPending)
-					R_StreamRequestImageRead(&s_pendingRequests[i]);
-			}
-			else
-			{
-				request = &s_pendingRequests[i];
-			}
-		}
-
-		if (!request)
-		{
-			return;
-		}
-
-		while (sortedIndex < streamFrontendGlob.sortedImageCount)
-		{
-			imagePartIndex = streamFrontendGlob.sortedImages[sortedIndex];
-
-			if (!(streamFrontendGlob.imageUseBits[imagePartIndex >> 5] & (1 << (imagePartIndex & 0x1F))))
-			{
-				imagePart = imagePartIndex & 0x80000000;
-				
-				if ((imagePartIndex & 0x80000000 & 0x80000000) != 0)
-					imagePart = 0;
-
-				if (!(streamFrontendGlob.imageLoading[imagePartIndex >> 5] & (1 << (imagePartIndex & 0x1F))))
+				if (request || s_pendingRequests[i].status || i >= ARRAYSIZE(s_pendingRequests))
 				{
-					image = DB_GetImageAtIndex(imagePartIndex);
-					if (image->streaming)
-					{
-						if (image->streaming != 3
-							&& image->skippedMipLevels
-							&& (imagePart <= 0
-								|| streamFrontendGlob.imageUseBits[(imagePartIndex - 1) >> 5] & (1 << ((imagePartIndex - 1) & 0x1F))))
-						{
-							if (R_StreamRequestImageAllocation(
-								request,
-								image,
-								1,
-								imagePart,
-								streamFrontendGlob.imageImportance[imagePartIndex]))
-							{
-								streamFrontendGlob.initialLoadAllocFailures = 0;
-								if (CG_IsShowingZombieMap(1) || R_StreamRequestImageRead(request))
-									goto LABEL_6;
-							}
-							else
-							{
-								++streamFrontendGlob.initialLoadAllocFailures;
-							}
-							return;
-						}
-					}
+					if (s_pendingRequests[i].status == STREAM_STATUS_PRE)
+						R_StreamRequestImageRead(&s_pendingRequests[i]);
+				}
+				else
+				{
+					request = &s_pendingRequests[i];
 				}
 			}
-			++sortedIndex;
-		}
+
+			if (!request)
+				return;
+
+			v4 = sortedIndex == streamFrontendGlob.sortedImageCount;
+			if (sortedIndex < streamFrontendGlob.sortedImageCount)
+			{
+				int imagePartIndex = 0;
+				GfxImage *image = nullptr;
+
+				while (true)
+				{
+					imagePartIndex = streamFrontendGlob.sortedImages[sortedIndex];
+
+					const unsigned int imageIndex = BIT_INDEX_32(imagePartIndex);
+					const unsigned int imageMask = BIT_MASK_32(imagePartIndex);
+
+					if (!(streamFrontendGlob.imageUseBits[imageIndex] & imageMask) && !(streamFrontendGlob.imageLoading[imageIndex] & imageMask))
+					{
+						image = DB_GetImageAtIndex(imagePartIndex);
+
+						if (image->streaming)
+						{
+							if (image->streaming != GFX_TEMP_STREAMING && image->skippedMipLevels)
+								break;
+						}
+					}
+
+					if (++sortedIndex >= streamFrontendGlob.sortedImageCount)
+						goto LABEL_23;
+				}
+
+				stream_status status = R_StreamRequestImageAllocation(request, image, true, streamFrontendGlob.imageImportance[imagePartIndex]);
+
+				if (status == STREAM_STATUS_INPROGRESS)
+				{
+					streamFrontendGlob.initialLoadAllocFailures = 0;
+
+					if (!R_StreamRequestImageRead(request))
+						return;
+
+				LABEL_23:
+					v4 = sortedIndex == streamFrontendGlob.sortedImageCount;
+					continue;
+				}
+
+				// bool GfxGlobals::isMultiplayer;
+				if (!*(bool *)0x396A4B1 || status != STREAM_STATUS_READFAILED && status != STREAM_STATUS_CANCELLED)
+					streamFrontendGlob.initialLoadAllocFailures++;
+
+				return;
+			}
+		} while (!v4);
 	}
 }
 
@@ -1736,4 +1709,3 @@ void R_Stream_CombineCmd(void *data)
 {
 	R_StreamUpdate_CombineImportance();
 }
-#endif
