@@ -10,6 +10,7 @@ struct BulletFireParams
 	float start[3];
 	float end[3];
 	float dir[3];
+	char _pad0[4];
 };
 STATIC_ASSERT_OFFSET(BulletFireParams, weaponEntIndex, 0x0);
 STATIC_ASSERT_OFFSET(BulletFireParams, ignoreEntIndex, 0x4);
@@ -19,6 +20,7 @@ STATIC_ASSERT_OFFSET(BulletFireParams, origStart, 0x10);
 STATIC_ASSERT_OFFSET(BulletFireParams, start, 0x1C);
 STATIC_ASSERT_OFFSET(BulletFireParams, end, 0x28);
 STATIC_ASSERT_OFFSET(BulletFireParams, dir, 0x34);
+STATIC_ASSERT_SIZE(BulletFireParams, 0x44);
 
 float G_GoodRandomFloat(int *idum);
 void Bullet_RandomDir(unsigned int *randSeed, float *x, float *y);
