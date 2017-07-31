@@ -49,11 +49,9 @@ unsigned int Image_GetCardMemoryAmountForMipLevel(D3DFORMAT format, unsigned int
 	case D3DFMT_A16B16G16R16F:
 		return 8 * mipDepth * mipHeight * mipWidth;
 
-	case D3DFMT_A8B8G8R8:
-		return 4 * mipDepth * mipHeight * mipWidth;
-
 	case D3DFMT_A8R8G8B8:
 	case D3DFMT_X8R8G8B8:
+	case D3DFMT_A8B8G8R8:
 	case D3DFMT_G16R16:
 	case D3DFMT_D24S8:
 	case D3DFMT_G16R16F:
@@ -98,27 +96,213 @@ unsigned int Image_GetCardMemoryAmount(unsigned int imageFlags, D3DFORMAT format
 	return memory;
 }
 
+// /gfx_d3d/r_image_load_common.cpp:348
+int Image_SourceBytesPerSlice_PC(D3DFORMAT format, int width, int height)
+{
+	switch (format)
+	{
+	case D3DFMT_DXT1:
+		return 8 * ((height + 3) >> 2) * ((width + 3) >> 2);
+
+	case D3DFMT_DXT3:
+	case D3DFMT_DXT5:
+		return 16 * ((height + 3) >> 2) * ((width + 3) >> 2);
+
+	case D3DFMT_A8R8G8B8:
+	case D3DFMT_D24S8:
+	case D3DFMT_R32F:
+		return 4 * height * width;
+
+	case D3DFMT_X8R8G8B8:
+		return 3 * height * width;
+
+	case D3DFMT_R5G6B5:
+	case D3DFMT_A8L8:
+	case D3DFMT_D16:
+		return 2 * height * width;
+
+	case D3DFMT_A8:
+	case D3DFMT_L8:
+		return height * width;
+	}
+
+	ASSERT_MSG_VA(false, "Unhandled case %d", format);
+	return 0;
+}
+
+// /gfx_d3d/r_image_load_common.cpp:590
+void Image_Upload2D_CopyDataBlock_PC(int width, int height, const char *src, D3DFORMAT format, int dstPitch, char *dst)
+{
+	ASSERT(src);
+	ASSERT(dst);
+
+	int srcStride = 0;
+	int dy = 0;
+
+	switch (format)
+	{
+	case D3DFMT_DXT1:
+		srcStride = 8 * ((width + 3) >> 2);
+		dy = 4;
+		break;
+
+	case D3DFMT_DXT3:
+	case D3DFMT_DXT5:
+		srcStride = 16 * ((width + 3) >> 2);
+		dy = 4;
+		break;
+
+	case D3DFMT_A8R8G8B8:
+	case D3DFMT_X8R8G8B8:
+	case D3DFMT_A8B8G8R8:
+	case D3DFMT_G16R16:
+	case D3DFMT_A16B16G16R16:
+	case D3DFMT_A16B16G16R16F:
+	case D3DFMT_R32F:
+		srcStride = 4 * width;
+		dy = 1;
+		break;
+
+	case D3DFMT_R5G6B5:
+	case D3DFMT_A8L8:
+		srcStride = 2 * width;
+		dy = 1;
+		break;
+
+	case D3DFMT_A8:
+	case D3DFMT_L8:
+		srcStride = width;
+		dy = 1;
+		break;
+
+	default:
+		ASSERT_MSG_VA(false, "Unhandled case %d", format);
+		return;
+	}
+
+	ASSERT_MSG_VA(dstPitch >= srcStride, "%i x %i: %i < %i", width, height, dstPitch, srcStride);
+
+	if (dstPitch == srcStride)
+	{
+		memcpy(dst, (char *)src, srcStride * ((height - 1) / dy + 1));
+	}
+	else
+	{
+		for (int y = 0; y < height; y += dy)
+		{
+			memcpy(dst, (char *)src, srcStride);
+			dst += dstPitch;
+			src += srcStride;
+		}
+	}
+}
+
 // /gfx_d3d/r_image_load_common.cpp:673
 void Image_Upload2D_CopyData_PC(GfxImage *image, D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src)
 {
-	static DWORD dwCall = 0x00739840;
+	D3DLOCKED_RECT lockedRect;
+	memset(&lockedRect, 0, sizeof(lockedRect));
 
-	__asm
+	HRESULT hr = S_OK;
+	int width = max(1, image->width >> mipLevel);
+	int height = max(1, image->height >> mipLevel);
+
+	if (image->mapType == MAPTYPE_2D)
 	{
-		push src
-		push face
-		push format
-		mov esi, mipLevel
-		mov eax, image
-		call [dwCall]
-		add esp, 0xC
+		ASSERT(image->texture.map);
+
+		hr = image->texture.map->LockRect(mipLevel, &lockedRect, nullptr, 0);
+
+		if (FAILED(hr))
+		{
+			g_disableRendering++;
+			Com_Error(0, "image->texture.map->LockRect(mipLevel, &lockedRect, nullptr, 0) failed: %s\n", R_ErrorDescription(hr));
+		}
+
+		Image_Upload2D_CopyDataBlock_PC(width, height, src, format, lockedRect.Pitch, (char *)lockedRect.pBits);
+
+		hr = image->texture.map->UnlockRect(mipLevel);
+
+		if (FAILED(hr))
+		{
+			g_disableRendering++;
+			Com_Error(0, "image->texture.map->UnlockRect(mipLevel) failed: %s\n", R_ErrorDescription(hr));
+		}
+	}
+	else
+	{
+		ASSERT(image->mapType == MAPTYPE_CUBE);
+		ASSERT(
+			face == D3DCUBEMAP_FACE_POSITIVE_X ||
+			face == D3DCUBEMAP_FACE_NEGATIVE_X ||
+			face == D3DCUBEMAP_FACE_POSITIVE_Y ||
+			face == D3DCUBEMAP_FACE_NEGATIVE_Y ||
+			face == D3DCUBEMAP_FACE_POSITIVE_Z ||
+			face == D3DCUBEMAP_FACE_NEGATIVE_Z);
+		ASSERT(image->texture.cubemap);
+
+		hr = image->texture.cubemap->LockRect(face, mipLevel, &lockedRect, nullptr, 0);
+
+		if (FAILED(hr))
+		{
+			g_disableRendering++;
+			Com_Error(0, "image->texture.cubemap->LockRect(face, mipLevel, &lockedRect, nullptr, 0) failed: %s\n", R_ErrorDescription(hr));
+		}
+
+		Image_Upload2D_CopyDataBlock_PC(width, height, src, format, lockedRect.Pitch, (char *)lockedRect.pBits);
+
+		hr = image->texture.cubemap->UnlockRect(face, mipLevel);
+
+		if (FAILED(hr))
+		{
+			g_disableRendering++;
+			Com_Error(0, "image->texture.cubemap->UnlockRect(face, mipLevel) failed: %s\n", R_ErrorDescription(hr));
+		}
 	}
 }
 
 // /gfx_d3d/r_image_load_common.cpp:824
 void Image_Upload3D_CopyData_PC(GfxImage *image, D3DFORMAT format, unsigned int mipLevel, const char *src)
 {
-	((void(__cdecl *)(GfxImage *, D3DFORMAT, unsigned int, const char *))0x00739910)(image, format, mipLevel, src);
+	ASSERT(image);
+	ASSERT(image->mapType == MAPTYPE_3D);
+
+	int width = max(1, image->width >> mipLevel);
+	int height = max(1, image->height >> mipLevel);
+	int depth = max(1, image->depth >> mipLevel);
+
+	int srcRowPitch = Image_SourceBytesPerSlice_PC(format, width, height);
+
+	ASSERT(image->texture.volmap);
+
+	D3DLOCKED_BOX lockedBox;
+	memset(&lockedBox, 0, sizeof(lockedBox));
+
+	HRESULT hr = image->texture.volmap->LockBox(mipLevel, &lockedBox, nullptr, 0);
+
+	if (FAILED(hr))
+	{
+		g_disableRendering++;
+		Com_Error(0, "image->texture.volmap->LockBox(mipLevel, &lockedBox, nullptr, 0) failed: %s\n", R_ErrorDescription(hr));
+	}
+
+	char *dst = (char *)lockedBox.pBits;
+	for (int sliceIndex = 0; sliceIndex < depth; sliceIndex++)
+	{
+		Image_Upload2D_CopyDataBlock_PC(width, height, src, format, lockedBox.RowPitch, dst);
+		src += srcRowPitch;
+		dst += lockedBox.SlicePitch;
+	}
+
+	hr = image->texture.volmap->UnlockBox(mipLevel);
+
+	if (FAILED(hr))
+	{
+		g_disableRendering++;
+		Com_Error(0, "image->texture.volmap->UnlockBox(mipLevel) failed: %s\n", R_ErrorDescription(hr));
+	}
+
+	image->texture.volmap->PreLoad();
 }
 
 // /gfx_d3d/r_image_load_common.cpp:1039
