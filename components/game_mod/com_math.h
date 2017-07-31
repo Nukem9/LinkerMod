@@ -23,3 +23,15 @@ static int CountBitsEnabled(unsigned int num)
 
 	return (numb >> 16) + (numb & 0xFFFF);
 }
+
+static int NextMSBSet(unsigned int value)
+{
+	// Return the first most-significant-bit index
+	DWORD index;
+
+	// 'BitScanReverse() == 0' indicates no bits were set. We return '-1' to indicate that.
+	if (_BitScanReverse(&index, value) == 0)
+		return -1;
+
+	return (int)index;
+}

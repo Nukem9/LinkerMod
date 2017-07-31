@@ -452,66 +452,40 @@ void R_StreamUpdate_AddInitialImages(float importance)
 // /gfx_d3d/r_stream.cpp:1474
 void R_StreamUpdate_AddForcedImages(float forceImportance, float touchImportance)
 {
-	unsigned int v2; // eax@3
-	int v3; // eax@5
-	signed int v4; // ecx@10
-	int v5; // eax@13
-	int v6; // eax@25
-	signed int mask; // [sp+1Ch] [bp-1Ch]@7
-	unsigned int useBits; // [sp+20h] [bp-18h]@3
-	unsigned int forceBits; // [sp+24h] [bp-14h]@3
-	unsigned int touchBits; // [sp+28h] [bp-10h]@3
-	int part; // [sp+2Ch] [bp-Ch]@12
-
+	// Toggle between index 1 and 0
 	streamFrontendGlob.activeImageTouchBits ^= 1;
 
 	for (int index = 0; index < STREAM_MAX_IMAGE_BITS; index++)
 	{
-		touchBits = streamFrontendGlob.imageTouchBits[index][0] | streamFrontendGlob.imageTouchBits[index][1];
-		forceBits = streamFrontendGlob.imageForceBits[index] | touchBits;
-		useBits = streamFrontendGlob.imageUseBits[index] & ~forceBits;
-		v2 = streamFrontendGlob.imageUseBits[index] & ~forceBits;
+		unsigned int touchBits = streamFrontendGlob.imageTouchBits[index][0] | streamFrontendGlob.imageTouchBits[index][1];
+		unsigned int forceBits = streamFrontendGlob.imageForceBits[index] | touchBits;
+		unsigned int useBits = streamFrontendGlob.imageUseBits[index] & ~forceBits;
 
-		if (!_BitScanReverse((DWORD *)&v2, forceBits))
-			v2 = 0x3F;
-		v3 = v2 ^ 0x1F;
-
-		for (int bitIndex = 31 - v3; bitIndex >= 0; bitIndex = 31 - v3)
+		for (int bitIndex = NextMSBSet(forceBits); bitIndex >= 0; bitIndex = NextMSBSet(forceBits))
 		{
-			mask = 1 << (bitIndex & 0x1F);
+			const int mask = BIT_MASK_32(bitIndex);
 
-			ASSERT(forceBits & BIT_MASK_32(bitIndex));
-
+			ASSERT(forceBits & mask);
 			forceBits &= ~mask;
 
-			v4 = (bitIndex + 32 * index) & 0x80000000;
-			if (v4 < 0)
-				v4 = 0;
-			part = v4 + 1;
+			int part;
+			part = (bitIndex + 32 * index) & 0x80000000;
+			part = max(part, 0) + 1;
 
 			if (mask & touchBits)
 				R_Stream_AddImagePartImportance(bitIndex + 32 * index, touchImportance / (float)part);
 			else
 				R_Stream_AddImagePartImportance(bitIndex + 32 * index, forceImportance / (float)part);
-
-			if (!_BitScanReverse((DWORD *)&v5, forceBits))
-				v5 = 0x3F;
-			v3 = v5 ^ 0x1F;
 		}
 
-		if (!_BitScanReverse((DWORD *)&v3, useBits))
-			v3 = 0x3F;
-
-		for (int bitIndex = 31 - (v3 ^ 0x1F); bitIndex >= 0; bitIndex = 31 - (v6 ^ 0x1F))
+		for (int bitIndex = NextMSBSet(useBits); bitIndex >= 0; bitIndex = NextMSBSet(useBits))
 		{
-			ASSERT(useBits & BIT_MASK_32(bitIndex));
+			const int mask = BIT_MASK_32(bitIndex);
 
-			useBits &= ~BIT_MASK_32(bitIndex);
+			ASSERT(useBits & mask);
+			useBits &= ~mask;
 
 			R_Stream_AddImagePartImportance(bitIndex + 32 * index, 0.0f);
-
-			if (!_BitScanReverse((DWORD *)&v6, useBits))
-				v6 = 0x3F;
 		}
 	}
 
@@ -713,7 +687,7 @@ void R_StreamTouchImage(GfxImage *image)
 	for (int part = 0; part < STREAM_MAX_IMAGE_PARTS;)
 	{
 		// Set the bit to 1/'enable'
-		streamFrontendGlob.imageTouchBits[BIT_INDEX_32(imagePartIndex)][streamFrontendGlob.activeImageTouchBits] = BIT_MASK_32(imagePartIndex);
+		streamFrontendGlob.imageTouchBits[BIT_INDEX_32(imagePartIndex)][streamFrontendGlob.activeImageTouchBits] |= BIT_MASK_32(imagePartIndex);
 
 		part++;
 		imagePartIndex++;
@@ -734,7 +708,7 @@ bool R_StreamTouchImageAndCheck(GfxImage *image, int level)
 	for (int part = 0; part < STREAM_MAX_IMAGE_PARTS;)
 	{
 		// Set the bit to 1/'enable'
-		streamFrontendGlob.imageTouchBits[BIT_INDEX_32(imagePartIndex)][streamFrontendGlob.activeImageTouchBits] = BIT_MASK_32(imagePartIndex);
+		streamFrontendGlob.imageTouchBits[BIT_INDEX_32(imagePartIndex)][streamFrontendGlob.activeImageTouchBits] |= BIT_MASK_32(imagePartIndex);
 
 		part++;
 		imagePartIndex++;
@@ -870,9 +844,6 @@ void R_Stream_Sync()
 			break;
 
 		case STREAM_STATUS_INPROGRESS:
-			// CHECK ME
-			while (request->status < STREAM_STATUS_CANCELLED || request->status > STREAM_STATUS_FINISHED)
-				Sleep(1);
 		case STREAM_STATUS_FINISHED:
 			IMAGE_BIT_UNSET(streamFrontendGlob.imageLoading, DB_GetImageIndex(request->image));
 			Z_VirtualFree(request->buffer, 20);
@@ -1265,7 +1236,6 @@ void R_StreamUpdate_AddDynamicXModelDistance(XModel *model, const float *viewPos
 // /gfx_d3d/r_stream.cpp:3690
 void R_StreamUpdateDynamicModels(const float *viewPos, float maxDistSq, unsigned int frame, float *distanceScale)
 {
-	//return;
 	memcpy((void *)0x03E5B664, &s_viewPos, 16);
 
 	static DWORD dwCall = 0x006FA4F0;
@@ -1571,84 +1541,76 @@ void R_StreamUpdateForcedModels(unsigned int frame)
 // /gfx_d3d/r_stream.cpp:4300
 void R_StreamUpdate_EndQuery_Internal()
 {
-	bool v4 = false;
-	int sortedIndex = 0;
-
 	if (Sys_IsRenderThread())
 		R_StreamUpdate_ProcessFileCallbacks();
 
-	if (streamFrontendGlob.sortedImageCount)
+	for (int sortedIndex = 0; sortedIndex != streamFrontendGlob.sortedImageCount;)
 	{
-		do
+		// Find the next applicable stream load request
+		pendingRequest *request = nullptr;
+
+		for (int i = 0; i < STREAM_MAX_REQUESTS; i++)
 		{
-			// Find the next applicable stream load request
-			pendingRequest *request = nullptr;
-
-			for (int i = 0; i < STREAM_MAX_REQUESTS; i++)
+			if (request || s_pendingRequests[i].status != STREAM_STATUS_INVALID || i >= STREAM_MAX_REQUESTS)
 			{
-				if (request || s_pendingRequests[i].status != STREAM_STATUS_INVALID || i >= STREAM_MAX_REQUESTS)
-				{
-					if (s_pendingRequests[i].status == STREAM_STATUS_PRE)
-						R_StreamRequestImageRead(&s_pendingRequests[i]);
-				}
-				else
-				{
-					request = &s_pendingRequests[i];
-				}
+				if (s_pendingRequests[i].status == STREAM_STATUS_PRE)
+					R_StreamRequestImageRead(&s_pendingRequests[i]);
 			}
-
-			if (!request)
-				return;
-
-			v4 = sortedIndex == streamFrontendGlob.sortedImageCount;
-			if (sortedIndex < streamFrontendGlob.sortedImageCount)
+			else
 			{
-				int imagePartIndex = 0;
-				GfxImage *image = nullptr;
+				request = &s_pendingRequests[i];
+			}
+		}
 
-				while (true)
+		if (!request)
+			return;
+
+		if (sortedIndex < streamFrontendGlob.sortedImageCount)
+		{
+			int imagePartIndex = 0;
+			GfxImage *image = nullptr;
+
+			while (true)
+			{
+				imagePartIndex = streamFrontendGlob.sortedImages[sortedIndex];
+
+				const unsigned int imageIndex = BIT_INDEX_32(imagePartIndex);
+				const unsigned int imageMask = BIT_MASK_32(imagePartIndex);
+
+				if (!(streamFrontendGlob.imageUseBits[imageIndex] & imageMask) && !(streamFrontendGlob.imageLoading[imageIndex] & imageMask))
 				{
-					imagePartIndex = streamFrontendGlob.sortedImages[sortedIndex];
+					image = DB_GetImageAtIndex(imagePartIndex);
 
-					const unsigned int imageIndex = BIT_INDEX_32(imagePartIndex);
-					const unsigned int imageMask = BIT_MASK_32(imagePartIndex);
-
-					if (!(streamFrontendGlob.imageUseBits[imageIndex] & imageMask) && !(streamFrontendGlob.imageLoading[imageIndex] & imageMask))
+					if (image->streaming)
 					{
-						image = DB_GetImageAtIndex(imagePartIndex);
-
-						if (image->streaming)
-						{
-							if (image->streaming != GFX_TEMP_STREAMING && image->skippedMipLevels)
-								break;
-						}
+						if (image->streaming != GFX_TEMP_STREAMING && image->skippedMipLevels)
+							break;
 					}
-
-					if (++sortedIndex >= streamFrontendGlob.sortedImageCount)
-						goto LABEL_23;
 				}
 
-				stream_status status = R_StreamRequestImageAllocation(request, image, true, streamFrontendGlob.imageImportance[imagePartIndex]);
-
-				if (status == STREAM_STATUS_INPROGRESS)
-				{
-					streamFrontendGlob.initialLoadAllocFailures = 0;
-
-					if (!R_StreamRequestImageRead(request))
-						return;
-
-				LABEL_23:
-					v4 = sortedIndex == streamFrontendGlob.sortedImageCount;
-					continue;
-				}
-
-				// bool GfxGlobals::isMultiplayer;
-				if (!*(bool *)0x396A4B1 || status != STREAM_STATUS_READFAILED && status != STREAM_STATUS_CANCELLED)
-					streamFrontendGlob.initialLoadAllocFailures++;
-
-				return;
+				if (++sortedIndex >= streamFrontendGlob.sortedImageCount)
+					goto LABEL_23;
 			}
-		} while (!v4);
+
+			stream_status status = R_StreamRequestImageAllocation(request, image, true, streamFrontendGlob.imageImportance[imagePartIndex]);
+
+			if (status == STREAM_STATUS_INPROGRESS)
+			{
+				streamFrontendGlob.initialLoadAllocFailures = 0;
+
+				if (!R_StreamRequestImageRead(request))
+					return;
+
+			LABEL_23:
+				continue;
+			}
+
+			// bool GfxGlobals::isMultiplayer;
+			if (!*(bool *)0x396A4B1 || status != STREAM_STATUS_READFAILED && status != STREAM_STATUS_CANCELLED)
+				streamFrontendGlob.initialLoadAllocFailures++;
+
+			return;
+		}
 	}
 }
 
@@ -1710,7 +1672,7 @@ bool R_StreamUpdate_FindImageAndOptimize(const float *viewPos)
 		StreamSortCmd sortCmd;
 		sortCmd.frontend = &streamFrontendGlob;
 		sortCmd.diskOrder = true;
-		Sys_AddWorkerCmdInternal(&r_stream_sortWorkerCmd, &sortCmd, 0);
+		Sys_AddWorkerCmdInternal(&r_stream_sortWorkerCmd, &sortCmd, nullptr);
 		streamFrontendGlob.queryClient = -1;
 
 		Sys_LeaveCriticalSection(CRITSECT_STREAM_SYNC_COMMAND);
