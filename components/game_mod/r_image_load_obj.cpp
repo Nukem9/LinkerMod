@@ -26,17 +26,20 @@ char Image_GetPcStreamedMips(GfxImageFileHeader *fileHeader)
 bool Image_ValidateHeader(GfxImageFileHeader *imageFile, const char *filepath)
 {
 	// First 3 bytes of the file is always 'IWi'
-	if (imageFile->tag[0] == 'I' && imageFile->tag[1] == 'W' && imageFile->tag[2] == 'i')
+	if (imageFile->tag[0] != 'I' || imageFile->tag[1] != 'W' || imageFile->tag[2] != 'i')
 	{
-		if (imageFile->version == 13)
-			return true;
+		Com_PrintError(8, "ERROR: image '%s' is not an IW image\n", filepath);
+		return false;
+	}
 
+	if (imageFile->version != 13)
+	{
 		Com_PrintError(8, "ERROR: image '%s' is version %i but should be version %i\n", filepath, imageFile->version, 13);
 		return false;
 	}
 
-	Com_PrintError(8, "ERROR: image '%s' is not an IW image\n", filepath);
-	return false;
+	// Passed validation
+	return true;
 }
 
 // /gfx_d3d/r_image_load_obj.cpp:187
@@ -224,6 +227,19 @@ void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char 
 // /gfx_d3d/r_image_load_obj.cpp:536
 void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *srcData, unsigned int allocFlags)
 {
+	static DWORD dwCall = 0x007366C0;
+
+	__asm
+	{
+		mov edx, srcData
+		mov ecx, fileHeader
+		push image
+		call [dwCall]
+		add esp, 0x4
+	}
+
+	return;
+
 	image->loadedSize		= fileHeader->fileSizeForPicmip[image->skippedMipLevels] - sizeof(GfxImageFileHeader);
 	image->baseSize			= fileHeader->fileSizeForPicmip[0] - sizeof(GfxImageFileHeader);
 	image->texture.basemap	= nullptr;
@@ -255,7 +271,7 @@ void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *s
 // /gfx_d3d/r_image_load_obj.cpp:627
 void Image_PrintTruncatedFileError(const char *filepath)
 {
-	Com_PrintError(8, "ERROR: image '%s' is truncated.  Delete the file and run converter to fix.\n", filepath);
+	Com_PrintError(8, "ERROR: image '%s' is truncated. Delete the file and run converter to fix.\n", filepath);
 }
 
 // /gfx_d3d/r_image_load_obj.cpp:1303
@@ -297,7 +313,7 @@ bool Image_LoadToBuffer(GfxImage *image, bool loadHighmip, char **imageBuffer, i
 		return false;
 	}
 
-	if (Image_ValidateHeader(&fileHeader, filepath))
+	if (!Image_ValidateHeader(&fileHeader, filepath))
 	{
 		FS_FCloseFile(fileHandle);
 		return false;
@@ -324,10 +340,10 @@ bool Image_LoadToBuffer(GfxImage *image, bool loadHighmip, char **imageBuffer, i
 	int picmip = image->picmip.platform[useFastFile->current.enabled == false];
 	char streamedMipLevels = picmip > 0;
 
-	ASSERT_MSG(streamedMipLevels > 0 && streamedMipLevels < PICMIP_SIZES_STORED, "streamedMipLevels doesn't index PICMIP_SIZES_STORED");
+	ASSERT_MSG(streamedMipLevels >= 0 && streamedMipLevels < PICMIP_SIZES_STORED, "streamedMipLevels doesn't index PICMIP_SIZES_STORED");
 
 	// Read the raw data from disk
-	int readSize = fileHeader.fileSizeForPicmip[picmip > 0];
+	int readSize = fileHeader.fileSizeForPicmip[streamedMipLevels];
 
 	*imageBuffer = (char *)Z_TryVirtualAlloc(readSize, "Image_AllocTempMemory", 20);
 	*bufferSize = readSize;
