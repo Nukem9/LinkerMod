@@ -55,6 +55,7 @@
 #include "cg_scoreboard.h"
 #include "cg_draw_debug.h"
 #include "sys_cmds.h"
+#include "r_surface.h"
 #include "r_init.h"
 #include "r_image.h"
 #include "r_debug.h"
@@ -98,7 +99,6 @@
 #include "r_stream.h"
 #include "r_image_load_common.h"
 #include "r_image_load_obj.h"
-#include "r_surface.h"
 
 #include "win_localize.h"
 #include "win_exception.h"

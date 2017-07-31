@@ -19,6 +19,59 @@ void R_StreamAlloc_InitTempImages()
 	s_allocGlob.tempImagesInit = true;
 }
 
+// /gfx_d3d/r_streamalloc.cpp:1751
+GfxImage *R_StreamAlloc_SetupTempImage(D3DFORMAT format, bool linear, int width, int height, int mipLevels)
+{
+	ASSERT(s_allocGlob.tempImagesInit);
+
+	R_StreamAlloc_Lock();
+
+	// Try to find a free image slot
+	GfxImage *image = nullptr;
+
+	for (int index = 0; index < ARRAYSIZE(s_allocGlob.tempImages); index++)
+	{
+		if (s_allocGlob.tempImages[index].alloced)
+			continue;
+
+		s_allocGlob.tempImages[index].alloced = true;
+		image = s_allocGlob.tempImages[index].image;
+		break;
+	}
+
+	// We found one, so register it with D3D
+	if (image)
+	{
+		Image_Create2DTexture_PC(image, width, height, 0, 0, format);
+		R_StreamAlloc_Unlock();
+		return image;
+	}
+
+	R_StreamAlloc_Unlock();
+	return nullptr;
+}
+
+// /gfx_d3d/r_streamalloc.cpp:1784
+void R_StreamAlloc_ReleaseTempImage(GfxImage *image)
+{
+	R_StreamAlloc_Lock();
+
+	for (int index = 0; index < ARRAYSIZE(s_allocGlob.tempImages); index++)
+	{
+		if (image != s_allocGlob.tempImages[index].image)
+			continue;
+
+		Image_Release(image);
+		s_allocGlob.tempImages[index].alloced = false;
+
+		R_StreamAlloc_Unlock();
+		return;
+	}
+
+	ASSERT_MSG(false, "Tried to release a non-temp image");
+	R_StreamAlloc_Unlock();
+}
+
 // /gfx_d3d/r_streamalloc.cpp:1804
 void R_StreamAlloc_Lock()
 {
@@ -46,7 +99,7 @@ bool R_StreamAlloc_FreeImageByImportance(int size, float importance, GfxImage **
 		if (!(streamFrontendGlob.imageUseBits[imageIndex] & imageMask))
 			continue;
 
-		// CHECK LAHF
+		// FLT_MAX acts as a wildcard
 		if (importance == FLT_MAX || !(streamFrontendGlob.imageForceBits[imageIndex] & imageMask))
 		{
 			// Kill the search if we hit a higher priority image
@@ -58,19 +111,19 @@ bool R_StreamAlloc_FreeImageByImportance(int size, float importance, GfxImage **
 
 			GfxImage *image = DB_GetImageAtIndex(imagePartIndex);
 
-			if (image->streaming)
-			{
-				if (!image->skippedMipLevels)
-				{
-					if ((signed int)image->loadedSize >= size)
-					{
-						*unloadImage = image;
-						return true;
-					}
+			if (image->streaming == GFX_NOT_STREAMING)
+				continue;
 
-					if (!sacrificeImage)
-						sacrificeImage = image;
+			if (!image->skippedMipLevels)
+			{
+				if (image->loadedSize >= (unsigned int)size)
+				{
+					*unloadImage = image;
+					return true;
 				}
+
+				if (!sacrificeImage)
+					sacrificeImage = image;
 			}
 		}
 	}
@@ -115,7 +168,7 @@ void R_StreamAlloc_Deallocate(char *imageMemory)
 // /gfx_d3d/r_streamalloc.cpp:1917
 void R_StreamAlloc_Flush()
 {
-	for (int index = 0; index < ARRAYSIZE(streamFrontendGlob.imageUseBits); index++)
+	for (int index = 0; index < STREAM_MAX_IMAGE_BITS; index++)
 	{
 		int useBits = streamFrontendGlob.imageUseBits[index];
 

@@ -380,7 +380,7 @@ void Image_Release(GfxImage *image)
 {
 	ASSERT(image);
 
-	((void(__cdecl *)())0x00709E10)();
+	((void(__cdecl *)(GfxImage *))0x00709E10)(image);
 }
 
 // /gfx_d3d/r_image.cpp:214

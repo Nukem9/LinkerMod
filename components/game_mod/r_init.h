@@ -57,6 +57,93 @@ struct __declspec(align(4)) vidConfig_t
 	bool deviceSupportsGamma;
 };
 
+struct GfxStreamingAabbTree
+{
+	unsigned __int16 firstItem;
+	unsigned __int16 itemCount;
+	unsigned __int16 firstChild;
+	unsigned __int16 childCount;
+	float mins[3];
+	float maxs[3];
+};
+STATIC_ASSERT_OFFSET(GfxStreamingAabbTree, firstItem, 0x0);
+STATIC_ASSERT_OFFSET(GfxStreamingAabbTree, itemCount, 0x2);
+STATIC_ASSERT_OFFSET(GfxStreamingAabbTree, firstChild, 0x4);
+STATIC_ASSERT_OFFSET(GfxStreamingAabbTree, childCount, 0x6);
+STATIC_ASSERT_SIZE(GfxStreamingAabbTree, 0x20);
+
+struct GfxWorldStreamInfo
+{
+	int aabbTreeCount;
+	GfxStreamingAabbTree *aabbTrees;
+	int leafRefCount;
+	int *leafRefs;
+};
+STATIC_ASSERT_OFFSET(GfxWorldStreamInfo, aabbTreeCount, 0x0);
+STATIC_ASSERT_OFFSET(GfxWorldStreamInfo, aabbTrees, 0x4);
+STATIC_ASSERT_OFFSET(GfxWorldStreamInfo, leafRefs, 0xC);
+
+struct GfxPackedPlacement
+{
+	float origin[3];
+	float axis[3][3];
+	float scale;
+};
+
+struct GfxStaticModelDrawInst
+{
+	char _pad1[0x4];
+	GfxPackedPlacement placement;
+	XModel *model;
+	char _pad2[0x10];
+};
+STATIC_ASSERT_OFFSET(GfxStaticModelDrawInst, placement, 0x4);
+STATIC_ASSERT_OFFSET(GfxStaticModelDrawInst, model, 0x38);
+STATIC_ASSERT_SIZE(GfxStaticModelDrawInst, 0x4C);
+
+struct GfxWorldDpvsStatic
+{
+	unsigned int smodelCount;
+	unsigned int dynamicSModelCount;
+	unsigned int staticSurfaceCount;
+	unsigned int litSurfsBegin;
+	unsigned int litSurfsEnd;
+	unsigned int decalSurfsBegin;
+	unsigned int decalSurfsEnd;
+	unsigned int emissiveSurfsBegin;
+	unsigned int emissiveSurfsEnd;
+	unsigned int smodelVisDataCount;
+	unsigned int surfaceVisDataCount;
+	char *smodelVisData[3];
+	char *surfaceVisData[3];
+	char *smodelVisDataCameraSaved;
+	char *surfaceVisDataCameraSaved;
+	unsigned int *lodData;
+	unsigned __int16 *sortedSurfIndex;
+	/*GfxStaticModelInst*/ void *smodelInsts;
+	GfxSurface *surfaces;
+	/*GfxCullGroup*/ void *cullGroups;
+	GfxStaticModelDrawInst *smodelDrawInsts;
+	/*GfxDrawSurf*/ void *surfaceMaterials;
+	unsigned int *surfaceCastsSunShadow;
+	volatile int usageCount;
+};
+STATIC_ASSERT_OFFSET(GfxWorldDpvsStatic, smodelCount, 0x0);
+STATIC_ASSERT_OFFSET(GfxWorldDpvsStatic, staticSurfaceCount, 0x8);
+STATIC_ASSERT_OFFSET(GfxWorldDpvsStatic, surfaceVisDataCameraSaved, 0x48);
+STATIC_ASSERT_OFFSET(GfxWorldDpvsStatic, surfaces, 0x58);
+STATIC_ASSERT_OFFSET(GfxWorldDpvsStatic, smodelDrawInsts, 0x60);
+
+struct GfxWorld
+{
+	char _pad1[0x14];
+	GfxWorldStreamInfo streamInfo;
+	char _pad2[0x320];
+	GfxWorldDpvsStatic dpvs;
+};
+STATIC_ASSERT_OFFSET(GfxWorld, streamInfo, 0x14);
+STATIC_ASSERT_OFFSET(GfxWorld, dpvs, 0x344);
+
 #define ASPECT_RATIO(W, H) (((float)W) / ((float)H))
 
 enum /*r_aspectRatio*/

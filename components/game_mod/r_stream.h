@@ -1,7 +1,16 @@
 #pragma once
 
-#define TOTAL_IMAGE_PARTS 0x1080
-#define MAX_IMAGE_STREAMED_PARTS 1
+#define STREAM_MAX_IMAGE_PARTS 1
+#define STREAM_MAX_REQUESTS 10
+
+#define STREAM_MAX_MATERIALS 4096
+#define STREAM_MAX_MATERIAL_BITS (STREAM_MAX_MATERIALS / 32)
+
+#define STREAM_MAX_MODELS 2048
+#define STREAM_MAX_MODEL_BITS (STREAM_MAX_MODELS / 32)
+
+#define STREAM_MAX_IMAGES 6000
+#define STREAM_MAX_IMAGE_BITS (STREAM_MAX_IMAGES / 32)
 
 enum
 {
@@ -25,7 +34,7 @@ enum stream_status
 	STREAM_STATUS_COUNT = 0x9,
 };
 
-struct __declspec(align(4)) StreamFrontendGlob
+struct alignas(128) StreamFrontendGlob
 {
 	void *mainBuffer;
 	int mainBufferSize;
@@ -33,31 +42,27 @@ struct __declspec(align(4)) StreamFrontendGlob
 	int extraBufferSize;
 	unsigned int frame;
 	char _pad0[108];
-	float materialImportance[4096];
-	unsigned int materialImportanceBits[128];
-	unsigned int materialTouchBits[128];
-	unsigned int materialPreventBits[128];
-	float modelDistance[1000];
+	float materialImportance[STREAM_MAX_MATERIALS];
+	unsigned int materialImportanceBits[STREAM_MAX_MATERIAL_BITS];
+	unsigned int materialTouchBits[STREAM_MAX_MATERIAL_BITS];
+	unsigned int materialPreventBits[STREAM_MAX_MATERIAL_BITS];
+	float modelDistance[STREAM_MAX_MODELS];
 	char _pad1[96];
-	unsigned int modelDistanceBits[32];
-	float dynamicModelDistance[1000];
+	unsigned int modelDistanceBits[STREAM_MAX_MODEL_BITS];
+	float dynamicModelDistance[STREAM_MAX_MODELS];
 	char _pad2[96];
-	unsigned int dynamicModelDistanceBits[32];
-	unsigned int modelTouchBits[32];
-	unsigned int imageInSortedListBits[132];
+	unsigned int dynamicModelDistanceBits[STREAM_MAX_MODEL_BITS];
+	unsigned int modelTouchBits[STREAM_MAX_MODEL_BITS];
+	unsigned int imageInSortedListBits[STREAM_MAX_IMAGE_BITS];
 	char _pad3[112];
-	float imageImportance[4224];
-	unsigned int imageImportanceBits[132];
-	char _pad4[112];
-	float dynamicImageImportance[4224];
-	unsigned int dynamicImageImportanceBits[132];
-	char _pad5[112];
-	unsigned int dummy;
-	unsigned int imageLoading[132];
-	unsigned int imageUseBits[132];
-	unsigned int imageForceBits[132];
-	unsigned int imageInitialBits[132];
-	unsigned int imageTouchBits[132][2];
+	float imageImportance[STREAM_MAX_IMAGES];
+	unsigned int imageImportanceBits[STREAM_MAX_IMAGE_BITS];
+	char _pad4[0x4AC4];
+	unsigned int imageLoading[STREAM_MAX_IMAGE_BITS];
+	unsigned int imageUseBits[STREAM_MAX_IMAGE_BITS];
+	unsigned int imageForceBits[STREAM_MAX_IMAGE_BITS];
+	unsigned int imageInitialBits[STREAM_MAX_IMAGE_BITS];
+	unsigned int imageTouchBits[STREAM_MAX_IMAGE_BITS][2];
 	int activeImageTouchBits;
 	float touchedImageImportance;
 	float initialImageImportance;
@@ -66,7 +71,8 @@ struct __declspec(align(4)) StreamFrontendGlob
 	int initialLoadAllocFailures;
 	bool preloadCancelled;
 	bool diskOrderImagesNeedSorting;
-	int sortedImages[4224];
+	char _pad5[0x62];
+	int sortedImages[STREAM_MAX_IMAGES];
 	int sortedImageCount;
 	bool calculateTotalBytesWanted;
 	int totalBytesWanted;
@@ -77,10 +83,31 @@ struct __declspec(align(4)) StreamFrontendGlob
 	bool outputImageList;
 	bool ignoreMainView;
 };
+/*
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, frame, 0x10);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, materialImportance, 0x80);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, materialImportanceBits, 0x4080);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, dynamicModelDistanceBits, 0x6700);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, imageInSortedListBits, 0x6800);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, imageImportance, 0x6A80);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, imageImportanceBits, 0xB280);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, imageLoading, 0xFF84);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, imageUseBits, 0x101C4);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, imageTouchBits, 0x10884);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, imageInitialBitsSet, 0x10D14);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, initialLoadAllocFailures, 0x10D18);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, diskOrderImagesNeedSorting, 0x10D1D);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, sortedImages, 0x10D80);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, sortedImageCount, 0x15580);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, queryClient, 0x1558C);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, queryInProgress, 0x15590);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, diskOrder, 0x15594);
+STATIC_ASSERT_OFFSET(StreamFrontendGlob, forceDiskOrder, 0x15595);
+*/
 
 struct pendingRequest
 {
-	int id[1];
+	int id[STREAM_MAX_IMAGE_PARTS];
 	GfxImage *image;
 	int imagePart;
 	char *buffer;
@@ -88,7 +115,7 @@ struct pendingRequest
 	int startTime;
 	float importance;
 	stream_status status;
-	stream_status partStatus[1];
+	stream_status partStatus[STREAM_MAX_IMAGE_PARTS];
 	int numParts;
 	int bytesToCopy;
 	bool highMip;
@@ -140,6 +167,7 @@ void R_Stream_InvalidateRequest(pendingRequest *request);
 stream_status R_StreamRequestImageAllocation(pendingRequest *request, GfxImage *image, bool highMip, float importance);
 void R_StreamUpdate_ReadTextures();
 bool R_StreamRequestImageRead(pendingRequest *request);
+float PointDistSqFromBounds(const float *v, const float *mins, const float *maxs);
 bool R_StreamUpdate_ProcessFileCallbacks();
 void R_StreamUpdate_SetupInitialImageList();
 void R_Stream_ForceLoadLowDetail();
@@ -170,7 +198,7 @@ void R_StreamUpdate_CompletePreload(void(__cdecl *pumpfunc)());
 bool R_StreamUpdate(const float *viewPos);
 void R_Stream_AddImagePartImportance(int imagePartIndex, float importance);
 void R_StreamTouchImagesFromMaterial(Material *remoteMaterial, float importance);
-float FastPointDistSqFromBounds(float4 mins, float4 maxs);
+float FastPointDistSqFromBounds(const float4& mins, const float4& maxs);
 void MultiplePointDistSqFromBounds(distance_data *distances, const float *v, const float *mip0mins, const float *mip0maxs, float himipRadiusSq, float distanceScale);
 void R_StreamUpdateForXModel(XModel *remoteModel, float distSq);
 void R_StreamUpdateForXModelTouched(XModel *model);
@@ -198,3 +226,10 @@ void R_Stream_UpdateStaticModelsCmd(void *data);
 void R_Stream_UpdateStaticSurfacesCmd(void *data);
 void R_Stream_SortCmd(void *data);
 void R_Stream_CombineCmd(void *data);
+int r_stream_update_staticmodelsCallback(jqBatch *batch);
+int r_stream_update_staticsurfacesCallback(jqBatch *batch);
+int r_stream_sortCallback(jqBatch *batch);
+int r_stream_combineCallback(jqBatch *batch);
+int r_stream_updateCallback(jqBatch *batch);
+
+void Patch_R_Stream();

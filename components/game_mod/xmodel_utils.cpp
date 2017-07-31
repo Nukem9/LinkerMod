@@ -22,8 +22,8 @@ int XModelGetSurfaces(XModel *model, XSurface **surfaces, int submodel)
 
 	XModelLodInfo *lodInfo = &model->lodInfo[submodel];
 
-	ASSERT_MSG(lodInfo->surfIndex > 0 && lodInfo->surfIndex < model->numsurfs, "lodInfo->surfIndex doesn't index model->numsurfs");
-	ASSERT(lodInfo->surfIndex + lodInfo->numsurfs <= model->numsurfs);
+	//ASSERT_MSG(lodInfo->surfIndex > 0 && lodInfo->surfIndex < model->numsurfs, "lodInfo->surfIndex doesn't index model->numsurfs");
+	//ASSERT(lodInfo->surfIndex + lodInfo->numsurfs <= model->numsurfs);
 
 	*surfaces = &model->surfs[model->lodInfo[submodel].surfIndex];
 	return model->lodInfo[submodel].numsurfs;

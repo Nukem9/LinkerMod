@@ -14,6 +14,8 @@ struct StreamAllocGlob
 };
 
 void R_StreamAlloc_InitTempImages();
+GfxImage *R_StreamAlloc_SetupTempImage(D3DFORMAT format, bool linear, int width, int height, int mipLevels);
+void R_StreamAlloc_ReleaseTempImage(GfxImage *image);
 void R_StreamAlloc_Lock();
 void R_StreamAlloc_Unlock();
 bool R_StreamAlloc_FreeImageByImportance(int size, float importance, GfxImage **unloadImage);

@@ -23,4 +23,5 @@ struct GfxSurface
 	char flags;
 	float bounds[2][3];
 };
+STATIC_ASSERT_OFFSET(GfxSurface, material, 0x30);
 STATIC_ASSERT_SIZE(GfxSurface, 0x50);

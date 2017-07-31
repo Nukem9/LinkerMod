@@ -21,6 +21,9 @@ struct XModelLodInfo
 	char smcAllocBits;
 	char unused;
 };
+STATIC_ASSERT_OFFSET(XModelLodInfo, numsurfs, 0x4);
+STATIC_ASSERT_OFFSET(XModelLodInfo, surfIndex, 0x6);
+STATIC_ASSERT_SIZE(XModelLodInfo, 0x20);
 
 struct XModelHighMipBounds
 {
