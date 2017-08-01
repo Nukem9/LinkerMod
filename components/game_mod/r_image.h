@@ -96,8 +96,11 @@ struct GfxImage
 	unsigned int hash;
 };
 STATIC_ASSERT_OFFSET(GfxImage, texture, 0x0);
+STATIC_ASSERT_OFFSET(GfxImage, mapType, 0x4);
+STATIC_ASSERT_OFFSET(GfxImage, picmip, 0x8);
 STATIC_ASSERT_OFFSET(GfxImage, baseSize, 0x1C);
 STATIC_ASSERT_OFFSET(GfxImage, loadedSize, 0x24);
+STATIC_ASSERT_OFFSET(GfxImage, skippedMipLevels, 0x28);
 STATIC_ASSERT_SIZE(GfxImage, 0x34);
 
 static int& Image_TrackBytes = *(int *)0x045FC158;

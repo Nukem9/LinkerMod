@@ -48,6 +48,8 @@ struct GfxImageFileHeader
 	float gamma;
 	int fileSizeForPicmip[PICMIP_SIZES_STORED];
 };
+STATIC_ASSERT_OFFSET(GfxImageFileHeader, dimensions, 0x6);
+STATIC_ASSERT_OFFSET(GfxImageFileHeader, fileSizeForPicmip, 0x10);
 STATIC_ASSERT_SIZE(GfxImageFileHeader, 0x30);
 
 char Image_GetPcStreamedMips(GfxImageFileHeader *fileHeader);

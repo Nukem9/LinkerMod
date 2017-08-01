@@ -15,7 +15,7 @@ cmd_function_s R_MaterialList_f_VAR;
 
 const char *R_ErrorDescription(HRESULT hr)
 {
-	return ((const char *(__cdecl *)(HRESULT))0x0098F062)(hr);
+	return ((const char *(__stdcall *)(HRESULT))0x0098F062)(hr);
 }
 
 HWND WINAPI hk_CreateWindowExA(DWORD dwExStyle, LPCSTR lpClassName, LPCSTR lpWindowName, DWORD dwStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)

@@ -352,7 +352,7 @@ void Image_GetPicmip(GfxImage *image, Picmip *picmip)
 }
 
 // /gfx_d3d/r_image_load_common.cpp:1497
-void Image_Setup(GfxImage *image, int width, int height, int depth, char imageFlags, D3DFORMAT imageFormat, const char *name, unsigned int allocFlags)
+void Image_Setup(GfxImage *image, int width, int height, int depth, int imageFlags, D3DFORMAT imageFormat, const char *name, unsigned int allocFlags)
 {
 	ASSERT(image);
 

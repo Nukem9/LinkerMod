@@ -53,7 +53,7 @@ void Image_SetupFromFile(GfxImage *image, GfxImageFileHeader *fileHeader, D3DFOR
 	int height = max(1, fileHeader->dimensions[1] >> picmip);
 	int depth = max(1, fileHeader->dimensions[2] >> picmip);
 
-	Image_Setup(image, width, height, depth, fileHeader->flags, imageFormat, "<file>", allocFlags);
+	Image_Setup(image, width, height, depth, fileHeader->flags & 0xFF, imageFormat, "<file>", allocFlags);
 
 	ASSERT(image->cardMemory.platform[PICMIP_PLATFORM_USED] > 0);
 }
@@ -164,9 +164,9 @@ void Image_LoadBitmap(GfxImage *image, GfxImageFileHeader *fileHeader, char *dat
 
 	for (int mipLevel = mipcount - 1; mipLevel >= picmip; mipLevel--)
 	{
-		int width = max(1, fileHeader->dimensions[0] >> picmip);
-		int height = max(1, fileHeader->dimensions[1] >> picmip);
-		int depth = max(1, fileHeader->dimensions[2] >> picmip);
+		int width = max(1, fileHeader->dimensions[0] >> mipLevel);
+		int height = max(1, fileHeader->dimensions[1] >> mipLevel);
+		int depth = max(1, fileHeader->dimensions[2] >> mipLevel);
 
 		for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
 		{
@@ -205,14 +205,17 @@ void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char 
 
 	Image_SetupFromFile(image, fileHeader, format, allocFlags);
 
+	if (!image->texture.basemap)
+		return;
+
 	int faceCount = (image->mapType == MAPTYPE_CUBE) ? 6 : 1;
 	int mipcount = Image_CountMipmapsForFile(fileHeader);
 	int picmip = image->picmip.platform[useFastFile->current.enabled == false];
 
 	for (int mipLevel = mipcount - 1; mipLevel >= picmip; mipLevel--)
 	{
-		int width = max(1, fileHeader->dimensions[0] >> picmip);
-		int height = max(1, fileHeader->dimensions[1] >> picmip);
+		int width = max(1, fileHeader->dimensions[0] >> mipLevel);
+		int height = max(1, fileHeader->dimensions[1] >> mipLevel);
 
 		for (int faceIndex = 0; faceIndex < faceCount; faceIndex++)
 		{
@@ -227,19 +230,6 @@ void Image_LoadDxtc(GfxImage *image, GfxImageFileHeader *fileHeader, const char 
 // /gfx_d3d/r_image_load_obj.cpp:536
 void Image_LoadFromData(GfxImage *image, GfxImageFileHeader *fileHeader, char *srcData, unsigned int allocFlags)
 {
-	static DWORD dwCall = 0x007366C0;
-
-	__asm
-	{
-		mov edx, srcData
-		mov ecx, fileHeader
-		push image
-		call [dwCall]
-		add esp, 0x4
-	}
-
-	return;
-
 	image->loadedSize		= fileHeader->fileSizeForPicmip[image->skippedMipLevels] - sizeof(GfxImageFileHeader);
 	image->baseSize			= fileHeader->fileSizeForPicmip[0] - sizeof(GfxImageFileHeader);
 	image->texture.basemap	= nullptr;

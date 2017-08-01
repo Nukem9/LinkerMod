@@ -10,5 +10,5 @@ void Image_Upload3D_CopyData_PC(GfxImage *image, D3DFORMAT format, unsigned int 
 void Image_UploadData(GfxImage *image, D3DFORMAT format, D3DCUBEMAP_FACES face, unsigned int mipLevel, const char *src);;
 unsigned int Image_CountMipmaps(unsigned int imageFlags, unsigned int width, unsigned int height, unsigned int depth);
 void Image_GetPicmip(GfxImage *image, Picmip *picmip);
-void Image_Setup(GfxImage *image, int width, int height, int depth, char imageFlags, D3DFORMAT imageFormat, const char *name, unsigned int allocFlags);
+void Image_Setup(GfxImage *image, int width, int height, int depth, int imageFlags, D3DFORMAT imageFormat, const char *name, unsigned int allocFlags);
 D3DCUBEMAP_FACES Image_CubemapFace(unsigned int faceIndex);
