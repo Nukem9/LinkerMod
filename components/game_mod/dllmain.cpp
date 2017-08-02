@@ -574,6 +574,7 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00766CF0, (PBYTE)&PM_Weapon_Jam);
 	Detours::X86::DetourFunction((PBYTE)0x007951E0, (PBYTE)&hk_StartWeaponAnim);
 	Detours::X86::DetourFunction((PBYTE)0x007694A0, (PBYTE)&PM_Weapon_WeaponTimeAdjust);
+	Detours::X86::DetourFunction((PBYTE)0x00769CD0, (PBYTE)&hk_PM_Weapon_ShouldBeFiring);
 	PatchMemory(0x00880140, (PBYTE)"\xE9\x87\x00\x00\x00", 5); // Clientside check in IN_Attack_Down
 
 	//

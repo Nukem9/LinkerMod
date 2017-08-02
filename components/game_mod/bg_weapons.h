@@ -80,14 +80,14 @@ enum weaponstate_t
 struct usercmd_s
 {
 	int serverTime;
-	bitarray<51> buttons;
+	bitarray<51> button_bits;
 	int angles[3];
 	unsigned char weapon;
 
 	// The rest omitted
 };
 STATIC_ASSERT_OFFSET(usercmd_s, serverTime, 0x0);
-STATIC_ASSERT_OFFSET(usercmd_s, buttons, 0x4);
+STATIC_ASSERT_OFFSET(usercmd_s, button_bits, 0x4);
 STATIC_ASSERT_OFFSET(usercmd_s, angles, 0xC);
 STATIC_ASSERT_OFFSET(usercmd_s, weapon, 0x18);
 
@@ -126,9 +126,14 @@ bool ShotLimitReached(playerState_s *ps, WeaponDef *weapDef);
 bool BurstFirePending(playerState_s *ps);
 bool WeaponUsesBurstCooldown(unsigned int weaponIdx);
 int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml);
+int PM_GetWeaponFireButton(unsigned int weapon);
+int PM_Weapon_ShouldBeFiring(pmove_t *pm, int delayedAction, bool testOnly);
 void PM_Weapon_Jam(/*playerState_s *ps*/);
 WeaponVariantDef *BG_LoadWeaponVariantDef(const char *name);
 const char *BG_WeaponName(int weapon);
+
+bool Mantle_IsWeaponEquipped(playerState_s *ps);
+void hk_PM_Weapon_ShouldBeFiring();
 
 // /bgame/bg_weapons.h:300
 static int BG_GetHeldWeaponSlot(playerState_s *ps, int weapon)
