@@ -34,7 +34,7 @@ enum stream_status
 	STREAM_STATUS_COUNT = 0x9,
 };
 
-struct alignas(128) StreamFrontendGlob
+struct  __declspec(align(128)) StreamFrontendGlob
 {
 	void *mainBuffer;
 	int mainBufferSize;

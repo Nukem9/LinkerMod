@@ -21,7 +21,7 @@ Material *s_preventMaterials[32];
 bool streamIsInitialized;
 volatile long disableCount;
 
-alignas(16) float4 s_viewPos;
+float4 __declspec(align(16)) s_viewPos;
 
 // /gfx_d3d/r_stream.cpp:266
 bool R_StreamIsEnabled()
