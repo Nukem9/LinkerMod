@@ -31,19 +31,25 @@ int Cmd_Rip_f(int argc, char** argv)
 
 		char mapname[256];
 		const char* prefix = "";
-		const char* additional_args = "";
+		const char* mp_args = "";
 
 #if _APPINFO_ALLOW_MP_MAPS
 		if (_strnicmp(rip_targetMap.ValueString(), "mp_", 3) == 0)
 		{
 			prefix = "so_dummy_";
-			additional_args = "+set g_loadScripts 0";
+			mp_args = "+set g_loadScripts 0";
 		}
 #endif
 		sprintf_s(mapname, "%s%s", prefix, rip_targetMap.ValueString());
 
+		// Automatically "click to continue" once the map is loaded
+		// Ensure that the intro cinematics don't play
+		const char* additional_args =	"+set ui_autoContinue 1 "
+										"+set com_introPlayed 1 "
+										"+set com_startupIntroPlayed 1 ";
+
 		char cmdLine[1024];
-		sprintf_s(cmdLine, "+devmap %s %s", mapname, additional_args);
+		sprintf_s(cmdLine, "+devmap %s %s%s%s", mapname, mp_args, *mp_args ? " " : "", additional_args);
 
 		pid = Process_LaunchGame(cmdLine);
 	}
