@@ -15,7 +15,7 @@ if [%OVERWRITE%] == [1] (set ASSET_UTIL_FLAGS=-o)
 "%ASSET_UTIL%" extract-iwd %ASSET_UTIL_FLAGS% --all
 "%ASSET_UTIL%" extract-ff %ASSET_UTIL_FLAGS% --all
 
-csvgen.bat
+csv.bat
 soundalias.bat
 ents.bat
 
