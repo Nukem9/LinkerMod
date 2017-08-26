@@ -1,0 +1,1 @@
+Fake file to inform Launcher to add a "zombie_" prefix to the map name when this template is used in the Create New Map dialog

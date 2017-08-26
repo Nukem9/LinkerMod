@@ -1,0 +1,25 @@
+// NOTE: If you add a comment, put a space after the double forward slash or you will get issues
+
+ignore,code_post_gfx
+ignore,common
+
+// map specific files
+col_map_sp,maps/template.d3dbsp
+gfx_map,maps/template.d3dbsp
+rawfile,maps/template.gsc
+rawfile,maps/template_amb.gsc
+rawfile,maps/template_anim.gsc
+rawfile,maps/template_fx.gsc
+
+// Weapons
+weapon,sp/m16_sp
+weapon,sp/m1911_sp
+weapon,sp/frag_grenade_sp
+weapon,sp/flash_grenade_sp
+
+// Viewarms
+xmodel,viewmodel_usa_marine_arms
+xmodel,viewmodel_usa_marine_player
+
+// 3rd person model
+mptype,player_usa_raider
