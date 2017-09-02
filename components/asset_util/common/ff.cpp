@@ -62,7 +62,9 @@ char* FindRawfileStringReverseLookup(BYTE* start)
 {
 	for (char* strStart = (char*)start; strStart > strStart - MAX_PATH; strStart--)
 	{
-		if (*(DWORD*)strStart == 0xFFFFFFFF)
+		if (*strStart == '\0')
+			return strStart + 1;
+		else if (*(DWORD*)strStart == 0xFFFFFFFF)
 		{
 			if (*(strStart + 4))
 			{
