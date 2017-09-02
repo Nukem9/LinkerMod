@@ -76,6 +76,12 @@ int Cmd_Extract_FF_f(int argc, char** argv)
 {
 	if (g_extractAll.ValueBool())
 	{
+		g_extractSounds.Enable();
+	}
+
+	// If the user didnt provide a specific fastfile to target - we automatically use *all* fastfiles
+	if (argc == 1)
+	{
 		std::vector<FastFileEntry> entries;
 		auto FF_ExtractDefered = [&entries](const char* filePath, const char* fileName) -> int
 		{

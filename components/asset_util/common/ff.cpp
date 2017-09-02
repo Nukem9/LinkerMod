@@ -358,16 +358,19 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 	auto data = std::vector<BYTE>(searchData, searchData + searchSize);
 	auto scanList = std::vector<std::vector<BYTE>>();
 
-	scanList.push_back(std::vector<BYTE>({ '.', 'g', 's', 'c' }));
-	scanList.push_back(std::vector<BYTE>({ '.', 'c', 's', 'c' }));
-	scanList.push_back(std::vector<BYTE>({ '.', 'a', 't', 'r' }));
-	scanList.push_back(std::vector<BYTE>({ '.', 's', 'u', 'n' }));
-	scanList.push_back(std::vector<BYTE>({ '.', 'x', 'p', 'o' }));
-	scanList.push_back(std::vector<BYTE>({ '.', 'w', 'a', 'v' }));
-	scanList.push_back(std::vector<BYTE>({ '.', 'c', 'f', 'g' }));
-	scanList.push_back(std::vector<BYTE>({ '.', 't', 'x', 't' }));
-	scanList.push_back(std::vector<BYTE>({ '.', 'v', 'i', 's', 'i', 'o', 'n' }));
-	// scanList.push_back(std::vector<BYTE>({ '.', 'h', 'l', 's', 'l' }));
+	// If we're extracting *all* supported assets, add the rawfiles to the pattern list
+	if (g_extractAll.ValueBool())
+	{
+		scanList.push_back(std::vector<BYTE>({ '.', 'g', 's', 'c' }));
+		scanList.push_back(std::vector<BYTE>({ '.', 'c', 's', 'c' }));
+		scanList.push_back(std::vector<BYTE>({ '.', 'a', 't', 'r' }));
+		scanList.push_back(std::vector<BYTE>({ '.', 's', 'u', 'n' }));
+		scanList.push_back(std::vector<BYTE>({ '.', 'x', 'p', 'o' }));
+		scanList.push_back(std::vector<BYTE>({ '.', 'c', 'f', 'g' }));
+		scanList.push_back(std::vector<BYTE>({ '.', 't', 'x', 't' }));
+		scanList.push_back(std::vector<BYTE>({ '.', 'v', 'i', 's', 'i', 'o', 'n' }));
+		// scanList.push_back(std::vector<BYTE>({ '.', 'h', 'l', 's', 'l' }));
+	}
 
 	if (g_extractSounds.ValueBool())
 		scanList.push_back(std::vector<BYTE>({ '.', 'w', 'a', 'v' }));
@@ -383,7 +386,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 
 int FF_FFExtract(const char* filepath, const char* filename)
 {
-	Con_Print("Extracting rawfiles from \"%s\"...\n", filename);
+	Con_Print("Extracting files from \"%s\"...\n", filename);
 
 	FILE* h = nullptr;
 	if (fopen_s(&h, filepath, "r+b") != 0)
