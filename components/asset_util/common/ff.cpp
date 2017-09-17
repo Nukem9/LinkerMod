@@ -19,6 +19,42 @@ enum class RAWFILE_TYPE
 	NONE = -1,
 };
 
+// Search from _First to _Last for a match against any of the scan patterns
+// returns _Last if no match was found, or an iterator to the match if successful
+// Signature points to the matched signature if there was one
+template<class _FwdIt1>
+inline _FwdIt1 PatternSearch(_FwdIt1 _First, _FwdIt1 _Last, const std::vector<std::vector<BYTE>>& scanList, const std::vector<BYTE>** Signature)
+{
+	// Check each position in the iterable to see if it matches any of the patterns in the scanlist
+	for (_FwdIt1 _Iter = _First; std::distance(_Iter, _Last) >= 0; _Iter = std::next(_Iter))
+	{
+		for (auto& pattern : scanList)
+		{
+			// Check if the pattern is too long to possibly match
+			if ((size_t)std::distance(_Iter, _Last) < pattern.size())
+			{
+				continue;
+			}
+
+			// Check each value in the pattern
+			for (size_t i = 0; i < pattern.size(); i++)
+			{
+				if ((_Iter + i) != pattern.begin() + i)
+				{
+					continue;
+				}
+			}
+
+			// Match
+			*Signature = &pattern;
+			return _Iter;
+		}
+	}
+
+	*Signature = NULL;
+	return _Last;
+}
+
 RAWFILE_TYPE FindRawfileString(BYTE* start, BYTE* end, char** result)
 {
 	RAWFILE_TYPE type = RAWFILE_TYPE::NONE;
@@ -62,9 +98,23 @@ char* FindRawfileStringReverseLookup(BYTE* start)
 {
 	for (char* strStart = (char*)start; strStart > strStart - MAX_PATH; strStart--)
 	{
-		if (*strStart == '\0')
+		switch (*strStart)
+		{
+		case '"':
+		case '*':
+		case '?':
+		case '<':
+		case '>':
+		case '|':
+		case '\n':
+		case '\r':
+		case '\t':
+			return nullptr;
+		case '\0':
 			return strStart + 1;
-		else if (*(DWORD*)strStart == 0xFFFFFFFF)
+		}
+
+		if (*(DWORD*)strStart == 0xFFFFFFFF)
 		{
 			if (*(strStart + 4))
 			{
@@ -85,6 +135,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	char qpath[1024] = "";
 	sprintf_s(qpath, "%s/%s", AppInfo_OutDir(), rawfilePath);
 
+#ifndef DRY_RUN
 	//
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
@@ -103,6 +154,7 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 		Con_Error_v("ERROR\n");
 		return 0;
 	}
+#endif
 
 	//
 	// Catch incorrect rawfile data to prevent massive allocations
@@ -112,6 +164,11 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 		Con_Print_v("IGNORED\n");
 		return 0;
 	}
+
+#if DRY_RUN
+	printf("(DRY_RUN)\n");
+	return rawfileHeader->compressedSize;
+#endif
 
 	BYTE* dBuf = new BYTE[rawfileHeader->uncompressedSize];
 	unsigned long dSize = rawfileHeader->uncompressedSize;
@@ -148,6 +205,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 
 	int* pHeader = (int*)rawfilePath;
 	int len = pHeader[-2];
+	printf("%p (%d)\n", rawfileData, len);
 
 	//
 	// Catch incorrect rawfile data to prevent massive allocations
@@ -157,6 +215,11 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 		Con_Print_v("IGNORED\n");
 		return 0;
 	}
+
+#if DRY_RUN
+	printf("(DRY_RUN)\n");
+	return len;
+#endif
 
 	//
 	// If not in overwrite mode AND the file exists
@@ -208,8 +271,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	sprintf_s(qpath, "%s/%s", AppInfo_OutDir(), sndfilePath);
 #endif
 	
-	
-
+#ifndef DRY_RUN
 	//
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
@@ -230,6 +292,7 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 		Con_Error_v("PATH ERROR\n");
 		return 0;
 	}
+#endif
 
 	//
 	// Catch incorrect sndfile data and bypass it
@@ -248,6 +311,10 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 		Con_Print_v("IGNORED\n");
 		return 0;
 	}
+
+#if DRY_RUN
+	return snd_header->data_size;
+#endif
 
 	if (FILE* h = fopen(qpath, "wb"))
 	{
@@ -280,12 +347,15 @@ int FF_FFExtractSoundFile(Snd_Header* snd_header, const char* sndfilePath)
 	return 0;
 }
 
-void PerformLookup(BYTE *Buffer, std::vector<BYTE>& Data, std::vector<BYTE>& Signature)
+void PerformLookup(BYTE *Buffer, std::vector<BYTE>& Data, std::vector<std::vector<BYTE>>& scanList)
 {
 	for (auto scanStart = Data.begin();;)
 	{
+		// Matched pattern signature
+		const std::vector<BYTE>* Signature = NULL;
+
 		// Search for the pattern
-		auto ret = std::search(scanStart, Data.end(), Signature.begin(), Signature.end());
+		auto ret = PatternSearch(scanStart, Data.end(), scanList, &Signature);
 
 		// If we didn't find a match, exit
 		if (ret == Data.end())
@@ -294,13 +364,27 @@ void PerformLookup(BYTE *Buffer, std::vector<BYTE>& Data, std::vector<BYTE>& Sig
 		// Convert match index to a real address
 		BYTE *asset = std::distance(Data.begin(), ret) + Buffer;
 
+		// At this point, rawfileString should point to the beginning of the matched signature
+		char *rawfileString = (char *)asset; 
+
+		// If the string isn't terminated after the matched signature, its part of another file
+		if (rawfileString[Signature->size()] != '\0')
+		{
+			scanStart = ret + Signature->size();
+			continue;
+		}
+
 		// Parse the asset (reverse string scan for the name)
-		char *rawfileString = (char *)asset;
 		char* tmpString = FindRawfileStringReverseLookup((BYTE*)rawfileString);
 		int moveLen = 0;
 
+		// We were unable to properly resolve the filename
+		// It may have been an invalid file - so we skip it
 		if (!tmpString)
-			return;
+		{
+			scanStart = ret + Signature->size();
+			continue;
+		}
 
 		if ((BYTE*)tmpString < Buffer || !IsCharAlphaNumericA(*tmpString))
 		{
@@ -312,7 +396,7 @@ void PerformLookup(BYTE *Buffer, std::vector<BYTE>& Data, std::vector<BYTE>& Sig
 
 		char assetExt[32];
 		memset(assetExt, 0, sizeof(assetExt));
-		memcpy(assetExt, asset, Signature.size());
+		memcpy(assetExt, asset, Signature->size());
 
 		// Dump
 		if (strstr(assetExt, ".gsc") ||
@@ -375,10 +459,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 	if (g_extractSounds.ValueBool())
 		scanList.push_back(std::vector<BYTE>({ '.', 'w', 'a', 'v' }));
 
-	concurrency::parallel_for(size_t(0), scanList.size(), [&](size_t i)
-	{
-		PerformLookup(searchData, data, scanList[i]);
-	});
+	PerformLookup(searchData, data, scanList);
 
 	// Return value is never used as of this time
 	return 0;
