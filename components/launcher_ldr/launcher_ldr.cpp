@@ -105,7 +105,7 @@ void OnErrorOccurred(const char* error, ...)
 	va_end(varargs);
 
 	// Log press any key with windows handler
-	printf("\nAn error occured on launch, press any key to continue...");
+	printf("\nAn error occurred on launch, press any key to continue...");
 	_getch();
 }
 
