@@ -95,7 +95,7 @@ void FixDirectory(int argc, char *argv[])
 		*filePart = '\0';
 }
 
-void OnErrorOccured(const char* error, ...)
+void OnErrorOccurred(const char* error, ...)
 {
 	// Prompt the error and the wait
 	va_list varargs;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 
 	if (argc < 3)
 	{
-		OnErrorOccured("USAGE: launcher_ldr <DLL> <EXE> <ARGUMENTS>\n");
+		OnErrorOccurred("USAGE: launcher_ldr <DLL> <EXE> <ARGUMENTS>\n");
 		return 0;
 	}
 
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 
 	if (ghJob == nullptr)
 	{
-		OnErrorOccured("Could not create job object\n");
+		OnErrorOccurred("Could not create job object\n");
 		return 1;
 	}
 	else
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
 		// Query original information first
 		if (!QueryInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &info, sizeof(info), nullptr))
 		{
-			OnErrorOccured("Could not QueryInformationJobObject\n");
+			OnErrorOccurred("Could not QueryInformationJobObject\n");
 			return 1;
 		}
 
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 
 		if (!SetInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &info, sizeof(info)))
 		{
-			OnErrorOccured("Could not SetInformationJobObject\n");
+			OnErrorOccurred("Could not SetInformationJobObject\n");
 			return 1;
 		}
 	}
@@ -168,14 +168,14 @@ int main(int argc, char *argv[])
 
 	if(!CreateProcessA(nullptr, g_CommandLine, nullptr, nullptr, TRUE, CREATE_BREAKAWAY_FROM_JOB | CREATE_SUSPENDED, nullptr, g_ExeDirectory, &startupInfo, &processInfo))
 	{
-		OnErrorOccured("Failed to create '%s' process\n", argv[2]);
+		OnErrorOccurred("Failed to create '%s' process\n", argv[2]);
 		return 1;
 	}
 
 	// Assign the job object
 	if (!AssignProcessToJobObject(ghJob, processInfo.hProcess))
 	{
-		OnErrorOccured("Unable to assign child process job object (0x%X)\n", GetLastError());
+		OnErrorOccurred("Unable to assign child process job object (0x%X)\n", GetLastError());
 		return 1;
 	}
 
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
 
 	if (!injectThread)
 	{
-		OnErrorOccured("DLL injection failed\n");
+		OnErrorOccurred("DLL injection failed\n");
 		return 1;
 	}
 
