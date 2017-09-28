@@ -380,13 +380,10 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x006D98F0, (PBYTE)&hk_R_Cinematic_BinkOpen);
 
 	// Ray
-	// Add Support for Mod Specific Frontend
+	// Add support for mod specific frontend levels (needs to be tested if coop lobbies work!)
 	//
-	Detours::X86::DetourFunction((PBYTE)0x00406B32, (PBYTE)&Com_RunFrontend, Detours::X86Option::USE_CALL);
-	Detours::X86::DetourFunction((PBYTE)0x005A6C32, (PBYTE)&Com_RunFrontend, Detours::X86Option::USE_JUMP);
-	Detours::X86::DetourFunction((PBYTE)0x00679018, (PBYTE)&Com_RunFrontend, Detours::X86Option::USE_JUMP);
-	// 005A6C32 - jmp
-	// 00679018 - jmp
+	Mod_Frontend_Init();
+
 	//
 	// Enable Custom / Updated Commands
 	//
@@ -410,11 +407,6 @@ BOOL GameMod_Init()
 	// Draw the Lagometer even if the player is the host
 	//
 	PatchMemory_WithNOP(0x0068ABFA, 6);
-
-	//
-	// Add support for mod specific frontend levels (needs to be tested if coop lobbies work!)
-	//
-	Mod_Frontend_Init();
 
 	//
 	// Add Game_Mod Version info to the 'version' dvar
