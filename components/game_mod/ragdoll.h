@@ -53,8 +53,9 @@ struct BoneOrientation
 };
 
 template<typename T>
-struct phys_free_list
+class phys_free_list
 {
+protected:
 	struct T_internal_base
 	{
 		T_internal_base *m_prev_T_internal;
@@ -67,6 +68,45 @@ struct phys_free_list
 		int m_ptr_list_index;
 	};
 
+public:
+	class iterator
+	{
+	private:
+		T_internal_base *m_ptr;
+
+	public:
+		iterator(T_internal_base *Node) : m_ptr(Node)
+		{
+		}
+
+		iterator operator++(int)
+		{
+			m_ptr = m_ptr->m_next_T_internal;
+			return iterator(m_ptr);
+		}
+
+		bool operator!=(const iterator& rhs)
+		{
+			return this->m_ptr != rhs.m_ptr;
+		}
+
+		T *operator *()
+		{
+			return &((T_internal *)m_ptr)->m_data;
+		}
+	};
+
+	iterator begin()
+	{
+		return m_dummy_head.m_next_T_internal;
+	}
+
+	iterator end()
+	{
+		return &m_dummy_head;
+	}
+
+private:
 	T_internal_base m_dummy_head;
 	int m_list_count;
 	int m_list_count_high_water;
@@ -76,7 +116,26 @@ struct phys_free_list
 
 extern phys_free_list<RagdollBody> *g_ragdoll_body_pool;
 
+// /ragdoll/ragdoll.h:298
+static bool Ragdoll_BodyPoseValid(RagdollBody *body)
+{
+	ASSERT(body);
+	return body->state >= BS_TUNNEL_TEST;
+}
+
+// /ragdoll/ragdoll.h:312
+static bool Ragdoll_BodyInUse(RagdollBody *body)
+{
+	ASSERT(body);
+	return body->references > 0;
+}
+
+// /ragdoll/ragdoll.h:326
+static bool Ragdoll_BodyIdle(RagdollBody *body)
+{
+	ASSERT(body);
+	return body->state == BS_IDLE;
+}
+
 void Ragdoll_BodyRootOrigin(RagdollBody *body, float *origin);
-bool Ragdoll_BodyInUse(RagdollBody *body);
-bool Ragdoll_BodyIdle(RagdollBody *body);
 BoneOrientation *Ragdoll_BodyBoneOrientations(RagdollBody *body);

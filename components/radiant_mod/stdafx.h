@@ -7,7 +7,7 @@
 #include <intrin.h>
 #include <shellapi.h>
 #include <unordered_map>
-#include <WinSock.h>
+#include <WinSock2.h>
 #pragma comment(lib, "ws2_32.lib")
 
 
@@ -64,6 +64,7 @@
 #include "win_splash.h"
 
 #include "T5.h"
+#include "common.h"
 #include "com_files.h"
 #include "com_memory.h"
 #include "com_math.h"
@@ -99,4 +100,4 @@
 #include "afx_colors.h"
 #include "afx_resource.h"
 
-#include "CCamWnd.h"
+#include "MainFrm.h"

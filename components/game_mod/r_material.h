@@ -224,8 +224,11 @@ struct Material
 
 	GfxStateBits *stateBitsTable;
 };
+STATIC_ASSERT_SIZE(Material, 0xC0);
 
 void __cdecl R_MaterialList_f();
 
 MaterialTechniqueSet *__cdecl Material_GetTechniqueSet(Material *material);
 MaterialTechnique *__cdecl Material_GetTechnique(Material *material, char techType);
+int Material_GetTextureCount(Material *handle);
+GfxImage *Material_GetTexture(Material *handle, int index);

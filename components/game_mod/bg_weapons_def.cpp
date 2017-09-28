@@ -90,7 +90,7 @@ void BG_SetupWeaponAlts(unsigned int weapIndex, void(__cdecl *regWeap)(unsigned 
 	ASSERT_MSG(weapIndex >= 0 && weapIndex <= bg_lastParsedWeaponIndex, "weapIndex not in [0, bg_lastParsedWeaponIndex]");
 
 	WeaponVariantDef *weapVariantDef = bg_weaponVariantDefs[weapIndex];
-	weapVariantDef->altWeaponIndex = 0;
+	weapVariantDef->altWeaponIndex = WP_NONE;
 
 	if (*weapVariantDef->szAltWeaponName)
 	{
@@ -102,7 +102,7 @@ void BG_SetupWeaponAlts(unsigned int weapIndex, void(__cdecl *regWeap)(unsigned 
 		if (Com_SessionMode_IsZombiesGame() || weapVariantDef->weapDef->inventoryType != WEAPINVENTORY_ALTMODE)
 			weapVariantDef->altWeaponIndex = altWeaponIndex;
 		else
-			weapVariantDef->altWeaponIndex = 0;
+			weapVariantDef->altWeaponIndex = WP_NONE;
 	}
 }
 
@@ -115,7 +115,7 @@ void BG_SetupDualWieldAlts(unsigned int weapIndex, void(__cdecl *regWeap)(unsign
 	if (!weapDef->bDualWield)
 		return;
 
-	weapDef->dualWieldWeaponIndex = 0;
+	weapDef->dualWieldWeaponIndex = WP_NONE;
 
 	if (*weapDef->szDualWieldWeaponName)
 	{
@@ -133,9 +133,9 @@ void BG_SetupWeaponMountedVersions(unsigned int weaponIndex, void(__cdecl *regWe
 {
 	WeaponDef *weapDef = bg_weaponVariantDefs[weaponIndex]->weapDef;
 
-	weapDef->standMountedIndex = 0;
-	weapDef->crouchMountedIndex = 0;
-	weapDef->proneMountedIndex = 0;
+	weapDef->standMountedIndex = WP_NONE;
+	weapDef->crouchMountedIndex = WP_NONE;
+	weapDef->proneMountedIndex = WP_NONE;
 
 	if (*weapDef->standMountedWeapdef)
 	{
@@ -185,7 +185,7 @@ void BG_InitDefaultWeaponDef()
 	WeaponVariantDef *defaultWeap = BG_LoadDefaultWeaponVariantDef();
 
 	bg_weaponVariantDefs[0] = defaultWeap;
-	bg_weaponVariantNameHashTable[0].weaponIndex = 0;
+	bg_weaponVariantNameHashTable[0].weaponIndex = WP_NONE;
 	bg_weaponVariantNameHashTable[0].hash = StringTable_HashString(defaultWeap->szInternalName);
 	bg_weaponVariantNameHashTableSorted = false;
 }
@@ -378,7 +378,7 @@ unsigned int BG_GetWeaponIndexForName(const char *name, void(__cdecl *regWeap)(u
 	// Check if the weapon was loaded already
 	unsigned int weapIndex = BG_FindWeaponIndexForName(name);
 
-	if (weapIndex)
+	if (weapIndex != WP_NONE)
 		return weapIndex;
 
 	// Try to load it

@@ -1,33 +1,56 @@
 #pragma once
 
-struct bdReferencableVtbl;
 struct bdByteBuffer;
-struct bdTaskResultVtbl;
+
+template<typename T>
+struct bdReference
+{
+	T *m_ptr;
+};
 
 struct bdTaskResult
 {
-  bdTaskResultVtbl *vfptr;
+	virtual void __vecDelDtor(unsigned int);
+	virtual bool deserialize(bdReference<bdByteBuffer> buffer) = 0;
+	virtual unsigned int sizeOf() = 0;
 };
 
 struct bdSecurityID
 {
-  char ab[8];
+	char ab[8];
 };
 
-struct bdMatchMakingInfo
+struct bdSessionID : bdTaskResult
 {
-  bdTaskResult baseclass_0;
-  bdSecurityID m_sessionID;
-  char m_hostAddr[255];
-  unsigned int m_hostAddrSize;
-  unsigned int m_gameType;
-  unsigned int m_maxPlayers;
-  unsigned int m_numPlayers;
-};
+	virtual bool deserialize(bdReference<bdByteBuffer> buffer) override;
+	virtual unsigned int sizeOf() override;
+	virtual void serialize(struct bdByteBuffer& buffer);
 
-struct MatchMakingInfo
+	bdSecurityID m_sessionID;
+};
+STATIC_ASSERT_OFFSET(bdSessionID, m_sessionID, 0x4);
+STATIC_ASSERT_SIZE(bdSessionID, 0xC);
+
+struct bdMatchMakingInfo : bdTaskResult
 {
-  bdMatchMakingInfo baseclass_0;
+	virtual bool deserialize(bdReference<bdByteBuffer> buffer) override;
+	virtual unsigned int sizeOf() override;
+	virtual void serialize(struct bdByteBuffer& buffer);
+
+	bdSecurityID m_sessionID;
+	char m_hostAddr[255];
+	unsigned int m_hostAddrSize;
+	unsigned int m_gameType;
+	unsigned int m_maxPlayers;
+	unsigned int m_numPlayers;
+};
+STATIC_ASSERT_OFFSET(bdMatchMakingInfo, m_hostAddr, 0xC);
+STATIC_ASSERT_OFFSET(bdMatchMakingInfo, m_hostAddrSize, 0x10C);
+STATIC_ASSERT_OFFSET(bdMatchMakingInfo, m_gameType, 0x110);
+STATIC_ASSERT_OFFSET(bdMatchMakingInfo, m_maxPlayers, 0x114);
+
+struct MatchMakingInfo : bdMatchMakingInfo
+{
   int m_memberNETCODE_VERSION;
   char m_membersecKey[17];
   char m_memberservername[65];
@@ -55,6 +78,28 @@ struct MatchMakingInfo
   int m_active;
   int m_membertimesincelastupdate;
 };
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_memberNETCODE_VERSION, 0x11C);
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_membersecKey, 0x120);
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_memberservername, 0x131);
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_membermaprotation, 0x178);
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_membermapname, 0x180);
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_memberGAME_TYPE, 0x1A4);
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_membermod, 0x1E0);
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_memberDDL_VERSION, 0x210);
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_memberLICENSE, 0x214);
+STATIC_ASSERT_OFFSET(MatchMakingInfo, m_active, 0x220);
+STATIC_ASSERT_SIZE(MatchMakingInfo, 0x228);
+
+struct invite_t
+{
+	unsigned __int64 from;
+	bdSessionID sessionID;
+	char password[32];
+};
+STATIC_ASSERT_OFFSET(invite_t, from, 0x0);
+STATIC_ASSERT_OFFSET(invite_t, sessionID, 0x8);
+STATIC_ASSERT_OFFSET(invite_t, password, 0x14);
+STATIC_ASSERT_SIZE(invite_t, 0x38);
 
 extern const int g_protocolVersion;
 

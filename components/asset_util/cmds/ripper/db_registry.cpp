@@ -234,7 +234,7 @@ void DB_ListAssetPool(XAssetType type, const char* zone)
 	printf("Total of %d assets in %s pool\n", count, DB_GetXAssetTypeName(type));
 }
 
-void DB_WaitForMapToLoad(void)
+int DB_WaitForMapToLoad(void)
 {
 	// Delay (ms) to prevent the checks from causing the game process to slow down
 	const unsigned int sleep_delay = 100;
@@ -244,13 +244,27 @@ void DB_WaitForMapToLoad(void)
 	while (*g_process.cl_ingame == NULL)
 	{
 		Sleep(sleep_delay);
+
+		// The process has exited
+		if (!g_process.IsRunning())
+		{
+			Con_Error("Error!\n");
+			return 1;
+		}
 	}
 
 	ForeignPointer<dvar_s> cl_ingame_val = *g_process.cl_ingame;
 	while (!cl_ingame_val->current.enabled)
 	{
 		Sleep(sleep_delay);
+
+		if (!g_process.IsRunning())
+		{
+			Con_Error("Error!\n");
+			return 2;
+		}
 	}
 
 	Con_Print("Map Loaded!\n");
+	return 0;
 }

@@ -246,3 +246,61 @@ void DB_ExternalInitAssets()
 {
 	BG_FillInAllWeaponItems();
 }
+
+unsigned int DB_GetImageIndex(GfxImage *image)
+{
+	//ASSERT(&entry->entry == image);
+	//ASSERT(false, "index doesn't index ARRAY_COUNT(g_GfxImagePool.entries)");
+
+	return ((char *)image - ((char *)DB_XAssetPool[ASSET_TYPE_IMAGE] + 4)) / sizeof(GfxImage);
+}
+
+GfxImage *DB_GetImageAtIndex(unsigned int index)
+{
+	// ASSERT(index < 0x1080, "index doesn't index ARRAY_COUNT(g_GfxImagePool.entries)");
+
+	return (GfxImage *)(((char *)DB_XAssetPool[ASSET_TYPE_IMAGE] + 4) + (index * sizeof(GfxImage)));
+	//return &g_GfxImagePool.entries[index].entry;
+}
+
+unsigned int DB_GetMaterialIndex(Material *material)
+{
+	//ASSERT(&entry->entry == material);
+	//ASSERT(false, "index doesn't index ARRAY_COUNT(g_MaterialPool.entries)");
+
+	return ((char *)material - ((char *)DB_XAssetPool[ASSET_TYPE_MATERIAL] + 8)) / sizeof(Material);
+}
+
+Material *DB_GetMaterialAtIndex(unsigned int index)
+{
+	// ASSERT(index < 0x1000, "index doesn't index ARRAY_COUNT(g_MaterialPool.entries)");
+
+	return (Material *)(((char *)DB_XAssetPool[ASSET_TYPE_MATERIAL] + 8) + (index * sizeof(Material)));
+	//return &g_MaterialPool.entries[index].entry;
+}
+
+unsigned int DB_GetXModelIndex(XModel *model)
+{
+	//ASSERT(&entry->entry == model);
+	//ASSERT(false, "index doesn't index ARRAY_COUNT(g_XModelPool.entries)");
+
+	return ((char *)model - ((char *)DB_XAssetPool[ASSET_TYPE_XMODEL] + 4)) / sizeof(XModel);
+}
+
+XModel *DB_GetXModelAtIndex(unsigned int index)
+{
+	// ASSERT(index < 0x3E8, "index doesn't index ARRAY_COUNT(g_XModelPool.entries)");
+
+	return (XModel *)(((char *)DB_XAssetPool[ASSET_TYPE_XMODEL] + 4) + (index * sizeof(XModel)));
+	//return &g_XModelPool.entries[index].entry;
+}
+
+int DB_FinishedLoadingAssets()
+{
+	return ((int(__cdecl *)())0x006714E0)();
+}
+
+GfxImage *DB_AllocTempImage()
+{
+	return ((GfxImage *(__cdecl *)())0x00528480)();
+}

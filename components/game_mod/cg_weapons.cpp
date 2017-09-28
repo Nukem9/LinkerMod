@@ -2,12 +2,18 @@
 
 void XAnimSetTime(XAnimTree_s *tree, unsigned int animIndex, float time, int cmdIndex)
 {
+	ASSERT(tree);
+	//ASSERT(tree->anims);
+	//ASSERT(animIndex < tree->anims->size);
+
 	((void(__cdecl *)(XAnimTree_s *, unsigned int, float, int))0x005E79C0)(tree, animIndex, time, cmdIndex);
 }
 
-void XAnimSetGoalWeight(DObj *obj, unsigned int animIndex, float goalWeight, float goalTime, float rate, unsigned int notifyName, unsigned int notifyType, int bRestart, int cmdIndex)
+int XAnimSetGoalWeight(DObj *obj, unsigned int animIndex, float goalWeight, float goalTime, float rate, unsigned int notifyName, unsigned int notifyType, int bRestart, int cmdIndex)
 {
-	((void(__cdecl *)(DObj *, unsigned int, float, float, float, unsigned int, unsigned int, int, int))0x004076C0)
+	ASSERT(obj);
+
+	return ((int(__cdecl *)(DObj *, unsigned int, float, float, float, unsigned int, unsigned int, int, int))0x004076C0)
 		(obj, animIndex, goalWeight, goalTime, rate, notifyName, notifyType, bRestart, cmdIndex);
 }
 
@@ -27,6 +33,12 @@ float GetWeaponAnimRate(int localClientNum, WeaponVariantDef *weapVariantDef, XA
 		mov eax, localClientNum
 		call[dwCall]
 		add esp, 0x8
+
+		// Return value in both xmm0 and ST(0)
+		movd eax, xmm0
+		push eax
+		fld [esp]
+		add esp, 0x4
 	}
 }
 
@@ -43,6 +55,12 @@ float GetWeaponAnimTimeFrac(int localClientNum, WeaponVariantDef *weapVariantDef
 		mov edx, weapVariantDef
 		mov eax, animIndex
 		call[dwCall]
+
+		// Return value in both xmm0 and ST(0)
+		movd eax, xmm0
+		push eax
+		fld[esp]
+		add esp, 0x4
 	}
 }
 
@@ -94,14 +112,17 @@ void StartWeaponAnim(int localClientNum, int weaponNum, DObj *obj, int animIndex
 		rate /= perk_weapSwitchMultiplier->current.value;
 	}
 
-	for (int i = 1; i < WEAP_ANIM_VIEWMODEL_END; ++i)
+	for (int i = 1; i < WEAP_ANIM_VIEWMODEL_END; i++)
 	{
 		if (animIndex == i)
 		{
 			XAnimSetGoalWeight(obj, i, 1.0f, transitionTime, rate, 0, 1, 1, -1);
 
 			if (newPlayerstate)
+			{
 				XAnimSetTime(viewModelInfo->tree, i, timeFrac, -1);
+				//ASSERT(viewModelInfo->tree->anims);
+			}
 		}
 		else if (weapDef->bDualWield
 			&& viewModelInfo->hand[0].iHandAnimIndex != i

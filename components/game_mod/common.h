@@ -107,3 +107,4 @@ void Com_FreeWeaponInfoMemory(int source);
 
 void __cdecl Com_RunAutoExec(int localClientNum, int controllerIndex);
 void __cdecl Com_ExecStartupConfigs(int localClientNum, const char *configFile);
+void Com_PrintMessage(int channel, const char *msg, int error);

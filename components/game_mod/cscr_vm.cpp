@@ -31,16 +31,6 @@ void SL_RemoveRefToString(scriptInstance_t inst, unsigned int stringValue)
 
 void __cdecl GScr_NewDebugHudElem()
 {
-	if (developer->current.enabled)
+	if (com_developer->current.enabled)
 		GScr_NewHudElem();
-}
-
-void __cdecl Scr_GetChecksumNoAsserts(int *checksum, scriptInstance_t inst)
-{
-	int* gScrVarPub = (int*)0x032C8680;
-	int* dword_30457E0 = (int*)0x030457E0;
-
-	*checksum = gScrVarPub[0x16 * inst + 0xE];
-	checksum[1] = dword_30457E0[33806 * inst];
-	checksum[2] = gScrVarPub[0x16 * inst + 0x13] - gScrVarPub[0x16 * inst + 0x12];
 }

@@ -273,9 +273,7 @@ void Bullet_Fire(gentity_s *attacker, float spread, weaponParms *wp, gentity_s *
 
 void BG_seedRandWithGameTime(unsigned int *pHoldrand)
 {
-	unsigned int v1 = *pHoldrand << 8;
-	*pHoldrand ^= v1;
-	*pHoldrand ^= (v1 << 8) ^ (v1 << 16);
+	*pHoldrand ^= (*pHoldrand << 8) ^ (((*pHoldrand << 8) ^ (*pHoldrand << 16)) << 8);
 }
 
 void BG_srand(unsigned int *pHoldrand)

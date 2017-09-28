@@ -224,51 +224,44 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			bool holdingFireBtn = false;
 
 			if (ps->bRunLeftGun)
-				holdingFireBtn = pm->cmd.buttons.testBit(0x18) != 0;
+				holdingFireBtn = pm->cmd.button_bits.testBit(0x18) != 0;
 			else
-				holdingFireBtn = pm->cmd.buttons.testBit(0) != 0;
+				holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
 
-			if (*weaponState >= WEAPON_OFFHAND_INIT && *weaponState <= WEAPON_OFFHAND_END || !pausedAfterFiring && !holdingGrenadeBtn)
-				goto LABEL_105;
-			if (!holdingFireBtn)
-				goto LABEL_97;
-			if (ps->weapon == pm->cmd.weapon || !PM_WeaponAmmoAvailable(ps) && !weapDef->unlimitedAmmo)
+			if ((*weaponState < WEAPON_OFFHAND_INIT || *weaponState > WEAPON_OFFHAND_END)
+				&& (pausedAfterFiring || holdingGrenadeBtn)
+				&& holdingFireBtn
+				&& ps->weapon == pm->cmd.weapon
+				&& (PM_WeaponAmmoAvailable(ps) || weapDef->unlimitedAmmo))
 			{
-			LABEL_105:
-				if (holdingFireBtn && !(ps->weapFlags & 0x400))
+				*weaponTime = 1;
+
+				if (IS_WEAPONSTATE_RELOAD(*weaponState))
 				{
 					*weaponTime = 0;
-					goto LABEL_100;
+					*weaponShotCount = 0;
 				}
-			LABEL_97:
-				if (!BurstFirePending(ps))
+				else if (*weaponState == WEAPON_RECHAMBERING)
+				{
+					PM_Weapon_FinishRechamber(ps);
+				}
+				else if (IS_WEAPONSTATE_FIRE(*weaponState))
+				{
+					// Bugfix? BO2 uses ps->bRunLeftGun
+					PM_ContinueWeaponAnim(ps, 0, ps->bRunLeftGun);
+					*weaponState = WEAPON_READY;
+				}
+			}
+			else
+			{
+				if ((!holdingFireBtn || ps->weapFlags & 0x400) && !BurstFirePending(ps))
 					*weaponShotCount = 0;
 
 				*weaponTime = 0;
-				goto LABEL_100;
-			}
-
-			*weaponTime = 1;
-
-			if (IS_WEAPONSTATE_RELOAD(*weaponState))
-			{
-				*weaponTime = 0;
-				*weaponShotCount = 0;
-			}
-			else if (*weaponState == WEAPON_RECHAMBERING)
-			{
-				PM_Weapon_FinishRechamber(ps);
-			}
-			else if (IS_WEAPONSTATE_FIRE(*weaponState))
-			{
-				// Bugfix? BO2 uses ps->bRunLeftGun
-				PM_ContinueWeaponAnim(ps, 0, ps->bRunLeftGun);
-				*weaponState = WEAPON_READY;
 			}
 		}
 	}
 
-LABEL_100:
 	if (!*weaponDelay)
 		return 0;
 
@@ -279,6 +272,88 @@ LABEL_100:
 
 	*weaponDelay = 0;
 	return 1;
+}
+
+// /bgame/bg_weapons.cpp:2985
+int PM_GetWeaponFireButton(unsigned int weapon)
+{
+	WeaponDef *weapDef = BG_GetWeaponDef(weapon);
+
+	ASSERT(weapDef);
+
+	if ((weapDef->weapType == WEAPTYPE_GRENADE || weapDef->weapType == WEAPTYPE_MINE) && weapDef->hasDetonator)
+		return 24;
+
+	return 0;
+}
+
+// /bgame/bg_weapons.cpp:2998
+int PM_Weapon_ShouldBeFiring(pmove_t *pm, int delayedAction, bool testOnly)
+{
+	playerState_s *ps = pm->ps;
+	ASSERT(ps);
+
+	if (ps->pm_flags & 0x200000)
+		return 0;
+
+	WeaponDef *weapDef = BG_GetWeaponDef(ps->weapon);
+	int weaponBit = PM_GetWeaponFireButton(ps->weapon);
+	bool shouldStartFiring = pm->cmd.button_bits.testBit(weaponBit) != 0;
+
+	// If this is a dw weapon and we're using the offhand
+	if (ps->bRunLeftGun && weapDef->bDualWield)
+	{
+		// Check if player holding the fire key
+		if (pm->cmd.button_bits.testBit(24))
+			shouldStartFiring = true;
+		else
+			shouldStartFiring = false;
+	}
+
+	if (weapDef->freezeMovementWhenFiring && ps->groundEntityNum == 1023)
+		shouldStartFiring = false;
+
+	if (weapDef->bCanUseInVehicle)
+		shouldStartFiring = false;
+
+	if (weapDef->fireType == WEAPON_FIRETYPE_MINIGUN && shouldStartFiring)
+		shouldStartFiring = ps->weaponSpinLerp >= 1.0f;
+
+	if (shouldStartFiring || (delayedAction || BurstFirePending(ps)))
+		return 1;
+
+	if (!testOnly)
+	{
+		if (ps->bRunLeftGun && weapDef->bDualWield)
+		{
+			if (ps->weaponstateLeft == WEAPON_FIRING)
+				PM_ContinueWeaponAnim(ps, 0, 1);
+
+			ps->weaponstateLeft = WEAPON_READY;
+		}
+		else
+		{
+			if (ps->weaponstate == WEAPON_FIRING && !Mantle_IsWeaponEquipped(ps))
+				PM_ContinueWeaponAnim(ps, 0, 0);
+
+			ps->weaponstate = WEAPON_READY;
+		}
+	}
+
+	return 0;
+}
+
+void __declspec(naked) hk_PM_Weapon_ShouldBeFiring()
+{
+	__asm
+	{
+		push [esp + 8]
+		push [esp + 8]
+		push eax
+		call PM_Weapon_ShouldBeFiring
+		add esp, 0xC
+		retn
+	}
 }
 
 // /bgame/bg_weapons.cpp:3276
@@ -302,4 +377,9 @@ WeaponVariantDef *BG_LoadWeaponVariantDef(const char *name)
 const char *BG_WeaponName(int weapon)
 {
 	return BG_GetWeaponVariantDef(weapon)->szInternalName;
+}
+
+bool Mantle_IsWeaponEquipped(playerState_s *ps)
+{
+	return ((bool (__cdecl *)(playerState_s *))0x0058D3A0)(ps);
 }

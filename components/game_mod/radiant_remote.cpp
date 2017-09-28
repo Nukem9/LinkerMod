@@ -3,9 +3,10 @@
 SOCKET g_ServerSocket = INVALID_SOCKET;
 SOCKET g_ClientSocket = INVALID_SOCKET;
 
+// /qcommon/radiant_remote.cpp:16
 const char *GetPairValue(SpawnVar *spawnVar, const char *key)
 {
-	for (int i = 0; i < spawnVar->numSpawnVars; ++i)
+	for (int i = 0; i < spawnVar->numSpawnVars; i++)
 	{
 		if (!_stricmp(key, spawnVar->spawnVars[i][0]))
 			return spawnVar->spawnVars[i][1];
@@ -14,6 +15,23 @@ const char *GetPairValue(SpawnVar *spawnVar, const char *key)
 	return nullptr;
 }
 
+// /qcommon/radiant_remote.cpp:176
+void G_AssignGameIdMapping(int liveUpdateId, int gameId)
+{
+	if (liveUpdateId > 0)
+		gObjectMapping[liveUpdateId - 1].gameId = gameId;
+}
+
+// /qcommon/radiant_remote.cpp:182
+int G_GetGameIdMapping(int liveUpdateId)
+{
+	if (liveUpdateId <= 0)
+		return -1;
+
+	return gObjectMapping[liveUpdateId - 1].gameId;
+}
+
+// /qcommon/radiant_remote.cpp:???
 void RadiantRemoteInit()
 {
 	savedCommandCount = 0;
@@ -68,6 +86,7 @@ void RadiantRemoteInit()
 	Com_Printf(1, "Succeeded\n");
 }
 
+// /qcommon/radiant_remote.cpp:???
 void RadiantRemoteShutdown()
 {
 	shutdown(g_ServerSocket, 2 /*SD_BOTH*/);
@@ -80,6 +99,7 @@ void RadiantRemoteShutdown()
 	g_ClientSocket = INVALID_SOCKET;
 }
 
+// /qcommon/radiant_remote.cpp:???
 void RadiantRemoteUpdate()
 {
 	if (!radiant_live->current.enabled || !RadiantRemoteUpdateSocket())
@@ -135,8 +155,10 @@ void RadiantRemoteUpdate()
 	Sys_LeaveCriticalSection((CriticalSection)61);
 }
 
+// /qcommon/radiant_remote.cpp:???
 bool RadiantRemoteUpdateSocket()
 {
+	// Skip this function if client already connected
 	if (g_ClientSocket != INVALID_SOCKET)
 		return true;
 
@@ -158,14 +180,14 @@ bool RadiantRemoteUpdateSocket()
 	if (status == SOCKET_ERROR)
 		Com_Error(ERR_FATAL, "LiveRadiant: Failed to query socket status\n");
 
-	// Must be 1 (handle) if there is a pending connection
+	// Must be 1 (handle) if someone is waiting
 	if (status != 1)
 		return false;
 
 	g_ClientSocket = accept(g_ServerSocket, nullptr, nullptr);
 
 	if (g_ClientSocket == INVALID_SOCKET)
-		Com_Error(ERR_FATAL, "LiveRadiant: Failed to accept a connection?\n");
+		Com_Error(ERR_FATAL, "LiveRadiant: Failed to accept a connection!?\n");
 
 	// Set non-blocking flag
 	u_long socketMode = 1;
@@ -173,169 +195,4 @@ bool RadiantRemoteUpdateSocket()
 
 	Com_Printf(1, "LiveRadiant: Client connected\n");
 	return true;
-}
-
-void G_AssignGameIdMapping(int liveUpdateId, int gameId)
-{
-	if (liveUpdateId > 0)
-		gObjectMapping[liveUpdateId - 1].gameId = gameId;
-}
-
-int G_GetGameIdMapping(int liveUpdateId)
-{
-	if (liveUpdateId <= 0)
-		return -1;
-
-	return gObjectMapping[liveUpdateId - 1].gameId;
-}
-
-pathnode_t *G_FindPathNode(SpawnVar *spawnVar, nodeType type, const int gameId)
-{
-	pathnode_t compareNode;
-	memset(&compareNode, 0, sizeof(pathnode_t));
-
-	G_ParsePathnodeFields(spawnVar, &compareNode, type);
-
-	pathnode_t *bestNode = nullptr;
-	int bestScore = 1;
-
-	for (unsigned int i = 0; i < gameWorldCurrent->path.nodeCount; ++i)
-	{
-		int score = 0;
-		pathnode_t *node = &gameWorldCurrent->path.nodes[i];
-
-		// 2D distance, ignores height
-		float dist =
-			((compareNode.constant.vOrigin[0] - node->constant.vOrigin[0]) *
-			(compareNode.constant.vOrigin[0] - node->constant.vOrigin[0])) +
-			((compareNode.constant.vOrigin[1] - node->constant.vOrigin[1]) *
-			(compareNode.constant.vOrigin[1] - node->constant.vOrigin[1]));
-
-		// The closer the distance, the higher the base match score
-		if (dist < 100.0f)
-			score = (dist < 0.5f) ? 2 : 1;
-
-		if (node->constant.target && node->constant.target == compareNode.constant.target)
-			++score;
-
-		if (node->constant.targetname && node->constant.targetname == compareNode.constant.targetname)
-			++score;
-
-		if (node->constant.script_noteworthy && node->constant.script_noteworthy == compareNode.constant.script_noteworthy)
-			++score;
-
-		if (score > bestScore)
-		{
-			bestNode = &gameWorldCurrent->path.nodes[i];
-			bestScore = score;
-		}
-	}
-
-	// If the search failed, check if there was a previous mapping
-	if (gameId > 0)
-	{
-		if ((unsigned int)gameId < gameWorldCurrent->path.nodeCount && !bestNode)
-			bestNode = &gameWorldCurrent->path.nodes[gameId];
-	}
-
-	return bestNode;
-}
-
-void G_ProcessPathnodeCommand(RadiantCommand *command, SpawnVar *spawnVar)
-{
-	const char *classname = GetPairValue(spawnVar, "classname");
-	nodeType nodetype = G_GetNodeTypeFromClassname(classname);
-
-	RadiantCommandType commandType = command->type;
-	int gameId = G_GetGameIdMapping(command->liveUpdateId);
-
-	if (commandType == RADIANT_COMMAND_CREATE)
-	{
-		G_SpawnPathnodeStatic(spawnVar, classname);
-		G_SpawnPathnodeDynamic(spawnVar);
-
-		g_radiant_selected_pathnode = &gameWorldCurrent->path.nodes[gameWorldCurrent->path.nodeCount - 1];
-
-		unsigned int nodeIndex = Path_ConvertNodeToIndex(g_radiant_selected_pathnode);
-		G_DropPathNodeToFloor(nodeIndex);
-
-		Path_ConnectPathsForSingleNode(g_radiant_selected_pathnode);
-
-		Com_Printf(5, "Radiant Live Update: Created new path node\n");
-		G_AssignGameIdMapping(command->liveUpdateId, nodeIndex);
-	}
-	else if (commandType == RADIANT_COMMAND_DELETE)
-	{
-		// Remove all node links and then set it to invalid status
-		g_radiant_selected_pathnode = G_FindPathNode(spawnVar, nodetype, gameId);
-
-		if (g_radiant_selected_pathnode)
-		{
-			int nodeindex = Path_ConvertNodeToIndex(g_radiant_selected_pathnode);
-
-			for (unsigned int i = 0; i < gameWorldCurrent->path.nodeCount; ++i)
-			{
-				pathnode_t *othernode = &gameWorldCurrent->path.nodes[i];
-
-				for (unsigned short j = 0; j < othernode->constant.totalLinkCount; ++j)
-				{
-					if (othernode->constant.Links[j].nodeNum == nodeindex)
-					{
-						othernode->constant.Links[j] = othernode->constant.Links[--othernode->constant.totalLinkCount];
-						othernode->dynamic.wLinkCount = othernode->constant.totalLinkCount;
-					}
-				}
-			}
-			g_radiant_selected_pathnode->constant.totalLinkCount = 0;
-			g_radiant_selected_pathnode->dynamic.wLinkCount = 0;
-			g_radiant_selected_pathnode->constant.type = NODE_BADNODE;
-		}
-
-		g_radiant_selected_pathnode = nullptr;
-	}
-	else
-	{
-		pathnode_t *node = 0;
-
-		if (commandType)
-		{
-			if (commandType == RADIANT_COMMAND_UPDATE_SELECTED)
-			{
-				node = g_radiant_selected_pathnode;
-			}
-			else if (commandType == RADIANT_COMMAND_UPDATE)
-			{
-				node = G_FindPathNode(spawnVar, nodetype, gameId);
-			}
-		}
-		else
-		{
-			node = g_radiant_selected_pathnode = G_FindPathNode(spawnVar, nodetype, gameId);
-
-			if (!node)
-				Com_Printf(5, "Radiant Live Update: Can't find pathnode. Maps out of sync (Radiant/Game), re-bsp!\n");
-		}
-		if (node)
-		{
-			// Prevent the temporary link flag from getting lost when parsing SpawnVars
-			unsigned short tempLinks = node->constant.spawnflags & 0x4000;
-
-			G_ParsePathnodeFields(spawnVar, node, nodetype);
-
-			if (tempLinks)
-				node->constant.spawnflags |= 0x4000u;
-
-			// Node attributes have been updated. Force it back to ground level.
-			unsigned int nodeIndex = Path_ConvertNodeToIndex(node);
-			G_DropPathNodeToFloor(nodeIndex);
-
-			Path_ConnectPathsForSingleNode(node);
-			G_AssignGameIdMapping(command->liveUpdateId, nodeIndex);
-		}
-	}
-}
-
-void G_ClearSelectedPathNode()
-{
-	g_radiant_selected_pathnode = nullptr;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#define WP_NONE 0
+
 enum weapType_t
 {
 	WEAPTYPE_BULLET = 0x0,
@@ -102,7 +104,8 @@ struct WeaponDef
 	bool bRifleBullet;
 	char _pad10[0x13];
 	bool bClipOnly;
-	char _pad11[0x8];
+	bool bCanUseInVehicle;
+	char _pad11[0x7];
 	bool bDualWield;
 	char _pad12[0x25];
 	const char *szDualWieldWeaponName;
@@ -111,14 +114,18 @@ struct WeaponDef
 	struct XModel *projectileModel;
 	char _pad14[0x41];
 	bool bBulletImpactExplode;
-	char _pad15[0x10];
+	char _pad15[0xB];
+	bool hasDetonator;
+	char _pad16[0x4];
 	bool holdButtonToThrow;
-	char _pad16[0x145];
+	char _pad17[0x1];
+	bool freezeMovementWhenFiring;
+	char _pad18[0x143];
 	const char *szUseHintString;
 	const char *dropHintString;
 	int iUseHintStringIndex;
 	int dropHintStringIndex;
-	char _pad17[0x18];
+	char _pad19[0x18];
 	float fMinDamageRange;
 };
 STATIC_ASSERT_OFFSET(WeaponDef, notetrackSoundMapKeys, 0x10);
@@ -148,12 +155,15 @@ STATIC_ASSERT_OFFSET(WeaponDef, ammoCountClipRelative, 0x359);
 STATIC_ASSERT_OFFSET(WeaponDef, sharedAmmo, 0x54C);
 STATIC_ASSERT_OFFSET(WeaponDef, bRifleBullet, 0x54D);
 STATIC_ASSERT_OFFSET(WeaponDef, bClipOnly, 0x561);
+STATIC_ASSERT_OFFSET(WeaponDef, bCanUseInVehicle, 0x562);
 STATIC_ASSERT_OFFSET(WeaponDef, bDualWield, 0x56A);
 STATIC_ASSERT_OFFSET(WeaponDef, szDualWieldWeaponName, 0x590);
 STATIC_ASSERT_OFFSET(WeaponDef, dualWieldWeaponIndex, 0x594);
 STATIC_ASSERT_OFFSET(WeaponDef, projectileModel, 0x5E8);
 STATIC_ASSERT_OFFSET(WeaponDef, bBulletImpactExplode, 0x62D);
+STATIC_ASSERT_OFFSET(WeaponDef, hasDetonator, 0x639);
 STATIC_ASSERT_OFFSET(WeaponDef, holdButtonToThrow, 0x63E);
+STATIC_ASSERT_OFFSET(WeaponDef, freezeMovementWhenFiring, 0x640);
 STATIC_ASSERT_OFFSET(WeaponDef, szUseHintString, 0x784);
 STATIC_ASSERT_OFFSET(WeaponDef, dropHintString, 0x788);
 STATIC_ASSERT_OFFSET(WeaponDef, iUseHintStringIndex, 0x78C);

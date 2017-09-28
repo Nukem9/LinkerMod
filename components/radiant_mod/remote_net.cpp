@@ -88,6 +88,7 @@ DWORD WINAPI RemoteNet_Thread(LPVOID)
 		// Send updates until the game exits/connection is terminated
 		printf("NOTICE: Game connected\n");
 
+		// Loop indefinitely until we the game disconnects
 		while (true)
 		{
 			// Check for a socket error
@@ -101,11 +102,7 @@ DWORD WINAPI RemoteNet_Thread(LPVOID)
 			if (retval == SOCKET_ERROR || error != 0)
 				break;
 
-			// Send the camera packet every few milliseconds
-			if (CCamWnd::ActiveWindow)
-				RemoteNet_UpdateCamera(CCamWnd::ActiveWindow->cameraOrigin, CCamWnd::ActiveWindow->cameraAngles);
-
-			Sleep(50);
+			Sleep(200);
 		}
 
 		printf("NOTICE: Game disconnected\n");

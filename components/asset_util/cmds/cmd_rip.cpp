@@ -1,4 +1,5 @@
 #include "cmd_common.h"
+#include "../sys/AppInfo.h"
 
 #include "../sys/process.h"
 #include "ripper\process_info.h"
@@ -10,8 +11,58 @@ bool wait = true;
 
 int Cmd_Rip_f(int argc, char** argv)
 {
-	unsigned int timeoutDelay = rip_waitForProcess.ValueBool() ? UINT_MAX : 0;
-	if (processId_t pid = Process_FindSupportedProcess(timeoutDelay))
+	processId_t pid = NULL;
+
+	//
+	// The user wants to launch a specific map
+	// So asset_util handles launching the game
+	//
+	if (rip_targetMap.ValueString()[0] != '\0')
+	{
+		rip_waitForMap.Enable();
+		rip_waitForProcess.Enable();
+		rip_killProcess.Enable();
+
+		if (!AppInfo_MapExists(rip_targetMap.ValueString()))
+		{
+			Con_Error("ERROR: Map '%s' is not a valid map!\n", rip_targetMap.ValueString());
+			return 1;
+		}
+
+		char mapname[256];
+		const char* prefix = "";
+		const char* mp_args = "";
+
+#if _APPINFO_ALLOW_MP_MAPS
+		if (_strnicmp(rip_targetMap.ValueString(), "mp_", 3) == 0)
+		{
+			prefix = "so_dummy_";
+			mp_args = "+set g_loadScripts 0";
+		}
+#endif
+		sprintf_s(mapname, "%s%s", prefix, rip_targetMap.ValueString());
+
+		// Automatically "click to continue" once the map is loaded
+		// Ensure that the intro cinematics don't play
+		const char* additional_args =	"+set ui_autoContinue 1 "
+										"+set com_introPlayed 1 "
+										"+set com_startupIntroPlayed 1 ";
+
+		char cmdLine[1024];
+		sprintf_s(cmdLine, "+devmap %s %s%s%s", mapname, mp_args, *mp_args ? " " : "", additional_args);
+
+		pid = Process_LaunchGame(cmdLine);
+	}
+	else
+	{
+		//
+		// No map was specified, so we wait for the first supported process and use that
+		//
+		unsigned int timeoutDelay = rip_waitForProcess.ValueBool() ? UINT_MAX : 0;
+		pid = Process_FindSupportedProcess(timeoutDelay);
+	}
+
+	if (pid)
 	{
 		if (int err = ProcessInfo_Init(pid))
 		{
@@ -21,7 +72,11 @@ int Cmd_Rip_f(int argc, char** argv)
 
 		if (rip_waitForMap.ValueBool())
 		{
-			DB_WaitForMapToLoad();
+			if (DB_WaitForMapToLoad() != 0)
+			{
+				Con_Error("Could not load map - game process is unavailable...\n");
+				return 2;
+			}
 		}
 
 		Process_SuspendThreads(pid);
@@ -52,6 +107,14 @@ int Cmd_Rip_f(int argc, char** argv)
 		if (rip_killProcess.ValueBool())
 		{
 			Process_KillProcess(pid);
+
+			//
+			// Kill any lingering supported processes to prevent conflicts in the batch script
+			//
+			while (pid = Process_FindSupportedProcess(0, true))
+			{
+				Process_KillProcess(pid);
+			}
 		}
 
 		return 0;

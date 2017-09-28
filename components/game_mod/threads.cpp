@@ -51,10 +51,38 @@ DWORD WINAPI Sys_ThreadMain(LPVOID Arg)
 
 bool Sys_IsMainThread()
 {
-	return true;
+	return ((bool(__cdecl *)())0x005A48F0)();
 }
 
 bool Sys_IsRenderThread()
 {
-	return true;
+	return ((bool(__cdecl *)())0x005F5F00)();
+}
+
+void Sys_WakeStream()
+{
+	((void(__cdecl *)())0x00628BD0)();
+}
+
+void Sys_LockWrite(FastCriticalSection *critSect)
+{
+	while (true)
+	{
+		if (!critSect->readCount)
+		{
+			if (InterlockedIncrement(&critSect->writeCount) == 1 && !critSect->readCount)
+				break;
+
+			InterlockedDecrement(&critSect->writeCount);
+		}
+
+		Sleep(0);
+	}
+}
+
+void Sys_UnlockWrite(FastCriticalSection *critSect)
+{
+	ASSERT(critSect->writeCount > 0);
+
+	InterlockedDecrement(&critSect->writeCount);
 }
