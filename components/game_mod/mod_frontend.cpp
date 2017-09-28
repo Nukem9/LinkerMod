@@ -69,10 +69,9 @@ void UI_RunMod_HandleFrontend()
 
 void Mod_Frontend_Init()
 {
-#define PatchRunFrontend(addr, jmp) Detours::X86::DetourFunction((PBYTE)&Com_RunFrontend, (PBYTE)addr, jmp ? Detours::X86Option::USE_JUMP : Detours::X86Option::USE_CALL)
-	PatchRunFrontend(0x406B32, 0);
-	PatchRunFrontend(0x5A6C32, 1);
-	PatchRunFrontend(0x679018, 1);
-
+	Detours::X86::DetourFunction((PBYTE)0x00406B32, (PBYTE)&Com_RunFrontend, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x005A6C32, (PBYTE)&Com_RunFrontend, Detours::X86Option::USE_JUMP);
+	Detours::X86::DetourFunction((PBYTE)0x00679018, (PBYTE)&Com_RunFrontend, Detours::X86Option::USE_JUMP);
+	
 	Detours::X86::DetourFunction((PBYTE)&UI_RunMod_HandleFrontend, (PBYTE)0x45CD7D, Detours::X86Option::USE_CALL);
 }
