@@ -132,6 +132,7 @@
     <ClCompile Include="g_utils_mp.cpp" />
     <ClCompile Include="live_steam_client.cpp" />
     <ClCompile Include="live_win.cpp" />
+    <ClCompile Include="mod_frontend.cpp" />
     <ClCompile Include="netfield.cpp" />
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_demo.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="g_utils_mp.h" />
     <ClInclude Include="live_steam_client.h" />
     <ClInclude Include="live_win.h" />
+    <ClInclude Include="mod_frontend.h" />
     <ClInclude Include="msg_mp.h" />
     <ClInclude Include="netfield.h" />
     <ClInclude Include="patch_common.h" />

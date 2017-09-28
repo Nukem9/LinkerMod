@@ -111,4 +111,8 @@
 
 #include "reshade.h"
 
+#include "mod_frontend.h"
+
 #define GM_NET_VERSION 0x01
+
+#define _USE_LEVEL_DEPENDENCIES 1
