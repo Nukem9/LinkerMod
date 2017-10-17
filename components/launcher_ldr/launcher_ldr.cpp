@@ -29,9 +29,9 @@ bool StrDel(char* Source, char* Needle, char StopAt)
 int StrContainsChar(char* str, char c)
 {
 	int len = strlen(str);
-	for(int i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 	{
-		if(str[i] == c)
+		if (str[i] == c)
 			return i;
 	}
 
@@ -50,22 +50,22 @@ void FixCommandLine(int argc, char *argv[])
 	strcat_s(g_CommandLine, argv[2]);
 	strcat_s(g_CommandLine, "\"");
 
-	for(int i = 3; i < argc; i++)
+	for (int i = 3; i < argc; i++)
 	{
 		strcat_s(g_CommandLine, " ");
 
 		// Fix for arguments in quotes being split into multiple args
 		char buf[8192];
-		if(StrContainsChar(argv[i], ' ') != -1)
+		if (StrContainsChar(argv[i], ' ') != -1)
 		{
-			strcpy_s(buf,"");
-			strcat_s(buf,"\"");
-			strcat_s(buf,argv[i]);
-			strcat_s(buf,"\"");
+			strcpy_s(buf, "");
+			strcat_s(buf, "\"");
+			strcat_s(buf, argv[i]);
+			strcat_s(buf, "\"");
 		}
 		else
 		{
-			strcpy_s(buf,argv[i]);
+			strcpy_s(buf, argv[i]);
 		}
 
 		strcat_s(g_CommandLine, buf);
@@ -109,10 +109,31 @@ void OnErrorOccurred(const char* error, ...)
 	_getch();
 }
 
+bool IsUserRunningAsAdmin() {
+	BOOL IsAdmin;
+	HANDLE ProcToken;
+	TOKEN_ELEVATION ElevationToken;
+	DWORD SizeOfResult = sizeof(TOKEN_ELEVATION);
+
+	if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &ProcToken) && GetTokenInformation(ProcToken, TokenElevation, &ElevationToken, sizeof(ElevationToken), &SizeOfResult))
+		IsAdmin = ElevationToken.TokenIsElevated;
+
+	if (ProcToken)
+		CloseHandle(ProcToken);
+
+	return IsAdmin;
+}
+
 int main(int argc, char *argv[])
 {
 	// Disable STDOUT buffering
 	setvbuf(stdout, nullptr, _IONBF, 0);
+
+	// Arefu: Determine if user is running as Admin
+	if (IsUserRunningAsAdmin() == FALSE)
+	{
+		printf("launcher_ldr is not running as Administrator. This may cause issues!\n\n");
+	}
 
 	if (argc < 3)
 	{
@@ -166,7 +187,7 @@ int main(int argc, char *argv[])
 	FixCommandLine(argc, argv);
 	FixDirectory(argc, argv);
 
-	if(!CreateProcessA(nullptr, g_CommandLine, nullptr, nullptr, TRUE, CREATE_BREAKAWAY_FROM_JOB | CREATE_SUSPENDED, nullptr, g_ExeDirectory, &startupInfo, &processInfo))
+	if (!CreateProcessA(nullptr, g_CommandLine, nullptr, nullptr, TRUE, CREATE_BREAKAWAY_FROM_JOB | CREATE_SUSPENDED, nullptr, g_ExeDirectory, &startupInfo, &processInfo))
 	{
 		OnErrorOccurred("Failed to create '%s' process\n", argv[2]);
 		return 1;
