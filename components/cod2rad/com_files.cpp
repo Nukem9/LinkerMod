@@ -67,6 +67,8 @@ int __cdecl FS_ReadFile(const char *qpath, void **buffer)
 		mov result, eax
 		popad
 	}
+
+	return result;
 }
 
 void __cdecl FS_FreeFile(void *buffer)
