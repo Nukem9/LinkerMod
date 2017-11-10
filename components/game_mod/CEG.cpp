@@ -94,6 +94,7 @@ void Patch_CEG()
 	Detours::X86::DetourFunction((PBYTE)0x8EE640, (PBYTE)&sub_8EE640);	// Patch intentional nullptr
 
 	FixupFunction(0x0060CC10, 0x004F20F0);		// CEGObfuscate<LiveStats_Init> => LiveStats_Init
+	FixupFunction(0x0063DCC0, 0x0062DD40);		// CEGObfuscate<LiveStats_ResetStats> => LiveStats_ResetStats
 	FixupFunction(0x00580460, 0x0079E6D0);		// CEGObfuscate<Con_Restricted_SetLists> => Con_Restricted_SetLists
 }
 
