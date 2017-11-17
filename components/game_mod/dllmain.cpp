@@ -616,7 +616,12 @@ BOOL GameMod_Init(HMODULE hModule)
 	PatchMemory(0x005A1DC6, (PBYTE)&g_GfxImagePool_entries, 4); // DB_GetImageIndex
 
 	PatchUseFF();
-	Patch_R_Stream();
+
+	if (!LaunchArg_NoFF())
+	{
+		// Patch image streaming if we *are* using fastfiles
+		Patch_R_Stream();
+	}
 
 	//
 	// Initialize either reflection mode or ReShade compatibility
