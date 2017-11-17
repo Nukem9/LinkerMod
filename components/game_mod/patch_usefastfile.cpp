@@ -64,14 +64,25 @@ void PatchUseFF()
 
 bool LaunchArg_NoFF(void)
 {
-	int argc = 0;
-	LPWSTR* argv = CommandLineToArgvW(GetCommandLine(), &argc);
+	static bool useFF = true;
+	static bool checked = false;
 
-	for (int i = 0; i < argc - 1; i++)
+	if (!checked)
 	{
-		if (_wcsicmp(argv[i], L"useFastFile") == 0 && wcscmp(argv[i + 1], L"0") == 0)
-			return true;
+		int argc = 0;
+		LPWSTR* argv = CommandLineToArgvW(GetCommandLine(), &argc);
+
+		for (int i = 0; i < argc - 1; i++)
+		{
+			if (_wcsicmp(argv[i], L"useFastFile") == 0 && wcscmp(argv[i + 1], L"0") == 0)
+			{
+				useFF = false;
+				break;
+			}
+		}
+
+		checked = true;
 	}
 
-	return false;
+	return !useFF;
 }
