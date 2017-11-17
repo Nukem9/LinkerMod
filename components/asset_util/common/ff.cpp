@@ -205,7 +205,7 @@ int FF_FFExtractUncompressedRawfile(char* rawfileData, const char* rawfilePath)
 
 	int* pHeader = (int*)rawfilePath;
 	int len = pHeader[-2];
-	printf("%p (%d)\n", rawfileData, len);
+	// printf("%p (%d)\n", rawfileData, len);
 
 	//
 	// Catch incorrect rawfile data to prevent massive allocations
