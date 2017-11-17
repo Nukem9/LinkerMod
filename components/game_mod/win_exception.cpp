@@ -4,6 +4,13 @@
 static_assert(EXCEPTION_STACKTRACE_MAXFRAMECOUNT < 63, "EXCEPTION_STACKTRACE_MAXFRAMECOUNT must be less than 63 to support Windows XP");
 
 char g_ExceptionStr[EXCEPTION_STR_MAXLEN];
+HMODULE g_hModule = NULL;
+
+void Patch_ExceptionFilter(void* ExceptionCallback_f, HMODULE hModule)
+{
+	PatchMemory(0x0050A7B0, (PBYTE)&ExceptionCallback_f, 4);
+	g_hModule = hModule;
+}
 
 LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 {
@@ -18,6 +25,9 @@ LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	sprintf_s(buf, "Exception Address: %p\n\n", ExceptionInfo->ExceptionRecord->ExceptionAddress);
 	strcat_s(g_ExceptionStr, buf);
 	
+	sprintf_s(buf, "DLL Base Address: %08x\n\n", g_hModule);
+	strcat_s(g_ExceptionStr, buf);
+
 	if (ExceptionInfo->ContextRecord->ContextFlags & CONTEXT_CONTROL)
 	{
 		sprintf_s(buf, "EBP: %08x\tEIP: %08x\nESP: %08x\tEFLAGS: %08x\n\nSEGCS: %08x\tSEGSS: %08x\t\n",

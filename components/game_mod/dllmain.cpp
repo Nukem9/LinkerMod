@@ -6,7 +6,7 @@
 void PatchMisc();
 #endif
 
-BOOL GameMod_Init()
+BOOL GameMod_Init(HMODULE hModule)
 {
 	//
 	// Disable STDOUT buffering
@@ -21,8 +21,7 @@ BOOL GameMod_Init()
 	//
 	// Enable custom exception filter 
 	//
-	void* ptr = PrivateUnhandledExceptionFilter;
-	PatchMemory(0x0050A7B0, (PBYTE)&ptr, 4);
+	Patch_ExceptionFilter(PrivateUnhandledExceptionFilter, hModule);
 
 	//
 	// Add stack trace info to Sys_OutOfMemErrorInternal
@@ -275,7 +274,7 @@ BOOL GameMod_Init()
 	// Increase mod description length limit
 	//
 	const int dirListLength = DIRLIST_LEN;
-	ptr = dirList;
+	void* ptr = dirList;
 	PatchMemory(0x00623A0B, (PBYTE)&ptr, 4); // dirList
 	PatchMemory(0x00623A65, (PBYTE)&ptr, 4); // dirList
 	PatchMemory(0x00623A06, (PBYTE)&dirListLength, 4);
@@ -633,7 +632,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH)
 	{
 		DisableThreadLibraryCalls(hModule);
-		return GameMod_Init(); 
+		return GameMod_Init(hModule); 
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
