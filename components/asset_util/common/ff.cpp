@@ -26,7 +26,7 @@ template<class _FwdIt1>
 inline _FwdIt1 PatternSearch(_FwdIt1 _First, _FwdIt1 _Last, const std::vector<std::vector<BYTE>>& scanList, const std::vector<BYTE>** Signature)
 {
 	// Check each position in the iterable to see if it matches any of the patterns in the scanlist
-	for (_FwdIt1 _Iter = _First; std::distance(_Iter, _Last) >= 0; _Iter = std::next(_Iter))
+	for (_FwdIt1 _Iter = _First; _Iter != _Last; _Iter = std::next(_Iter))
 	{
 		for (auto& pattern : scanList)
 		{
@@ -39,7 +39,7 @@ inline _FwdIt1 PatternSearch(_FwdIt1 _First, _FwdIt1 _Last, const std::vector<st
 			// Check each value in the pattern
 			for (size_t i = 0; i < pattern.size(); i++)
 			{
-				if ((_Iter + i) != pattern.begin() + i)
+				if (_Iter[i] != pattern[i])
 				{
 					continue;
 				}
