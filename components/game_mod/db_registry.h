@@ -189,9 +189,6 @@ static DB_LoadXAssets_t DB_LoadXAssets = (DB_LoadXAssets_t)0x00631B10;
 typedef int (__cdecl* DB_ReleaseXAssets_t)();
 static DB_ReleaseXAssets_t DB_ReleaseXAssets = (DB_ReleaseXAssets_t)0x0062C260;
 
-typedef bool (__cdecl* DB_ModFileExists_t)();
-static DB_ModFileExists_t DB_ModFileExists = (DB_ModFileExists_t)0x005EEBF0;
-
 typedef void (__cdecl* DB_ResetZoneSize_t)(int trackLoadProgress);
 static DB_ResetZoneSize_t DB_ResetZoneSize = (DB_ResetZoneSize_t)0x00621530;
 
@@ -242,3 +239,4 @@ unsigned int DB_GetXModelIndex(XModel *model);
 XModel *DB_GetXModelAtIndex(unsigned int index);
 int DB_FinishedLoadingAssets();
 GfxImage *DB_AllocTempImage();
+bool DB_ModFileExists(int index = 0);

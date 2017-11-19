@@ -5,6 +5,19 @@ static_assert((FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING) == 0x60000000, "(F
 static_assert(FILE_SHARE_READ == 0x1, "FILE_SHARE_READ must have a value of 0x1");
 static_assert(OPEN_EXISTING == 0x3, "OPEN_EXISTING must have a value of 0x3");
 
+// List of supported mod zone names
+// These will be checked (in order) as long as a zone for the previous name exists
+static const char* g_modZones[] = {
+	"mod",
+	"mod1",
+	"mod2",
+	"mod3",
+	"mod4",
+	"mod5",
+	"mod6",
+	"mod7"
+};
+
 XAssetEntry *DB_LinkXAssetEntry(XAssetEntry *newEntry, int allowOverride)
 {
 	// If yes, skip loading certain assets in this FF
@@ -87,7 +100,7 @@ void DB_LoadGraphicsAssetsForPC()
 {
 	unsigned int zoneCount = 1;
 	
-	XZoneInfo zoneInfo[6];
+	XZoneInfo zoneInfo[5 + ARRAYSIZE(g_modZones)];
 	zoneInfo[0].name = "code_post_gfx";
 	zoneInfo[0].allocFlags = DB_ZONE_CODE;
 	zoneInfo[0].freeFlags = DB_FLAG_STRICTFREE;
@@ -105,13 +118,19 @@ void DB_LoadGraphicsAssetsForPC()
 	zoneInfo[zoneCount].freeFlags = DB_FLAG_NULL;
 	zoneCount++;
 
-	if(DB_ModFileExists())
+	for (int modIndex = 0; modIndex < ARRAYSIZE(g_modZones); modIndex++)
 	{
-		zoneInfo[zoneCount].name = "mod";
+		// Check if the corresponding mod file exists
+		// if it doesn't - we should stop looking for additional ones
+		if (!DB_ModFileExists(modIndex))
+			break;
+
+		zoneInfo[zoneCount].name = g_modZones[modIndex];
 		zoneInfo[zoneCount].allocFlags = DB_ZONE_MOD;
 		zoneInfo[zoneCount].freeFlags = DB_FLAG_NULL;
-		zoneCount++;
+		zoneCount++;	
 	}
+	
 
 	DB_LoadXAssets(zoneInfo, zoneCount, 0);
 }
@@ -303,4 +322,23 @@ int DB_FinishedLoadingAssets()
 GfxImage *DB_AllocTempImage()
 {
 	return ((GfxImage *(__cdecl *)())0x00528480)();
+}
+
+bool DB_ModFileExists(int index)
+{
+	ASSERT(index >= 0 && index < ARRAYSIZE(g_modZones));
+	if (fs_gameDirVar == NULL || fs_homepath == NULL)
+		return false;
+
+	char filename[256];
+	if (sprintf_s(filename, 256, "%s\\%s\\%s.ff", fs_homepath->current.string, fs_gameDirVar->current.string, g_modZones[index]) == -1)
+		return false;
+
+	HANDLE h = CreateFileA(filename, 0x80000000, 1u, 0, 3u, 0x60000000u, 0);
+	if (h == INVALID_HANDLE_VALUE)
+		return false;
+
+
+	CloseHandle(h);
+	return true;
 }
