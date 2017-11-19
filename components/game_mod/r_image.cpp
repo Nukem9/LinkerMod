@@ -91,7 +91,13 @@ void Image_CreateCubeTexture_PC(GfxImage *image, unsigned __int16 edgeLen, int m
 {
 	ASSERT(image != nullptr);
 	ASSERT(!image->texture.basemap);
-	ASSERT(Sys_IsRenderThread());
+
+	// Shit gets weird when you have useFastFile 0 enabled
+	// so we'll just suppress this for now
+	if (!LaunchArg_NoFF())
+	{
+		ASSERT(Sys_IsRenderThread());
+	}
 
 	image->width	= edgeLen;
 	image->height	= edgeLen;
