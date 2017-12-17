@@ -82,8 +82,11 @@ namespace LiveSteam
 
 			m_steamAppTicketSize = 0;
 		};
+		// We only need to allocate a buffer for m_steamCookieKey if it doesn't already have one.
+		// Since m_steamCookieKeySize is constant, we don't need to worry about resizing the buffer
+		if (m_steamCookieKey == nullptr)
+			m_steamCookieKey = new char[m_steamCookieKeySize];
 
-		m_steamCookieKey = new char[m_steamCookieKeySize];
 		if (fread(m_steamCookieKey, 1, m_steamCookieKeySize, h) != m_steamCookieKeySize)
 		{
 			Cleanup();
@@ -95,8 +98,17 @@ namespace LiveSteam
 		unsigned int end = ftell(h);
 		fseek(h, cur, SEEK_SET);
 
+		int oldTicketSize = m_steamAppTicketSize;
 		m_steamAppTicketSize = end - cur;
-		m_steamAppTicket = new char[m_steamAppTicketSize];
+
+		// Only bother reallocating the appTicket buffer if the old ticket was smaller than the new one
+		// or if the buffer wasn't allocated yet
+		if (m_steamAppTicket == nullptr || oldTicketSize < m_steamAppTicketSize)
+		{
+			delete[] m_steamAppTicket;
+			m_steamAppTicket = new char[m_steamAppTicketSize];
+		}
+
 		if (fread(m_steamAppTicket, 1, m_steamAppTicketSize, h) != m_steamAppTicketSize)
 		{
 			Cleanup();
