@@ -201,7 +201,7 @@ bool LiveSteamClient::GetRetrievedEncryptedAppTicket(void *ticketBuf, const unsi
 				Com_DPrintf(1, "STEAM: Wrote cached auth ticket\n");
 			}
 
-			Com_DPrintf(1, "STEAM: Retrieved ticket from Steam, sending to DemonWare\n");
+			Com_DPrintf(1, "STEAM: Retrieved auth ticket from Steam, sending to DemonWare\n");
 			return true;
 		}
 	}
@@ -212,11 +212,11 @@ bool LiveSteamClient::GetRetrievedEncryptedAppTicket(void *ticketBuf, const unsi
 		int err = g_authCache.ApplyCache(ticketBuf, ticketBufSize, ticketSize, g_authService->m_steamCookieKey);
 		if (err == 0)
 		{
-			Com_DPrintf(0, "STEAM Loaded cached auth ticket\n");
+			Com_DPrintf(1, "STEAM: Retrieved cached auth ticket, sending to DemonWare\n");
 			return true;
 		}
 
-		Com_DPrintf(0, "^1STEAM Load cache - error %d\n", err);
+		Com_DPrintf(1, "^1STEAM: Load cache - error %d\n", err);
 		g_authCache.ClearCache();
 	}
 
