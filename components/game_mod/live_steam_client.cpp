@@ -90,7 +90,7 @@ namespace LiveSteam
 		unsigned int end = ftell(h);
 		fseek(h, cur, SEEK_SET);
 
-		int oldTicketSize = m_steamAppTicketSize;
+		unsigned int oldTicketSize = m_steamAppTicketSize;
 		m_steamAppTicketSize = end - cur;
 
 		// Only bother reallocating the appTicket buffer if the old ticket was smaller than the new one
