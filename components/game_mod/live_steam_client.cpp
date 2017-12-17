@@ -63,25 +63,13 @@ namespace LiveSteam
 	int AuthCache::ReloadCache(void)
 	{
 		FILE *h = nullptr;
-
 		if (fopen_s(&h, AUTHCACHE_FILEPATH, "rb") != 0)
 		{
-			// auth cache could not be loaded
+			// auth cache file could not be loaded
+			ClearCache();
 			return 1;
 		}
 
-		auto Cleanup = [&h, this](void) -> void
-		{
-			fclose(h);
-
-			delete[] m_steamCookieKey;
-			delete[] m_steamAppTicket;
-
-			m_steamCookieKey = nullptr;
-			m_steamAppTicket = nullptr;
-
-			m_steamAppTicketSize = 0;
-		};
 		// We only need to allocate a buffer for m_steamCookieKey if it doesn't already have one.
 		// Since m_steamCookieKeySize is constant, we don't need to worry about resizing the buffer
 		if (m_steamCookieKey == nullptr)
@@ -89,10 +77,14 @@ namespace LiveSteam
 
 		if (fread(m_steamCookieKey, 1, m_steamCookieKeySize, h) != m_steamCookieKeySize)
 		{
-			Cleanup();
+			// Unable to read the correct number of bytes for the cookie key
+			fclose(h);
+			ClearCache();
 			return 2;
 		}
 
+		// All of the remaining data is the appTicket, so let's figure out how big the ticket is
+		// by determining the size of the remaining data
 		unsigned int cur = ftell(h);
 		fseek(h, 0, SEEK_END);
 		unsigned int end = ftell(h);
@@ -111,7 +103,9 @@ namespace LiveSteam
 
 		if (fread(m_steamAppTicket, 1, m_steamAppTicketSize, h) != m_steamAppTicketSize)
 		{
-			Cleanup();
+			// Unable to read the correct number of bytes for the app ticket
+			fclose(h);
+			ClearCache();
 			return 3;
 		}
 
@@ -128,8 +122,8 @@ namespace LiveSteam
 		m_steamAppTicket = new char[m_steamAppTicketSize];
 		memcpy(m_steamAppTicket, appTicket, m_steamAppTicketSize);
 
-		if (m_steamCookieKey == nullptr)
-			m_steamCookieKey = new char[m_steamCookieKeySize];
+		delete[] m_steamCookieKey;
+		m_steamCookieKey = new char[m_steamCookieKeySize];
 
 		memcpy(m_steamCookieKey, cookieKey, m_steamCookieKeySize);
 
@@ -144,7 +138,7 @@ namespace LiveSteam
 
 		if (fopen_s(&h, AUTHCACHE_FILEPATH, "wb") != 0)
 		{
-			// auth cache could not be written
+			// auth cache file could not be written
 			return 1;
 		}
 
