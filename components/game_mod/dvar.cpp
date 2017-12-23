@@ -91,7 +91,7 @@ void R_RegisterCustomDvars()
 	com_developer_print = Dvar_RegisterEnum("developer_print", com_dprintf_options, 0, 0x80, "Modify Com_DPrintf() behavior");
 	sv_showCommands = Dvar_RegisterBool("sv_showCommands", 0, 0, "Print client commands in the log file");
 
-	r_streamCheckAabb = Dvar_RegisterBool("r_streamCheckAabb", false, DVAR_CHEAT, "Enables runtime checking of stream aabb tree");
+	r_streamCheckAabb = Dvar_RegisterBool("r_streamCheckAabb", false, DVAR_CHEAT, "Enables runtime checking of the stream aabb tree");
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;
