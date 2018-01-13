@@ -134,6 +134,7 @@ void __cdecl R_DrawXModelRigidModelSurf(GfxCmdBufContext context, XSurface *xsur
 	R_DrawXModelRigidModelSurf_o(xsurf, context);
 
 	if (r_showTess->current.enabled)
+	if (r_showTess && r_showTess->current.enabled)
 	{
 		GfxMatrix* mtx = R_GetActiveWorldMatrix(context.source);
 		RB_ShowTess(context, (float*)&mtx->m[3], "XMRigid", colorWhite);

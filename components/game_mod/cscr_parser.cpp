@@ -96,7 +96,8 @@ char *Scr_ReadFile(scriptInstance_t inst, const char *filename, const char *extF
 {
 	Scr_ReadFile_t func = nullptr;
 
-	if (!scr_useFastFileOnly->current.integer && (fs_gameDirVar && *fs_gameDirVar->current.string || com_developer->current.enabled))
+	if ((scr_useFastFileOnly && !scr_useFastFileOnly->current.integer) &&
+		(fs_gameDirVar && *fs_gameDirVar->current.string || com_developer->current.enabled))
 	{
 		int file = 0;
 		if (FS_FOpenFileRead(extFilename, &file) < 0)
