@@ -19,6 +19,8 @@ dvar_s* com_developer_print = NULL;
 
 dvar_s* sv_showCommands = NULL;
 
+dvar_s* dw_cacheTicket = NULL;
+
 dvar_s* radiant_live = NULL;
 dvar_s* radiant_livePort = NULL;
 dvar_s* radiant_liveDebug = NULL;
@@ -92,6 +94,8 @@ void R_RegisterCustomDvars()
 	sv_showCommands = Dvar_RegisterBool("sv_showCommands", 0, 0, "Print client commands in the log file");
 
 	r_streamCheckAabb = Dvar_RegisterBool("r_streamCheckAabb", false, DVAR_CHEAT, "Enables runtime checking of the stream aabb tree");
+
+	dw_cacheTicket = Dvar_RegisterBool("dw_cacheTicket", true, DVAR_ARCHIVE, "Cache the SteamAuth ticket to the disk");
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;

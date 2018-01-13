@@ -208,6 +208,8 @@ extern dvar_s* com_developer_print;
 
 extern dvar_s* sv_showCommands;
 
+extern dvar_s* dw_cacheTicket;
+
 extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;
 extern dvar_s* radiant_liveDebug;
