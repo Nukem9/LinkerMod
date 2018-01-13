@@ -198,6 +198,13 @@ bool LiveSteamClient::GetRetrievedEncryptedAppTicket(void *ticketBuf, const unsi
 	{
 		if (getEncryptedAppTicket(steamUser, ticketBuf, ticketBufSize, ticketSize))
 		{
+			DBG_ASSERT(g_authService);
+			if (!g_authService)
+			{
+				Com_DPrintf(1, "STEAM: Couldn't cache recieved auth ticket - g_authService is NULL\n");
+				return true;
+			}
+
 			// Update the cache with the generated ticket & DW cookie
 			g_authCache.UpdateCache(ticketBuf, *ticketSize, g_authService->m_steamCookieKey);
 			
@@ -213,7 +220,12 @@ bool LiveSteamClient::GetRetrievedEncryptedAppTicket(void *ticketBuf, const unsi
 	}
 	else
 	{
-		DBG_ASSERT(g_authService->m_steamCookieKey != (char*)0x150);
+		DBG_ASSERT(g_authService);
+		if (!g_authService)
+		{
+			Com_DPrintf(1, "STEAM: Couldn't use cached auth ticket - g_authService is NULL\n");
+			return false;
+		}
 
 		int err = g_authCache.ApplyCache(ticketBuf, ticketBufSize, ticketSize, g_authService->m_steamCookieKey);
 		if (err == 0)
