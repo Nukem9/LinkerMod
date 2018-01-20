@@ -193,6 +193,15 @@ void BG_InitDefaultWeaponDef()
 // /bgame/bg_weapons_def.cpp:274
 void BG_ClearWeaponDef()
 {
+	//Set changed variables back to default
+	for (auto& weapon : bg_PatchedVariantDefs)
+	{
+		weapon->weapDef->iStartAmmo -= 1;
+		weapon->weapDef->iMaxAmmo -= 1;
+		weapon->weapDef->iSharedAmmoCap -= 1;
+		weapon->iClipSize -= 1;
+	}
+
 	bg_CheckedVariantDefs.clear();
 	bg_PatchedVariantDefs.clear();
 	bg_PatchedWeapDefs.clear();
@@ -218,7 +227,8 @@ void BG_SetupWeaponIndex(unsigned int weapIndex)
 	// Override the default grenade limit (See PERK_STOCKPILE)
 	WeaponVariantDef *variant = BG_GetWeaponVariantDef(weapIndex);
 
-	if (variant->weapDef->weapType == WEAPTYPE_GRENADE)
+	// Offhand makes sure that it is an actual grenade
+	if (variant->weapDef->weapType == WEAPTYPE_GRENADE && variant->weapDef->inventoryType == WEAPINVENTORY_OFFHAND)
 	{
 		auto& usedDefs = bg_CheckedVariantDefs;
 
@@ -227,19 +237,13 @@ void BG_SetupWeaponIndex(unsigned int weapIndex)
 		{
 			usedDefs.push_back(variant);
 
-			// Some weapons (perk bottle/xbow/syrette) are classified as grenades, but they
-			// dont't have a valid clip size
-			if (variant->iClipSize == 3 ||
-				variant->iClipSize == 4)
-			{
-				variant->weapDef->iStartAmmo += 1;
-				variant->weapDef->iMaxAmmo += 1;
-				variant->weapDef->iSharedAmmoCap += 1;
-				variant->iClipSize += 1;
+			variant->weapDef->iStartAmmo += 1;
+			variant->weapDef->iMaxAmmo += 1;
+			variant->weapDef->iSharedAmmoCap += 1;
+			variant->iClipSize += 1;
 
-				bg_PatchedVariantDefs.push_back(variant);
-				bg_PatchedWeapDefs.push_back(variant->weapDef);
-			}
+			bg_PatchedVariantDefs.push_back(variant);
+			bg_PatchedWeapDefs.push_back(variant->weapDef);
 		}
 	}
 
