@@ -239,7 +239,7 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 					holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
 			}
 
-			if ((*weaponState < WEAPON_OFFHAND_INIT || *weaponState > WEAPON_OFFHAND_END)
+			if (!IS_WEAPONSTATE_OFFHAND(*weaponState)
 				&& (pausedAfterFiring || holdingGrenadeBtn)
 				&& holdingFireBtn
 				&& ps->weapon == pm->cmd.weapon
@@ -265,7 +265,7 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			}
 			else
 			{
-				if ((!holdingFireBtn || ps->weapFlags & 0x400) && !BurstFirePending(ps))
+				if ((!holdingFireBtn || ps->weapFlags & 0x400 || IS_WEAPONSTATE_OFFHAND(*weaponState)) && !BurstFirePending(ps))
 					*weaponShotCount = 0;
 
 				*weaponTime = 0;
