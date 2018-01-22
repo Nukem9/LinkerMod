@@ -78,7 +78,6 @@ enum weaponstate_t
 								IS_WEAPONSTATE_MELEE(x))
 
 #define IS_WEAPONSTATE_OFFHAND(x) (\
-								(x) == WEAPON_DROPPING_QUICK || /*WEAPON_DROPPING_QUICK is the weapon drop for offhands*/ \
 								(x) == WEAPON_OFFHAND_INIT || \
 								(x) == WEAPON_OFFHAND_PREPARE || \
 								(x) == WEAPON_OFFHAND_HOLD || \

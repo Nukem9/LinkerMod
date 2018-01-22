@@ -188,6 +188,14 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 
 		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
 	}
+	/*else if (IS_WEAPONSTATE_OFFHAND(*weaponState) && BG_HasPerk(ps->perks, PERK_FASTINTERACT))
+	{
+		// Fast grenade throw perk
+		// TODO - use perk_interactSpeedMultiplier
+		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
+
+		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
+	}*/
 	else
 	{
 		// Default modifier time
@@ -240,6 +248,8 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			}
 
 			if (!IS_WEAPONSTATE_OFFHAND(*weaponState)
+				&& *weaponState != WEAPON_DROPPING_QUICK
+				&& *weaponState != WEAPON_RAISING
 				&& (pausedAfterFiring || holdingGrenadeBtn)
 				&& holdingFireBtn
 				&& ps->weapon == pm->cmd.weapon
@@ -265,7 +275,7 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			}
 			else
 			{
-				if ((!holdingFireBtn || ps->weapFlags & 0x400 || IS_WEAPONSTATE_OFFHAND(*weaponState)) && !BurstFirePending(ps))
+				if ((!holdingFireBtn || ps->weapFlags & 0x400 || *weaponState == WEAPON_DROPPING_QUICK || *weaponState == WEAPON_RAISING) && !BurstFirePending(ps))
 					*weaponShotCount = 0;
 
 				*weaponTime = 0;
