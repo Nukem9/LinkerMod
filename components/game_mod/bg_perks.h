@@ -43,20 +43,6 @@ static bool BG_HasPerk(const unsigned int *perks, unsigned int perkIndex)
 	return (perks[0] & BG_PERK_BITS(perkIndex)) != 0;
 }
 
-static bool BG_HasPerk(const unsigned int *perks, unsigned int perkIndex, playerState_s *ps)
-{
-	ASSERT(perks);
-	ASSERT(perkIndex >= 0 && perkIndex < PERK_COUNT);
-
-	// Call original function for original perks
-	if (perkIndex < 15)
-	{
-		return BG_HasPerk(perks, perkIndex);
-	}
-
-	return g_playerVars[ps->clientNum].newPerks[perkIndex - ORIGINAL_PERK_COUNT];
-}
-
 // /game/bg_perks.h:144
 static void BG_SetPerk(unsigned int *perks, unsigned int perkIndex)
 {
@@ -66,21 +52,6 @@ static void BG_SetPerk(unsigned int *perks, unsigned int perkIndex)
 	perks[0] |= BG_PERK_BITS(perkIndex);
 }
 
-static void BG_SetPerk(unsigned int *perks, unsigned int perkIndex, playerState_s *ps)
-{
-	ASSERT(perks);
-	ASSERT(perkIndex >= 0 && perkIndex < PERK_COUNT);
-
-	// Call original function for original perks
-	if (perkIndex < 15)
-	{
-		BG_SetPerk(perks, perkIndex);
-		return;
-	}
-
-	g_playerVars[ps->clientNum].newPerks[perkIndex - ORIGINAL_PERK_COUNT] = true;
-}
-
 // /game/bg_perks.h:159
 static void BG_UnsetPerk(unsigned int *perks, unsigned int perkIndex)
 {
@@ -88,21 +59,6 @@ static void BG_UnsetPerk(unsigned int *perks, unsigned int perkIndex)
 	ASSERT(perkIndex >= 0 && perkIndex < PERK_COUNT);
 
 	perks[0] &= ~BG_PERK_BITS(perkIndex);
-}
-
-static void BG_UnsetPerk(unsigned int *perks, unsigned int perkIndex, playerState_s *ps)
-{
-	ASSERT(perks);
-	ASSERT(perkIndex >= 0 && perkIndex < PERK_COUNT);
-
-	// Call original function for original perks
-	if (perkIndex < 15)
-	{
-		BG_UnsetPerk(perks, perkIndex);
-		return;
-	}
-
-	g_playerVars[ps->clientNum].newPerks[perkIndex - ORIGINAL_PERK_COUNT] = false;
 }
 
 // /game/bg_perks.h:174
