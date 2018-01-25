@@ -231,8 +231,12 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			bool holdingGrenadeBtn = (weapDef->weapType == WEAPTYPE_GRENADE || weapDef->weapType == WEAPTYPE_MINE) && weapDef->holdButtonToThrow;
 			bool holdingFireBtn = false;
 
-			// Switch fire input and ads input for dual wield weapons if player is using keyboard and mouse
-			if (weapDef->bDualWield && !Dvar_GetString("gpad_enabled"))
+			// TODO - Switch fire input and ads input for dual wield weapons, add check for dvar "gpad_enabled" that works on clients
+			if (ps->bRunLeftGun)
+				holdingFireBtn = pm->cmd.button_bits.testBit(24) != 0;
+			else
+				holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
+			/*if (weapDef->bDualWield && !Dvar_GetString("gpad_enabled"))
 			{
 				if (ps->bRunLeftGun)
 					holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
@@ -245,7 +249,7 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 					holdingFireBtn = pm->cmd.button_bits.testBit(24) != 0;
 				else
 					holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
-			}
+			}*/
 
 			if (!IS_WEAPONSTATE_OFFHAND(*weaponState)
 				&& *weaponState != WEAPON_DROPPING_QUICK
@@ -322,10 +326,11 @@ int PM_Weapon_ShouldBeFiring(pmove_t *pm, int delayedAction, bool testOnly)
 	int dualWieldWeaponBit = 24;
 	bool shouldStartFiring = pm->cmd.button_bits.testBit(weaponBit) != 0;
 
-	// Switch fire input and ads input for dual wield weapons if player is using keyboard and mouse
-	if (weapDef->bDualWield)
+	// TODO - Switch fire input and ads input for dual wield weapons, add check for dvar "gpad_enabled" that works on clients
+	if (weapDef->bDualWield && ps->bRunLeftGun)
 	{
-		if (!Dvar_GetString("gpad_enabled"))
+		shouldStartFiring = pm->cmd.button_bits.testBit(dualWieldWeaponBit) != 0;
+		/*if (!Dvar_GetString("gpad_enabled"))
 		{
 			if (ps->bRunLeftGun)
 			{
@@ -346,7 +351,7 @@ int PM_Weapon_ShouldBeFiring(pmove_t *pm, int delayedAction, bool testOnly)
 			{
 				shouldStartFiring = pm->cmd.button_bits.testBit(weaponBit);
 			}
-		}
+		}*/
 	}
 
 	if (weapDef->freezeMovementWhenFiring && ps->groundEntityNum == 1023)
