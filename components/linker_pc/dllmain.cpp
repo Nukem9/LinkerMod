@@ -7,9 +7,9 @@
 LONG WINAPI MyUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 {
 	printf("\n\nEXCEPTION DETECTED:\n");
-	printf("EIP: 0x%p\n", ExceptionInfo->ContextRecord->Eip);
-	printf("EX0: 0x%p\n", ExceptionInfo->ExceptionRecord->ExceptionInformation[0]);
-	printf("EX1: 0x%p\n", ExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
+	printf("EIP: 0x%X\n", ExceptionInfo->ContextRecord->Eip);
+	printf("EX0: 0x%p\n", (void*)ExceptionInfo->ExceptionRecord->ExceptionInformation[0]);
+	printf("EX1: 0x%p\n", (void*)ExceptionInfo->ExceptionRecord->ExceptionInformation[1]);
 	printf("\n\n");
 
 	return EXCEPTION_CONTINUE_SEARCH;

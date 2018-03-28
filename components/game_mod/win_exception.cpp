@@ -25,7 +25,7 @@ LONG WINAPI PrivateUnhandledExceptionFilter(PEXCEPTION_POINTERS ExceptionInfo)
 	sprintf_s(buf, "Exception Address: %p\n\n", ExceptionInfo->ExceptionRecord->ExceptionAddress);
 	strcat_s(g_ExceptionStr, buf);
 	
-	sprintf_s(buf, "DLL Base Address: %08x\n\n", g_hModule);
+	sprintf_s(buf, "DLL Base Address: %p\n\n", g_hModule);
 	strcat_s(g_ExceptionStr, buf);
 
 	if (ExceptionInfo->ContextRecord->ContextFlags & CONTEXT_CONTROL)

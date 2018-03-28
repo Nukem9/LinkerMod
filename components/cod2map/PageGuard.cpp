@@ -38,7 +38,7 @@ LONG PageGuard_Check(PEXCEPTION_POINTERS ExceptionInfo)
 		// Is the offset in our range?
 		if (offset >= g_Target && offset < (g_Target + g_Size))
 		{
-			printf("HIT: 0x%X - 0x%X\n", eip, offset);
+			printf("HIT: 0x%p - 0x%p\n", (void*)eip, (void*)offset);
 			fflush(stdout);
 		}
 
@@ -50,7 +50,7 @@ LONG PageGuard_Check(PEXCEPTION_POINTERS ExceptionInfo)
 		return EXCEPTION_CONTINUE_EXECUTION;
 	}
 
-	printf("wtf: 0x%X\n", ExceptionInfo->ExceptionRecord->ExceptionAddress);
+	printf("wtf: 0x%p\n", ExceptionInfo->ExceptionRecord->ExceptionAddress);
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 

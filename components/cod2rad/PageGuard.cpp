@@ -53,7 +53,7 @@ LONG PageGuard_Check(PEXCEPTION_POINTERS ExceptionInfo)
 		return EXCEPTION_CONTINUE_EXECUTION;
 	}
 
-	printf("wtf: 0x%X\n", ExceptionInfo->ExceptionRecord->ExceptionAddress);
+	printf("wtf: 0x%p\n", (void*)ExceptionInfo->ExceptionRecord->ExceptionAddress);
 	return EXCEPTION_CONTINUE_SEARCH;
 }
 
