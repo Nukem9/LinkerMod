@@ -3,6 +3,7 @@
 #pragma comment(lib, "detours.lib")
 #include "../shared/detours/Detours.h"
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>
