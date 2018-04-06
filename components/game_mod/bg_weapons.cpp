@@ -188,14 +188,14 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 
 		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
 	}
-	/*else if (IS_WEAPONSTATE_OFFHAND(*weaponState) && BG_HasPerk(ps->perks, PERK_FASTINTERACT))
+	else if (IS_WEAPONSTATE_OFFHAND(*weaponState) && BG_HasPerk(ps->perks, PERK_FASTINTERACT))
 	{
 		// Fast grenade throw perk
-		// TODO - use perk_interactSpeedMultiplier
+		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
 		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
 
 		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
-	}*/
+	}
 	else
 	{
 		// Default modifier time

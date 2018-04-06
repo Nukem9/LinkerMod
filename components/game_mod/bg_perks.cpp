@@ -4,7 +4,7 @@ std::unordered_map<std::string, unsigned int> gPerkList(
 {
 	{ "specialty_longersprint",				PERK_LONGERSPRINT },
 	{ "specialty_unlimitedsprint",			PERK_UNLIMITEDSPRINT },
-	{ "specialty_scavanger",				PERK_SCAVENGER },
+	{ "specialty_scavenger",				PERK_SCAVENGER },
 	{ "specialty_fastreload",				PERK_FASTRELOAD },
 	{ "specialty_bulletdamage",				PERK_BULLETDAMAGE },
 	{ "specialty_bulletaccuracy",			PERK_BULLETACCURACY },
@@ -19,8 +19,8 @@ std::unordered_map<std::string, unsigned int> gPerkList(
 	{ "specialty_additionalprimaryweapon",	PERK_ADDITIONALPRIMARYWEAPON },
 	{ "specialty_fastswitch",				PERK_FASTSWITCH },
 	{ "specialty_stockpile",				PERK_STOCKPILE },
-	//{ "specialty_fastads",					PERK_FASTADS },
-	//{ "specialty_fastinteract",				PERK_FASTINTERACT },
+	{ "specialty_fastads",					PERK_FASTADS },
+	{ "specialty_fastinteract",				PERK_FASTINTERACT },
 });
 
 // /game/bg_perks.cpp:129
