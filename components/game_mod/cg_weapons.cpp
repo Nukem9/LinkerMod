@@ -155,12 +155,12 @@ void hk_StartWeaponAnim(int localClientNum, DObj *obj, int animIndex, float tran
 // /cgame/cg_weapons.cpp:3329
 void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *start, float *end, float *dir, const float *forwardDir, const float *rightDir, const float *upDir, const float maxRange, int shotIndex, int maxShotIndex)
 {
-	ASSERT(!IS_NAN(spread));
-	ASSERT(end);
+	DBG_ASSERT(!IS_NAN(spread));
+	DBG_ASSERT(end);
 
 	float aimOffset = tan(spread * 0.017453292f) * maxRange;
 
-	ASSERT(!IS_NAN(aimOffset));
+	DBG_ASSERT(!IS_NAN(aimOffset));
 
 	float right = 0.0f;
 	float up = 0.0f;
@@ -182,14 +182,14 @@ void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *st
 	right *= aimOffset;
 	up *= aimOffset;
 
-	ASSERT(!IS_NAN(right));
-	ASSERT(!IS_NAN(up));
+	DBG_ASSERT(!IS_NAN(right));
+	DBG_ASSERT(!IS_NAN(up));
 
 	end[0] = (maxRange * forwardDir[0]) + start[0];
 	end[1] = (maxRange * forwardDir[1]) + start[1];
 	end[2] = (maxRange * forwardDir[2]) + start[2];
 
-	ASSERT(!IS_NAN(end[0]) && !IS_NAN(end[1]) && !IS_NAN(end[2]));
+	DBG_ASSERT(!IS_NAN(end[0]) && !IS_NAN(end[1]) && !IS_NAN(end[2]));
 
 	end[0] = (right * rightDir[0]) + end[0];
 	end[1] = (right * rightDir[1]) + end[1];
@@ -199,7 +199,7 @@ void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *st
 	end[1] = (up * upDir[1]) + end[1];
 	end[2] = (up * upDir[2]) + end[2];
 
-	ASSERT(!IS_NAN(end[0]) && !IS_NAN(end[1]) && !IS_NAN(end[2]));
+	DBG_ASSERT(!IS_NAN(end[0]) && !IS_NAN(end[1]) && !IS_NAN(end[2]));
 
 	if (dir)
 	{
@@ -208,7 +208,7 @@ void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *st
 		dir[2] = end[2] - start[2];
 		Vec3Normalize(dir);
 
-		ASSERT(!IS_NAN(dir[0]) && !IS_NAN(dir[1]) && !IS_NAN(dir[2]));
+		DBG_ASSERT(!IS_NAN(dir[0]) && !IS_NAN(dir[1]) && !IS_NAN(dir[2]));
 	}
 }
 
