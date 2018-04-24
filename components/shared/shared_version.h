@@ -46,10 +46,10 @@ namespace semver
 			if (constraint.GetMajorVersion() != version.GetMajorVersion())
 				return false;
 
-			if (constraint.GetMajorVersion() > version.GetMajorVersion())
+			if (constraint.GetMinorVersion() > version.GetMinorVersion())
 				return false;
 
-			if (constraint.GetMajorVersion() < version.GetMajorVersion())
+			if (constraint.GetMinorVersion() < version.GetMinorVersion())
 				return true;
 
 			if (constraint.GetPatchVersion() > version.GetPatchVersion())
