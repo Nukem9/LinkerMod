@@ -19,15 +19,19 @@
 
 /Debug
 /Release
+/Production
 
 components/sdk
 components/game_mod/steam
 components/*/Debug
 components/*/Release
+components/*/Production
 components/shared/*/Debug
 components/shared/*/Release
+components/shared/*/Production
 components/D3DBSP_Lib/*/Release
 components/D3DBSP_Lib/*/Debug
+components/D3DBSP_Lib/*/Production
 components/launcher/imgui.ini
 
 components/gsc_parser/src/cpp/parser
