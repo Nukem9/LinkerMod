@@ -1,4 +1,4 @@
-#define G_VERSION 1, 3, 1
+#define G_VERSION 1, 3, 2
 #include "stdafx.h"
 
 // Defined in patch_misc.cpp
