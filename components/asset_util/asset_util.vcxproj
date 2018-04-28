@@ -140,6 +140,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalDependencies);zlib.lib;miniz.lib;</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>
@@ -163,6 +164,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>%(AdditionalDependencies);zlib.lib;miniz.lib;</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>
@@ -186,6 +188,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>%(AdditionalDependencies);zlib.lib;miniz.lib;</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>
