@@ -43,3 +43,25 @@ void Sys_OutOfMemErrorInternal(const char *filename, int line)
 	MessageBoxA(hWnd, msg, title, MB_ICONERROR);
 	exit(-1);
 }
+
+void Sys_ResolveWorkingDirectory(char* lpBuffer, DWORD nBufferLength)
+{
+	GetModuleFileNameA(GetModuleHandleA(NULL), lpBuffer, nBufferLength);
+
+	char tmp[MAX_PATH];
+	FS_ReturnPath(lpBuffer, tmp); // Strip the module binary name
+	FS_ReturnPath(tmp, lpBuffer); // Go up 1 directory level
+}
+
+DWORD __stdcall Sys_GetModuleFileName(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
+{
+	if (hModule != GetModuleHandle(NULL))
+		return GetModuleFileNameA(hModule, lpFilename, nSize);
+
+	auto result = GetModuleFileNameA(hModule, lpFilename, nSize);
+
+	GetCurrentDirectoryA(nSize, lpFilename);
+	strcat_s(lpFilename, nSize, "\\BlackOps.exe");
+
+	return result;
+}

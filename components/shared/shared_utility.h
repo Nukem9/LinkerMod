@@ -23,6 +23,12 @@ static void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 	FlushInstructionCache(GetCurrentProcess(), (LPVOID)Address, Size);
 }
 
+template<typename T>
+static inline void PatchPointer(ULONG_PTR Address, T* Value)
+{
+	PatchMemory(Address, (PBYTE)&Value, sizeof(Value));
+}
+
 //
 // Only supports the 0xE8 opcode
 //

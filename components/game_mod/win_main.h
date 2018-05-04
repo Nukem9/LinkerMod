@@ -22,3 +22,9 @@ int Sys_Milliseconds();
 void Sys_GetEvent(sysEvent_t *event);
 void Sys_NormalExit();
 void Sys_OutOfMemErrorInternal(const char *filename, int line);
+
+// Should only be called *once* (by game_mod init)
+void Sys_ResolveWorkingDirectory(char* lpBuffer, DWORD nBufferLength);
+
+// Replacement for GetModuleFileNameA
+DWORD __stdcall Sys_GetModuleFileName(HMODULE hModule, LPSTR lpFilename, DWORD nSize);

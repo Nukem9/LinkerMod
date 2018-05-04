@@ -19,6 +19,30 @@ size_t FS_ModDesc::Length(void) const
 	return strlen((const char*)this) + 1;
 }
 
+int FS_ReturnPath(const char *zname, char *zpath, int *depth)
+{
+	DBG_ASSERT(zname != zpath);
+
+	static const void* dwCall = (void*)0x0085E2A0;
+	
+	int result = 0;
+
+	if (!depth)
+		depth = &result;
+
+	_asm
+	{
+		push depth;
+		push zpath
+		mov ecx, zname
+		call dwCall
+		add esp, 8
+		mov result, eax
+	}
+
+	return result;
+}
+
 unsigned int __cdecl FS_ReadModDescription(void *ptr, unsigned int len, _iobuf *stream)
 {
 	return FS_FileRead(ptr, MODDESC_LEN, stream);

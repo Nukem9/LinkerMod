@@ -53,6 +53,17 @@ BOOL GameMod_Init(HMODULE hModule)
 	PatchMemory(0x008B4240, (PBYTE)"\xC3", 1);// KickClientFromSteamGameServer
 	PatchMemory(0x00616628, (PBYTE)"\xEB", 1);// Runframe
 
+#if GM_USE_PROXY
+	//
+	// Fix the CWD
+	//
+	char path[MAX_PATH];
+	Sys_ResolveWorkingDirectory(path, _countof(path));
+	SetCurrentDirectoryA(path);
+
+	PatchPointer(0x009A313C, &Sys_GetModuleFileName);
+#endif
+
 	//
 	// Patch Aspect Ratio
 	//
