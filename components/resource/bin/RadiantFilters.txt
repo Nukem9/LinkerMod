@@ -1,0 +1,317 @@
+Geometry World fdshow
+{
+	((Misc world || KeyValue classname func_group) && !Contents detail)
+}
+
+Geometry Terrain fdshow
+{
+	Misc terrain
+}
+
+Geometry Curve fdshow
+{
+	Misc curve
+}
+
+Geometry Sky
+{
+	Contents sky
+}
+
+Geometry Water
+{
+	Contents water
+}
+
+Geometry Mantle
+{
+	Contents mantle
+}
+
+Geometry nodraw_notsolid face
+{
+	nodraw_notsolid
+}
+
+Geometry shadowcaster face
+{
+	shadowcaster
+}
+
+Geometry traverse face
+{
+	traverse
+}
+
+Geometry foliage face
+{
+	foliage
+}
+
+Geometry Structural
+{
+	((Misc world || KeyValue classname func_group) && (!Contents detail && !Contents translucent))
+}
+
+Geometry Detail
+{
+	(Contents detail && !(Contents clipshot || Contents missileclip || Contents noncolliding))
+}
+
+Geometry WeaponClip
+{
+	(Contents clipshot || Contents missileclip)
+}
+
+Geometry NonColliding
+{
+	(Contents noncolliding && Contents detail)
+}
+
+Geometry Translucent fdhide
+{
+	Contents translucent
+}
+
+Geometry GoalVolumes fdhide
+{
+	KeyValue classname info_volume
+}
+
+Geometry Lightgrid fdhide
+{
+	(Texture lightgrid_volume || Texture lightgrid_sky)
+}
+
+Geometry Caulk face
+{
+	caulk
+}
+
+Geometry NoDrawDecal face
+{
+	nodraw_decal
+}
+
+Geometry Clip fdhide
+{
+	Texture *clip
+}
+
+Geometry HintSkip fdhide
+{
+	(Texture hint || Texture *skip)
+}
+
+Geometry Portals fdhide
+{
+	(Surface portal || Texture *portal)
+}
+
+Geometry Decals fdhide
+{
+	(Misc decal || Texture *decal)
+}
+
+Geometry NonDecals
+{
+	(!Misc decal && !Texture *decal)
+}
+
+Trigger Triggers fdhide
+{
+	KeyValue classname trigger*
+}
+
+Trigger Radius-Triggers fdhide
+{
+	KeyValue classname trigger_radius
+}
+
+Trigger BCS
+{
+	(Texture All *bcs || KeyValue targetname trigger_location || KeyValue targetname trigger_landmark)
+}
+
+Trigger Escort
+{
+	Texture All *escort
+}
+
+Trigger Unlock
+{
+	Texture All *unlock
+}
+
+Trigger vehicle
+{
+	Texture All *vehicle_trigger
+}
+
+Trigger Friendly_Respawn
+{
+	Texture All *friendly_respawn
+}
+
+Trigger Flag
+{
+	Texture All *flag
+}
+
+Trigger In/Out-door
+{
+	Texture All *indoor_outdoor
+}
+
+Trigger Standard-trigger
+{
+	Texture All trigger
+}
+
+Trigger Kill
+{
+	Texture All *kill
+}
+
+Trigger Volume
+{
+	Texture All *volume
+}
+
+Trigger Fog
+{
+	Texture All *fog
+}
+
+Trigger Auto_adjust
+{
+	Texture All *adjust
+}
+
+Trigger Spawner
+{
+	(Texture All *spawner_trigger || KeyValue targetname flood_*)
+}
+
+Trigger StopSpawner
+{
+	(Texture All *stopspawn || KeyValue targetname friendly_spawn)
+}
+
+Trigger FriendlyChain
+{
+	(Texture All *aitrig || KeyValue classname trigger_friendlychain)
+}
+
+Trigger Ambient
+{
+	(Texture All *ambient || KeyValue targetname ambient*)
+}
+
+Trigger Damage
+{
+	(Texture All *trigger_damage || KeyValue classname trigger_damage*)
+}
+
+Trigger Hint
+{
+	(Texture All *trigger_hint || KeyValue targetname trigger_hint*)
+}
+
+Entity Entities
+{
+	(!Misc world && !KeyValue classname func_group && !KeyValue classname light)
+}
+
+Entity Lights
+{
+	KeyValue classname light
+}
+
+Entity ReflectionProbes
+{
+	KeyValue classname reflection_probe
+}
+
+Entity EntityModels fdhide
+{
+	(KeyValue model xmodel* && !KeyValue classname misc_model && !KeyValue classname misc_prefab)
+}
+
+Entity StaticModels fdhide
+{
+	KeyValue classname misc_model
+}
+
+Entity AISpawners
+{
+	(KeyValue classname ai_* || KeyValue classname actor_*)
+}
+
+Entity PathNodes fdhide
+{
+	KeyValue classname node_pathnode
+}
+
+Entity ActionNodes fdhide
+{
+	(KeyValue classname node_* && !KeyValue classname node_pathnode)
+}
+
+Entity Misc
+{
+	KeyValue classname misc_*
+}
+
+Entity Funcs
+{
+	KeyValue classname func_*
+}
+
+Entity Info
+{
+	KeyValue classname info_*
+}
+
+Entity Weapons
+{
+	KeyValue classname weapon_*
+}
+
+Entity AmmoItems fdhide
+{
+	(KeyValue classname ammo_* || KeyValue classname item_*)
+}
+
+Entity DynObjects fdhide
+{
+	KeyValue classname dyn_*
+}
+
+Entity MP_entities fdhide
+{
+	KeyValue classname mp_*
+}
+
+Entity script_origins fdhide
+{
+	(KeyValue classname script_origin || KeyValue classname script_struct)
+}
+
+
+Entity foliage fdhide
+{
+	KeyValue model foliage_*
+}
+
+
+Entity vehicles fdhide
+{
+	KeyValue model vehicle_*
+}
+
+
+Entity script_entites fdhide
+{
+	KeyValue classname script_*
+}
