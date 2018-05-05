@@ -1,6 +1,23 @@
 #pragma once
 #include "vanilla.h"
 
+#define DVAR_NOFLAG				0				// 0x0000
+#define DVAR_ARCHIVE            (1 << 0)        // 0x0001
+#define DVAR_USERINFO           (1 << 1)        // 0x0002
+#define DVAR_SERVERINFO         (1 << 2)        // 0x0004
+#define DVAR_SYSTEMINFO         (1 << 3)        // 0x0008
+#define DVAR_INIT               (1 << 4)        // 0x0010
+#define DVAR_LATCH              (1 << 5)        // 0x0020
+#define DVAR_ROM                (1 << 6)        // 0x0040
+#define DVAR_CHEAT              (1 << 7)        // 0x0080
+#define DVAR_DEVELOPER          (1 << 8)        // 0x0100
+#define DVAR_SAVED              (1 << 9)        // 0x0200
+#define DVAR_NORESTART          (1 << 10)       // 0x0400
+#define DVAR_CHANGEABLE_RESET   (1 << 12)       // 0x1000
+#define DVAR_EXTERNAL           (1 << 14)       // 0x4000
+#define DVAR_AUTOEXEC           (1 << 15)       // 0x8000
+#define DVAR_UNRESTRICTED		(1 << 16)		// 0x10000
+
 enum dvarType_t
 {
 	DVAR_TYPE_BOOL = 0x0,
@@ -72,20 +89,6 @@ union DvarLimits
 	} vector;
 };
 
-enum dvarFlags_t
-{
-	DVAR_ARCHIVED = 0x1, //seta
-	DVAR_UPDATE = 0x2, //setu
-	DVAR_S = 0x4, //sets
-	DVAR_CHEAT = 0x80,
-	DVAR_CHANGEABLE_RESET = 0x200,
-	DVAR_SERVER_INFO = 0x500,
-	DVAR_SAVED = 0x1000,
-	DVAR_EXTERNAL = 0x4000,
-	DVAR_AUTOEXEC = 0x8000,
-	DVAR_ADMIN = 0x10000,
-};
-
 struct dvar_s
 {
 	const char *name;
@@ -114,6 +117,12 @@ VANILLA_DVAR(cg_fov_default, 0x02FF669C);
 VANILLA_DVAR(cg_fov_default_thirdperson, 0x02F67B9C);
 VANILLA_DVAR(cg_fovScale, 0x02FF66A8);
 
+VANILLA_DVAR(g_changelevel_time, 0x01C018AC);
+VANILLA_DVAR(g_reloading, 0x01C0186C);
+
+VANILLA_DVAR(useSvMapPreloading, 0x02481784);
+VANILLA_DVAR(useMapPreloading, 0x02481740);
+
 VANILLA_DVAR(uiscript_debug, 0x02562A20);
 
 VANILLA_DVAR(cl_demoLiveStreaming, 0x028D9DD0);
@@ -125,7 +134,6 @@ VANILLA_DVAR(com_developer, 0x0243FCA0);
 VANILLA_DVAR(sv_mapname, 0x02899CEC);
 VANILLA_DVAR(sv_floodProtect, 0x02866FE4);
 
-VANILLA_DVAR(developer, 0x0243FCA0);
 VANILLA_DVAR(developer_script, 0x02481714);
 VANILLA_DVAR(zombietron, 0x0247FDE8);
 VANILLA_DVAR(zombiemode, 0x0243FDD4);
@@ -138,6 +146,19 @@ VANILLA_DVAR(r_lockPvs, 0x03B1FD24);
 VANILLA_DVAR(r_reflectionProbeGenerate, 0x03B35038);
 VANILLA_DVAR(r_reflectionProbeGenerateExit, 0x03B3503C);
 VANILLA_DVAR(r_reflectionProbeRegenerateAll, 0x03B20030);
+
+VANILLA_DVAR(r_streamLog, 0x03B1FFC0);
+VANILLA_DVAR(r_streamLowDetail, 0x03B1FCA4);
+VANILLA_DVAR(r_streamClear, 0x03B1FDC0);
+VANILLA_DVAR(r_stream, 0x03B1FB54);
+VANILLA_DVAR(r_streamSize, 0x0396F9C4);
+VANILLA_DVAR(r_streamFreezeState, 0x03B1FBCC);
+VANILLA_DVAR(r_streamMaxDist, 0x0396F9CC);
+VANILLA_DVAR(r_streamHiddenPush, 0x03B1FD18);
+VANILLA_DVAR(r_loadForRenderer, 0x03B1FCC0);
+
+VANILLA_DVAR(r_aspectRatio, 0x03B1FF88);
+VANILLA_DVAR(com_wideScreen, 0x024817A8);
 
 VANILLA_DVAR(cg_drawVersion, 0x02F67B14);
 VANILLA_DVAR(cg_drawMaterial, 0x02FF676C);
@@ -182,9 +203,12 @@ VANILLA_DVAR(sys_configSum, 0x0276F558);
 
 VANILLA_DVAR(showVisionSetDebugInfo, 0x00C23D40);
 
+extern dvar_s* com_waitForStreamer;
 extern dvar_s* com_developer_print;
 
 extern dvar_s* sv_showCommands;
+
+extern dvar_s* dw_cacheTicket;
 
 extern dvar_s* radiant_live;
 extern dvar_s* radiant_livePort;
@@ -200,6 +224,7 @@ extern dvar_s* r_renderSuperflare;
 extern dvar_s* r_renderSun;
 extern dvar_s* r_renderReflected;
 extern dvar_s* r_renderCloakHDR;
+extern dvar_s* r_streamCheckAabb;
 
 extern bool com_cfg_readOnly_default;
 extern dvar_s* com_cfg_readOnly;

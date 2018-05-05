@@ -1,16 +1,5 @@
 #pragma once
 
-struct SpawnVar
-{
-	bool spawnVarsValid;
-	int numSpawnVars;
-	char *spawnVars[64][2];
-	int numSpawnVarChars;
-	char spawnVarChars[2048];
-};
-STATIC_ASSERT_OFFSET(SpawnVar, numSpawnVars, 0x4);
-STATIC_ASSERT_OFFSET(SpawnVar, spawnVars, 0x8);
-
 struct SentientHandle
 {
 	unsigned __int16 number;
@@ -20,6 +9,7 @@ struct SentientHandle
 #define MAX_PATH_DYNAMIC_NODES	128
 #define MAX_SPAWN_EXIT_NODES	100
 #define MAX_NODES_IN_BRUSH		512
+#define MAX_LINKS_PER_NODE		16
 
 #define PATH_MAX_NODES			8192
 #define PATH_MAX_TOTAL_LINKS	524288
@@ -52,7 +42,6 @@ enum nodeType
 	NODE_DONTLINK = 0x15,
 };
 
-struct pathlink_s;
 struct pathnode_t;
 
 struct pathlink_s
@@ -153,7 +142,9 @@ STATIC_ASSERT_SIZE(pathstatic_t, 0xC);
 
 struct pathlocal_t
 {
-	char _pad[0x4080];
+	char _pad1[0x4004];
+	unsigned int actualNodeCount;
+	char _pad2[0x78];
 };
 STATIC_ASSERT_SIZE(pathlocal_t, 0x4080);
 
@@ -172,14 +163,12 @@ struct PathData
 };
 STATIC_ASSERT_SIZE(PathData, 0x28);
 
-static pathlocal_t *g_path = (pathlocal_t *)0x01D00400;
+static pathlocal_t& g_path = *(pathlocal_t *)0x01D00400;
 static const char*& g_pathsError = *(const char **)0x01D0496C;
 static badplace_t *g_badplaces = (badplace_t *)0x01A4C088;
 static path_t*& debugPath = *(path_t **)0x01D04484;
 static pathstatic_t *pathstatic = (pathstatic_t *)0x01D04970;
-
-typedef bool (*G_OnlyConnectingPaths_t)();
-static G_OnlyConnectingPaths_t G_OnlyConnectingPaths = (G_OnlyConnectingPaths_t)0x0049D640;
+static pathnode_t*& g_radiant_selected_pathnode = *(pathnode_t **)0x01D04870;
 
 void node_droptofloor(pathnode_t *node);
 void G_InitPathBaseNode(pathbasenode_t *pbnode, pathnode_t *pnode);
@@ -194,6 +183,9 @@ void Path_InitPaths();
 void Path_CheckSpawnExitNodesConnectivity();
 void Path_ValidateNode(pathnode_t *node);
 void Path_ValidateAllNodes();
+pathnode_t *G_FindPathNode(SpawnVar *spawnVar, nodeType type, const int gameId);
+void G_ProcessPathnodeCommand(RadiantCommand *command, SpawnVar *spawnVar);
+void G_ClearSelectedPathNode();
 
 typedef struct
 {

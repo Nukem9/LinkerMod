@@ -95,6 +95,20 @@ void FixDirectory(int argc, char *argv[])
 		*filePart = '\0';
 }
 
+void OnErrorOccurred(const char* error, ...)
+{
+	// Prompt the error and the wait
+	va_list varargs;
+
+	va_start(varargs, error);
+	vprintf(error, varargs);
+	va_end(varargs);
+
+	// Log press any key with windows handler
+	printf("\nAn error occurred on launch, press any key to continue...");
+	_getch();
+}
+
 int main(int argc, char *argv[])
 {
 	// Disable STDOUT buffering
@@ -102,7 +116,7 @@ int main(int argc, char *argv[])
 
 	if (argc < 3)
 	{
-		printf("USAGE: launcher_ldr <DLL> <EXE> <ARGUMENTS>\n");
+		OnErrorOccurred("USAGE: launcher_ldr <DLL> <EXE> <ARGUMENTS>\n");
 		return 0;
 	}
 
@@ -120,7 +134,7 @@ int main(int argc, char *argv[])
 
 	if (ghJob == nullptr)
 	{
-		printf("Could not create job object\n");
+		OnErrorOccurred("Could not create job object\n");
 		return 1;
 	}
 	else
@@ -131,7 +145,7 @@ int main(int argc, char *argv[])
 		// Query original information first
 		if (!QueryInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &info, sizeof(info), nullptr))
 		{
-			printf("Could not QueryInformationJobObject\n");
+			OnErrorOccurred("Could not QueryInformationJobObject\n");
 			return 1;
 		}
 
@@ -143,7 +157,7 @@ int main(int argc, char *argv[])
 
 		if (!SetInformationJobObject(ghJob, JobObjectExtendedLimitInformation, &info, sizeof(info)))
 		{
-			printf("Could not SetInformationJobObject\n");
+			OnErrorOccurred("Could not SetInformationJobObject\n");
 			return 1;
 		}
 	}
@@ -154,14 +168,14 @@ int main(int argc, char *argv[])
 
 	if(!CreateProcessA(nullptr, g_CommandLine, nullptr, nullptr, TRUE, CREATE_BREAKAWAY_FROM_JOB | CREATE_SUSPENDED, nullptr, g_ExeDirectory, &startupInfo, &processInfo))
 	{
-		printf("Failed to create '%s' process\n", argv[2]);
+		OnErrorOccurred("Failed to create '%s' process\n", argv[2]);
 		return 1;
 	}
 
 	// Assign the job object
 	if (!AssignProcessToJobObject(ghJob, processInfo.hProcess))
 	{
-		printf("Unable to assign child process job object (0x%X)\n", GetLastError());
+		OnErrorOccurred("Unable to assign child process job object (0x%X)\n", GetLastError());
 		return 1;
 	}
 
@@ -170,7 +184,7 @@ int main(int argc, char *argv[])
 
 	if (!injectThread)
 	{
-		printf("DLL injection failed\n");
+		OnErrorOccurred("DLL injection failed\n");
 		return 1;
 	}
 
@@ -182,6 +196,9 @@ int main(int argc, char *argv[])
 
 	CloseHandle(processInfo.hThread);
 	CloseHandle(injectThread);
+
+	// Clear the console window, we are finished with it
+	FreeConsole();
 
 	// Wait until it exits
 	WaitForSingleObject(processInfo.hProcess, INFINITE);

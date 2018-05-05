@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 int g_tempPathNodeLinksCount;
-char g_tempPathNodeLinks[MAX_PATH_DYNAMIC_NODES * 0xC0];
+pathlink_s g_tempPathNodeLinks[MAX_LINKS_PER_NODE * MAX_PATH_DYNAMIC_NODES];
 
 // /game/pathnode_load_obj.cpp:207
 void Path_CreateNodes()
@@ -120,10 +120,10 @@ pathlink_s *G_GetNextAvailableTempLinks()
 {
 	ASSERT(g_tempPathNodeLinksCount < MAX_PATH_DYNAMIC_NODES);
 
-	pathlink_s *links = (pathlink_s *)&g_tempPathNodeLinks[0xC0 * g_tempPathNodeLinksCount];
+	pathlink_s *links = &g_tempPathNodeLinks[MAX_LINKS_PER_NODE * g_tempPathNodeLinksCount];
 	g_tempPathNodeLinksCount++;
 
-	memset(links, 0, 0xC0);
+	memset(links, 0, MAX_LINKS_PER_NODE * sizeof(pathlink_s));
 	return links;
 }
 
@@ -148,13 +148,13 @@ void Path_ConnectPathsForSingleNode(pathnode_t *node)
 	node->constant.totalLinkCount = 0;
 	unsigned int nodeindex = Path_ConvertNodeToIndex(node);
 
-	for (unsigned int i = 0; i < gameWorldCurrent->path.nodeCount; ++i)
+	for (unsigned int i = 0; i < gameWorldCurrent->path.nodeCount; i++)
 	{
 		pathnode_t *othernode = &gameWorldCurrent->path.nodes[i];
 
 		if (!(othernode->constant.spawnflags & 1) && othernode->constant.type != NODE_BADNODE && othernode != node)
 		{
-			for (unsigned short j = 0; j < othernode->constant.totalLinkCount; ++j)
+			for (unsigned short j = 0; j < othernode->constant.totalLinkCount; j++)
 			{
 				if (othernode->constant.Links[j].nodeNum == nodeindex)
 				{
@@ -163,7 +163,7 @@ void Path_ConnectPathsForSingleNode(pathnode_t *node)
 				}
 			}
 
-			if (Path_AttemptLink(node, othernode, node->constant.Links, 16))
+			if (Path_AttemptLink(node, othernode, node->constant.Links, MAX_LINKS_PER_NODE))
 			{
 				if (!othernode->constant.Links || !(othernode->constant.spawnflags & 0x4000))
 				{
@@ -172,16 +172,16 @@ void Path_ConnectPathsForSingleNode(pathnode_t *node)
 					pathlink_s *linksBuffer = G_GetNextAvailableTempLinks();
 
 					if (othernode->constant.Links)
-						memcpy(linksBuffer, othernode->constant.Links, 12 * othernode->constant.totalLinkCount);
+						memcpy(linksBuffer, othernode->constant.Links, othernode->constant.totalLinkCount * sizeof(pathlink_s));
 
 					othernode->constant.Links = linksBuffer;
 				}
 
-				if (othernode->constant.totalLinkCount < 16 && Path_AttemptLink(othernode, node, othernode->constant.Links, 16))
+				if (othernode->constant.totalLinkCount < MAX_LINKS_PER_NODE && Path_AttemptLink(othernode, node, othernode->constant.Links, MAX_LINKS_PER_NODE))
 					othernode->dynamic.wLinkCount = othernode->constant.totalLinkCount;
 			}
 
-			if (node->constant.totalLinkCount >= 16)
+			if (node->constant.totalLinkCount >= MAX_LINKS_PER_NODE)
 				break;
 		}
 	}

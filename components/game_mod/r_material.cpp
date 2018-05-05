@@ -97,3 +97,15 @@ MaterialTechnique *__cdecl Material_GetTechnique(Material *material, char techTy
 
 	return techSet->techniques[techType];
 }
+
+int Material_GetTextureCount(Material *handle)
+{
+	return handle->textureCount;
+}
+
+GfxImage *Material_GetTexture(Material *handle, int index)
+{
+	ASSERT(index < Material_GetTextureCount(handle));
+
+	return handle->textureTable[index].u.image;
+}

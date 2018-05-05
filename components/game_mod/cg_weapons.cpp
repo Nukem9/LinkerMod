@@ -2,12 +2,18 @@
 
 void XAnimSetTime(XAnimTree_s *tree, unsigned int animIndex, float time, int cmdIndex)
 {
+	ASSERT(tree);
+	//ASSERT(tree->anims);
+	//ASSERT(animIndex < tree->anims->size);
+
 	((void(__cdecl *)(XAnimTree_s *, unsigned int, float, int))0x005E79C0)(tree, animIndex, time, cmdIndex);
 }
 
-void XAnimSetGoalWeight(DObj *obj, unsigned int animIndex, float goalWeight, float goalTime, float rate, unsigned int notifyName, unsigned int notifyType, int bRestart, int cmdIndex)
+int XAnimSetGoalWeight(DObj *obj, unsigned int animIndex, float goalWeight, float goalTime, float rate, unsigned int notifyName, unsigned int notifyType, int bRestart, int cmdIndex)
 {
-	((void(__cdecl *)(DObj *, unsigned int, float, float, float, unsigned int, unsigned int, int, int))0x004076C0)
+	ASSERT(obj);
+
+	return ((int(__cdecl *)(DObj *, unsigned int, float, float, float, unsigned int, unsigned int, int, int))0x004076C0)
 		(obj, animIndex, goalWeight, goalTime, rate, notifyName, notifyType, bRestart, cmdIndex);
 }
 
@@ -27,6 +33,12 @@ float GetWeaponAnimRate(int localClientNum, WeaponVariantDef *weapVariantDef, XA
 		mov eax, localClientNum
 		call[dwCall]
 		add esp, 0x8
+
+		// Return value in both xmm0 and ST(0)
+		movd eax, xmm0
+		push eax
+		fld [esp]
+		add esp, 0x4
 	}
 }
 
@@ -43,6 +55,12 @@ float GetWeaponAnimTimeFrac(int localClientNum, WeaponVariantDef *weapVariantDef
 		mov edx, weapVariantDef
 		mov eax, animIndex
 		call[dwCall]
+
+		// Return value in both xmm0 and ST(0)
+		movd eax, xmm0
+		push eax
+		fld[esp]
+		add esp, 0x4
 	}
 }
 
@@ -94,14 +112,17 @@ void StartWeaponAnim(int localClientNum, int weaponNum, DObj *obj, int animIndex
 		rate /= perk_weapSwitchMultiplier->current.value;
 	}
 
-	for (int i = 1; i < WEAP_ANIM_VIEWMODEL_END; ++i)
+	for (int i = 1; i < WEAP_ANIM_VIEWMODEL_END; i++)
 	{
 		if (animIndex == i)
 		{
 			XAnimSetGoalWeight(obj, i, 1.0f, transitionTime, rate, 0, 1, 1, -1);
 
 			if (newPlayerstate)
+			{
 				XAnimSetTime(viewModelInfo->tree, i, timeFrac, -1);
+				//ASSERT(viewModelInfo->tree->anims);
+			}
 		}
 		else if (weapDef->bDualWield
 			&& viewModelInfo->hand[0].iHandAnimIndex != i
@@ -134,12 +155,12 @@ void hk_StartWeaponAnim(int localClientNum, DObj *obj, int animIndex, float tran
 // /cgame/cg_weapons.cpp:3329
 void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *start, float *end, float *dir, const float *forwardDir, const float *rightDir, const float *upDir, const float maxRange, int shotIndex, int maxShotIndex)
 {
-	ASSERT(!IS_NAN(spread));
-	ASSERT(end);
+	DBG_ASSERT(!IS_NAN(spread));
+	DBG_ASSERT(end);
 
 	float aimOffset = tan(spread * 0.017453292f) * maxRange;
 
-	ASSERT(!IS_NAN(aimOffset));
+	DBG_ASSERT(!IS_NAN(aimOffset));
 
 	float right = 0.0f;
 	float up = 0.0f;
@@ -161,14 +182,14 @@ void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *st
 	right *= aimOffset;
 	up *= aimOffset;
 
-	ASSERT(!IS_NAN(right));
-	ASSERT(!IS_NAN(up));
+	DBG_ASSERT(!IS_NAN(right));
+	DBG_ASSERT(!IS_NAN(up));
 
 	end[0] = (maxRange * forwardDir[0]) + start[0];
 	end[1] = (maxRange * forwardDir[1]) + start[1];
 	end[2] = (maxRange * forwardDir[2]) + start[2];
 
-	ASSERT(!IS_NAN(end[0]) && !IS_NAN(end[1]) && !IS_NAN(end[2]));
+	DBG_ASSERT(!IS_NAN(end[0]) && !IS_NAN(end[1]) && !IS_NAN(end[2]));
 
 	end[0] = (right * rightDir[0]) + end[0];
 	end[1] = (right * rightDir[1]) + end[1];
@@ -178,7 +199,7 @@ void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *st
 	end[1] = (up * upDir[1]) + end[1];
 	end[2] = (up * upDir[2]) + end[2];
 
-	ASSERT(!IS_NAN(end[0]) && !IS_NAN(end[1]) && !IS_NAN(end[2]));
+	DBG_ASSERT(!IS_NAN(end[0]) && !IS_NAN(end[1]) && !IS_NAN(end[2]));
 
 	if (dir)
 	{
@@ -187,7 +208,7 @@ void CG_BulletEndpos(unsigned int *randSeed, const float spread, const float *st
 		dir[2] = end[2] - start[2];
 		Vec3Normalize(dir);
 
-		ASSERT(!IS_NAN(dir[0]) && !IS_NAN(dir[1]) && !IS_NAN(dir[2]));
+		DBG_ASSERT(!IS_NAN(dir[0]) && !IS_NAN(dir[1]) && !IS_NAN(dir[2]));
 	}
 }
 

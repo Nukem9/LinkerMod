@@ -37,11 +37,10 @@ struct BodyState
 	int underwater;
 };
 
-void Phys_ObjAddForce(int id, const float *worldPos, const float *impulse, const bool relative);
 void Phys_ObjGetCenterOfMass(int id, float *outPosition);
+void Phys_ObjAddForce(int id, const float *worldPos, const float *impulse, const bool relative);
 
 void hk_Phys_ObjCreateAxis(); //int worldIndex, const float *position, struct gjk_geom_list_t* gjk_geom_list, int id, int do_collision_test);
-int __cdecl Phys_ObjCreateAxis(int worldIndex, const float *position, const float(*axis)[3], const float *velocity, PhysPreset *physPreset, struct gjk_geom_list_t *gjk_geom_list, int id, const bool do_collision_test);
 
 typedef int (__cdecl* Phys_CreateBodyFromState_t)(int worldIndex, BodyState *state, struct gjk_geom_list_t *gjk_geom_list, const bool do_collision_test);
 static Phys_CreateBodyFromState_t Phys_CreateBodyFromState = (Phys_CreateBodyFromState_t)0x005785C0;

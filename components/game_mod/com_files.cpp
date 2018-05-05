@@ -151,3 +151,39 @@ int __cdecl FS_FOpenFileWriteToDir(const char *filename, const char *dir, const 
 
 	return FS_FOpenFileWriteToDir_o(filename, dir, osbasepath);
 }
+
+unsigned __int64 FS_FileAge(const char* path)
+{
+	// Quick lambda for converting filetimes to ull
+	auto ft2uint64 = [](const FILETIME& ft)
+	{
+		ULARGE_INTEGER ul;
+		ul.LowPart = ft.dwLowDateTime;
+		ul.HighPart = ft.dwHighDateTime;
+		return ul.QuadPart;
+	};
+
+	HANDLE h = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	if (h == INVALID_HANDLE_VALUE)
+		return UINT64_MAX;
+
+	// Retrieve the file times for the file
+	FILETIME create, access, write;
+	auto err = GetFileTime(h, &create, &access, &write);
+	CloseHandle(h);
+
+	// Abort if we couldn't get the filetime
+	if (!err)
+		return UINT64_MAX;
+
+	FILETIME sys_time;
+	GetSystemTimeAsFileTime(&sys_time);
+
+	auto age = (ft2uint64(sys_time) - ft2uint64(write)) / 10000;
+	return __int64(age);
+}
+
+unsigned __int64 FS_FileAge_Sec(const char* path)
+{
+	return FS_FileAge(path) / 1000;
+}

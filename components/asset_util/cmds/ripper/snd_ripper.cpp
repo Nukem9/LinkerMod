@@ -316,6 +316,8 @@ int Rip_Sound_Alias_Callback_f(ForeignPointer<snd_alias_t>& alias, snd_ripper_in
 		file = ReadString(snd->name);
 	}
 
+	file_pc = file.c_str();
+
 	fprintf(instance.outputFile, "%s,", name.c_str());
 	fprintf(instance.outputFile, "%s,", file.c_str());
 	fprintf(instance.outputFile, "%s,", _template);

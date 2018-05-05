@@ -1,8 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Production|Win32">
+      <Configuration>Production</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -15,22 +19,28 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>game_mod</RootNamespace>
     <ProjectName>game_mod</ProjectName>
-    <WindowsTargetPlatformVersion>
-    </WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v120_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -43,11 +53,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\common.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Production|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -64,7 +81,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <AdditionalOptions>/ignore:4099 /opt:nolbr %(AdditionalOptions) /opt:nolbr </AdditionalOptions>
-      <AdditionalDependencies>%(AdditionalDependencies);imgui.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -85,7 +103,31 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <IgnoreSpecificDefaultLibraries />
-      <AdditionalDependencies>%(AdditionalDependencies);imgui.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Production|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GAME_MOD_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -98,6 +140,7 @@
     <ClCompile Include="CEG.cpp" />
     <ClCompile Include="cg_draw_debug.cpp" />
     <ClCompile Include="cg_scoreboard.cpp" />
+    <ClCompile Include="cg_servercmds_mp.cpp" />
     <ClCompile Include="cg_weapons.cpp" />
     <ClCompile Include="cl_debugdata.cpp" />
     <ClCompile Include="cl_keys.cpp" />
@@ -109,7 +152,17 @@
     <ClCompile Include="com_files.cpp" />
     <ClCompile Include="com_math.cpp" />
     <ClCompile Include="com_memory.cpp" />
+    <ClCompile Include="com_workercmds.cpp" />
+    <ClCompile Include="cscr_main.cpp" />
     <ClCompile Include="cscr_parser.cpp" />
+    <ClCompile Include="dobj_utils.cpp" />
+    <ClCompile Include="r_image_load_common.cpp" />
+    <ClCompile Include="r_image_load_obj.cpp" />
+    <ClCompile Include="xmodel_utils.cpp" />
+    <ClInclude Include="cg_servercmds_mp.h" />
+    <ClInclude Include="com_workercmds.h" />
+    <ClInclude Include="cscr_variable.h" />
+    <ClCompile Include="cscr_variable.cpp" />
     <ClCompile Include="cscr_vm.cpp" />
     <ClCompile Include="db_registry.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -117,8 +170,11 @@
     <ClCompile Include="dwlogon_pc.cpp" />
     <ClCompile Include="g_client_script_cmd_mp.cpp" />
     <ClCompile Include="g_items.cpp" />
+    <ClCompile Include="g_main_mp.cpp" />
+    <ClCompile Include="g_utils_mp.cpp" />
     <ClCompile Include="live_steam_client.cpp" />
     <ClCompile Include="live_win.cpp" />
+    <ClCompile Include="netfield.cpp" />
     <ClCompile Include="patch_common.cpp" />
     <ClCompile Include="patch_demo.cpp" />
     <ClCompile Include="patch_misc.cpp" />
@@ -141,7 +197,10 @@
     <ClCompile Include="r_material.cpp" />
     <ClCompile Include="r_material_load_obj.cpp" />
     <ClCompile Include="r_reflection_probe.cpp" />
+    <ClCompile Include="r_rendercmds.cpp" />
     <ClCompile Include="r_screenshot.cpp" />
+    <ClCompile Include="r_stream.cpp" />
+    <ClCompile Include="r_streamalloc.cpp" />
     <ClCompile Include="scr_cmds.cpp" />
     <ClCompile Include="sv_ccmds_mp.cpp" />
     <ClCompile Include="sv_client_mp.cpp" />
@@ -152,6 +211,11 @@
     <ClCompile Include="win_common.cpp" />
     <ClCompile Include="win_exception.cpp" />
     <ClCompile Include="win_main.cpp" />
+    <ClInclude Include="dobj_utils.h" />
+    <ClInclude Include="r_image_load_common.h" />
+    <ClInclude Include="r_image_load_obj.h" />
+    <ClInclude Include="r_surface.h" />
+    <ClInclude Include="xmodel_utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bg_perks.h" />
@@ -176,6 +240,8 @@
     <ClInclude Include="com_files.h" />
     <ClInclude Include="com_math.h" />
     <ClInclude Include="com_memory.h" />
+    <ClInclude Include="cscr_compiler.h" />
+    <ClInclude Include="cscr_main.h" />
     <ClInclude Include="cscr_parser.h" />
     <ClInclude Include="cscr_vm.h" />
     <ClInclude Include="d3d9ex.h" />
@@ -185,9 +251,11 @@
     <ClInclude Include="g_client_script_cmd_mp.h" />
     <ClInclude Include="g_items.h" />
     <ClInclude Include="g_main_mp.h" />
+    <ClInclude Include="g_utils_mp.h" />
     <ClInclude Include="live_steam_client.h" />
     <ClInclude Include="live_win.h" />
     <ClInclude Include="msg_mp.h" />
+    <ClInclude Include="netfield.h" />
     <ClInclude Include="patch_common.h" />
     <ClInclude Include="patch_usefastfile.h" />
     <ClInclude Include="patch_reflections.h" />
@@ -206,10 +274,13 @@
     <ClInclude Include="r_init.h" />
     <ClInclude Include="r_material.h" />
     <ClInclude Include="r_material_load_obj.h" />
+    <ClInclude Include="xmodel.h" />
     <ClInclude Include="r_reflection_probe.h" />
     <ClInclude Include="r_rendercmds.h" />
     <ClInclude Include="r_scene.h" />
     <ClInclude Include="r_screenshot.h" />
+    <ClInclude Include="r_stream.h" />
+    <ClInclude Include="r_streamalloc.h" />
     <ClInclude Include="scr_cmds.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv_ccmds_mp.h" />

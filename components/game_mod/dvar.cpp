@@ -14,9 +14,12 @@ dvar_s* scr_useFastFileOnly = NULL;
 dvar_s* scr_suppressErrors = NULL;
 dvar_s* perk_weapRateEnhanced = NULL;
 
+dvar_s* com_waitForStreamer = NULL;
 dvar_s* com_developer_print = NULL;
 
 dvar_s* sv_showCommands = NULL;
+
+dvar_s* dw_cacheTicket = NULL;
 
 dvar_s* radiant_live = NULL;
 dvar_s* radiant_livePort = NULL;
@@ -32,6 +35,7 @@ dvar_s* r_renderSuperflare = NULL;
 dvar_s* r_renderSun = NULL;
 dvar_s* r_renderReflected = NULL;
 dvar_s* r_renderCloakHDR = NULL;
+dvar_s* r_streamCheckAabb = NULL;
 
 bool com_cfg_readOnly_default = false;
 dvar_s* com_cfg_readOnly = NULL;
@@ -50,13 +54,13 @@ const char* r_showTessNames[] =
 void R_RegisterCustomDvars()
 {
 	// DirectX9 extensions
-	r_d3d9ex = Dvar_RegisterInt("r_d3d9ex", 0, 0, 1, 1, "Enable DirectX 9Ex improvements");
+	r_d3d9ex = Dvar_RegisterInt("r_d3d9ex", 0, 0, 1, DVAR_ARCHIVE, "Enable DirectX 9Ex improvements");
 
 	// Borderless window toggle
-	r_noborder = Dvar_RegisterInt("r_noborder", 0, 0, 1, 1, "Enable borderless windowed mode");
+	r_noborder = Dvar_RegisterInt("r_noborder", 0, 0, 1, DVAR_ARCHIVE, "Enable borderless windowed mode");
 
 	//this can go up to 13 - but anything > 11 has artifacts
-	sm_quality = Dvar_RegisterInt("sm_quality", 10, 5, 13, 0x2000 | DVAR_ARCHIVED, "Exponent for shadow map resolution (2^n) - requires restart - anything over 11 has potential for artifacts");
+	sm_quality = Dvar_RegisterInt("sm_quality", 10, 5, 13, DVAR_ARCHIVE | 0x2000, "Exponent for shadow map resolution (2^n) - requires restart - anything over 11 has potential for artifacts");
 	
 	//
 	// Patch ShadowMap SampleSize
@@ -88,6 +92,10 @@ void R_RegisterCustomDvars()
 
 	com_developer_print = Dvar_RegisterEnum("developer_print", com_dprintf_options, 0, 0x80, "Modify Com_DPrintf() behavior");
 	sv_showCommands = Dvar_RegisterBool("sv_showCommands", 0, 0, "Print client commands in the log file");
+
+	r_streamCheckAabb = Dvar_RegisterBool("r_streamCheckAabb", false, DVAR_CHEAT, "Enables runtime checking of the stream aabb tree");
+
+	dw_cacheTicket = Dvar_RegisterBool("dw_cacheTicket", true, DVAR_ARCHIVE, "Cache the SteamAuth ticket to the disk");
 }
 
 void* rtn_R_RegisterDvars = (void*)0x006CA283;
@@ -138,6 +146,8 @@ void __cdecl CG_RegisterDvars()
 	r_renderSun = Dvar_RegisterBool("r_renderSun", true, 0x2, "");
 	r_renderReflected = Dvar_RegisterBool("r_renderReflected", true, 0x2, "");
 	r_renderCloakHDR = Dvar_RegisterBool("r_renderCloakHDR", true, 0x2, "");
+
+	com_waitForStreamer = Dvar_RegisterInt("waitForStreamer", 1, 0, 2, DVAR_NOFLAG, "1) wait for initial lowmips, 2) wait for full initial texture load.");
 
 	// Set the max number of suggestions to show in the console autocomplete preview
 	PatchMemory(0x00B72F7C, (PBYTE)&con_inputMaxMatchesShown->current.value, 4);

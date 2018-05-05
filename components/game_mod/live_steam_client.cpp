@@ -63,43 +63,72 @@ namespace LiveSteam
 	int AuthCache::ReloadCache(void)
 	{
 		FILE *h = nullptr;
-
 		if (fopen_s(&h, AUTHCACHE_FILEPATH, "rb") != 0)
 		{
-			// auth cache could not be loaded
+			// auth cache file could not be loaded
+			ClearCache();
 			return 1;
 		}
 
-		auto Cleanup = [&h, this](void) -> void
+		//
+		// Error handler lambda that automatically:
+		//  + frees the cache file handle
+		//  + deletes the cache file
+		//  + clears the memory cache
+		//
+		auto DeleteBadCache = [this, h](void)
 		{
+			// Close the file handle so we can actually delete the file
 			fclose(h);
 
-			delete[] m_steamCookieKey;
-			delete[] m_steamAppTicket;
-
-			m_steamCookieKey = nullptr;
-			m_steamAppTicket = nullptr;
-
-			m_steamAppTicketSize = 0;
+			DeleteFileA(AUTHCACHE_FILEPATH);
+			ClearCache();
 		};
 
-		m_steamCookieKey = new char[m_steamCookieKeySize];
+		//
+		// Check the age of the cache file
+		// If it's too old we need to delete it and clear the cache
+		//
+		if (FS_FileAge_Sec(AUTHCACHE_FILEPATH) > 60)
+		{
+			DeleteBadCache();
+			return 5;
+		}
+
+		// We only need to allocate a buffer for m_steamCookieKey if it doesn't already have one.
+		// Since m_steamCookieKeySize is constant, we don't need to worry about resizing the buffer
+		if (m_steamCookieKey == nullptr)
+			m_steamCookieKey = new char[m_steamCookieKeySize];
+
 		if (fread(m_steamCookieKey, 1, m_steamCookieKeySize, h) != m_steamCookieKeySize)
 		{
-			Cleanup();
+			// Unable to read the correct number of bytes for the cookie key
+			DeleteBadCache();
 			return 2;
 		}
 
+		// All of the remaining data is the appTicket, so let's figure out how big the ticket is
+		// by determining the size of the remaining data
 		unsigned int cur = ftell(h);
 		fseek(h, 0, SEEK_END);
 		unsigned int end = ftell(h);
 		fseek(h, cur, SEEK_SET);
 
+		unsigned int oldTicketSize = m_steamAppTicketSize;
 		m_steamAppTicketSize = end - cur;
-		m_steamAppTicket = new char[m_steamAppTicketSize];
+
+		// Only bother reallocating the appTicket buffer if the old ticket was smaller than the new one
+		// or if the buffer wasn't allocated yet
+		if (m_steamAppTicket == nullptr || oldTicketSize < m_steamAppTicketSize)
+		{
+			delete[] m_steamAppTicket;
+			m_steamAppTicket = new char[m_steamAppTicketSize];
+		}
+
 		if (fread(m_steamAppTicket, 1, m_steamAppTicketSize, h) != m_steamAppTicketSize)
 		{
-			Cleanup();
+			// Unable to read the correct number of bytes for the app ticket
+			DeleteBadCache();
 			return 3;
 		}
 
@@ -116,8 +145,8 @@ namespace LiveSteam
 		m_steamAppTicket = new char[m_steamAppTicketSize];
 		memcpy(m_steamAppTicket, appTicket, m_steamAppTicketSize);
 
-		if (m_steamCookieKey == nullptr)
-			m_steamCookieKey = new char[m_steamCookieKeySize];
+		delete[] m_steamCookieKey;
+		m_steamCookieKey = new char[m_steamCookieKeySize];
 
 		memcpy(m_steamCookieKey, cookieKey, m_steamCookieKeySize);
 
@@ -132,7 +161,7 @@ namespace LiveSteam
 
 		if (fopen_s(&h, AUTHCACHE_FILEPATH, "wb") != 0)
 		{
-			// auth cache could not be written
+			// auth cache file could not be written
 			return 1;
 		}
 
@@ -187,36 +216,59 @@ bool LiveSteamClient::GetRetrievedEncryptedAppTicket(void *ticketBuf, const unsi
 	auto steamUser = (*(void *(__cdecl **)())0x009A356C)();
 	auto getEncryptedAppTicket = *(bool(__thiscall **)(void *, void *, int, unsigned int *))(*(DWORD *)steamUser + 80);
 
-	// Use the real function if Steam had a good ticket
-	if (this->rawTicketResult == k_EResultOK)
+	bool useCache = dw_cacheTicket && dw_cacheTicket->current.enabled;
+
+	//
+	// Use the real function if one of the following conditions are met:
+	//	+ Steam had a good ticket
+	//	+ The caching subsystem is disabled
+	//
+	// Otherwise we fallback to using the cached ticket
+	//
+	if (this->rawTicketResult == k_EResultOK || !useCache)
 	{
 		if (getEncryptedAppTicket(steamUser, ticketBuf, ticketBufSize, ticketSize))
 		{
-			// Update the cache with the generated ticket & DW cookie
-			g_authCache.UpdateCache(ticketBuf, *ticketSize, g_authService->m_steamCookieKey);
-			
-			// Commit the new cache contents to the disk
-			if (g_authCache.CommitCache() == 0)
+			if (useCache)
 			{
-				Com_DPrintf(1, "STEAM: Wrote cached auth ticket\n");
+				DBG_ASSERT(g_authService);
+				if (!g_authService)
+				{
+					Com_DPrintf(1, "STEAM: Couldn't cache recieved auth ticket - g_authService is NULL\n");
+					return true;
+				}
+
+				// Update the cache with the generated ticket & DW cookie
+				g_authCache.UpdateCache(ticketBuf, *ticketSize, g_authService->m_steamCookieKey);
+
+				// Commit the new cache contents to the disk
+				if (g_authCache.CommitCache() == 0)
+				{
+					Com_DPrintf(1, "STEAM: Wrote cached auth ticket\n");
+				}
 			}
 
-			Com_DPrintf(1, "STEAM: Retrieved ticket from Steam, sending to DemonWare\n");
+			Com_DPrintf(1, "STEAM: Retrieved auth ticket from Steam, sending to DemonWare\n");
 			return true;
 		}
 	}
 	else
 	{
-		DBG_ASSERT(g_authService->m_steamCookieKey != (char*)0x150);
+		DBG_ASSERT(g_authService);
+		if (!g_authService)
+		{
+			Com_DPrintf(1, "STEAM: Couldn't use cached auth ticket - g_authService is NULL\n");
+			return false;
+		}
 
 		int err = g_authCache.ApplyCache(ticketBuf, ticketBufSize, ticketSize, g_authService->m_steamCookieKey);
 		if (err == 0)
 		{
-			Com_DPrintf(0, "STEAM Loaded cached auth ticket\n");
+			Com_DPrintf(1, "STEAM: Retrieved cached auth ticket, sending to DemonWare\n");
 			return true;
 		}
 
-		Com_DPrintf(0, "^1STEAM Load cache - error %d\n", err);
+		Com_DPrintf(1, "^1STEAM: Load cache - error %d\n", err);
 		g_authCache.ClearCache();
 	}
 
@@ -248,15 +300,21 @@ void LiveSteamClient::OnRequestEncryptedAppTicket(EncryptedAppTicketResponse_t *
 		break;
 	}
 
-	// If the request was rate limited, check if there's a cached ticket
-	if (pEncryptedAppTicketResponse->m_eResult == k_EResultLimitExceeded)
+	//
+	// Only use the caching subsystem if we explicitly have it enabled
+	//
+	if (dw_cacheTicket && dw_cacheTicket->current.enabled)
 	{
-		if (g_authCache.ValidateCache())
+		// If the request was rate limited, check if there's a cached ticket
+		if (pEncryptedAppTicketResponse->m_eResult == k_EResultLimitExceeded)
 		{
-			Com_DPrintf(1, "STEAM: Attempting to use cached auth ticket...\n");
+			if (g_authCache.ValidateCache())
+			{
+				Com_DPrintf(1, "STEAM: Attempting to use cached auth ticket...\n");
 
-			pEncryptedAppTicketResponse->m_eResult = k_EResultOK;
-			dwLogonSeAcquiredSteamTicket();
+				pEncryptedAppTicketResponse->m_eResult = k_EResultOK;
+				dwLogonSeAcquiredSteamTicket();
+			}
 		}
 	}
 

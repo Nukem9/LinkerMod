@@ -1,4 +1,4 @@
-#define G_VERSION 1, 1, 0
+#define G_VERSION 1, 3, 2
 #include "stdafx.h"
 
 // Defined in patch_misc.cpp
@@ -6,7 +6,7 @@
 void PatchMisc();
 #endif
 
-BOOL GameMod_Init()
+BOOL GameMod_Init(HMODULE hModule)
 {
 	//
 	// Disable STDOUT buffering
@@ -21,8 +21,7 @@ BOOL GameMod_Init()
 	//
 	// Enable custom exception filter 
 	//
-	void* ptr = PrivateUnhandledExceptionFilter;
-	PatchMemory(0x0050A7B0, (PBYTE)&ptr, 4);
+	Patch_ExceptionFilter(PrivateUnhandledExceptionFilter, hModule);
 
 	//
 	// Add stack trace info to Sys_OutOfMemErrorInternal
@@ -53,6 +52,11 @@ BOOL GameMod_Init()
 	//
 	PatchMemory(0x008B4240, (PBYTE)"\xC3", 1);// KickClientFromSteamGameServer
 	PatchMemory(0x00616628, (PBYTE)"\xEB", 1);// Runframe
+
+	//
+	// Patch Aspect Ratio
+	//
+	Detours::X86::DetourFunction((PBYTE)0x006B68D0, (PBYTE)&hk_R_StoreWindowSettings);
 
 	//
 	// "com_introPlayed"
@@ -144,6 +148,17 @@ BOOL GameMod_Init()
 	PartyClient_CheckMapExists_o = (PartyClient_CheckMapExists_t)Detours::X86::DetourFunction((PBYTE)0x0061B480, (PBYTE)&PartyClient_CheckMapExists);
 
 	//
+	// Automatically disable server map preloading when doing ChangeLevel()
+	//
+	Detours::X86::DetourFunction((PBYTE)0x005A30FD, (PBYTE)mfh_PartyHost_StartMatch);
+	Detours::X86::DetourFunction((PBYTE)0x0050F06B, (PBYTE)mfh_SV_SpawnServer);
+	Detours::X86::DetourFunction((PBYTE)0x007FBBB0, (PBYTE)GScr_ChangeLevel);
+
+	// Add Support for Custom Server / Client Commands
+	Detours::X86::DetourFunction((PBYTE)0x004AFBC7, (PBYTE)&mfh_ClientCommand);				// SERVERSIDE
+	Detours::X86::DetourFunction((PBYTE)0x0078E76A, (PBYTE)&mfh_CG_DeployServerCommand);	// CLIENTSIDE
+
+	//
 	// Unrestrict Dvar_ForEachConsoleAccessName,
 	// Cmd_ForEachConsoleAccessName, and Dvar_ListSingle
 	//
@@ -175,7 +190,7 @@ BOOL GameMod_Init()
 	//
 	// Add scr_supressErrors to disable error message boxes with developer_script
 	//
-	Detours::X86::DetourFunction((PBYTE)0x005A1732, (PBYTE)&mfh_RuntimeError);
+	Detours::X86::DetourFunction((PBYTE)0x005A1680, (PBYTE)&RuntimeError);
 	
 	//
 	// Add com_cfg_readOnly dvar - to allow prevention of writing to the config
@@ -259,7 +274,7 @@ BOOL GameMod_Init()
 	// Increase mod description length limit
 	//
 	const int dirListLength = DIRLIST_LEN;
-	ptr = dirList;
+	void* ptr = dirList;
 	PatchMemory(0x00623A0B, (PBYTE)&ptr, 4); // dirList
 	PatchMemory(0x00623A65, (PBYTE)&ptr, 4); // dirList
 	PatchMemory(0x00623A06, (PBYTE)&dirListLength, 4);
@@ -505,6 +520,7 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x006B7780, (PBYTE)&hk_Direct3DCreate9, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x006B7597, (PBYTE)&hk_CreateDevice, Detours::X86Option::USE_CALL);
 	Detours::X86::DetourFunction((PBYTE)0x0071F387, (PBYTE)&hk_GetSwapChain, Detours::X86Option::USE_CALL);
+	Detours::X86::DetourFunction((PBYTE)0x00737A91, (PBYTE)&hk_CreateVertexBuffer, Detours::X86Option::USE_CALL);
 	PatchMemory(0x006EB4F1, (PBYTE)"\xEB", 1);
 
 	Detours::X86::DetourFunction((PBYTE)0x0070A050, (PBYTE)&hk_Image_Create2DTexture_PC);
@@ -557,11 +573,21 @@ BOOL GameMod_Init()
 	Detours::X86::DetourFunction((PBYTE)0x00766CF0, (PBYTE)&PM_Weapon_Jam);
 	Detours::X86::DetourFunction((PBYTE)0x007951E0, (PBYTE)&hk_StartWeaponAnim);
 	Detours::X86::DetourFunction((PBYTE)0x007694A0, (PBYTE)&PM_Weapon_WeaponTimeAdjust);
+	Detours::X86::DetourFunction((PBYTE)0x00769CD0, (PBYTE)&hk_PM_Weapon_ShouldBeFiring);
+	PatchMemory(0x00880140, (PBYTE)"\xE9\x87\x00\x00\x00", 5); // Clientside check in IN_Attack_Down
 
 	//
 	// Hook reliable command handling
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0087D940, (PBYTE)&hk_SV_ClientCommand);
+
+	//
+	// Prevent "'sl' client command received with %i parameters instead of 3" error
+	//  from causing an error dialog to display
+	// (Should *never* happen - but apparently it occasionally does...)
+	//
+	PatchMemory(0x0053B6CE, (PBYTE)"\x00", 1); // Com_PrintError: Channel 0
+	PatchCall(0x0053B6CF, (PBYTE)Com_PrintError);
 
 	//
 	// Increase default sv_network_fps to 200
@@ -591,6 +617,12 @@ BOOL GameMod_Init()
 
 	PatchUseFF();
 
+	if (!LaunchArg_NoFF())
+	{
+		// Patch image streaming if we *are* using fastfiles
+		Patch_R_Stream();
+	}
+
 	//
 	// Initialize either reflection mode or ReShade compatibility
 	// depending on whether or not reflections are going to be calculated
@@ -605,7 +637,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH)
 	{
 		DisableThreadLibraryCalls(hModule);
-		return GameMod_Init(); 
+		return GameMod_Init(hModule); 
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{

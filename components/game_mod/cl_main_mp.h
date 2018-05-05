@@ -1,7 +1,5 @@
 #pragma once
 
-typedef int DObj;
-typedef int XAnimTree_s;
 typedef int XAnim_s;
 
 struct ViewModelHand
@@ -33,7 +31,6 @@ struct  SnapshotInfo_s
 	BYTE pad[0x1C];
 };
 STATIC_ASSERT_SIZE(SnapshotInfo_s, 0x2C);
-
 
 VANILLA_VALUE(localClientConnectionState, int, 0x02910164);
 

@@ -6,11 +6,6 @@
 
 set GAME_DIR=..\..
 set ASSET_UTIL=%GAME_DIR%\bin\asset_util.exe
-set LAUNCHER_LDR=%GAME_DIR%\bin\launcher_ldr.exe
-set GAME_MOD=%GAME_DIR%\bin\game_mod.dll
-set BLACKOPS=%GAME_DIR%\BlackOps.exe
-
-set LAUNCH_ARGS=
 
 set FF_DIR=%GAME_DIR%\zone\Common\
 
@@ -33,7 +28,7 @@ set MAP=
 	call :export
 ))
 
-(for %%m in (%SP_MAPS%) do (
+(for %%m in (%MP_MAPS%) do (
 	set MAP=%%m
 	call :export
 ))
@@ -42,15 +37,9 @@ goto:eof
 
 :export_mp
 set MAP=so_dummy_%MAP%
-set LAUNCH_ARGS=+set g_loadScripts 0
 
 :export
-echo Ripping Soundaliases for %MAP% ...
-:: Start the game process - automatically terminated by Asset Util
-start %LAUNCHER_LDR% %GAME_MOD% %BLACKOPS% +devmap %MAP% %LAUNCH_ARGS%
-
-:: Launch Asset Util and make sure the game process was started
-:: The loop automatically continues when asset util exits
-:: Must be run as blocking to ensure that it prints to the same console as the batch script
-%ASSET_UTIL% rip --waitForProcess --waitForMap --killProcess
-taskkill /F /IM launcher_ldr.exe
+echo Ripping soundaliases for %MAP% ...
+:: Launch Asset Util
+:: Automatically launches the game with the target map and terminates on completion
+%ASSET_UTIL% rip --targetMap %MAP%

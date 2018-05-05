@@ -93,3 +93,15 @@ int __cdecl FS_GetModList(char *listbuf, int bufsize);
 // Used only by Com_WriteConfigToFile and Com_WriteKeyConfigToFile
 //
 int __cdecl FS_FOpenFileWriteToDir(const char *filename, const char *dir, const char *osbasepath);
+
+//
+// Get the age of a file in milliseconds
+// returns UINT64_MAX if the file doesn't exist
+//
+unsigned __int64 FS_FileAge(const char* path);
+
+//
+// Get the age of a file in seconds
+// returns UINT64_MAX if the file doesn't exist
+//
+unsigned __int64 FS_FileAge_Sec(const char* path);

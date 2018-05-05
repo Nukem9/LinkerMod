@@ -20,4 +20,12 @@ public:
 
 		return (array[pos / BITS_PER_WORD] & (0x80000000 >> (pos & 0x1F))) != 0;
 	}
+
+	// /qcommon/bitarray.h:114
+	void setBit(unsigned int pos)
+	{
+		ASSERT(pos < BIT_COUNT);
+
+		array[pos / BITS_PER_WORD] |= (0x80000000 >> (pos & 0x1F));
+	}
 };

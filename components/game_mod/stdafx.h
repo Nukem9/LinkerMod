@@ -3,16 +3,18 @@
 #pragma comment(lib, "detours.lib")
 #include "../shared/detours/Detours.h"
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>
 #include <intrin.h>
 #include <Psapi.h>
 #include <shellapi.h>
-#include <winsock.h>
+#include <winsock2.h>
 #include <time.h>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -39,9 +41,11 @@
 #include "bg_weapons_def.h"
 #include "bg_weapons_ammo.h"
 #include "bg_weapons_load_obj.h"
+#include "cg_servercmds_mp.h"
 #include "g_items.h"
 #include "sv_ccmds_mp.h"
 #include "sv_client_mp.h"
+#include "dobj_utils.h"
 #include "cl_main_mp.h"
 #include "cl_console.h"
 #include "db_registry.h"
@@ -52,9 +56,11 @@
 #include "cg_scoreboard.h"
 #include "cg_draw_debug.h"
 #include "sys_cmds.h"
+#include "r_surface.h"
 #include "r_init.h"
 #include "r_image.h"
 #include "r_debug.h"
+#include "com_workercmds.h"
 #include "r_rendercmds.h"
 #include "r_cinematic.h"
 #include "r_screenshot.h"
@@ -63,10 +69,15 @@
 #include "r_material.h"
 #include "r_material_load_obj.h"
 #include "r_draw_xmodel.h"
+#include "xmodel.h"
+#include "xmodel_utils.h"
 #include "rb_tess.h"
+#include "cscr_main.h"
+#include "cscr_parser.h"
+#include "cscr_compiler.h"
+#include "cscr_variable.h"
 #include "cscr_vm.h"
 #include "scr_cmds.h"
-#include "cscr_parser.h"
 #include "threads.h"
 #include "ragdoll.h"
 #include "ragdoll_update.h"
@@ -79,10 +90,16 @@
 #include "bg_weapons.h"
 #include "cl_keys.h"
 #include "sv_main_mp.h"
+#include "g_utils_mp.h"
+#include "radiant_remote.h"
 #include "pathnode.h"
 #include "pathnode_load_obj.h"
-#include "radiant_remote.h"
 #include "g_client_script_cmd_mp.h"
+#include "netfield.h"
+#include "r_streamalloc.h"
+#include "r_stream.h"
+#include "r_image_load_common.h"
+#include "r_image_load_obj.h"
 
 #include "win_localize.h"
 #include "win_exception.h"
@@ -96,5 +113,3 @@
 #include "reshade.h"
 
 #define GM_NET_VERSION 0x01
-
-#define _USE_LEVEL_DEPENDENCIES 1

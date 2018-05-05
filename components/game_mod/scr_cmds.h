@@ -1,5 +1,4 @@
 #pragma once
-#include "cscr_parser.h"
 
 struct BuiltinFunctionDef
 {
@@ -8,14 +7,15 @@ struct BuiltinFunctionDef
 	int type;
 };
 
-typedef unsigned int(__cdecl* Scr_GetNumParam_t)(scriptInstance_t inst);
-static Scr_GetNumParam_t Scr_GetNumParam = (Scr_GetNumParam_t)0x005C6DA0;
+VANILLA_FUNC(G_Find, gentity_s *(__cdecl*)(gentity_s *from, int fieldofs, unsigned __int16 match), 0x0054EC60);
 
-typedef int (__cdecl* Scr_GetInt_t)(unsigned int index, scriptInstance_t inst);
-static Scr_GetInt_t Scr_GetInt = (Scr_GetInt_t)0x004C1BB0;
+VANILLA_FUNC(Scr_GetNumParam, unsigned int(__cdecl*)(scriptInstance_t inst), 0x005C6DA0);
+VANILLA_FUNC(Scr_GetInt, int(__cdecl*)(unsigned int index, scriptInstance_t inst), 0x004C1BB0);
+VANILLA_FUNC(Scr_GetFloat, float(__cdecl*)(unsigned int index, scriptInstance_t inst), 0x00473380);
 
-typedef void (__cdecl* Scr_AddInt_t)(int value, scriptInstance_t inst);
-static Scr_AddInt_t Scr_AddInt = (Scr_AddInt_t)0x0045DBB0;
+VANILLA_FUNC(Scr_AddInt, void(__cdecl*)(int value, scriptInstance_t inst), 0x0045DBB0);
+
+VANILLA_FUNC(Scr_ParamError, void(__cdecl*)(unsigned int index, const char *error, scriptInstance_t inst), 0x0069EDB0)
 
 void CScr_OpenFile();
 void GScr_OpenFile();
@@ -30,3 +30,5 @@ void CScr_FPrintFields();
 void GScr_FPrintFields();
 
 void Scr_PatchFunctions();
+
+void GScr_ChangeLevel(void);

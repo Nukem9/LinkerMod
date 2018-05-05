@@ -1,6 +1,9 @@
 #pragma once
 #include "bg_weapons_def.h"
 
+#define MAX_MATERIAL_POOL_SIZE	0x1000
+#define MAX_XMODEL_POOL_SIZE	0x3E8
+
 enum FF_DIR : DWORD
 {
 	FFD_DEFAULT,
@@ -186,9 +189,6 @@ static DB_LoadXAssets_t DB_LoadXAssets = (DB_LoadXAssets_t)0x00631B10;
 typedef int (__cdecl* DB_ReleaseXAssets_t)();
 static DB_ReleaseXAssets_t DB_ReleaseXAssets = (DB_ReleaseXAssets_t)0x0062C260;
 
-typedef bool (__cdecl* DB_ModFileExists_t)();
-static DB_ModFileExists_t DB_ModFileExists = (DB_ModFileExists_t)0x005EEBF0;
-
 typedef void (__cdecl* DB_ResetZoneSize_t)(int trackLoadProgress);
 static DB_ResetZoneSize_t DB_ResetZoneSize = (DB_ResetZoneSize_t)0x00621530;
 
@@ -231,3 +231,12 @@ void* DB_ReallocXAssetPool(XAssetType type, unsigned int size);
 void __cdecl DB_ListAssetPool_f(void);
 bool DB_IsXAssetDefault(XAssetType type, const char *name);
 void DB_ExternalInitAssets();
+unsigned int DB_GetImageIndex(GfxImage *image);
+GfxImage *DB_GetImageAtIndex(unsigned int index);
+unsigned int DB_GetMaterialIndex(Material *material);
+Material *DB_GetMaterialAtIndex(unsigned int index);
+unsigned int DB_GetXModelIndex(XModel *model);
+XModel *DB_GetXModelAtIndex(unsigned int index);
+int DB_FinishedLoadingAssets();
+GfxImage *DB_AllocTempImage();
+bool DB_ModFileExists(int index = 0);

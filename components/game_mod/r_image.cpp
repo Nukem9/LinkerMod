@@ -14,12 +14,12 @@ unsigned int Image_GetUsage(int imageFlags, D3DFORMAT imageFormat)
 {
 	if (imageFlags & 0x20000)
 	{
-		if (imageFormat != D3DFMT_D24S8
-			&& imageFormat != D3DFMT_D24X8
-			&& imageFormat != D3DFMT_D16)
-			return D3DUSAGE_RENDERTARGET;
+		if (imageFormat == D3DFMT_D24S8 ||
+			imageFormat == D3DFMT_D24X8 ||
+			imageFormat == D3DFMT_D16)
+			return D3DUSAGE_DEPTHSTENCIL;
 
-		return D3DUSAGE_DEPTHSTENCIL;
+		return D3DUSAGE_RENDERTARGET;
 	}
 
 	if (imageFlags & 0x10000)
@@ -37,7 +37,7 @@ void Image_Create2DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned 
 	image->width	= width;
 	image->height	= height;
 	image->depth	= 1;
-	image->mapType	= 3;
+	image->mapType	= MAPTYPE_2D;
 
 	D3DPOOL memPool	= D3DPOOL_DEFAULT;
 	DWORD usage		= Image_GetUsage(imageFlags, imageFormat);
@@ -72,7 +72,7 @@ void Image_Create3DTexture_PC(GfxImage *image, unsigned __int16 width, unsigned 
 	image->width	= width;
 	image->height	= height;
 	image->depth	= depth;
-	image->mapType	= 4;
+	image->mapType	= MAPTYPE_3D;
 
 	// D3D9Ex does not allow D3DPOOL_MANAGED
 	DWORD usage		= (IsD3D9ExAvailable()) ? D3DUSAGE_DYNAMIC : 0;
@@ -91,12 +91,18 @@ void Image_CreateCubeTexture_PC(GfxImage *image, unsigned __int16 edgeLen, int m
 {
 	ASSERT(image != nullptr);
 	ASSERT(!image->texture.basemap);
-	ASSERT(Sys_IsRenderThread());
+
+	// Shit gets weird when you have useFastFile 0 enabled
+	// so we'll just suppress this for now
+	if (!LaunchArg_NoFF())
+	{
+		ASSERT(Sys_IsRenderThread());
+	}
 
 	image->width	= edgeLen;
 	image->height	= edgeLen;
 	image->depth	= 1;
-	image->mapType	= 5;
+	image->mapType	= MAPTYPE_CUBE;
 
 	// D3DDeviceCaps support for mipping
 	if (!r_supportCubedMipMaps)
@@ -197,7 +203,7 @@ struct ImageList
 	GfxImage *image[4096*2]; // make sure there are enough pointers for the modified image limit
 };
 
-_D3DFORMAT __cdecl R_ImagePixelFormat(GfxImage *image)
+D3DFORMAT __cdecl R_ImagePixelFormat(GfxImage *image)
 {
 	_D3DSURFACE_DESC surfaceDesc;
 	_D3DVOLUME_DESC volumeDesc;
@@ -374,4 +380,83 @@ void __cdecl R_ImageList_f()
 	}
 
 	Com_Printf(8, "Related commands: imagelist, gfx_world, cg_drawfps\n");
+}
+
+void Image_Release(GfxImage *image)
+{
+	ASSERT(image);
+
+	((void(__cdecl *)(GfxImage *))0x00709E10)(image);
+}
+
+// /gfx_d3d/r_image.cpp:214
+void Image_TrackTotalMemory(GfxImage *image, int platform, int memory)
+{
+	if (!Image_IsCodeImage(image->track))
+		((int *)0x4572D8C)[platform] += memory - image->cardMemory.platform[platform];
+}
+
+// /gfx_d3d/r_image.cpp:792
+void Image_PicmipForSemantic(char semantic, Picmip *picmip)
+{
+	int picmipUsed = 0;
+
+	switch (semantic)
+	{
+	default:
+		ASSERT_MSG_VA(0, "Unhandled case: %d", semantic);
+	case TS_2D:
+	case TS_FUNCTION:
+		picmip->platform[PICMIP_PLATFORM_USED] = 0;
+		picmip->platform[PICMIP_PLATFORM_MINSPEC] = 0;
+		return;
+
+	case TS_NORMAL_MAP:
+		picmipUsed = *(int *)0x4572D84;
+		break;
+
+	case TS_SPECULAR_MAP:
+		picmipUsed = *(int *)0x4572D88;
+		break;
+
+	case TS_COLOR_MAP:
+	case TS_WATER_MAP:
+	case TS_COLOR0_MAP:
+	case TS_COLOR1_MAP:
+	case TS_COLOR2_MAP:
+	case TS_COLOR3_MAP:
+	case TS_COLOR4_MAP:
+	case TS_COLOR5_MAP:
+	case TS_COLOR6_MAP:
+	case TS_COLOR7_MAP:
+	case TS_COLOR8_MAP:
+	case TS_COLOR9_MAP:
+	case TS_COLOR10_MAP:
+	case TS_COLOR11_MAP:
+	case TS_COLOR12_MAP:
+	case TS_COLOR13_MAP:
+	case TS_COLOR14_MAP:
+	case TS_COLOR15_MAP:
+	case TS_THROW_MAP:
+		picmipUsed = *(int *)0x4572D80;
+		break;
+	}
+
+	picmip->platform[PICMIP_PLATFORM_MINSPEC] = 2;
+
+	if (picmipUsed >= 0)
+	{
+		if (picmipUsed > 3)
+			picmipUsed = 3;
+	}
+	else
+	{
+		picmipUsed = 0;
+	}
+
+	picmip->platform[PICMIP_PLATFORM_USED] = picmipUsed;
+}
+
+void R_ImageList_Output()
+{
 }

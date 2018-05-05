@@ -28,6 +28,10 @@ struct FxCmd
 	int updateEffectEnd;
 };
 
+static jqWorkerCmd& r_stream_sortWorkerCmd = *(jqWorkerCmd *)0x00BA5770;
+static jqWorkerCmd& r_stream_updateWorkerCmd = *(jqWorkerCmd *)0x00BA5740;
+static jqWorkerCmd& r_stream_combineWorkerCmd = *(jqWorkerCmd *)0x00BA5790;
+
 typedef char __cdecl R_BeginFrame_t(void);
 static R_BeginFrame_t* R_BeginFrame = (R_BeginFrame_t*)0x006D7AD0;
 
@@ -59,3 +63,5 @@ static R_AddCmdDrawText_t R_AddCmdDrawText = (R_AddCmdDrawText_t)0x006D6460;
 
 typedef void(__cdecl* R_AddCmdProjectionSet2D_t)();
 static R_AddCmdProjectionSet2D_t R_AddCmdProjectionSet2D = (R_AddCmdProjectionSet2D_t)0x006D7D30;
+
+int R_IsRemoteScreenUpdateActive();
