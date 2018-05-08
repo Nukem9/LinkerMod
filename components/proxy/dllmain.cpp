@@ -7,9 +7,11 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved)
 	case DLL_PROCESS_ATTACH:
 		Winmm_Init(hInst, dwReason);
 		Proxy_Init(hInst, dwReason);
+		break;
 	case DLL_PROCESS_DETACH:
 		Proxy_Free(hInst, dwReason);
 		Winmm_Free(hInst, dwReason);
+		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 		break;
