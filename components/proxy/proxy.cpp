@@ -45,7 +45,13 @@ BOOL WINAPI Proxy_Init(HINSTANCE hInst, DWORD reason)
 			HMODULE h = LoadLibraryA(library);
 			if (!h)
 			{
-				MessageBoxA(0, "Failed to load library", 0, 0);
+				char msg[1024];
+				const auto err = GetLastError();
+				const auto offset = sprintf_s(msg, "Failed to load library '%s'\n", library);
+				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+							   NULL, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+							   msg + offset, (sizeof(msg) / sizeof(decltype(*msg))) - offset, NULL);
+				MessageBoxA(0, msg, 0, 0);
 				return FALSE;
 			}
 
@@ -71,6 +77,6 @@ BOOL WINAPI Proxy_Free(HINSTANCE hInst, DWORD reason)
 		// Should we add error handling here?
 		FreeLibrary(h);
 	}
-	
+
 	return TRUE;
 }
