@@ -378,6 +378,11 @@ BOOL GameMod_Init(HMODULE hModule)
 	//
 	Detours::X86::DetourFunction((PBYTE)0x006D98F0, (PBYTE)&hk_R_Cinematic_BinkOpen);
 
+	// Ray
+	// Add support for mod specific frontend levels (needs to be tested if coop lobbies work!)
+	//
+	Mod_Frontend_Init();
+
 	//
 	// Enable Custom / Updated Commands
 	//
