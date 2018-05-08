@@ -6,8 +6,5 @@
 #include <stdlib.h>
 #include <vector>
 
-BOOL WINAPI Winmm_Init(HINSTANCE hInst, DWORD reason);
-BOOL WINAPI Winmm_Free(HINSTANCE hInst, DWORD reason);
-
 BOOL WINAPI Proxy_Init(HINSTANCE hInst, DWORD reason);
 BOOL WINAPI Proxy_Free(HINSTANCE hInst, DWORD reason);

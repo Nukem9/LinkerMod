@@ -102,8 +102,6 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>$(ProjectDir)winmm.def</ModuleDefinitionFile>
-      <MapFileName>$(ProjectDir)winmm.def</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -118,8 +116,6 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>$(ProjectDir)winmm.def</ModuleDefinitionFile>
-      <MapFileName>$(ProjectDir)winmm.def</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -134,8 +130,6 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>$(ProjectDir)winmm.def</ModuleDefinitionFile>
-      <MapFileName>$(ProjectDir)winmm.def</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -154,8 +148,6 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>$(ProjectDir)winmm.def</ModuleDefinitionFile>
-      <MapFileName>$(ProjectDir)winmm.def</MapFileName>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -165,9 +157,6 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="proxy.cpp" />
     <ClCompile Include="winmm.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="winmm.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
