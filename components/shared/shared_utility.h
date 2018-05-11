@@ -23,6 +23,12 @@ static void PatchMemory(ULONG_PTR Address, PBYTE Data, SIZE_T Size)
 	FlushInstructionCache(GetCurrentProcess(), (LPVOID)Address, Size);
 }
 
+template<typename T>
+static inline void PatchPointer(ULONG_PTR Address, T* Value)
+{
+	PatchMemory(Address, (PBYTE)&Value, sizeof(Value));
+}
+
 //
 // Only supports the 0xE8 opcode
 //
@@ -121,7 +127,6 @@ static bool GetGameDirectory(char *Buffer, DWORD BufferSize)
 	return true;
 }
 
-#if _DEPRECATED
 namespace Detours
 {
 	namespace X86
@@ -137,7 +142,10 @@ namespace Detours
 		public:
 			LogHook(const char* message)
 			{
-				op = new BYTE[23];
+				// Using new[] instead of malloc causes the VS2017 compiler to crash
+				op = (BYTE*)malloc(23);
+				ASSERT(op != NULL);
+
 				PatchMemory((ULONG_PTR)op + 0,	(PBYTE)"\x60", 1);						//pusha
 				PatchMemory((ULONG_PTR)op + 1,	(PBYTE)"\xFF\x35\x00\x00\x00\x00", 6);	//push str
 				PatchMemory((ULONG_PTR)op + 7,	(PBYTE)"\xFF\x15\x00\x00\x00\x00", 6);	//call printf
@@ -159,12 +167,14 @@ namespace Detours
 
 			~LogHook()
 			{
-				delete[] op;
+				if (op)
+					free(op);
+				op = NULL;
 			}
 
 			static void __cdecl PrintMessage(const char* str)
 			{
-				printf("%s\n", str);
+				OutputDebugStringA(str);
 			}
 
 			friend void AddLogHook(uint8_t * target, const char* msg);
@@ -198,7 +208,6 @@ namespace Detours
 		}
 	}
 }
-#endif
 
 template <typename _New_t, typename _Old_t>
 static inline _New_t* ForceCastPointer(_Old_t* addr)

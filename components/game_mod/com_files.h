@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vanilla.h"
+
 struct XFile
 {
 	unsigned int size;
@@ -78,6 +80,11 @@ VANILLA_FUNC(FS_SV_FOpenFileWrite, int(__cdecl*)(const char *filename, const cha
 
 typedef _iobuf *(__cdecl* FS_FileForHandle_t)(int f);
 static FS_FileForHandle_t FS_FileForHandle = (FS_FileForHandle_t)0x00516DA0;
+
+// zname : input path
+// zpath : output path
+// depth : output depth
+int FS_ReturnPath(const char *zname, char *zpath, int *depth = NULL);
 
 typedef char **(__cdecl* Sys_ListFiles_t)(const char *directory, const char *extension, const char *filter, int *numfiles, int wantsubs);
 static Sys_ListFiles_t Sys_ListFiles = (Sys_ListFiles_t)0x00690E40;
