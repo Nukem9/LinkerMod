@@ -183,9 +183,20 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 		return 0;
 	}
 
+	//
+	// Adjust the file size so that it doesn't include any trailing null chars
+	//
+	size_t fileSize = rawfileHeader->uncompressedSize;
+	while (fileSize)
+	{
+		if (dBuf[fileSize - 1])
+			break;
+		fileSize--;
+	}
+
 	if (FILE* h = fopen(qpath, "wb"))
 	{
-		fwrite(dBuf, 1, rawfileHeader->uncompressedSize, h);
+		fwrite(dBuf, 1, fileSize, h);
 		fclose(h);
 
 		Con_Print_v("SUCCESS\n");
