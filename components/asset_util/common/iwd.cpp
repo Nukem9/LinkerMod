@@ -49,8 +49,15 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 
 	if (fs_overwrite.ValueBool())
 	{
-		Con_Print_v("Extracting file: \"%s\"\n", filepath);
-		mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0);
+		Con_Print_v("Extracting file: \"%s\"... ", filepath);
+
+		if (!mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0))
+		{
+			Con_Print_v("ERROR\n");
+			return 1;
+		}
+
+		Con_Print_v("SUCCESS\n");
 		return 0;
 	}
 
