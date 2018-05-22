@@ -68,8 +68,13 @@ int app_main(int argc, char** argv)
 	}
 	else
 #endif
-	
-	AppInfo_Init();
+
+	// Attempt to initialize the app info...
+	// quit if we were unable to do so
+	if(!AppInfo_Init())
+		return 1;
+
+	// Execute the requested command
 	return cmd_info.Cmd()->Exec(cmd_info.Argc(), cmd_info.Argv());
 }
 

@@ -10,13 +10,20 @@ char g_GameDirectory[MAX_PATH];
 
 bool AppInfo_Init()
 {
-	bool foundPath = GetGameDirectory(g_GameDirectory, ARRAYSIZE(g_GameDirectory));
-
-	if(foundPath)
-		Con_Print_v("GAME_DIR: \"%s\"\n", g_GameDirectory);
+	const bool foundPath = GetGameDirectory(g_GameDirectory, ARRAYSIZE(g_GameDirectory));
+	if(!foundPath)
+	{
+		Con_Error("ERROR: Unable to locate game directory!\n");
+#if PRODUCTION && 0
+		Con_Print("Press <Return> to Quit");
+		fflush(stdout);
+		getchar();
+#endif
+	}
 	else
-		Con_Warning_v("GAME_DIR: \"%s\"\n", "NOT_FOUND");
-	Con_Print_v("\n");
+	{
+		Con_Print_v("GAME_DIR: \"%s\"\n\n", g_GameDirectory);
+	}
 
 	return foundPath;
 }

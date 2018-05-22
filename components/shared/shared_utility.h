@@ -103,30 +103,41 @@ static bool GetGameDirectory(char *Buffer, DWORD BufferSize)
 	// Zero initial value
 	memset(Buffer, 0, sizeof(char) * BufferSize);
 
-	//
-	// 64: HKEY_LOCAL_MACHINE\SOFTWARE\[ Wow6432Node ]\activision\call of duty black ops
-	// 32: HKEY_LOCAL_MACHINE\SOFTWARE\activision\call of duty black ops
-	//
-	// Subkey: installpath
-	//
-	HKEY regKey;
-	if (RegOpenKeyA(HKEY_LOCAL_MACHINE, "SOFTWARE\\activision\\call of duty black ops", &regKey) != ERROR_SUCCESS)
-		return false;
+	// Using a lambda here makes it easier to organize the execution flow
+	auto GetGameDirectoryFromRegistryKey = [&Buffer, &BufferSize] {
+		//
+		// 64: HKEY_LOCAL_MACHINE\SOFTWARE\[ Wow6432Node ]\activision\call of duty black ops
+		// 32: HKEY_LOCAL_MACHINE\SOFTWARE\activision\call of duty black ops
+		//
+		// Subkey: installpath
+		//
+		HKEY regKey;
+		if (RegOpenKeyA(HKEY_LOCAL_MACHINE, "SOFTWARE\\activision\\call of duty black ops", &regKey) != ERROR_SUCCESS)
+			return false;
 
-	if (RegQueryValueExA(regKey, "installpath", nullptr, nullptr, (LPBYTE)Buffer, &BufferSize) != ERROR_SUCCESS)
-		return false;
+		if (RegQueryValueExA(regKey, "installpath", nullptr, nullptr, (LPBYTE)Buffer, &BufferSize) != ERROR_SUCCESS)
+			return false;
 
-	// Check that the key is filled and the directory exists
-	if (strlen(Buffer) <= 0)
-		return false;
+		// Check that the key is filled and the directory exists
+		if (strlen(Buffer) <= 0)
+			return false;
 
-	DWORD dirType = GetFileAttributesA(Buffer);
+		DWORD dirType = GetFileAttributesA(Buffer);
 
-	if ((dirType == INVALID_FILE_ATTRIBUTES) ||
-		!(dirType & FILE_ATTRIBUTE_DIRECTORY))
-		return false;
+		if ((dirType == INVALID_FILE_ATTRIBUTES) ||
+			!(dirType & FILE_ATTRIBUTE_DIRECTORY))
+			return false;
 
-	return true;
+		return true;
+	};
+
+	// Attempt to locate the game directory through known registry keys
+	if (GetGameDirectoryFromRegistryKey())
+		return true;
+
+	// TODO
+	// Fallback to searching backwards along the current file path
+	return false;
 }
 
 namespace Detours
