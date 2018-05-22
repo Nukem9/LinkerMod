@@ -47,46 +47,36 @@ int __cdecl IWD_IWDExtractFile(mz_zip_archive* iwd, const char* filepath)
 	sprintf_s(outPath, "%s/%s", AppInfo_OutDir(), filepath);
 	FS_SanitizePath(outPath);
 
-	if (fs_overwrite.ValueBool())
-	{
-		Con_Print_v("Extracting file: \"%s\"... ", filepath);
-
-		if (!mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0))
-		{
-			Con_Print_v("ERROR\n");
-			return 1;
-		}
-
-		Con_Print_v("SUCCESS\n");
-		return 0;
-	}
-
-	if (FS_FileExists(outPath))
+	// Skip any irrelevant files
+	if (!fs_overwrite.ValueBool() && FS_FileExists(outPath))
 	{
 		Con_Print_v("Skipping file: \"%s\"\n", filepath);
 		return 1;
 	}
-	else
+	
+	Con_Print_v("Extracting file: \"%s\"... ", filepath);
+
+#if DRY_RUN
+	Con_Print_v("(DRY RUN)\n");
+#else
+	// Ensure that the destination path exists
+	// Otherwise mz_zip_reader_extract_file_to_file will fail
+	int err = FS_CreatePath(filepath);
+	if (err != 0)
 	{
-		Con_Print_v("Extracting file: \"%s\"...	", filepath);
+		Con_Error_v("DIR ERROR (%d)\n", err);
+		return 2;
+	}
 
-		int err = FS_CreatePath(filepath);
-		if (err != 0)
-		{
-			Con_Error_v("DIR ERROR (%d)\n", err);
-			return 1;
-		}
-		
-		if (!mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0))
-		{
-			Con_Error_v("ERROR\n");
-			return 1;
-		}
-
-		Con_Print_v("SUCCESS\n");
-		return 0;
+	// Attempt to actually extract the file
+	if (!mz_zip_reader_extract_file_to_file(iwd, filepath, outPath, 0))
+	{
+		Con_Print_v("ERROR\n");
+		return 3;
 	}
 	
+	Con_Print_v("SUCCESS\n");
+#endif
 	return 0;
 }
 

@@ -144,13 +144,10 @@ int FF_FFExtractCompressedRawfile(XAssetRawfileHeader* rawfileHeader, const char
 	// If not in overwrite mode AND the file exists
 	// skip it before performing decompression
 	//
-	if (!fs_overwrite.ValueBool())
+	if (!fs_overwrite.ValueBool() && FS_FileExists(qpath))
 	{
-		if (FS_FileExists(qpath))
-		{
-			Con_Print_v("SKIPPED\n");
-			return 0;
-		}
+		Con_Print_v("SKIPPED\n");
+		return 0;
 	}
 
 	if (FS_CreatePath(rawfilePath) != 0)
