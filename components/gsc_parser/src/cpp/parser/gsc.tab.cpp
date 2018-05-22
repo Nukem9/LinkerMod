@@ -2,7 +2,7 @@
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -77,11 +77,11 @@
 
 #line 79 "cpp/parser/gsc.tab.cpp" /* yacc.c:339  */
 
-# ifndef YY_NULL
+# ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
-#   define YY_NULL nullptr
+#   define YY_NULLPTR nullptr
 #  else
-#   define YY_NULL 0
+#   define YY_NULLPTR 0
 #  endif
 # endif
 
@@ -217,7 +217,7 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE YYSTYPE;
+
 union YYSTYPE
 {
 #line 58 "gsc.ypp" /* yacc.c:355  */
@@ -249,6 +249,8 @@ union YYSTYPE
 
 #line 251 "cpp/parser/gsc.tab.cpp" /* yacc.c:355  */
 };
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -275,7 +277,7 @@ int yyparse (Symbol** yyAST_out, void* scanner);
 
 /* Copy the second part of user declarations.  */
 
-#line 279 "cpp/parser/gsc.tab.cpp" /* yacc.c:358  */
+#line 281 "cpp/parser/gsc.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -332,11 +334,30 @@ typedef short int yytype_int16;
 # endif
 #endif
 
-#ifndef __attribute__
-/* This feature is available in gcc versions 2.5 and later.  */
-# if (! defined __GNUC__ || __GNUC__ < 2 \
-      || (__GNUC__ == 2 && __GNUC_MINOR__ < 5))
-#  define __attribute__(Spec) /* empty */
+#ifndef YY_ATTRIBUTE
+# if (defined __GNUC__                                               \
+      && (2 < __GNUC__ || (__GNUC__ == 2 && 96 <= __GNUC_MINOR__)))  \
+     || defined __SUNPRO_C && 0x5110 <= __SUNPRO_C
+#  define YY_ATTRIBUTE(Spec) __attribute__(Spec)
+# else
+#  define YY_ATTRIBUTE(Spec) /* empty */
+# endif
+#endif
+
+#ifndef YY_ATTRIBUTE_PURE
+# define YY_ATTRIBUTE_PURE   YY_ATTRIBUTE ((__pure__))
+#endif
+
+#ifndef YY_ATTRIBUTE_UNUSED
+# define YY_ATTRIBUTE_UNUSED YY_ATTRIBUTE ((__unused__))
+#endif
+
+#if !defined _Noreturn \
+     && (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112)
+# if defined _MSC_VER && 1200 <= _MSC_VER
+#  define _Noreturn __declspec (noreturn)
+# else
+#  define _Noreturn YY_ATTRIBUTE ((__noreturn__))
 # endif
 #endif
 
@@ -606,7 +627,7 @@ static const char *const yytname[] =
   "ModifiableExpression", "e", "Expression", "ExpressionStatement",
   "ReturnStatement", "WaitStatement", "EmptyStatement", "IfStatement",
   "SwitchStatement", "CaseStatement", "LoopStatement", "Statement",
-  "StatementList", YY_NULL
+  "StatementList", YY_NULLPTR
 };
 #endif
 
@@ -976,7 +997,7 @@ do {                                            \
 
 /* Print *YYLOCP on YYO.  Private, do not rely on its existence. */
 
-__attribute__((__unused__))
+YY_ATTRIBUTE_UNUSED
 static unsigned
 yy_location_print_ (FILE *yyo, YYLTYPE const * const yylocp)
 {
@@ -1241,11 +1262,11 @@ static int
 yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
                 yytype_int16 *yyssp, int yytoken)
 {
-  YYSIZE_T yysize0 = yytnamerr (YY_NULL, yytname[yytoken]);
+  YYSIZE_T yysize0 = yytnamerr (YY_NULLPTR, yytname[yytoken]);
   YYSIZE_T yysize = yysize0;
   enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
   /* Internationalized format string. */
-  const char *yyformat = YY_NULL;
+  const char *yyformat = YY_NULLPTR;
   /* Arguments of yyformat. */
   char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
   /* Number of reported tokens (one for the "unexpected", one per
@@ -1302,7 +1323,7 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
                   }
                 yyarg[yycount++] = yytname[yyx];
                 {
-                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULL, yytname[yyx]);
+                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULLPTR, yytname[yyx]);
                   if (! (yysize <= yysize1
                          && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
                     return 2;
@@ -1386,241 +1407,241 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocatio
           case 3: /* T_STRING  */
 #line 204 "gsc.ypp" /* yacc.c:1257  */
       { free(((*yyvaluep).literal_string)); }
-#line 1390 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1411 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 4: /* T_FLOAT  */
 #line 204 "gsc.ypp" /* yacc.c:1257  */
       { free(((*yyvaluep).literal_string)); }
-#line 1396 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1417 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 5: /* T_INT  */
 #line 204 "gsc.ypp" /* yacc.c:1257  */
       { free(((*yyvaluep).literal_string)); }
-#line 1402 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1423 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 34: /* T_FILEPATH  */
 #line 204 "gsc.ypp" /* yacc.c:1257  */
       { free(((*yyvaluep).literal_string)); }
-#line 1408 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1429 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 35: /* T_IDENTIFIER  */
 #line 204 "gsc.ypp" /* yacc.c:1257  */
       { free(((*yyvaluep).t_identifier)); }
-#line 1414 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1435 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 75: /* IncludeDirective  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1420 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1441 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 76: /* AnimtreeDirective  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1426 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1447 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 77: /* FunctionDeclaration  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1432 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1453 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 78: /* FormalParameterList  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1438 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1459 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 79: /* SourceElement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1444 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1465 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 80: /* SourceElements  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1450 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1471 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 82: /* StringLiteral  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).literal); }
-#line 1456 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1477 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 83: /* NumericLiteral  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).literal); }
-#line 1462 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1483 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 84: /* Block  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1468 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1489 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 85: /* FunctionParameterList  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1474 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1495 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 86: /* FunctionCall  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).call); }
-#line 1480 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1501 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 87: /* FunctionExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1486 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1507 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 88: /* PointerExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).pointer); }
-#line 1492 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1513 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 89: /* ReferenceExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).reference); }
-#line 1498 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1519 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 90: /* AnimReferenceExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1504 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1525 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 91: /* MemberExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1510 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1531 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 92: /* ElementList  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1516 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1537 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 93: /* ListExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1522 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1543 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 94: /* ObjectExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1528 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1549 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 95: /* LiteralExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).literal); }
-#line 1534 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1555 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 96: /* OptionalExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).expression); }
-#line 1540 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1561 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 97: /* BasicExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).expression); }
-#line 1546 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1567 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 98: /* ModifiableExpression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1552 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1573 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 99: /* e  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).expression); }
-#line 1558 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1579 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 100: /* Expression  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).expression); }
-#line 1564 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1585 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 101: /* ExpressionStatement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1570 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1591 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 102: /* ReturnStatement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1576 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1597 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 103: /* WaitStatement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1582 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1603 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 104: /* EmptyStatement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1588 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1609 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 105: /* IfStatement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1594 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1615 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 106: /* SwitchStatement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1600 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1621 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 107: /* CaseStatement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1606 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1627 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 108: /* LoopStatement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1612 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1633 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 109: /* Statement  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1618 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1639 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
     case 110: /* StatementList  */
 #line 203 "gsc.ypp" /* yacc.c:1257  */
       { delete ((*yyvaluep).symbol); }
-#line 1624 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
+#line 1645 "cpp/parser/gsc.tab.cpp" /* yacc.c:1257  */
         break;
 
 
@@ -1736,7 +1757,7 @@ YYLTYPE yylloc = yyloc_default;
 	#endif
 }
 
-#line 1740 "cpp/parser/gsc.tab.cpp" /* yacc.c:1429  */
+#line 1761 "cpp/parser/gsc.tab.cpp" /* yacc.c:1429  */
   yylsp[0] = yylloc;
   goto yysetstate;
 
@@ -1927,7 +1948,7 @@ yyreduce:
     {
 			(yyval.symbol) = new Include(new Literal((yyvsp[-1].literal_string), (yylsp[-1]), S_TYPE_LITERAL_FILEPATH), (yyloc)); 
 		}
-#line 1931 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 1952 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
@@ -1935,7 +1956,7 @@ yyreduce:
     {
 			(yyval.symbol) = new Animtree(new Literal((yyvsp[-2].literal_string), (yylsp[-2]), S_TYPE_LITERAL_STRING), (yyloc)); 
 		}
-#line 1939 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 1960 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
@@ -1945,7 +1966,7 @@ yyreduce:
 		(yyval.symbol)->AddChild(new Group((yyvsp[-2].symbol), (yylsp[-2])));
 		(yyval.symbol)->AddChild((yyvsp[0].symbol));
 	}
-#line 1949 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 1970 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
@@ -1954,19 +1975,19 @@ yyreduce:
 			(yyvsp[-2].symbol)->AddToEnd( new Identifier((yyvsp[0].t_identifier), (yylsp[0])) );
 			(yyval.symbol) = (yyvsp[-2].symbol);
 		}
-#line 1958 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 1979 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
 #line 237 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Identifier((yyvsp[0].t_identifier), (yylsp[0])); }
-#line 1964 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 1985 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
 #line 239 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = NULL; }
-#line 1970 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 1991 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
@@ -1975,7 +1996,7 @@ yyreduce:
 			(yyvsp[-1].symbol)->AddToEnd((yyvsp[0].symbol));
 			(yyval.symbol) = (yyvsp[-1].symbol);
 		}
-#line 1979 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2000 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
@@ -1983,43 +2004,43 @@ yyreduce:
     {
 		*yyAST_out = new Group((yyvsp[-1].symbol), (yylsp[-1]));
 	}
-#line 1987 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2008 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
 #line 262 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.literal) = new Literal((yyvsp[0].literal_string), (yylsp[0]), S_TYPE_LITERAL_STRING); }
-#line 1993 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2014 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 264 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.literal) = new Literal((yyvsp[0].literal_string), (yyloc), S_TYPE_LITERAL_STRING); }
-#line 1999 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2020 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
 #line 266 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.literal) = new Literal((yyvsp[0].literal_string), (yyloc), S_TYPE_LITERAL_STRING); }
-#line 2005 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2026 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
 #line 271 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.literal) = new Literal((yyvsp[0].literal_string), (yylsp[0]), S_TYPE_LITERAL_INT); }
-#line 2011 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2032 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
 #line 273 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.literal) = new Literal((yyvsp[0].literal_string), (yylsp[0]), S_TYPE_LITERAL_FLOAT); }
-#line 2017 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2038 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
 #line 278 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Group((yyvsp[-1].symbol), (yylsp[-1])); }
-#line 2023 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2044 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
@@ -2028,19 +2049,19 @@ yyreduce:
 			(yyvsp[-2].symbol)->AddToEnd((yyvsp[0].expression));
 			(yyval.symbol) = (yyvsp[-2].symbol);
 		}
-#line 2032 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2053 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
 #line 288 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = (yyvsp[0].expression); }
-#line 2038 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2059 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
 #line 290 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = NULL; }
-#line 2044 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2065 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
@@ -2050,7 +2071,7 @@ yyreduce:
 			(yyval.call)->AddChild(new Identifier((yyvsp[-3].t_identifier),(yylsp[-3])));
 			(yyval.call)->AddChild(new Group((yyvsp[-1].symbol), (yylsp[-1])));
 		}
-#line 2054 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2075 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
@@ -2060,7 +2081,7 @@ yyreduce:
 			(yyval.call)->AddChild(new Identifier((yyvsp[-3].t_identifier),(yylsp[-3])));
 			(yyval.call)->AddChild(new Group((yyvsp[-1].symbol), (yylsp[-1])));
 		}
-#line 2064 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2085 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
@@ -2070,7 +2091,7 @@ yyreduce:
 			(yyval.call)->AddChild((yyvsp[-3].pointer));
 			(yyval.call)->AddChild(new Group((yyvsp[-1].symbol), (yylsp[-1])));
 		}
-#line 2074 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2095 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
@@ -2080,7 +2101,7 @@ yyreduce:
 			(yyval.call)->AddChild((yyvsp[-3].pointer));
 			(yyval.call)->AddChild(new Group((yyvsp[-1].symbol), (yylsp[-1])));
 		}
-#line 2084 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2105 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
@@ -2090,7 +2111,7 @@ yyreduce:
 			(yyval.call)->AddChild((yyvsp[-3].reference));
 			(yyval.call)->AddChild(new Group((yyvsp[-1].symbol), (yylsp[-1])));
 		}
-#line 2094 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2115 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
@@ -2100,7 +2121,7 @@ yyreduce:
 			(yyval.call)->AddChild((yyvsp[-3].reference));
 			(yyval.call)->AddChild(new Group((yyvsp[-1].symbol), (yylsp[-1])));
 		}
-#line 2104 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2125 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
@@ -2109,25 +2130,25 @@ yyreduce:
 			(yyvsp[0].call)->SetCaller((yyvsp[-1].expression));
 			(yyval.symbol) = (yyvsp[0].call);
 		}
-#line 2113 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2134 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
 #line 339 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = (yyvsp[0].call); }
-#line 2119 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2140 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
 #line 344 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.pointer) = new Pointer((yyvsp[-2].expression), (yyloc)); }
-#line 2125 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2146 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
 #line 346 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.pointer) = new Pointer((yyvsp[-2].expression), (yyloc)); }
-#line 2131 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2152 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
@@ -2137,7 +2158,7 @@ yyreduce:
 			Identifier* identifier = new Identifier((yyvsp[0].t_identifier), (yylsp[0]));
 			(yyval.reference) = new Reference(file, identifier, (yyloc));
 		}
-#line 2141 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2162 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
@@ -2146,31 +2167,31 @@ yyreduce:
 			Identifier* identifier = new Identifier((yyvsp[0].t_identifier), (yylsp[0]));
 			(yyval.reference) = new Reference(NULL, identifier, (yyloc));
 		}
-#line 2150 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2171 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
 #line 365 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Identifier((yyvsp[0].t_identifier), (yylsp[0])); }
-#line 2156 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2177 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
 #line 370 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Member((yyvsp[-3].expression), (yyvsp[-1].expression), (yyloc), S_TYPE_MEMBER_ARRAY_ELEMENT); }
-#line 2162 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2183 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
 #line 372 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Member((yyvsp[-2].expression), (yyvsp[0].expression), (yyloc), S_TYPE_MEMBER_OBJECT_PROPERTY); }
-#line 2168 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2189 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 38:
 #line 374 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Member(NULL, NULL, (yyloc), S_TYPE_MEMBER_ARRAY_EMPTY); }
-#line 2174 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2195 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 39:
@@ -2179,7 +2200,7 @@ yyreduce:
 			(yyvsp[-2].expression)->AddToEnd((yyvsp[0].expression));
 			(yyval.symbol) = (yyvsp[-2].expression);
 		}
-#line 2183 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2204 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 40:
@@ -2188,339 +2209,339 @@ yyreduce:
 			(yyvsp[-2].symbol)->AddToEnd((yyvsp[0].expression));
 			(yyval.symbol) = (yyvsp[-2].symbol);
 		}
-#line 2192 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2213 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
 #line 392 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = (yyvsp[-1].symbol); }
-#line 2198 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2219 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
 #line 410 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = NULL; }
-#line 2204 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2225 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
 #line 415 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = (yyvsp[0].expression); }
-#line 2210 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2231 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
 #line 417 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = (yyvsp[0].expression); }
-#line 2216 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2237 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
 #line 419 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = (yyvsp[0].expression); }
-#line 2222 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2243 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 51:
 #line 421 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = (yyvsp[0].expression); }
-#line 2228 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2249 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 52:
 #line 423 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyloc)); }
-#line 2234 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2255 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 53:
 #line 428 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Identifier((yyvsp[0].t_identifier), (yylsp[0])); }
-#line 2240 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2261 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 55:
 #line 435 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = (Expression*)new Group((yyvsp[0].expression), (yylsp[0])); }
-#line 2246 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2267 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 56:
 #line 439 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression(OP_TYPE_INC, (yyvsp[0].expression), (yyloc)); }
-#line 2252 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2273 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 57:
 #line 441 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression(OP_TYPE_DEC, (yyvsp[0].expression), (yyloc)); }
-#line 2258 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2279 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 58:
 #line 443 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression(OP_TYPE_ADD, (yyvsp[0].expression), (yyloc)); }
-#line 2264 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2285 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 59:
 #line 445 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression(OP_TYPE_SUB, (yyvsp[0].expression), (yyloc)); }
-#line 2270 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2291 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 60:
 #line 447 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression(OP_TYPE_BW_NOT, (yyvsp[0].expression), (yyloc)); }
-#line 2276 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2297 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 61:
 #line 449 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression(OP_TYPE_NOT, (yyvsp[0].expression), (yyloc)); }
-#line 2282 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2303 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 62:
 #line 453 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-1].expression), OP_TYPE_INC, (yyloc)); }
-#line 2288 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2309 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 63:
 #line 455 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-1].expression), OP_TYPE_INC, (yyloc)); }
-#line 2294 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2315 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 64:
 #line 459 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_MULT, (yyvsp[0].expression), (yyloc)); }
-#line 2300 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2321 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 65:
 #line 461 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_DIV, (yyvsp[0].expression), (yyloc)); }
-#line 2306 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2327 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 66:
 #line 463 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_MOD, (yyvsp[0].expression), (yyloc)); }
-#line 2312 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2333 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 67:
 #line 465 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_ADD, (yyvsp[0].expression), (yyloc)); }
-#line 2318 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2339 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 68:
 #line 467 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_SUB, (yyvsp[0].expression), (yyloc)); }
-#line 2324 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2345 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 69:
 #line 469 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_LSHIFT, (yyvsp[0].expression), (yyloc)); }
-#line 2330 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2351 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 70:
 #line 471 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_RSHIFT, (yyvsp[0].expression), (yyloc)); }
-#line 2336 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2357 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 71:
 #line 473 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_CMP_LT, (yyvsp[0].expression), (yyloc)); }
-#line 2342 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2363 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 72:
 #line 475 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_CMP_LE, (yyvsp[0].expression), (yyloc)); }
-#line 2348 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2369 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 73:
 #line 477 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_CMP_GT, (yyvsp[0].expression), (yyloc)); }
-#line 2354 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2375 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 74:
 #line 479 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_CMP_GE, (yyvsp[0].expression), (yyloc)); }
-#line 2360 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2381 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 75:
 #line 481 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_CMP_EQ, (yyvsp[0].expression), (yyloc)); }
-#line 2366 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2387 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 76:
 #line 483 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_CMP_NEQ, (yyvsp[0].expression), (yyloc)); }
-#line 2372 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2393 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 77:
 #line 485 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_BW_AND, (yyvsp[0].expression), (yyloc)); }
-#line 2378 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2399 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 78:
 #line 487 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_BW_OR, (yyvsp[0].expression), (yyloc)); }
-#line 2384 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2405 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 79:
 #line 489 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_CMP_AND, (yyvsp[0].expression), (yyloc)); }
-#line 2390 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2411 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 80:
 #line 491 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_CMP_OR, (yyvsp[0].expression), (yyloc)); }
-#line 2396 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2417 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 81:
 #line 493 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_ASSIGN, (yyvsp[0].expression), (yyloc)); }
-#line 2402 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2423 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 82:
 #line 495 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_ASSIGN_ADD, (yyvsp[0].expression), (yyloc)); }
-#line 2408 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2429 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 83:
 #line 497 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_ASSIGN_SUB, (yyvsp[0].expression), (yyloc)); }
-#line 2414 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2435 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 84:
 #line 499 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_ASSIGN_MULT, (yyvsp[0].expression), (yyloc)); }
-#line 2420 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2441 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 85:
 #line 501 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_ASSIGN_DIV, (yyvsp[0].expression), (yyloc)); }
-#line 2426 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2447 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 86:
 #line 503 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_ASSIGN_BW_AND, (yyvsp[0].expression), (yyloc)); }
-#line 2432 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2453 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 87:
 #line 505 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_ASSIGN_BW_XOR, (yyvsp[0].expression), (yyloc)); }
-#line 2438 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2459 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 88:
 #line 507 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = new Expression((yyvsp[-2].expression), OP_TYPE_ASSIGN_BW_OR, (yyvsp[0].expression), (yyloc)); }
-#line 2444 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2465 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 89:
 #line 509 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = (yyvsp[0].expression); }
-#line 2450 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2471 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 90:
 #line 511 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.expression) = (yyvsp[-1].expression); }
-#line 2456 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2477 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 92:
 #line 520 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = (yyvsp[-1].expression); /*new Symbol(@$);*/ }
-#line 2462 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2483 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 93:
 #line 525 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Return(NULL, (yyloc)); }
-#line 2468 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2489 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 94:
 #line 527 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Return((yyvsp[-1].expression), (yyloc)); }
-#line 2474 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2495 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 95:
 #line 532 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Wait((yyvsp[-1].expression), (yyloc)); }
-#line 2480 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2501 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 96:
 #line 539 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Symbol((yyloc)); }
-#line 2486 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2507 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 97:
 #line 544 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Conditional((yyvsp[-2].expression), (yyvsp[0].symbol), (yyloc), S_TYPE_CONDITIONAL_IF); }
-#line 2492 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2513 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 98:
 #line 546 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Conditional(NULL, (yyvsp[0].symbol), (yyloc), S_TYPE_CONDITIONAL_ELSE); }
-#line 2498 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2519 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 99:
 #line 551 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Conditional((yyvsp[-2].expression), (yyvsp[0].symbol), (yyloc), S_TYPE_CONDITIONAL_SWITCH); }
-#line 2504 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2525 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 100:
 #line 556 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Conditional((yyvsp[-1].expression), NULL, (yyloc), S_TYPE_CONDITIONAL_CASE);
 		}
-#line 2511 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2532 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 101:
 #line 559 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Conditional(NULL, NULL, (yyloc), S_TYPE_CONDITIONAL_CASE);
 		}
-#line 2518 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2539 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 102:
 #line 565 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Conditional((yyvsp[-2].expression), (yyvsp[0].symbol), (yyloc), S_TYPE_CONDITIONAL_WHILE); }
-#line 2524 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2545 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 103:
@@ -2528,19 +2549,19 @@ yyreduce:
     {
 			(yyval.symbol) = new Conditional((yyvsp[-6].expression), (yyvsp[-4].expression), (yyvsp[-2].expression), (yyvsp[0].symbol), (yyloc), S_TYPE_CONDITIONAL_FOR);
 		}
-#line 2532 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2553 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 112:
 #line 582 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Symbol((yyloc)); }
-#line 2538 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2559 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 113:
 #line 584 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = new Symbol((yyloc)); }
-#line 2544 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2565 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 115:
@@ -2556,17 +2577,17 @@ yyreduce:
 				(yyval.symbol) = (yyvsp[0].symbol);
 			}
 		}
-#line 2560 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2581 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 117:
 #line 604 "gsc.ypp" /* yacc.c:1646  */
     { (yyval.symbol) = NULL; }
-#line 2566 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2587 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2570 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
+#line 2591 "cpp/parser/gsc.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
