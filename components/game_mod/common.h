@@ -45,11 +45,12 @@ void Com_ToolPrintf(int channel, const char* fmt, ...);
 void Com_ToolError(int channel, const char* fmt, ...);
 void Com_DPrintf(int channel, const char *fmt, ...);
 
-typedef char *va_t(const char *format, ...);
-static va_t* va = (va_t*)0x0057CDD0;
+//
+// NOTE: Uses TLS in Black Ops, but still only supports 4 swap buffers for nested calls
+//
+VANILLA_FUNC(va, char*(*)(const char* format, ...), 0x0057CDD0);
 
 int nullsub(int);
-
 
 typedef const char* (__cdecl* Com_LoadInfoString_t)(const char *fileName, const char *fileDesc, const char *ident, char *loadBuffer);
 static Com_LoadInfoString_t Com_LoadInfoString = (Com_LoadInfoString_t)0x005A5F10;

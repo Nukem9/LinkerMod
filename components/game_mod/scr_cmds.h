@@ -15,7 +15,7 @@ VANILLA_FUNC(Scr_GetFloat, float(__cdecl*)(unsigned int index, scriptInstance_t 
 
 VANILLA_FUNC(Scr_AddInt, void(__cdecl*)(int value, scriptInstance_t inst), 0x0045DBB0);
 
-VANILLA_FUNC(Scr_ParamError, void(__cdecl*)(unsigned int index, const char *error, scriptInstance_t inst), 0x0069EDB0)
+VANILLA_FUNC(Scr_ParamError, void(__cdecl*)(unsigned int index, const char *error, scriptInstance_t inst), 0x0069EDB0);
 
 void CScr_OpenFile();
 void GScr_OpenFile();
