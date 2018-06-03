@@ -158,6 +158,7 @@
     <ClCompile Include="dobj_utils.cpp" />
     <ClCompile Include="r_image_load_common.cpp" />
     <ClCompile Include="r_image_load_obj.cpp" />
+    <ClCompile Include="string.cpp" />
     <ClCompile Include="xmodel_utils.cpp" />
     <ClInclude Include="cg_servercmds_mp.h" />
     <ClInclude Include="com_workercmds.h" />
@@ -215,6 +216,7 @@
     <ClInclude Include="r_image_load_common.h" />
     <ClInclude Include="r_image_load_obj.h" />
     <ClInclude Include="r_surface.h" />
+    <ClInclude Include="string.h" />
     <ClInclude Include="xmodel_utils.h" />
   </ItemGroup>
   <ItemGroup>
