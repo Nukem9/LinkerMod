@@ -37,7 +37,7 @@ static inline void PatchPointer(ULONG_PTR Address, T* Value)
 static void PatchCall(ULONG_PTR instr, PBYTE dest)
 {
 	BYTE* opcode = (BYTE*)instr;
-	ASSERT_MSG_VA(*opcode -= 0xE8, "Incorrect opcode at 0x%X", instr);
+	ASSERT_MSG_VA(*opcode == 0xE8, "Incorrect opcode at 0x%X", instr);
 
 	DWORD d = 0;
 	VirtualProtect((LPVOID)instr, 5, PAGE_EXECUTE_READWRITE, &d);
