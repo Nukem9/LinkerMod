@@ -52,6 +52,11 @@ BOOL WINAPI Proxy_Init(HINSTANCE hInst, DWORD reason)
 							   NULL, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 							   msg + offset, (sizeof(msg) / sizeof(decltype(*msg))) - offset, NULL);
 				MessageBoxA(0, msg, 0, 0);
+				
+				// We were unable to load the required mod
+				// Kill the process
+				exit(0);
+
 				return FALSE;
 			}
 
