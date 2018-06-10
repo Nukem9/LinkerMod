@@ -6,8 +6,34 @@
 void PatchMisc();
 #endif
 
+bool GameMod_IsGermanBinary(void)
+{
+	// The location of the PDB string in the **German binary**
+	// Note: This will point to arbitrary data in any other version
+	const char* pStr = (const char*)0xB61694; 
+
+	// Target PDB string for the **German binary**
+	const char pdb[] = "C:\\projects_pc\\cod\\codsrc\\src\\obj\\t5\\CoDSteam_CEG_German_bin\\BlackOps.pdb";
+
+	size_t len = _countof(pdb);
+
+	DWORD dwProtect = 0;
+	VirtualProtect((LPVOID)pStr, len + 1, PAGE_EXECUTE_READ, &dwProtect);
+	
+	bool result = strncmp(pStr, pdb, len) == 0;
+	
+	VirtualProtect((LPVOID)pStr, len + 1, dwProtect, &dwProtect);
+
+	return result;
+}
+
 BOOL GameMod_Init(HMODULE hModule)
 {
+	//
+	// Make sure that the user is not running the German version of Black Ops
+	//
+	ASSERT_MSG(!GameMod_IsGermanBinary(), "The German version of Call of Duty: Black Ops is not supported!");
+
 	//
 	// Disable STDOUT buffering
 	//
