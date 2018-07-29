@@ -9,6 +9,7 @@
 *.opendb
 *.db
 *.tlog
+*.aps
 
 !components/asset_util/asset_util.vcxproj.filters
 
