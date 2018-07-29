@@ -74,6 +74,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "proxy", "components\proxy\proxy.vcxproj", "{934C1737-3D69-4D46-B43C-047FEB737B54}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "installer", "components\installer\installer.vcxproj", "{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1E6C2C1C-6453-4129-AE3F-0EE8E6599C89} = {1E6C2C1C-6453-4129-AE3F-0EE8E6599C89}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
