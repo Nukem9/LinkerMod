@@ -4,8 +4,9 @@
 [Setup]
 AppName=LinkerMod
 AppVersion=1.0
-DefaultDirName={code:GetInstallationDir}
-DisableDirPage=Yes
+DefaultDirName={pf}\My Program
+; DefaultDirName={code:GetInstallationDir}
+; DisableDirPage=Yes
 DefaultGroupName=My Program
 UninstallDisplayIcon={app}\MyProg.exe
 Compression=lzma2
@@ -31,6 +32,8 @@ Name: "LinkerMod\Linker";		Description: "Linker Mod"; Types: full
 Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full
 
 [Files]
+Source: "test.dll"; DestDir: "{app}"
+
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
 Source: "build\Release\asset_util.exe";		DestDir: "{app}\bin"; Components: LinkerMod\AssetUtil
@@ -41,10 +44,26 @@ Source: "build\Release\linker_pc.dll";		DestDir: "{app}\bin"; Components: Linker
 Source: "build\Release\radiant_mod.dll";	DestDir: "{app}\bin"; Components: LinkerMod\Radiant
 
 [Code]
+procedure GetString(buffer: String; size: Integer);
+external 'GetString@files:test.dll stdcall setuponly';
+
+function TryString(): string;
+var
+  str: String;
+begin
+  // allocate enough memory (pascal script will deallocate the string) 
+  SetLength(str, 256); 
+  // the DLL returns the number of characters copied to the buffer
+  GetString(str, 256);
+  // adjust new size
+  Result := str;
+end;
+
 procedure InitializeWizard;
 var Page: TWizardPage;
 	CheckListBox: TNewCheckListBox;
 begin;
+	MsgBox(TryString(), mbInformation, mb_Ok);
 (*
 	Page := CreateCustomPage(wpWelcome, 'Select version', 'woah');
 

@@ -16,3 +16,9 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD dwReason, LPVOID lpReserved)
 	}
 	return TRUE;
 }
+
+__declspec(dllexport) int __stdcall GetString(char* dst, int size)
+{
+	strcpy_s(dst, (size_t) size, "Hello World!");
+	return 0;
+}
