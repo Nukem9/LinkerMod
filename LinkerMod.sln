@@ -73,6 +73,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_json", "components\shar
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "proxy", "components\proxy\proxy.vcxproj", "{934C1737-3D69-4D46-B43C-047FEB737B54}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "installer", "components\installer\installer.vcxproj", "{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -233,6 +235,18 @@ Global
 		{934C1737-3D69-4D46-B43C-047FEB737B54}.Release|Win32.Build.0 = Release|Win32
 		{934C1737-3D69-4D46-B43C-047FEB737B54}.Release|x64.ActiveCfg = Release|x64
 		{934C1737-3D69-4D46-B43C-047FEB737B54}.Release|x64.Build.0 = Release|x64
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Debug|Win32.Build.0 = Debug|Win32
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Debug|x64.ActiveCfg = Debug|x64
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Debug|x64.Build.0 = Debug|x64
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Production|Win32.ActiveCfg = Release|Win32
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Production|Win32.Build.0 = Release|Win32
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Production|x64.ActiveCfg = Release|x64
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Production|x64.Build.0 = Release|x64
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Release|Win32.ActiveCfg = Release|Win32
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Release|Win32.Build.0 = Release|Win32
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Release|x64.ActiveCfg = Release|x64
+		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
