@@ -4,7 +4,7 @@
 [Setup]
 AppName=LinkerMod
 AppVersion=1.0
-DefaultDirName={code:GetDefaultDirName}
+DefaultDirName={code:GetInstallationDir}
 DisableDirPage=Yes
 DefaultGroupName=My Program
 UninstallDisplayIcon={app}\MyProg.exe
@@ -60,7 +60,7 @@ begin;
 	*)
 end;
 
-function GetDefaultDirName(Param: string): string;
+function GetInstallationDir(Param: string): string;
 begin
   Result := '{pf}\My Program';
 end;
