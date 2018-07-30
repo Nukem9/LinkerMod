@@ -84,5 +84,8 @@ void debug_main()
 
 		std::string str = name.toStyledString();
 		printfd("%s\n", str.c_str());
+		MessageBoxA(0, str.c_str(), 0, 0);
 	}
+
+	
 }

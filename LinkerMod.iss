@@ -40,7 +40,8 @@ Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags:
 
 [Files]
 Source: "test.dll"; DestDir: "{app}"
-
+Source: "build\Release\installer.dll";  DestDir: "{app}"
+;Flags: dontcopy
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
 Source: "build\Release\asset_util.exe";		DestDir: "{app}\bin"; Components: LinkerMod\AssetUtil
@@ -56,18 +57,33 @@ Source: "build\Release\radiant_mod.dll";	DestDir: "{app}\bin"; Components: Linke
 procedure MyFunc(hWnd: Integer; lpText, lpCaption: AnsiString; uType: Cardinal);
 external 'MyDllFunc@files:test.dll stdcall';
 
+procedure TestFunc(a:String);
+external 'TestFunc@files:installer.dll stdcall';
+
 
 
 procedure InitializeWizard;
 var Page: TWizardPage;
 	CheckListBox: TNewCheckListBox;
+	a: string;
+	strs:Array Of String
 begin;
+	strs[0] = 'HELLO WORLD';
+	strs[1] = 'WOA';
 	itd_init;
+	SetLength(a, 256); 
+	TestFunc(strs);
+	MsgBox(a, mbInformation, MB_OK);
 
-	if itd_downloadfile('https://api.github.com/repos/Nukem9/LinkerMod/releases',expandconstant('{tmp}\releases'))=ITDERR_SUCCESS then
-	begin
+	// Stuff
+	itd_downloadafter(wpWelcome);
+
+	if itd_downloadfile('https://api.github.com/repos/Nukem9/LinkerMod/releases', expandconstant('{tmp}\releases'))=ITDERR_SUCCESS then begin
 		MyFunc(0, 'YAY', 'Msgd', 0);
-	end;
+	end else begin
+		ITD_PostPage('https://api.github.com/repos/Nukem9/LinkerMod/releases', 'HELLO', a);
+		MsgBox('FAIL', mbInformation, MB_OK);
+    end;
 	//Let's download two zipfiles from my website..
 	//itd_addfile('https://api.github.com/repos/Nukem9/LinkerMod/releases',expandconstant('{tmp}\release'));
 
