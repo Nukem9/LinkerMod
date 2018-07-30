@@ -64,6 +64,7 @@ std::string DownloadReleaseJSon()
 	return std::string((char *)data.data());
 }
 
+std::string g_data = "";
 void debug_main()
 {
 	auto j = DownloadReleaseJSon();
@@ -84,8 +85,8 @@ void debug_main()
 
 		std::string str = name.toStyledString();
 		printfd("%s\n", str.c_str());
-		MessageBoxA(0, str.c_str(), 0, 0);
+		
 	}
 
-	
+	g_data = root.toStyledString();
 }

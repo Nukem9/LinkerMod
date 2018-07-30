@@ -54,34 +54,42 @@ Source: "build\Release\radiant_mod.dll";	DestDir: "{app}\bin"; Components: Linke
 [Code]
 (* Note: These *MUST* have the module exports definition files	*)
 (*       Using __declspec(dllexport) does *NOT* work 			*)
-procedure MyFunc(hWnd: Integer; lpText, lpCaption: AnsiString; uType: Cardinal);
+procedure MyFunc(hWnd: Integer; lpText, lpCaption: String; uType: Cardinal);
 external 'MyDllFunc@files:test.dll stdcall';
 
-procedure TestFunc(a:String);
+function  TestFunc( buffer:PChar): Cardinal;
 external 'TestFunc@files:installer.dll stdcall';
 
-
+function GetString(): String;
+var str: String;
+	size: Cardinal;
+	tmp: PChar;
+begin 
+	// Note on passing PChars using RemObjects Pascal Script:
+ 	// '' pass a nil PChar  
+  	// #0 pass an empty PChar
+	size := TestFunc('');
+	SetLength(str, size+1);
+	TestFunc(str);
+	MsgBox(str, mbInformation, MB_OK);
+	Result := str;
+end;
 
 procedure InitializeWizard;
-var Page: TWizardPage;
-	CheckListBox: TNewCheckListBox;
+var
 	a: string;
-	strs:Array Of String
-begin;
-	strs[0] = 'HELLO WORLD';
-	strs[1] = 'WOA';
+begin
 	itd_init;
-	SetLength(a, 256); 
-	TestFunc(strs);
-	MsgBox(a, mbInformation, MB_OK);
+
+	GetString();
 
 	// Stuff
 	itd_downloadafter(wpWelcome);
 
-	if itd_downloadfile('https://api.github.com/repos/Nukem9/LinkerMod/releases', expandconstant('{tmp}\releases'))=ITDERR_SUCCESS then begin
+	if itd_downloadfile('https://github.com/Nukem9/LinkerMod/releases/download/v1.3.2/game_mod.zip', expandconstant('{tmp}\releases'))=ITDERR_SUCCESS then begin
 		MyFunc(0, 'YAY', 'Msgd', 0);
 	end else begin
-		ITD_PostPage('https://api.github.com/repos/Nukem9/LinkerMod/releases', 'HELLO', a);
+		// ITD_PostPage('https://api.github.com/repos/Nukem9/LinkerMod/releases', 'HELLO', a);
 		MsgBox('FAIL', mbInformation, MB_OK);
     end;
 	//Let's download two zipfiles from my website..
@@ -91,7 +99,7 @@ begin;
  	// itd_downloadafter(wpReady);
 
 	(*MsgBox(TryString(), mbInformation, mb_Ok);*)
-  	MyFunc(0, 'HELLO', 'Msgd', 0);
+  	// MyFunc(0, 'HELLO', 'Msgd', 0);
 (*
 	Page := CreateCustomPage(wpWelcome, 'Select version', 'woah');
 
