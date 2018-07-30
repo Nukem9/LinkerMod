@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=LinkerMod
-AppVersion=1.0
+AppVersion=DevHead
 DefaultDirName={pf}\My Program
 ; DefaultDirName={code:GetInstallationDir}
 ; DisableDirPage=Yes
@@ -13,7 +13,7 @@ Compression=lzma2
 SolidCompression=yes
 OutputDir=userdocs:Inno Setup Examples Output
 
-[Files]
+[Files]                              
 ; Source: "build\Release\game_mod.dll"; DestDir: "{app}"
 ; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
 
@@ -23,13 +23,14 @@ OutputDir=userdocs:Inno Setup Examples Output
 [Components]
 Name: "GameMod"; Description: "Game Mod"; Types: full compact custom; Flags: fixed
 
-Name: "LinkerMod"; Description: "Mod Tools"; Types: full
-Name: "LinkerMod\AssetUtil";	Description: "Asset Util"; Types: full
-Name: "LinkerMod\AssetViewer";	Description: "AssetViewer Mod"; Types: full
-Name: "LinkerMod\CoD2Map";		Description: "CoD2Map Mod"; Types: full
-Name: "LinkerMod\CoD2Rad";		Description: "CoD2Rad Mod"; Types: full
-Name: "LinkerMod\Linker";		Description: "Linker Mod"; Types: full
-Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full
+; exlusive flag makes them radio buttons
+Name: "LinkerMod"; Description: "Mod Tools"; Types: full custom
+Name: "LinkerMod\AssetUtil";	Description: "Asset Util"; Types: full;			Flags: 
+Name: "LinkerMod\AssetViewer";	Description: "AssetViewer Mod"; Types: full;	Flags: 
+Name: "LinkerMod\CoD2Map";		Description: "CoD2Map Mod"; Types: full;		Flags: 
+Name: "LinkerMod\CoD2Rad";		Description: "CoD2Rad Mod"; Types: full;		Flags: 
+Name: "LinkerMod\Linker";		Description: "Linker Mod"; Types: full;			Flags: 
+Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags: 
 
 [Files]
 Source: "test.dll"; DestDir: "{app}"
@@ -44,17 +45,19 @@ Source: "build\Release\linker_pc.dll";		DestDir: "{app}\bin"; Components: Linker
 Source: "build\Release\radiant_mod.dll";	DestDir: "{app}\bin"; Components: LinkerMod\Radiant
 
 [Code]
-procedure GetString(buffer: String; size: Integer);
-external 'GetString@files:test.dll stdcall setuponly';
+(* Note: These *MUST* have the module exports definition files	*)
+(*       Using __declspec(dllexport) does *NOT* work 			*)
+procedure MyFunc(hWnd: Integer; lpText, lpCaption: AnsiString; uType: Cardinal);
+external 'MyDllFunc@files:test.dll stdcall';
 
 function TryString(): string;
-var
+var                     
   str: String;
 begin
   // allocate enough memory (pascal script will deallocate the string) 
   SetLength(str, 256); 
   // the DLL returns the number of characters copied to the buffer
-  GetString(str, 256);
+  MyFunc(0, 'HELLO', 'Msgd', 0);
   // adjust new size
   Result := str;
 end;
@@ -63,7 +66,8 @@ procedure InitializeWizard;
 var Page: TWizardPage;
 	CheckListBox: TNewCheckListBox;
 begin;
-	MsgBox(TryString(), mbInformation, mb_Ok);
+	(*MsgBox(TryString(), mbInformation, mb_Ok);*)
+  MyFunc(0, 'HELLO', 'Msgd', 0);
 (*
 	Page := CreateCustomPage(wpWelcome, 'Select version', 'woah');
 
@@ -77,6 +81,8 @@ begin;
 	CheckListBox.AddRadioButton('TNewCheckListBox', '', 1, False, True, nil);
 	CheckListBox.AddCheckBox('LinkerMod', '', 0, True, True, False, True, nil);
 	*)
+
+	
 end;
 
 function GetInstallationDir(Param: string): string;
