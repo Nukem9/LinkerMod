@@ -8,17 +8,23 @@ DefaultDirName={pf}\My Program
 ; DefaultDirName={code:GetInstallationDir}
 ; DisableDirPage=Yes
 DefaultGroupName=My Program
-UninstallDisplayIcon={app}\MyProg.exe
+UninstallDisplayIcon={app}\LinkerMod.exe
 Compression=lzma2
 SolidCompression=yes
-OutputDir=./build/setup.exe
+OutputDir=./build/
+
+[Languages]
+Name: english; MessagesFile: compiler:Default.isl
+
+; Inlude the Inno Downloader scripts
+#include ReadReg(HKEY_LOCAL_MACHINE,'Software\Sherlock Software\InnoTools\Downloader','ScriptPath','');
 
 [Files]                              
 ; Source: "build\Release\game_mod.dll"; DestDir: "{app}"
 ; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
 
 [Icons]
-; Name: "{group}\My Program"; Filename: "{app}\MyProg.exe"
+; Name: "{group}\My Program"; Filename: "{app}\LinkerMod.exe"
 
 [Components]
 Name: "GameMod"; Description: "Game Mod"; Types: full compact custom; Flags: fixed
@@ -50,24 +56,26 @@ Source: "build\Release\radiant_mod.dll";	DestDir: "{app}\bin"; Components: Linke
 procedure MyFunc(hWnd: Integer; lpText, lpCaption: AnsiString; uType: Cardinal);
 external 'MyDllFunc@files:test.dll stdcall';
 
-function TryString(): string;
-var                     
-  str: String;
-begin
-  // allocate enough memory (pascal script will deallocate the string) 
-  SetLength(str, 256); 
-  // the DLL returns the number of characters copied to the buffer
-  MyFunc(0, 'HELLO', 'Msgd', 0);
-  // adjust new size
-  Result := str;
-end;
+
 
 procedure InitializeWizard;
 var Page: TWizardPage;
 	CheckListBox: TNewCheckListBox;
 begin;
+	itd_init;
+
+	if itd_downloadfile('https://api.github.com/repos/Nukem9/LinkerMod/releases',expandconstant('{tmp}\releases'))=ITDERR_SUCCESS then
+	begin
+		MyFunc(0, 'YAY', 'Msgd', 0);
+	end;
+	//Let's download two zipfiles from my website..
+	//itd_addfile('https://api.github.com/repos/Nukem9/LinkerMod/releases',expandconstant('{tmp}\release'));
+
+ 	//Start the download after the "Ready to install" screen is shown
+ 	// itd_downloadafter(wpReady);
+
 	(*MsgBox(TryString(), mbInformation, mb_Ok);*)
-  MyFunc(0, 'HELLO', 'Msgd', 0);
+  	MyFunc(0, 'HELLO', 'Msgd', 0);
 (*
 	Page := CreateCustomPage(wpWelcome, 'Select version', 'woah');
 
