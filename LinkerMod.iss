@@ -11,7 +11,7 @@ DefaultGroupName=My Program
 UninstallDisplayIcon={app}\MyProg.exe
 Compression=lzma2
 SolidCompression=yes
-OutputDir=userdocs:Inno Setup Examples Output
+OutputDir=./build/setup.exe
 
 [Files]                              
 ; Source: "build\Release\game_mod.dll"; DestDir: "{app}"
