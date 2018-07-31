@@ -8,7 +8,7 @@
 			"type": "shell",
       "command": "C:\\Program Files (x86)\\Inno Setup 5\\ISCC.exe",
       "args": [
-        "${file}",
+        "${workspaceRoot}\\LinkerMod.iss",
       ],
       "group": {
         "kind": "build",

@@ -40,7 +40,7 @@ Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags:
 
 [Files]
 Source: "test.dll"; DestDir: "{app}"
-Source: "build\Release\installer.dll";  DestDir: "{app}"
+Source: "build\Release\installer.dll";	DestDir: "{app}"
 ;Flags: dontcopy
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
@@ -66,8 +66,8 @@ var str: String;
 	tmp: PChar;
 begin 
 	// Note on passing PChars using RemObjects Pascal Script:
- 	// '' pass a nil PChar  
-  	// #0 pass an empty PChar
+ 	// '' pass a nil PChar    (null pointer)
+  	// #0 pass an empty PChar (pointer to an empty string)
 	size := TestFunc('');
 	SetLength(str, size+1);
 	TestFunc(str);
@@ -75,49 +75,96 @@ begin
 	Result := str;
 end;
 
+// Test
+var progress:TOutputProgressWizardPage;
+
 procedure InitializeWizard;
 var
 	a: string;
+	downloadPage:TWizardpage;
 begin
 	itd_init;
 
-	GetString();
+	// GetString();
+	
+	 {Create our own progress page for the initial download of a small
+		textfile from the server which says what the latest version is}
+		progress := CreateOutputProgressPage(ITD_GetString(ITDS_Update_Caption), ITD_GetString(ITDS_Update_Description));
 
 	// Stuff
-	itd_downloadafter(wpWelcome);
-
-	if itd_downloadfile('https://github.com/Nukem9/LinkerMod/releases/download/v1.3.2/game_mod.zip', expandconstant('{tmp}\releases'))=ITDERR_SUCCESS then begin
-		MyFunc(0, 'YAY', 'Msgd', 0);
-	end else begin
-		// ITD_PostPage('https://api.github.com/repos/Nukem9/LinkerMod/releases', 'HELLO', a);
-		MsgBox('FAIL', mbInformation, MB_OK);
-    end;
-	//Let's download two zipfiles from my website..
-	//itd_addfile('https://api.github.com/repos/Nukem9/LinkerMod/releases',expandconstant('{tmp}\release'));
-
- 	//Start the download after the "Ready to install" screen is shown
- 	// itd_downloadafter(wpReady);
-
-	(*MsgBox(TryString(), mbInformation, mb_Ok);*)
-  	// MyFunc(0, 'HELLO', 'Msgd', 0);
-(*
-	Page := CreateCustomPage(wpWelcome, 'Select version', 'woah');
-
-	CheckListBox := TNewCheckListBox.Create(Page);
-	CheckListBox.Width := Page.SurfaceWidth;
-	CheckListBox.Height := ScaleY(97);
-	CheckListBox.Flat := True;
-	CheckListBox.Parent := Page.Surface;
-	CheckListBox.AddCheckBox('Game Mod', '', 0, True, True, False, True, nil);
-	CheckListBox.AddRadioButton('v1.2.3', '', 1, True, True, nil);
-	CheckListBox.AddRadioButton('TNewCheckListBox', '', 1, False, True, nil);
-	CheckListBox.AddCheckBox('LinkerMod', '', 0, True, True, False, True, nil);
-	*)
-
-	
+	//Create the ITD GUI so that we have it if we decide to download a new intaller version
+	downloadPage:=itd_downloadafter(wpWelcome);
 end;
 
 function GetInstallationDir(Param: string): string;
 begin
   Result := '{pf}\My Program';
 end;
+
+function NextButtonClick(curPageID:integer):boolean;
+var
+ list, line:TStringList;
+ newavail:boolean;
+ i:integer;
+ ourVersion:string;
+ checkedSuccessfully:boolean;
+ text:string;
+begin
+ result:=true;
+ if curPageID=wpWelcome then begin
+
+	 
+
+
+			wizardform.show;
+			progress.Show;
+			progress.SetText(ITD_GetString(ITDS_Update_Checking),'');
+			progress.SetProgress(2,10);
+			try
+				newavail:=false;
+
+				checkedSuccessfully:=false;
+				GetVersionNumbersString(expandconstant('{srcexe}'), ourVersion);
+
+				if itd_downloadfile('https://api.github.com/repos/Nukem9/LinkerMod/releases',expandconstant('{tmp}\latestver.txt'))=ITDERR_SUCCESS then begin
+				//'http://www.sherlocksoftware.org/innotools/latestver.txt',expandconstant('{tmp}\latestver.txt'))=ITDERR_SUCCESS then begin
+					{ Now read the version from that file and see if it is newer.
+						The file has a really simple format:
+
+						2.0,"http://www.sherlocksoftware.org/innotools/example3%202.0.exe"
+
+						The installer version, a comma, and the URL where the new version can be downloaded.
+					}
+					list:=TStringList.create;
+					try
+						list.loadfromfile(expandconstant('{tmp}\latestver.txt'));
+
+						if list.count>0 then begin
+							line:=TStringList.create;
+							try
+								line.commatext:=list[0]; //Break down the line into its components
+
+								if line.count>=2 then begin
+								checkedSuccessfully:=true;
+								
+								end;
+							finally
+								line.free;
+							end;
+						end;
+					finally
+						list.free;
+					end;
+				end;
+
+				if not checkedSuccessfully then begin
+					text:=ITD_GetString(ITDS_Update_Failed);
+			StringChangeEx(text, '%1', ourVersion, true);
+					MsgBox(text, mbInformation, MB_OK);
+				end;
+			finally
+				progress.Hide;
+			end;
+
+	end;
+ end;
