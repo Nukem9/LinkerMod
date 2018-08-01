@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "fs.h"
 
-namespace fs
+namespace FS
 {
 	bool FileExists(const std::string& filepath)
 	{		
@@ -15,5 +15,11 @@ namespace fs
 		FindClose(h);
 		
 		return true;
+	}
+
+	// TODO: Properly check this
+	std::string JoinPath(const std::string& path1, const std::string& path2)
+	{
+		return path1 + "\\" + path2;
 	}
 };
