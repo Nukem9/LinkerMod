@@ -4,14 +4,17 @@
 [Setup]
 AppName=LinkerMod
 AppVersion=DevHead
-DefaultDirName={pf}\My Program
-; DefaultDirName={code:GetInstallationDir}
-; DisableDirPage=Yes
-DefaultGroupName=My Program
+DefaultGroupName=FA
 UninstallDisplayIcon={app}\LinkerMod.exe
 Compression=lzma2
 SolidCompression=yes
 OutputDir=./build/
+
+; Install Path Options
+UsePreviousAppDir=no
+AppendDefaultDirName=no
+DefaultDirName={code:GetDefaultDir}
+DisableDirPage=No
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
@@ -60,6 +63,26 @@ external 'MyDllFunc@files:test.dll stdcall';
 function  TestFunc( buffer:PChar): Cardinal;
 external 'TestFunc@files:installer.dll stdcall';
 
+function  GetGamePath(): PChar;
+external 'LMI_GamePath@files:installer.dll stdcall';
+
+function  SetInstallPath(path: String): Boolean;
+external 'LMI_SetInstallPath@files:installer.dll stdcall';
+
+//
+// Get the default installation directory
+//
+function GetDefaultDir(Param: string): string;
+var
+	installPath: PChar;
+begin
+	installPath := GetGamePath();
+	if(length(installPath) < 1) then
+		Result := #0
+	else
+		Result := installPath;
+end;
+
 function GetString(): String;
 var str: String;
 	size: Cardinal;
@@ -85,86 +108,33 @@ var
 begin
 	itd_init;
 
+	// Attempt to get the installation path
+	
+
+	
+
 	// GetString();
 	
 	 {Create our own progress page for the initial download of a small
 		textfile from the server which says what the latest version is}
-		progress := CreateOutputProgressPage(ITD_GetString(ITDS_Update_Caption), ITD_GetString(ITDS_Update_Description));
+	//	progress := CreateOutputProgressPage(ITD_GetString(ITDS_Update_Caption), ITD_GetString(ITDS_Update_Description));
 
 	// Stuff
 	//Create the ITD GUI so that we have it if we decide to download a new intaller version
 	downloadPage:=itd_downloadafter(wpWelcome);
 end;
 
-function GetInstallationDir(Param: string): string;
+
+
+function NextButtonClick(curPageID:integer): boolean;
 begin
-  Result := '{pf}\My Program';
-end;
+	Result := True;
 
-function NextButtonClick(curPageID:integer):boolean;
-var
- list, line:TStringList;
- newavail:boolean;
- i:integer;
- ourVersion:string;
- checkedSuccessfully:boolean;
- text:string;
-begin
- result:=true;
- if curPageID=wpWelcome then begin
-
-	 
-
-
-			wizardform.show;
-			progress.Show;
-			progress.SetText(ITD_GetString(ITDS_Update_Checking),'');
-			progress.SetProgress(2,10);
-			try
-				newavail:=false;
-
-				checkedSuccessfully:=false;
-				GetVersionNumbersString(expandconstant('{srcexe}'), ourVersion);
-
-				if itd_downloadfile('https://api.github.com/repos/Nukem9/LinkerMod/releases',expandconstant('{tmp}\latestver.txt'))=ITDERR_SUCCESS then begin
-				//'http://www.sherlocksoftware.org/innotools/latestver.txt',expandconstant('{tmp}\latestver.txt'))=ITDERR_SUCCESS then begin
-					{ Now read the version from that file and see if it is newer.
-						The file has a really simple format:
-
-						2.0,"http://www.sherlocksoftware.org/innotools/example3%202.0.exe"
-
-						The installer version, a comma, and the URL where the new version can be downloaded.
-					}
-					list:=TStringList.create;
-					try
-						list.loadfromfile(expandconstant('{tmp}\latestver.txt'));
-
-						if list.count>0 then begin
-							line:=TStringList.create;
-							try
-								line.commatext:=list[0]; //Break down the line into its components
-
-								if line.count>=2 then begin
-								checkedSuccessfully:=true;
-								
-								end;
-							finally
-								line.free;
-							end;
-						end;
-					finally
-						list.free;
-					end;
-				end;
-
-				if not checkedSuccessfully then begin
-					text:=ITD_GetString(ITDS_Update_Failed);
-			StringChangeEx(text, '%1', ourVersion, true);
-					MsgBox(text, mbInformation, MB_OK);
-				end;
-			finally
-				progress.Hide;
-			end;
-
+	// Validate the install path
+	if (CurPageID = wpSelectDir) and (SetInstallPath(WizardDirValue) = false) then
+	begin
+		Result := False;
+		MsgBox('Target installation directory is invalid. ' +
+			'Choose a different one.', mbError, MB_OK);
 	end;
- end;
+end;
