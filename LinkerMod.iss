@@ -56,11 +56,8 @@ Source: "build\Release\linker_pc.dll";		DestDir: "{app}\bin"; Components: Linker
 Source: "build\Release\radiant_mod.dll";	DestDir: "{app}\bin"; Components: LinkerMod\Radiant
 
 [Code]
-(* Note: These *MUST* have the module exports definition files	*)
+(* Note: These *MUST* use the module exports definition files	*)
 (*       Using __declspec(dllexport) does *NOT* work 			*)
-procedure MyFunc(hWnd: Integer; lpText, lpCaption: String; uType: Cardinal);
-external 'MyDllFunc@files:test.dll stdcall';
-
 function  TestFunc( buffer:PChar): Cardinal;
 external 'TestFunc@files:installer.dll stdcall';
 
@@ -125,13 +122,13 @@ begin
 	downloadPage:=itd_downloadafter(wpWelcome);
 end;
 
-
-
 function NextButtonClick(curPageID:integer): boolean;
 begin
 	Result := True;
 
+	//
 	// Validate the install path
+	//
 	if (CurPageID = wpSelectDir) and (SetInstallPath(WizardDirValue) = false) then
 	begin
 		Result := False;
