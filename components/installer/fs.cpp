@@ -48,6 +48,6 @@ namespace FS
 	// TODO: Properly check this
 	std::string JoinPath(const std::string& path1, const std::string& path2)
 	{
-		return NormalizePath(path1 + "\\//\\//\\" + path2);
+		return NormalizePath(path1 + "\\" + path2);
 	}
 };
