@@ -9,6 +9,10 @@ UninstallDisplayIcon={app}\LinkerMod.exe
 Compression=lzma2
 SolidCompression=yes
 OutputDir=./build/
+DisableWelcomePage=no
+
+WizardImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
+WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
 
 ; Install Path Options
 DefaultDirName={code:GetDefaultDir}
