@@ -11,9 +11,10 @@ SolidCompression=yes
 OutputDir=./build/
 
 ; Install Path Options
-UsePreviousAppDir=no
-AppendDefaultDirName=no
 DefaultDirName={code:GetDefaultDir}
+AppendDefaultDirName=no
+UsePreviousAppDir=no
+DirExistsWarning=no
 DisableDirPage=No
 
 [Languages]
