@@ -32,7 +32,8 @@ Name: english; MessagesFile: compiler:Default.isl
 ; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
 
 [Icons]
-; Name: "{group}\My Program"; Filename: "{app}\LinkerMod.exe"
+Name: "{commondesktop}\Game Mod"; Filename: "{app}\bin\BlackOps.exe"
+; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{app}\bin\BlackOps.exe"
 
 [Components]
 Name: "GameMod"; Description: "Game Mod"; Types: full compact custom; Flags: fixed
@@ -45,6 +46,8 @@ Name: "LinkerMod\CoD2Map";		Description: "CoD2Map Mod"; Types: full;		Flags:
 Name: "LinkerMod\CoD2Rad";		Description: "CoD2Rad Mod"; Types: full;		Flags: 
 Name: "LinkerMod\Linker";		Description: "Linker Mod"; Types: full;			Flags: 
 Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags: 
+
+Name: "Debug";		Description: "Debug"; Types: full;		Flags:
 
 [Files]
 Source: "test.dll"; DestDir: "{app}"
@@ -59,6 +62,19 @@ Source: "build\Release\cod2rad.dll";		DestDir: "{app}\bin"; Components: LinkerMo
 Source: "build\Release\linker_pc.dll";		DestDir: "{app}\bin"; Components: LinkerMod\Linker
 Source: "build\Release\radiant_mod.dll";	DestDir: "{app}\bin"; Components: LinkerMod\Radiant
 
+; Test automatic shit
+Source: "{code:GetAutoFiles}";				DestDir: "{app}\bin\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
+
+[Tasks]
+Name: extract; 			Description: "Extract I&WDs"; 			GroupDescription: "IWDs:"; 			Components: LinkerMod\AssetUtil
+Name: extract\iwd; 		Description: "Extract &Images"; 		GroupDescription: "IWDs:"; 			Components: LinkerMod\AssetUtil
+Name: extract\iwd; 		Description: "Extract &Sounds"; 		GroupDescription: "IWDs:"; 			Components: LinkerMod\AssetUtil
+Name: extract\iwd; 		Description: "Extract &Other Assets"; 	GroupDescription: "IWDs:"; 			Components: LinkerMod\AssetUtil
+Name: extract; 			Description: "Extract &FastFiles"; 		GroupDescription: "FastFiles:"; 	Components: LinkerMod\AssetUtil
+Name: extract\ffs; 		Description: "Extract &Sounds"; 		GroupDescription: "FastFiles:"; 	Components: LinkerMod\AssetUtil
+Name: extract\ffs; 		Description: "Extract &Rawfiles"; 		GroupDescription: "FastFiles:"; 	Components: LinkerMod\AssetUtil
+Name: extract\ffs; 		Description: "Extract &Entity Maps"; 	GroupDescription: "FastFiles:"; 	Components: LinkerMod\AssetUtil
+
 [Code]
 (* Note: These *MUST* use the module exports definition files	*)
 (*       Using __declspec(dllexport) does *NOT* work 			*)
@@ -70,6 +86,9 @@ external 'LMI_GamePath@files:installer.dll stdcall';
 
 function  SetInstallPath(path: String): Boolean;
 external 'LMI_SetInstallPath@files:installer.dll stdcall';
+
+function  GetVersions(): PChar;
+external 'LMI_GetTags@files:installer.dll stdcall';
 
 //
 // Get the default installation directory
@@ -83,6 +102,12 @@ begin
 		Result := #0
 	else
 		Result := installPath;
+end;
+
+function GetAutoFiles(Param: string): string;
+begin
+  Result := 'C:\Users\SE2Dev\Desktop\blender-2.80.0-git.a1689fb091a-windows64\2.80\python\bin\python.exe';
+  { make it return path to the checked out files }
 end;
 
 function GetString(): String;
@@ -100,20 +125,53 @@ begin
 	Result := str;
 end;
 
+function GetVersionTags(): TStringList;
+var
+	installPath: PChar;
+	inputString: String;
+	list: TStringList;
+begin
+	installPath := GetVersions();
+	if(length(installPath) < 1) then
+		inputString := #0
+	else
+		inputString := installPath;
+
+	list := TStringList.create;
+	list.Text := inputString;
+
+	Result := list;
+end;
+
 // Test
 var progress:TOutputProgressWizardPage;
 
 procedure InitializeWizard;
 var
-	a: string;
 	downloadPage:TWizardpage;
+	UserPage: TWizardPage;
+	ListBox: TNewListBox; 
+	tags: TStringList;
+	i: Cardinal;
 begin
 	itd_init;
 
-	// Attempt to get the installation path
-	
+	tags := GetVersionTags();
 
-	
+	// Attempt to get the installation path
+	UserPage :=  CreateCustomPage(wpWelcome, 'Which version should be installed?', '????');
+
+
+	ListBox := TNewListBox.Create(UserPage);
+	ListBox.Parent := UserPage.Surface;
+
+	For i := 0 to tags.Count - 1 do
+	begin
+	 ListBox.Items.Add(tags[i]);
+	end;
+
+	ListBox.Items.Add('test1');
+	ListBox.Items.Add('test2');
 
 	// GetString();
 	
