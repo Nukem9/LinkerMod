@@ -21,6 +21,7 @@ std::unordered_map<std::string, unsigned int> gPerkList(
 	{ "specialty_stockpile",				PERK_STOCKPILE },
 	{ "specialty_fastads",					PERK_FASTADS },
 	{ "specialty_fastinteract",				PERK_FASTINTERACT },
+	{ "specialty_fastsprintrecovery",		PERK_FASTSPRINTRECOVERY },
 });
 
 // /game/bg_perks.cpp:129
