@@ -77,6 +77,14 @@ enum weaponstate_t
 								(x) == WEAPON_CONT_FIRE_LOOP || \
 								IS_WEAPONSTATE_MELEE(x))
 
+#define IS_WEAPONSTATE_OFFHAND(x) (\
+								(x) == WEAPON_OFFHAND_INIT || \
+								(x) == WEAPON_OFFHAND_PREPARE || \
+								(x) == WEAPON_OFFHAND_HOLD || \
+								(x) == WEAPON_OFFHAND_START || \
+								(x) == WEAPON_OFFHAND || \
+								(x) == WEAPON_OFFHAND_END)
+
 struct usercmd_s
 {
 	int serverTime;

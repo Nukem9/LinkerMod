@@ -188,6 +188,22 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 
 		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
 	}
+	else if (IS_WEAPONSTATE_OFFHAND(*weaponState) && BG_HasPerk(ps->perks, PERK_FASTINTERACT))
+	{
+		// Fast grenade throw perk
+		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
+		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
+
+		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
+	}
+	else if (*weaponState == WEAPON_SPRINT_DROP && BG_HasPerk(ps->perks, PERK_FASTSPRINTRECOVERY))
+	{
+		// Fast sprint recovery perk
+		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
+		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
+
+		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
+	}
 	else
 	{
 		// Default modifier time
@@ -223,12 +239,29 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			bool holdingGrenadeBtn = (weapDef->weapType == WEAPTYPE_GRENADE || weapDef->weapType == WEAPTYPE_MINE) && weapDef->holdButtonToThrow;
 			bool holdingFireBtn = false;
 
+			// TODO - Switch fire input and ads input for dual wield weapons, add check for dvar "gpad_enabled" that works on clients
 			if (ps->bRunLeftGun)
-				holdingFireBtn = pm->cmd.button_bits.testBit(0x18) != 0;
+				holdingFireBtn = pm->cmd.button_bits.testBit(24) != 0;
 			else
 				holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
+			/*if (weapDef->bDualWield && !Dvar_GetString("gpad_enabled"))
+			{
+				if (ps->bRunLeftGun)
+					holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
+				else
+					holdingFireBtn = pm->cmd.button_bits.testBit(24) != 0;
+			}
+			else
+			{
+				if (ps->bRunLeftGun)
+					holdingFireBtn = pm->cmd.button_bits.testBit(24) != 0;
+				else
+					holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
+			}*/
 
-			if ((*weaponState < WEAPON_OFFHAND_INIT || *weaponState > WEAPON_OFFHAND_END)
+			if (!IS_WEAPONSTATE_OFFHAND(*weaponState)
+				&& *weaponState != WEAPON_DROPPING_QUICK
+				&& *weaponState != WEAPON_RAISING
 				&& (pausedAfterFiring || holdingGrenadeBtn)
 				&& holdingFireBtn
 				&& ps->weapon == pm->cmd.weapon
@@ -254,7 +287,7 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			}
 			else
 			{
-				if ((!holdingFireBtn || ps->weapFlags & 0x400) && !BurstFirePending(ps))
+				if ((!holdingFireBtn || ps->weapFlags & 0x400 || *weaponState == WEAPON_DROPPING_QUICK || *weaponState == WEAPON_RAISING) && !BurstFirePending(ps))
 					*weaponShotCount = 0;
 
 				*weaponTime = 0;
@@ -298,16 +331,35 @@ int PM_Weapon_ShouldBeFiring(pmove_t *pm, int delayedAction, bool testOnly)
 
 	WeaponDef *weapDef = BG_GetWeaponDef(ps->weapon);
 	int weaponBit = PM_GetWeaponFireButton(ps->weapon);
+	int dualWieldWeaponBit = 24;
 	bool shouldStartFiring = pm->cmd.button_bits.testBit(weaponBit) != 0;
 
-	// If this is a dw weapon and we're using the offhand
-	if (ps->bRunLeftGun && weapDef->bDualWield)
+	// TODO - Switch fire input and ads input for dual wield weapons, add check for dvar "gpad_enabled" that works on clients
+	if (weapDef->bDualWield && ps->bRunLeftGun)
 	{
-		// Check if player holding the fire key
-		if (pm->cmd.button_bits.testBit(24))
-			shouldStartFiring = true;
+		shouldStartFiring = pm->cmd.button_bits.testBit(dualWieldWeaponBit) != 0;
+		/*if (!Dvar_GetString("gpad_enabled"))
+		{
+			if (ps->bRunLeftGun)
+			{
+				shouldStartFiring = pm->cmd.button_bits.testBit(weaponBit);
+			}
+			else
+			{
+				shouldStartFiring = pm->cmd.button_bits.testBit(dualWieldWeaponBit);
+			}
+		}
 		else
-			shouldStartFiring = false;
+		{
+			if (ps->bRunLeftGun)
+			{
+				shouldStartFiring = pm->cmd.button_bits.testBit(dualWieldWeaponBit);
+			}
+			else
+			{
+				shouldStartFiring = pm->cmd.button_bits.testBit(weaponBit);
+			}
+		}*/
 	}
 
 	if (weapDef->freezeMovementWhenFiring && ps->groundEntityNum == 1023)

@@ -111,6 +111,20 @@ void StartWeaponAnim(int localClientNum, int weaponNum, DObj *obj, int animIndex
 		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
 		rate /= perk_weapSwitchMultiplier->current.value;
 	}
+	else if (IS_WEAPONSTATE_OFFHAND(weaponstate) && BG_HasPerk(ps_perks, PERK_FASTINTERACT))
+	{
+		// Fast grenade throw perk
+		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
+		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
+		rate /= perk_weapSwitchMultiplier->current.value;
+	}
+	else if (weaponstate == WEAPON_SPRINT_DROP && BG_HasPerk(ps_perks, PERK_FASTSPRINTRECOVERY))
+	{
+		// Fast sprint recovery perk
+		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
+		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
+		rate /= perk_weapSwitchMultiplier->current.value;
+	}
 
 	for (int i = 1; i < WEAP_ANIM_VIEWMODEL_END; i++)
 	{
