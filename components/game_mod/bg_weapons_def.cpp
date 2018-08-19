@@ -193,6 +193,15 @@ void BG_InitDefaultWeaponDef()
 // /bgame/bg_weapons_def.cpp:274
 void BG_ClearWeaponDef()
 {
+	// Set changed variables back to default
+	for (auto& weapon : bg_PatchedVariantDefs)
+	{
+		weapon->weapDef->iStartAmmo -= 1;
+		weapon->weapDef->iMaxAmmo -= 1;
+		weapon->weapDef->iSharedAmmoCap -= 1;
+		weapon->iClipSize -= 1;
+	}
+
 	bg_CheckedVariantDefs.clear();
 	bg_PatchedVariantDefs.clear();
 	bg_PatchedWeapDefs.clear();
