@@ -8,10 +8,10 @@
 *.ttf binary
 
 # Git kept corrupting source files so let's fix them
-*.c
-*.h
-*.cpp
-*.hpp
-*.def
-*.gsc
-*.csc
+*.c text
+*.h text
+*.cpp  text
+*.hpp  text
+*.def  text
+*.gsc  text
+*.csc  text
