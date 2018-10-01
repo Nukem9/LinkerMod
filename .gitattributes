@@ -10,8 +10,8 @@
 # Git kept corrupting source files so let's fix them
 *.c text
 *.h text
-*.cpp  text
-*.hpp  text
-*.def  text
-*.gsc  text
-*.csc  text
+*.cpp text
+*.hpp text
+*.def text
+*.gsc text
+*.csc text
