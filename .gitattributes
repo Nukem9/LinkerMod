@@ -6,3 +6,12 @@
 *.iwi binary
 *.lib binary
 *.ttf binary
+
+# Git kept corrupting source files so let's fix them
+*.c
+*.h
+*.cpp
+*.hpp
+*.def
+*.gsc
+*.csc
