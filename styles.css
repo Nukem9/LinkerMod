@@ -1,0 +1,9 @@
+html {
+    background-color: #282828;
+	color: whitesmoke;
+	
+    background-image: url('img/logo_gm.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
