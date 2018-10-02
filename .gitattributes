@@ -15,3 +15,5 @@
 *.def text
 *.gsc text
 *.csc text
+*.txt text
+*.md text
