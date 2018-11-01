@@ -6,21 +6,48 @@
 		{
 			"label": "Inno: Build",
 			"type": "shell",
-      "command": "C:\\Program Files (x86)\\Inno Setup 5\\ISCC.exe",
-      "args": [
-        "${workspaceRoot}\\LinkerMod.iss",
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "presentation": {
-        "echo": false,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true
-      }
+			"command": "C:\\Program Files (x86)\\Inno Setup 5\\ISCC.exe",
+			"args": [
+				"${workspaceRoot}\\LinkerMod.iss",
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"echo": false,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true
+			},
+			"problemMatcher": [
+				{
+					// The problem is owned by the cpp language service.
+					"owner": "inno",
+					// The file name for reported problems is relative to the opened folder.
+					"fileLocation": [
+						"relative",
+						"${workspaceFolder}"
+					],
+					// The actual pattern to match problems in the output.
+					"pattern": {
+						"kind": "",
+						// The regular expression. Example to match: helloWorld.c:5:3: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]
+						"regexp": "^(Warning|Error):.*?Line\\s*(\\d+).*?Column\\s*(\\d+):\\s*\\[Hint\\]\\s*(.*)", //:\\s*Line\\s*(\\d+),\\s*Column\\s*(\\d+):\\s*\\[Hint\\]\\s*(.*)
+						// The first match group matches the file name which is relative.
+						// "file": 1,
+						// The second match group matches the line on which the problem occurred.
+						"line": 2,
+						// The third match group matches the column at which the problem occurred.
+						"column": 3,
+						// The fourth match group matches the problem's severity. Can be ignored. Then all problems are captured as errors.
+						"severity": 1,
+						// The fifth match group matches the message.
+						"message": 4
+					}
+				}
+			]
 		}
 	]
 }
