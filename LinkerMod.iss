@@ -50,9 +50,8 @@ Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags:
 Name: "Debug";		Description: "Debug"; Types: full;		Flags:
 
 [Files]
-Source: "test.dll"; DestDir: "{app}"
 Source: "build\Release\installer.dll";	DestDir: "{app}"
-;Flags: dontcopy
+; Flags: dontcopy
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
 Source: "build\Release\asset_util.exe";		DestDir: "{app}\bin"; Components: LinkerMod\AssetUtil
