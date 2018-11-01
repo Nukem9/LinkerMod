@@ -64,7 +64,7 @@ end;
 function GetString(): String;
 var str: String;
 	size: Cardinal;
-	tmp: PChar;
+//	tmp: PChar;
 begin 
 	// Note on passing PChars using RemObjects Pascal Script:
  	// '' pass a nil PChar    (null pointer)
@@ -95,15 +95,14 @@ begin
 end;
 
 // Test
-var progress:TOutputProgressWizardPage;
+// var progress:TOutputProgressWizardPage;
 
 procedure InitializeWizard;
-var
-	downloadPage:TWizardpage;
-	UserPage: TWizardPage;
-	ListBox: TNewListBox; 
-	tags: TStringList;
-	i: Cardinal;
+// var
+	// UserPage: TWizardPage;
+	// ListBox: TNewListBox; 
+	// tags: TStringList;
+	// i: Cardinal;
 begin
 	 {Create our own progress page for the initial download of a small
 		textfile from the server which says what the latest version is}
