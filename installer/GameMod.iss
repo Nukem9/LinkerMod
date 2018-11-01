@@ -6,7 +6,7 @@
 [Setup]
 AppName=GameMod
 AppVersion=DevHead
-DefaultGroupName=FA
+DefaultGroupName=LinkerMod
 UninstallDisplayIcon={app}\GameMod.exe
 Compression=lzma2
 SolidCompression=yes
@@ -27,8 +27,12 @@ DisableDirPage=No
 Name: english; MessagesFile: compiler:Default.isl
 
 [Icons]
-Name: "{commondesktop}\Game Mod"; Filename: "{app}\bin\BlackOps.exe"
-; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{app}\bin\BlackOps.exe"
+; Start Menu Shortcuts
+Name: "{group}\GameMod"; Filename: "{app}\bin\BlackOps.exe";
+Name: "{group}\Uninstall GameMod"; Filename: "{uninstallexe}"
+
+; Desktop Shortcut
+Name: "{commondesktop}\GameMod"; Filename: "{app}\bin\BlackOps.exe";
 
 [Components]
 Name: "GameMod"; Description: "Game Mod"; Types: full compact custom; Flags: fixed
