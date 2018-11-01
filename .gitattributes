@@ -6,6 +6,7 @@
 *.iwi binary
 *.lib binary
 *.ttf binary
+*.ico binary
 
 # Git kept corrupting source files so let's fix them
 *.c text
