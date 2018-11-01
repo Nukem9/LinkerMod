@@ -44,45 +44,6 @@ Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
 
 [Code]
-function GetAutoFiles(Param: string): string;
-begin
-  Result := 'C:\Users\SE2Dev\Desktop\blender-2.80.0-git.a1689fb091a-windows64\2.80\python\bin\python.exe';
-  { make it return path to the checked out files }
-end;
-
-function GetString(): String;
-var str: String;
-	size: Cardinal;
-//	tmp: PChar;
-begin 
-	// Note on passing PChars using RemObjects Pascal Script:
- 	// '' pass a nil PChar    (null pointer)
-  	// #0 pass an empty PChar (pointer to an empty string)
-	size := TestFunc('');
-	SetLength(str, size+1);
-	TestFunc(str);
-	MsgBox(str, mbInformation, MB_OK);
-	Result := str;
-end;
-
-function GetVersionTags(): TStringList;
-var
-	installPath: PChar;
-	inputString: String;
-	list: TStringList;
-begin
-	installPath := GetVersions();
-	if(length(installPath) < 1) then
-		inputString := #0
-	else
-		inputString := installPath;
-
-	list := TStringList.create;
-	list.Text := inputString;
-
-	Result := list;
-end;
-
 // Test
 // var progress:TOutputProgressWizardPage;
 
