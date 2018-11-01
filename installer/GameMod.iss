@@ -40,21 +40,6 @@ Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
 
 [Code]
-(* Note: These *MUST* use the module exports definition files	*)
-(*       Using __declspec(dllexport) does *NOT* work 			*)
-function  TestFunc( buffer:PChar): Cardinal;
-external 'TestFunc@files:installer.dll stdcall';
-
-
-
-function  SetInstallPath(path: String): Boolean;
-external 'LMI_SetInstallPath@files:installer.dll stdcall';
-
-function  GetVersions(): PChar;
-external 'LMI_GetTags@files:installer.dll stdcall';
-
-
-
 function GetAutoFiles(Param: string): string;
 begin
   Result := 'C:\Users\SE2Dev\Desktop\blender-2.80.0-git.a1689fb091a-windows64\2.80\python\bin\python.exe';
