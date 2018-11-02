@@ -71,8 +71,8 @@ Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
 
 procedure InitializeWizard;
 var
-	UserPage: TWizardPage;
-	ListBox: TNewListBox; 
+	(*UserPage: TWizardPage;
+	ListBox: TNewListBox; *)
 	// tags: TStringList;
 	// i: Cardinal;
 begin
@@ -83,7 +83,7 @@ begin
 	//
 	// Tests for CompareVersions()
 	//
-	UserPage :=  CreateCustomPage(wpWelcome, 'Which version should be installed?', '????');
+	(*UserPage :=  CreateCustomPage(wpWelcome, 'Which version should be installed?', '????');
 
 	ListBox := TNewListBox.Create(UserPage);
 	ListBox.Parent := UserPage.Surface;
@@ -110,7 +110,7 @@ begin
 	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '0.0.0')));
 	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '0.0.1')));
 	ListBox.Items.Add(IntToStr(CompareVersions('1.1.2', '0.0.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('0.0.0', '1.1.0')));
+	ListBox.Items.Add(IntToStr(CompareVersions('0.0.0', '1.1.0')));*)
 end;
 
 function BoolToStr(Value : Boolean) : String; 
@@ -135,6 +135,13 @@ begin
 			'Choose a different one.', mbError, MB_OK);
 		Exit;
 	end;
+end;
 
-	MsgBox(BoolToStr(Pkg_CheckForUpdate('GameMod', '{#GAMEMOD_VERSION}')), mbError, MB_OK);
+procedure CurPageChanged(CurPageID: Integer);
+begin
+	if(CurPageId = wpSelectComponents) then 
+	begin
+		MsgBox(BoolToStr(Pkg_CheckForUpdate('GameMod', '{#GAMEMOD_VERSION}')), mbError, MB_YESNO);
+		Exit;
+	end;
 end;
