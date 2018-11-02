@@ -6,24 +6,10 @@
 [Setup]
 AppName=GameMod
 AppVersion=0.0.2
-DefaultGroupName=LinkerMod
 UninstallDisplayIcon={app}\GameMod.exe
-Compression=lzma2
-SolidCompression=yes
-OutputDir=./build/
-DisableWelcomePage=no
-
-LicenseFile="./installer/license.txt"
 
 WizardImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
 WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
-
-; Install Path Options
-DefaultDirName={code:GetDefaultDir}
-AppendDefaultDirName=no
-UsePreviousAppDir=no
-DirExistsWarning=no
-DisableDirPage=No
 
 ; Define the bundled GameMod version
 #define GAMEMOD_VERSION SetupSetting("AppVersion")

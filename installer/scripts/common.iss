@@ -1,5 +1,25 @@
 #define ProjectGroup 'LinkerMod'
 
+[Setup]
+; Require Windows Vista or higher
+MinVersion=6.0
+
+DefaultGroupName="{#ProjectGroup}"
+LicenseFile="./installer/license.txt"
+
+OutputDir=./build/
+Compression=lzma2
+SolidCompression=yes
+
+DisableWelcomePage=no
+
+; Install Path Options
+DefaultDirName={code:GetDefaultDir}
+AppendDefaultDirName=no
+UsePreviousAppDir=no
+DirExistsWarning=no
+DisableDirPage=No
+
 [Registry]
 ; LinkerMod Registry Group
 Root: HKLM; Subkey: "Software\{#ProjectGroup}"; \
