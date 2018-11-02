@@ -57,5 +57,20 @@ namespace semver
 
 			return true;
 		}
+
+		static int Compare(const Version& a, const Version& b) {
+			int cmp[] = {
+				(int)a.GetMajorVersion() - (int)b.GetMajorVersion(),
+				(int)a.GetMinorVersion() - (int)b.GetMinorVersion(),
+				(int)a.GetPatchVersion() - (int)b.GetPatchVersion(),
+			};
+
+			for (const auto result : cmp) {
+				if (result != 0)
+					return result;
+			}
+
+			return 0;
+		}
 	}
 }

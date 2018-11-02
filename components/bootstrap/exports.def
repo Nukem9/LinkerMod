@@ -3,3 +3,4 @@ TestFunc
 LMI_GamePath
 LMI_SetInstallPath
 LMI_GetTags
+LMI_CompareVersions

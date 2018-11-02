@@ -27,3 +27,6 @@
 
 // Additional headers
 #include "shared_utility.h"
+#include "shared_version.h"
+
+#include "jsoncpp/include/json/json.h"

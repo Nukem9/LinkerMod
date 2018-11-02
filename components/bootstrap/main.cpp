@@ -5,7 +5,6 @@
 
 #include "common/fs.h"
 
-#include "jsoncpp/include/json/json.h"
 
  void debug_main();
 
@@ -81,5 +80,14 @@ extern "C" {
 		}
 
 		return tags.c_str();
+	}
+
+	int __stdcall LMI_CompareVersions(const char* a, const char* b)
+	{
+		using namespace semver::v2;
+		Version _a(a);
+		Version _b(b);
+
+		return Compare(_a, _b);
 	}
 }
