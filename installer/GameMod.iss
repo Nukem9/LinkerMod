@@ -59,7 +59,7 @@ Name: "{commondesktop}\GameMod"; Filename: "{app}\bin\BlackOps.exe";
 Name: "GameMod"; Description: "Game Mod"; Types: full compact custom; Flags: fixed
 
 [Files]
-Source: "build\Release\installer.dll";	DestDir: "{app}"
+Source: "build\Release\bootstrap.dll";	DestDir: "{app}"
 ; Flags: dontcopy
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod

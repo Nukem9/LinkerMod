@@ -50,7 +50,7 @@ Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags:
 Name: "Debug";		Description: "Debug"; Types: full;		Flags:
 
 [Files]
-Source: "build\Release\installer.dll";	DestDir: "{app}"
+Source: "build\Release\bootstrap.dll";	DestDir: "{app}"
 ; Flags: dontcopy
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
@@ -78,16 +78,16 @@ Name: extract\ffs; 		Description: "Extract &Entity Maps"; 	GroupDescription: "Fa
 (* Note: These *MUST* use the module exports definition files	*)
 (*       Using __declspec(dllexport) does *NOT* work 			*)
 function  TestFunc( buffer:PChar): Cardinal;
-external 'TestFunc@files:installer.dll stdcall';
+external 'TestFunc@files:bootstrap.dll stdcall';
 
 function  GetGamePath(): PChar;
-external 'LMI_GamePath@files:installer.dll stdcall';
+external 'LMI_GamePath@files:bootstrap.dll stdcall';
 
 function  SetInstallPath(path: String): Boolean;
-external 'LMI_SetInstallPath@files:installer.dll stdcall';
+external 'LMI_SetInstallPath@files:bootstrap.dll stdcall';
 
 function  GetVersions(): PChar;
-external 'LMI_GetTags@files:installer.dll stdcall';
+external 'LMI_GetTags@files:bootstrap.dll stdcall';
 
 //
 // Get the default installation directory
