@@ -1,5 +1,10 @@
 #define ProjectGroup 'LinkerMod'
 
+[Registry]
+; LinkerMod Registry Group
+Root: HKLM; Subkey: "Software\{#ProjectGroup}"; \
+			Flags: uninsdeletekeyifempty createvalueifdoesntexist;
+
 [Code]
 (* Note: These *MUST* use the module exports definition files	*)
 (*       Using __declspec(dllexport) does *NOT* work 			*)

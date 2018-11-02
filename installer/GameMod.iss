@@ -32,21 +32,17 @@ DisableDirPage=No
 Name: english; MessagesFile: compiler:Default.isl
 
 [Registry]
-; LinkerMod Registry Group
-Root: HKLM; Subkey: "Software\LinkerMod"; \
-			Flags: uninsdeletekeyifempty createvalueifdoesntexist;
-
 ; {AppName} Registry Group
-Root: HKLM; Subkey: "Software\LinkerMod\{#SetupSetting('AppName')}"; \
+Root: HKLM; Subkey: "Software\{#ProjectGroup}\{#SetupSetting('AppName')}"; \
 			Flags: uninsdeletekey deletevalue;
 
-Root: HKLM; Subkey: "Software\LinkerMod\{#SetupSetting('AppName')}"; \
+Root: HKLM; Subkey: "Software\{#ProjectGroup}\{#SetupSetting('AppName')}"; \
 			Flags: deletevalue uninsclearvalue; \
 			ValueType: string; \
 			ValueName: "InstallPath"; \
 			ValueData: "{app}\bin"; 
 
-Root: HKLM; Subkey: "Software\LinkerMod\{#SetupSetting('AppName')}"; \
+Root: HKLM; Subkey: "Software\{#ProjectGroup}\{#SetupSetting('AppName')}"; \
 			Flags: deletevalue uninsclearvalue; \
 			ValueType: string; \
 			ValueName: "CurrentVersion"; \
