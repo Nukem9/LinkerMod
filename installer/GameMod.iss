@@ -60,17 +60,19 @@ Name: "{commondesktop}\GameMod"; Filename: "{app}\bin\BlackOps.exe";
 Name: "GameMod"; Description: "Game Mod"; Types: full compact custom; Flags: fixed
 
 [Files]
-Source: "build\Release\bootstrap.dll";	DestDir: "{app}"
-; Flags: dontcopy
+Source: "build\Release\bootstrap.dll";		DestDir: "{app}"; \
+											Flags: dontcopy;
+
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
-Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
+Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; \
+											Components: GameMod;
 
 [Code]
 // Test
 // var progress:TOutputProgressWizardPage;
 
 procedure InitializeWizard;
-var
+// var
 	(*UserPage: TWizardPage;
 	ListBox: TNewListBox; *)
 	// tags: TStringList;
