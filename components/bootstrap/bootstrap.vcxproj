@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>installer</RootNamespace>
+    <RootNamespace>bootstrap</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
     <ProjectName>bootstrap</ProjectName>
   </PropertyGroup>
