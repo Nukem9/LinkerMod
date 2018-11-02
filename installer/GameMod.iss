@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=GameMod
-AppVersion=v0.0.1
+AppVersion=0.0.2
 DefaultGroupName=LinkerMod
 UninstallDisplayIcon={app}\GameMod.exe
 Compression=lzma2
@@ -23,6 +23,9 @@ UsePreviousAppDir=no
 DirExistsWarning=no
 DisableDirPage=No
 
+; Define the bundled GameMod version
+#define GAMEMOD_VERSION SetupSetting("AppVersion")
+
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
 
@@ -36,16 +39,16 @@ Root: HKLM; Subkey: "Software\LinkerMod\{#SetupSetting('AppName')}"; \
 			Flags: uninsdeletekey deletevalue;
 
 Root: HKLM; Subkey: "Software\LinkerMod\{#SetupSetting('AppName')}"; \
-			Flags: createvalueifdoesntexist uninsclearvalue; \
+			Flags: deletevalue uninsclearvalue; \
 			ValueType: string; \
 			ValueName: "InstallPath"; \
-			ValueData: "{app}"; 
+			ValueData: "{app}\bin"; 
 
 Root: HKLM; Subkey: "Software\LinkerMod\{#SetupSetting('AppName')}"; \
-			Flags: createvalueifdoesntexist uninsclearvalue; \
+			Flags: deletevalue uninsclearvalue; \
 			ValueType: string; \
 			ValueName: "CurrentVersion"; \
-			ValueData: "{#SetupSetting('AppVersion')}" 
+			ValueData: "{#GAMEMOD_VERSION}" 
 
 [Icons]
 ; Start Menu Shortcuts
@@ -69,18 +72,52 @@ Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
 // var progress:TOutputProgressWizardPage;
 
 procedure InitializeWizard;
-// var
-	// UserPage: TWizardPage;
-	// ListBox: TNewListBox; 
+var
+	UserPage: TWizardPage;
+	ListBox: TNewListBox; 
 	// tags: TStringList;
 	// i: Cardinal;
 begin
 	 {Create our own progress page for the initial download of a small
 		textfile from the server which says what the latest version is}
 	//	progress := CreateOutputProgressPage(ITD_GetString(ITDS_Update_Caption), ITD_GetString(ITDS_Update_Description));
+
+	//
+	// Tests for CompareVersions()
+	//
+	UserPage :=  CreateCustomPage(wpWelcome, 'Which version should be installed?', '????');
+
+	ListBox := TNewListBox.Create(UserPage);
+	ListBox.Parent := UserPage.Surface;
+
+	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '1.0.0')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '1.0.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.0.2', '1.0.1')));
+
+	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '1.1.0')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '1.1.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.0.2', '1.1.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '1.0.0')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '1.0.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.1.2', '1.0.1')));
+
+	ListBox.Items.Add(IntToStr(CompareVersions('0.0.0', '1.1.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('0.0.2', '1.1.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('0.1.0', '1.0.0')));
+	ListBox.Items.Add(IntToStr(CompareVersions('0.1.0', '1.0.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('0.1.2', '1.0.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '0.1.0')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '0.1.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.0.2', '0.1.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '0.0.0')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '0.0.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('1.1.2', '0.0.1')));
+	ListBox.Items.Add(IntToStr(CompareVersions('0.0.0', '1.1.0')));
 end;
 
 function NextButtonClick(curPageID:integer): boolean;
+var
+	gmCurrentVersion: String;
 begin
 	Result := True;
 
@@ -94,4 +131,33 @@ begin
 			'Choose a different one.', mbError, MB_OK);
 		Exit;
 	end;
+
+	//
+	// Check for existing GameMod installs. If the existing
+	// version one is older than the bundled one, ask the 
+	// user if they want to upgrade.
+	// 
+	// TODO: Put this after a specific menu
+	//
+	if RegQueryStringValue(HKEY_LOCAL_MACHINE,
+						'Software\LinkerMod\{#SetupSetting("AppName")}',
+						'CurrentVersion',
+						gmCurrentVersion) then
+	begin
+		//
+		// Check if the bundled version is newer than the
+		// currently installed version
+		//
+		if (CompareVersions('{#GAMEMOD_VERSION}', gmCurrentVersion) > 0) then
+		begin
+			MsgBox('{#GAMEMOD_VERSION}', mbInformation, MB_OK);
+		end
+	end;	
+
+	// if RegKeyExists(HKEY_CURRENT_USER, 'Software\Jordan Russell\Inno Setup') then
+	// begin
+	// 	RegQueryStringValue(HKEY_LOCAL_MACHINE, "Software\LinkerMod\{#SetupSetting('AppName')}"
+	//   // The key exists
+	// end;
+	
 end;

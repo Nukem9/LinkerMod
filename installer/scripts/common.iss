@@ -4,6 +4,9 @@
 function  TestFunc( buffer:PChar): Cardinal;
 external 'TestFunc@files:bootstrap.dll stdcall';
 
+function  CompareVersions(a: String; b: String): Integer;
+external 'LMI_CompareVersions@files:bootstrap.dll stdcall';
+
 function  GetGamePath(): PChar;
 external 'LMI_GamePath@files:bootstrap.dll stdcall';
 
