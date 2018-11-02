@@ -13,6 +13,8 @@ SolidCompression=yes
 OutputDir=./build/
 DisableWelcomePage=no
 
+LicenseFile="./installer/license.txt"
+
 WizardImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
 WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
 
