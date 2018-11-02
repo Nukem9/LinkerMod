@@ -14,9 +14,6 @@ WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
 ; Define the bundled GameMod version
 #define GAMEMOD_VERSION SetupSetting("AppVersion")
 
-[Languages]
-Name: english; MessagesFile: compiler:Default.isl
-
 [Registry]
 ; {AppName} Registry Group
 Root: HKLM; Subkey: "Software\{#ProjectGroup}\{#SetupSetting('AppName')}"; \
@@ -99,14 +96,6 @@ begin
 	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '0.0.1')));
 	ListBox.Items.Add(IntToStr(CompareVersions('1.1.2', '0.0.1')));
 	ListBox.Items.Add(IntToStr(CompareVersions('0.0.0', '1.1.0')));*)
-end;
-
-function BoolToStr(Value : Boolean) : String; 
-begin
-  if Value then
-    result := 'true'
-  else
-    result := 'false';
 end;
 
 function NextButtonClick(curPageID:integer): boolean;
