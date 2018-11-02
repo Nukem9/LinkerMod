@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=GameMod
-AppVersion=DevHead
+AppVersion=v0.0.1
 DefaultGroupName=LinkerMod
 UninstallDisplayIcon={app}\GameMod.exe
 Compression=lzma2
@@ -25,6 +25,27 @@ DisableDirPage=No
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl
+
+[Registry]
+; LinkerMod Registry Group
+Root: HKLM; Subkey: "Software\LinkerMod"; \
+			Flags: uninsdeletekeyifempty createvalueifdoesntexist;
+
+; {AppName} Registry Group
+Root: HKLM; Subkey: "Software\LinkerMod\{#SetupSetting('AppName')}"; \
+			Flags: uninsdeletekey deletevalue;
+
+Root: HKLM; Subkey: "Software\LinkerMod\{#SetupSetting('AppName')}"; \
+			Flags: createvalueifdoesntexist uninsclearvalue; \
+			ValueType: string; \
+			ValueName: "InstallPath"; \
+			ValueData: "{app}"; 
+
+Root: HKLM; Subkey: "Software\LinkerMod\{#SetupSetting('AppName')}"; \
+			Flags: createvalueifdoesntexist uninsclearvalue; \
+			ValueType: string; \
+			ValueName: "CurrentVersion"; \
+			ValueData: "{#SetupSetting('AppVersion')}" 
 
 [Icons]
 ; Start Menu Shortcuts
