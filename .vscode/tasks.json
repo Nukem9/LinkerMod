@@ -27,7 +27,7 @@
 					"owner": "inno",
 					// The file name for reported problems is relative to the opened folder.
 					"fileLocation": [
-						"relative",
+						"absolute",
 						"${workspaceFolder}"
 					],
 					// The actual pattern to match problems in the output.
@@ -45,6 +45,22 @@
 						"severity": 1,
 						// The fifth match group matches the message.
 						"message": 4
+					}
+				},
+				{
+					// The problem is owned by the cpp language service.
+					"owner": "inno",
+					// The file name for reported problems is relative to the opened folder.
+					"fileLocation": [
+						"absolute"
+					],
+					// The actual pattern to match problems in the output.
+					"pattern": {
+						"regexp": "^(Error) on line (\\d+) in (.*?:.*?):\\s*(.*)$",
+						"file": 3,
+						"line": 2,
+						"message": 4,
+						"severity": 1
 					}
 				}
 			]
