@@ -92,5 +92,6 @@ begin
 		Result := False;
 		MsgBox('Target installation directory is invalid. ' +
 			'Choose a different one.', mbError, MB_OK);
+		Exit;
 	end;
 end;
