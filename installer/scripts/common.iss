@@ -17,7 +17,8 @@ function  GetVersions(): PChar;
 external 'LMI_GetTags@files:bootstrap.dll stdcall';
 
 //
-// Get the default installation directory
+// Get the (automatically resolved) default installation directory
+// Returns an empty string if it couldn't be found
 //
 function GetDefaultDir(Param: string): string;
 var
