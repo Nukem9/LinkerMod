@@ -126,8 +126,6 @@ begin
 end;
 
 function NextButtonClick(curPageID:integer): boolean;
-var
-	gmCurrentVersion: String;
 begin
 	Result := True;
 
