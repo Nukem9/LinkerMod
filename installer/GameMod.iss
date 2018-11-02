@@ -115,6 +115,14 @@ begin
 	ListBox.Items.Add(IntToStr(CompareVersions('0.0.0', '1.1.0')));
 end;
 
+function BoolToStr(Value : Boolean) : String; 
+begin
+  if Value then
+    result := 'true'
+  else
+    result := 'false';
+end;
+
 function NextButtonClick(curPageID:integer): boolean;
 var
 	gmCurrentVersion: String;
@@ -132,32 +140,5 @@ begin
 		Exit;
 	end;
 
-	//
-	// Check for existing GameMod installs. If the existing
-	// version one is older than the bundled one, ask the 
-	// user if they want to upgrade.
-	// 
-	// TODO: Put this after a specific menu
-	//
-	if RegQueryStringValue(HKEY_LOCAL_MACHINE,
-						'Software\LinkerMod\{#SetupSetting("AppName")}',
-						'CurrentVersion',
-						gmCurrentVersion) then
-	begin
-		//
-		// Check if the bundled version is newer than the
-		// currently installed version
-		//
-		if (CompareVersions('{#GAMEMOD_VERSION}', gmCurrentVersion) > 0) then
-		begin
-			MsgBox('{#GAMEMOD_VERSION}', mbInformation, MB_OK);
-		end
-	end;	
-
-	// if RegKeyExists(HKEY_CURRENT_USER, 'Software\Jordan Russell\Inno Setup') then
-	// begin
-	// 	RegQueryStringValue(HKEY_LOCAL_MACHINE, "Software\LinkerMod\{#SetupSetting('AppName')}"
-	//   // The key exists
-	// end;
-	
+	MsgBox(BoolToStr(Pkg_CheckForUpdate('GameMod', '{#GAMEMOD_VERSION}')), mbError, MB_OK);
 end;

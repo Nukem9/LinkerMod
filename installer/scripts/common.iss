@@ -1,3 +1,5 @@
+#define ProjectGroup 'LinkerMod'
+
 [Code]
 (* Note: These *MUST* use the module exports definition files	*)
 (*       Using __declspec(dllexport) does *NOT* work 			*)
@@ -47,4 +49,45 @@ begin
 		Result := #0
 	else
 		Result := installPath;
+end;
+
+//
+// Check if an existing version of a package is installed, then check
+// if the bundled version of that package is newer than the installed one.
+// If the bundled version is newer, ask the user if they want to upgrade
+// to the bundled version.
+//
+// Returns: True if the package should be updated
+//
+function Pkg_CheckForUpdate(packageName: string; bundledVersion: string): boolean;
+var
+	installedVersion: String;
+begin
+	(* Check for existing <packageName> installs. If there is no 
+	   existing installation of <packageName>, we need to install
+	   the version bundled with the ModTools installer *)
+	if not RegQueryStringValue(HKEY_LOCAL_MACHINE,
+						'Software\{#ProjectGroup}\' + packageName,
+						'CurrentVersion',
+						installedVersion) then
+	begin
+		Result := True;
+		Exit;
+	end;
+
+	(*
+	   Check if the bundled version of <packageName> is newer than
+	   the existing version. If the bundled version is newer
+	   we need update <packageName> to use the bundled one.
+	*)
+	if CompareVersions(bundledVersion, installedVersion) > 0 then
+	begin
+		Result := (MsgBox(	'An existing installation of ' + packageName + ' has been detected.' + #13#10 + #13#10 +
+			'Installed: ' + packageName + ' (' + installedVersion + ')' + #13#10 + 
+			'Bundled: ' + packageName + ' (' + bundledVersion + ')' + #13#10 + #13#10 +
+			'Would you like to automatically install the bundled version of ' + packageName + '?' , mbConfirmation, MB_YESNO) = IDYES);
+		Exit;
+	end
+
+	Result := False;
 end;
