@@ -19,8 +19,8 @@ WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
 ; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
 
 [Icons]
-Name: "{commondesktop}\Game Mod"; Filename: "{app}\bin\BlackOps.exe"
-; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{app}\bin\BlackOps.exe"
+Name: "{commondesktop}\Game Mod"; Filename: "{#BinDir}\BlackOps.exe"
+; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{#BinDir}\BlackOps.exe"
 
 [Components]
 Name: "GameMod";	Description: "Game Mod";	\
@@ -61,19 +61,50 @@ Name: extract\ffs\ents; Description: "Extract &Entity Maps"; 	\
 						Components: LinkerMod\AssetUtil;
 
 [Files]
-Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
-Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
-Source: "build\Release\asset_util.exe";		DestDir: "{app}\bin"; Components: LinkerMod\AssetUtil
-Source: "build\Release\asset_viewer.dll";	DestDir: "{app}\bin"; Components: LinkerMod\AssetViewer
-Source: "build\Release\cod2map.dll";		DestDir: "{app}\bin"; Components: LinkerMod\CoD2Map
-Source: "build\Release\cod2rad.dll";		DestDir: "{app}\bin"; Components: LinkerMod\CoD2Rad
-Source: "build\Release\linker_pc.dll";		DestDir: "{app}\bin"; Components: LinkerMod\Linker
-Source: "build\Release\radiant_mod.dll";	DestDir: "{app}\bin"; Components: LinkerMod\Radiant
+;
+; Actual LinkerMod binaries
+;
+Source: "build\Release\proxy.dll";			DestDir: "{#BinDir}";
+Source: "build\Release\game_mod.dll";		DestDir: "{#BinDir}"; Components: GameMod
+Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}"; Components: LinkerMod\AssetUtil
+Source: "build\Release\asset_viewer.dll";	DestDir: "{#BinDir}"; Components: LinkerMod\AssetViewer
+Source: "build\Release\cod2map.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\CoD2Map
+Source: "build\Release\cod2rad.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\CoD2Rad
+Source: "build\Release\linker_pc.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Linker
+Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}"; Components: LinkerMod\Radiant
+
+;
+; Mod Tools asset files
+;
+
+; Utility scripts
+Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";		\
+									Components: LinkerMod\AssetUtil; 	\
+									Flags: recursesubdirs;
+
+; Custom / missing assets
+; Source: "components\resource\*";	DestDir: "{app}";		\
+;									Components: LinkerMod;	\
+; 									Flags: recursesubdirs;
 
 ; Test automatic shit
-; Source: "{code:GetAutoFiles}";				DestDir: "{app}\bin\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
+; Source: "{code:GetAutoFiles}";				DestDir: "{#BinDir}\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
 
-
+[Run]
+;; extract-iwd --all --includeLocalized
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets...";		\
+										Parameters: "help";							\
+										WorkingDir:	"{#BinDir}";					\
+										Flags: runhidden;							\
+										Tasks: extract\iwd;
+;; extract-ff -v --all --includeLocalized
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets...";	\
+										Parameters: "";								\
+										WorkingDir:	"{#BinDir}";					\
+										Flags: runhidden;							\
+										Tasks: extract\ffs
+; Filename: "{app}\README.TXT"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
+; Filename: "{app}\MYPROG.EXE"; Description: "Launch application"; Flags: postinstall nowait skipifsilent unchecked
 
 [Code]
 // Test

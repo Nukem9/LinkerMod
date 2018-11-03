@@ -1,4 +1,5 @@
 #define ProjectGroup 'LinkerMod'
+#define BinDir '{app}\bin'
 
 #include "./utility.iss"
 
