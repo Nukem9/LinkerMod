@@ -101,18 +101,7 @@ end;
 
 function NextButtonClick(curPageID:integer): boolean;
 begin
-	Result := True;
-
-	//
-	// Validate the install path
-	//
-	if (CurPageID = wpSelectDir) and (SetInstallPath(WizardDirValue) = false) then
-	begin
-		Result := False;
-		MsgBox('Target installation directory is invalid. ' +
-			'Choose a different one.', mbError, MB_OK);
-		Exit;
-	end;
+	Result := Com_ValidateInstallPath(curPageID);
 end;
 
 // procedure CurPageChanged(CurPageID: Integer);

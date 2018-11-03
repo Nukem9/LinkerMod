@@ -30,6 +30,11 @@ Name: english; MessagesFile: compiler:Default.isl
 Root: HKLM; Subkey: "Software\{#ProjectGroup}"; \
 			Flags: uninsdeletekeyifempty createvalueifdoesntexist;
 
+[Files]
+; Installer Bootstrap DLL (required for external dll code)
+Source: "build\Release\bootstrap.dll";	DestDir: "{app}" \
+										Flags: dontcopy
+
 [Code]
 (* Note: These *MUST* use the module exports definition files	*)
 (*       Using __declspec(dllexport) does *NOT* work 			*)
@@ -131,7 +136,7 @@ end;
 function Pkg_AskToUpgrade(packageName: string; fromVersion: string; toVersion: string): boolean;
 begin
 	Result := (MsgBox(	'An existing installation of ' + packageName + ' has been detected.' + #13#10 + #13#10 +
-			'Installed: ' + packageName + ' (' + fromVersion + ')' + #13#10 + 
+			'Installed: ' + packageName + ' (' + fromVersion + ')' + #13#10 +
 			'Bundled: ' + packageName + ' (' + toVersion + ')' + #13#10 + #13#10 +
 			'Would you like to automatically install the bundled version of ' + packageName + '?' , mbConfirmation, MB_YESNO) = IDYES);
 end;
@@ -148,7 +153,7 @@ function Pkg_CheckForUpgrade(packageName: string; bundledVersion: string): boole
 var
 	installedVersion: String;
 begin
-	(* Check for existing <packageName> installs. If there is no 
+	(* Check for existing <packageName> installs. If there is no
 	   existing installation of <packageName>, we need to install
 	   the version bundled with the ModTools installer *)
 	if not Pkg_CheckInstalledVersion(packageName, installedVersion) then
@@ -169,4 +174,21 @@ begin
 	end
 
 	Result := False;
+end;
+
+//
+// Validate the install path
+// Returns True if the path is valid
+//
+function Com_ValidateInstallPath(curPageID:integer): boolean;
+begin
+	Result := True;
+
+	if (CurPageID = wpSelectDir) and (SetInstallPath(WizardDirValue) = false) then
+	begin
+		Result := False;
+		MsgBox('Target installation directory is invalid. ' +
+			'Choose a different one.', mbError, MB_OK);
+		Exit;
+	end;
 end;
