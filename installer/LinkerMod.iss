@@ -40,23 +40,23 @@ Name: "Debug";		Description: "Debug"; Types: full;
 ; Flags:
 
 [Tasks]
-Name: extract; 	Description: "Extract I&WDs"; 				\
-				Components: LinkerMod\AssetUtil;
-Name: extract\iwd; 	Description: "Extract Images"; 			\
-					Components: LinkerMod\AssetUtil
-Name: extract\iwd; 	Description: "Extract &Sounds"; 		\
+Name: extract\iwd; 	Description: "Extract I&WDs"; 				\
 					Components: LinkerMod\AssetUtil;
-Name: extract\iwd; 	Description: "Extract &Other Assets"; 	\
-					Components: LinkerMod\AssetUtil;
+Name: extract\iwd\img; 	Description: "Extract Images"; 			\
+						Components: LinkerMod\AssetUtil
+Name: extract\iwd\snd; 	Description: "Extract &Sounds"; 		\
+						Components: LinkerMod\AssetUtil;
+Name: extract\iwd\misc; Description: "Extract &Other Assets"; 	\
+						Components: LinkerMod\AssetUtil;
 
-Name: extract; 		Description: "Extract &FastFiles"; 		\
-					Components: LinkerMod\AssetUtil;
-Name: extract\ffs; 	Description: "Extract &Sounds"; 		\
-					Components: LinkerMod\AssetUtil;
-Name: extract\ffs; 	Description: "Extract &Rawfiles"; 		\
-					Components: LinkerMod\AssetUtil;
-Name: extract\ffs; 	Description: "Extract &Entity Maps"; 	\
-					Components: LinkerMod\AssetUtil;
+Name: extract\ffs; 		Description: "Extract &FastFiles"; 		\
+						Components: LinkerMod\AssetUtil;
+Name: extract\ffs\snd; 	Description: "Extract &Sounds"; 		\
+						Components: LinkerMod\AssetUtil;
+Name: extract\ffs\raw; 	Description: "Extract &Rawfiles"; 		\
+						Components: LinkerMod\AssetUtil;
+Name: extract\ffs\ents; Description: "Extract &Entity Maps"; 	\
+						Components: LinkerMod\AssetUtil;
 
 [Files]
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
