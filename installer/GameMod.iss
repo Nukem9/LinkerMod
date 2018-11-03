@@ -76,9 +76,6 @@ Name: "{userdesktop}\GameMod";	Filename: "{app}\bin\BlackOps.exe"; \
 								Tasks: desktopicon\user;
 
 [Files]
-Source: "build\Release\bootstrap.dll";		DestDir: "{app}"; \
-											Flags: dontcopy;
-
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin"; \
 											Components: GameMod\bundled;
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; \

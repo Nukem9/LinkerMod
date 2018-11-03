@@ -32,7 +32,7 @@ Root: HKLM; Subkey: "Software\{#ProjectGroup}"; \
 
 [Files]
 ; Installer Bootstrap DLL (required for external dll code)
-Source: "build\Release\bootstrap.dll";	DestDir: "{app}" \
+Source: ".\build\Release\bootstrap.dll";	DestDir: {app} \
 										Flags: dontcopy
 
 [Code]
