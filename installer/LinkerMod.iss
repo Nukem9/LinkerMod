@@ -14,7 +14,7 @@ WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
 ; Inlude the Inno Downloader scripts
 #include ReadReg(HKEY_LOCAL_MACHINE,'Software\Sherlock Software\InnoTools\Downloader','ScriptPath','');
 
-[Files]                              
+[Files]
 ; Source: "build\Release\game_mod.dll"; DestDir: "{app}"
 ; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
 
@@ -23,22 +23,42 @@ Name: "{commondesktop}\Game Mod"; Filename: "{app}\bin\BlackOps.exe"
 ; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{app}\bin\BlackOps.exe"
 
 [Components]
-Name: "GameMod"; Description: "Game Mod"; Types: full compact custom; Flags: fixed
+Name: "GameMod";	Description: "Game Mod";	\
+					Types: full compact custom;	\
+					Flags: fixed
 
 ; exlusive flag makes them radio buttons
 Name: "LinkerMod"; Description: "Mod Tools"; Types: full custom
-Name: "LinkerMod\AssetUtil";	Description: "Asset Util"; Types: full;			Flags: 
-Name: "LinkerMod\AssetViewer";	Description: "AssetViewer Mod"; Types: full;	Flags: 
-Name: "LinkerMod\CoD2Map";		Description: "CoD2Map Mod"; Types: full;		Flags: 
-Name: "LinkerMod\CoD2Rad";		Description: "CoD2Rad Mod"; Types: full;		Flags: 
-Name: "LinkerMod\Linker";		Description: "Linker Mod"; Types: full;			Flags: 
-Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags: 
+Name: "LinkerMod\AssetUtil";	Description: "Asset Util"; Types: full;			Flags:
+Name: "LinkerMod\AssetViewer";	Description: "AssetViewer Mod"; Types: full;	Flags:
+Name: "LinkerMod\CoD2Map";		Description: "CoD2Map Mod"; Types: full;		Flags:
+Name: "LinkerMod\CoD2Rad";		Description: "CoD2Rad Mod"; Types: full;		Flags:
+Name: "LinkerMod\Linker";		Description: "Linker Mod"; Types: full;			Flags:
+Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags:
 
-Name: "Debug";		Description: "Debug"; Types: full;		Flags:
+Name: "Debug";		Description: "Debug"; Types: full;
+; Flags:
+
+[Tasks]
+Name: extract; 	Description: "Extract I&WDs"; 				\
+				Components: LinkerMod\AssetUtil;
+Name: extract\iwd; 	Description: "Extract Images"; 			\
+					Components: LinkerMod\AssetUtil
+Name: extract\iwd; 	Description: "Extract &Sounds"; 		\
+					Components: LinkerMod\AssetUtil;
+Name: extract\iwd; 	Description: "Extract &Other Assets"; 	\
+					Components: LinkerMod\AssetUtil;
+
+Name: extract; 		Description: "Extract &FastFiles"; 		\
+					Components: LinkerMod\AssetUtil;
+Name: extract\ffs; 	Description: "Extract &Sounds"; 		\
+					Components: LinkerMod\AssetUtil;
+Name: extract\ffs; 	Description: "Extract &Rawfiles"; 		\
+					Components: LinkerMod\AssetUtil;
+Name: extract\ffs; 	Description: "Extract &Entity Maps"; 	\
+					Components: LinkerMod\AssetUtil;
 
 [Files]
-
-
 Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; Components: GameMod
 Source: "build\Release\asset_util.exe";		DestDir: "{app}\bin"; Components: LinkerMod\AssetUtil
@@ -49,125 +69,50 @@ Source: "build\Release\linker_pc.dll";		DestDir: "{app}\bin"; Components: Linker
 Source: "build\Release\radiant_mod.dll";	DestDir: "{app}\bin"; Components: LinkerMod\Radiant
 
 ; Test automatic shit
-Source: "{code:GetAutoFiles}";				DestDir: "{app}\bin\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
+; Source: "{code:GetAutoFiles}";				DestDir: "{app}\bin\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
 
-[Tasks]
-Name: extract; 			Description: "Extract I&WDs"; 			GroupDescription: "IWDs:"; 			Components: LinkerMod\AssetUtil
-Name: extract\iwd; 		Description: "Extract &Images"; 		GroupDescription: "IWDs:"; 			Components: LinkerMod\AssetUtil
-Name: extract\iwd; 		Description: "Extract &Sounds"; 		GroupDescription: "IWDs:"; 			Components: LinkerMod\AssetUtil
-Name: extract\iwd; 		Description: "Extract &Other Assets"; 	GroupDescription: "IWDs:"; 			Components: LinkerMod\AssetUtil
-Name: extract; 			Description: "Extract &FastFiles"; 		GroupDescription: "FastFiles:"; 	Components: LinkerMod\AssetUtil
-Name: extract\ffs; 		Description: "Extract &Sounds"; 		GroupDescription: "FastFiles:"; 	Components: LinkerMod\AssetUtil
-Name: extract\ffs; 		Description: "Extract &Rawfiles"; 		GroupDescription: "FastFiles:"; 	Components: LinkerMod\AssetUtil
-Name: extract\ffs; 		Description: "Extract &Entity Maps"; 	GroupDescription: "FastFiles:"; 	Components: LinkerMod\AssetUtil
+
 
 [Code]
-(* Note: These *MUST* use the module exports definition files	*)
-(*       Using __declspec(dllexport) does *NOT* work 			*)
-function  TestFunc( buffer:PChar): Cardinal;
-external 'TestFunc@files:bootstrap.dll stdcall';
-
-function  GetGamePath(): PChar;
-external 'LMI_GamePath@files:bootstrap.dll stdcall';
-
-function  SetInstallPath(path: String): Boolean;
-external 'LMI_SetInstallPath@files:bootstrap.dll stdcall';
-
-function  GetVersions(): PChar;
-external 'LMI_GetTags@files:bootstrap.dll stdcall';
-
-//
-// Get the default installation directory
-//
-function GetDefaultDir(Param: string): string;
-var
-	installPath: PChar;
-begin
-	installPath := GetGamePath();
-	if(length(installPath) < 1) then
-		Result := #0
-	else
-		Result := installPath;
-end;
-
-function GetAutoFiles(Param: string): string;
-begin
-  Result := 'C:\Users\SE2Dev\Desktop\blender-2.80.0-git.a1689fb091a-windows64\2.80\python\bin\python.exe';
-  { make it return path to the checked out files }
-end;
-
-function GetString(): String;
-var str: String;
-	size: Cardinal;
-	tmp: PChar;
-begin 
-	// Note on passing PChars using RemObjects Pascal Script:
- 	// '' pass a nil PChar    (null pointer)
-  	// #0 pass an empty PChar (pointer to an empty string)
-	size := TestFunc('');
-	SetLength(str, size+1);
-	TestFunc(str);
-	MsgBox(str, mbInformation, MB_OK);
-	Result := str;
-end;
-
-function GetVersionTags(): TStringList;
-var
-	installPath: PChar;
-	inputString: String;
-	list: TStringList;
-begin
-	installPath := GetVersions();
-	if(length(installPath) < 1) then
-		inputString := #0
-	else
-		inputString := installPath;
-
-	list := TStringList.create;
-	list.Text := inputString;
-
-	Result := list;
-end;
-
 // Test
 var progress:TOutputProgressWizardPage;
 
 procedure InitializeWizard;
-var
-	downloadPage:TWizardpage;
-	UserPage: TWizardPage;
-	ListBox: TNewListBox; 
-	tags: TStringList;
-	i: Cardinal;
+// var
+//	downloadPage:TWizardpage;
+//	UserPage: TWizardPage;
+//	ListBox: TNewListBox;
+//	tags: TStringList;
+//	i: Cardinal;
 begin
-	itd_init;
+ 	itd_init;
 
-	tags := GetVersionTags();
-
-	// Attempt to get the installation path
-	UserPage :=  CreateCustomPage(wpWelcome, 'Which version should be installed?', '????');
-
-
-	ListBox := TNewListBox.Create(UserPage);
-	ListBox.Parent := UserPage.Surface;
-
-	For i := 0 to tags.Count - 1 do
-	begin
-	 ListBox.Items.Add(tags[i]);
-	end;
-
-	ListBox.Items.Add('test1');
-	ListBox.Items.Add('test2');
-
-	// GetString();
-	
-	 {Create our own progress page for the initial download of a small
-		textfile from the server which says what the latest version is}
-	//	progress := CreateOutputProgressPage(ITD_GetString(ITDS_Update_Caption), ITD_GetString(ITDS_Update_Description));
-
-	// Stuff
-	//Create the ITD GUI so that we have it if we decide to download a new intaller version
-	downloadPage:=itd_downloadafter(wpWelcome);
+	// tags := GetVersionTags();
+//
+	// // Attempt to get the installation path
+	// UserPage :=  CreateCustomPage(wpWelcome, 'Which version should be installed?', '????');
+//
+//
+	// ListBox := TNewListBox.Create(UserPage);
+	// ListBox.Parent := UserPage.Surface;
+//
+	// For i := 0 to tags.Count - 1 do
+	// begin
+	//  ListBox.Items.Add(tags[i]);
+	// end;
+//
+	// ListBox.Items.Add('test1');
+	// ListBox.Items.Add('test2');
+//
+	// // GetString();
+	//
+	//  {Create our own progress page for the initial download of a small
+	// 	textfile from the server which says what the latest version is}
+	// //	progress := CreateOutputProgressPage(ITD_GetString(ITDS_Update_Caption), ITD_GetString(ITDS_Update_Description));
+//
+	// // Stuff
+	// //Create the ITD GUI so that we have it if we decide to download a new intaller version
+	// downloadPage:=itd_downloadafter(wpWelcome);
 end;
 
 function NextButtonClick(curPageID:integer): boolean;
