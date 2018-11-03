@@ -40,6 +40,8 @@ Name: "Debug";		Description: "Debug"; Types: full;
 ; Flags:
 
 [Tasks]
+Name: extract;	Description: "Extract Assets";	\
+				Components: LinkerMod\AssetUtil;
 Name: extract\iwd; 	Description: "Extract I&WDs"; 				\
 					Components: LinkerMod\AssetUtil;
 Name: extract\iwd\img; 	Description: "Extract Images"; 			\
