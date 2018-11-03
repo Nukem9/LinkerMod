@@ -1,1 +1,1 @@
-#include "./installer/GameMod.iss"
+#include "./installer/LinkerMod.iss"
