@@ -31,16 +31,42 @@ Root: HKLM; Subkey: "Software\{#ProjectGroup}\{#SetupSetting('AppName')}"; \
 			ValueName: "CurrentVersion"; \
 			ValueData: "{#GAMEMOD_VERSION}" 
 
-[Icons]
-; Start Menu Shortcuts
-Name: "{group}\GameMod"; Filename: "{app}\bin\BlackOps.exe";
-Name: "{group}\Uninstall GameMod"; Filename: "{uninstallexe}"
-
-; Desktop Shortcut
-Name: "{commondesktop}\GameMod"; Filename: "{app}\bin\BlackOps.exe";
-
 [Components]
 Name: "GameMod"; Description: "Game Mod"; Types: full compact custom; Flags: fixed
+
+[Tasks]
+Name: desktopicon;			Description: "Create a &desktop icon";	\
+							GroupDescription: "Additional icons:";	\
+							Components: GameMod	
+Name: desktopicon\common;	Description: "For all users";	\
+							GroupDescription: "Additional icons:";	\
+							Components: GameMod; \
+							Flags: exclusive unchecked	
+Name: desktopicon\user;		Description: "For the current user only";	\
+							GroupDescription: "Additional icons:";	\
+							Components: GameMod; \
+							Flags: exclusive unchecked	
+Name: quicklaunchicon;		Description: "Create a &Quick Launch icon";	\
+							GroupDescription: "Additional icons:";	\
+							Components: GameMod; \
+							Flags: unchecked	
+
+[Icons]
+; Start Menu Shortcuts
+Name: "{group}\GameMod";	Filename: "{app}\bin\BlackOps.exe"; \
+							Components: GameMod; \
+							Tasks: quicklaunchicon;
+Name: "{group}\Uninstall GameMod";	Filename: "{uninstallexe}"; \
+									Components: GameMod; \
+									Tasks: quicklaunchicon;
+
+; Desktop Shortcuts
+Name: "{commondesktop}\GameMod";	Filename: "{app}\bin\BlackOps.exe"; \
+									Components: GameMod; \
+									Tasks: desktopicon\common;
+Name: "{userdesktop}\GameMod";	Filename: "{app}\bin\BlackOps.exe"; \
+									Components: GameMod; \
+									Tasks: desktopicon\user;
 
 [Files]
 Source: "build\Release\bootstrap.dll";		DestDir: "{app}"; \
