@@ -32,7 +32,14 @@ Root: HKLM; Subkey: "Software\{#ProjectGroup}\{#SetupSetting('AppName')}"; \
 			ValueData: "{#GAMEMOD_VERSION}" 
 
 [Components]
-Name: "GameMod"; Description: "Game Mod {#GAMEMOD_VERSION}"; Types: full compact custom; Flags: fixed
+Name: "GameMod";	Description: "Game Mod"; \
+					Types: full compact custom; \
+					Flags: fixed;
+Name: "GameMod\bundled";	Description: "{#GAMEMOD_VERSION} (bundled version)"; \
+							Flags: exclusive;
+Name: "GameMod\current";	Description: "{code:Pkg_GetInstalledVersion|GameMod} (current version)"; \
+							Flags: exclusive; \
+							Check: Pkg_IsInstalled('GameMod');	 					 									
 
 [Tasks]
 Name: desktopicon;			Description: "Create a &desktop icon";	\
@@ -63,18 +70,19 @@ Name: "{group}\Uninstall GameMod";	Filename: "{uninstallexe}"; \
 ; Desktop Shortcuts
 Name: "{commondesktop}\GameMod";	Filename: "{app}\bin\BlackOps.exe"; \
 									Components: GameMod; \
-									Tasks: desktopicon\common;
+									Tasks: desktopicon\common; 
 Name: "{userdesktop}\GameMod";	Filename: "{app}\bin\BlackOps.exe"; \
-									Components: GameMod; \
-									Tasks: desktopicon\user;
+								Components: GameMod; \
+								Tasks: desktopicon\user;
 
 [Files]
 Source: "build\Release\bootstrap.dll";		DestDir: "{app}"; \
 											Flags: dontcopy;
 
-Source: "build\Release\proxy.dll";			DestDir: "{app}\bin";
+Source: "build\Release\proxy.dll";			DestDir: "{app}\bin"; \
+											Components: GameMod\bundled;
 Source: "build\Release\game_mod.dll";		DestDir: "{app}\bin"; \
-											Components: GameMod;
+											Components: GameMod\bundled;
 
 [Code]
 // Test
@@ -87,41 +95,8 @@ procedure InitializeWizard;
 	// tags: TStringList;
 	// i: Cardinal;
 begin
-	 {Create our own progress page for the initial download of a small
-		textfile from the server which says what the latest version is}
-	//	progress := CreateOutputProgressPage(ITD_GetString(ITDS_Update_Caption), ITD_GetString(ITDS_Update_Description));
 
-	//
-	// Tests for CompareVersions()
-	//
-	(*UserPage :=  CreateCustomPage(wpWelcome, 'Which version should be installed?', '????');
 
-	ListBox := TNewListBox.Create(UserPage);
-	ListBox.Parent := UserPage.Surface;
-
-	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '1.0.0')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '1.0.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.0.2', '1.0.1')));
-
-	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '1.1.0')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '1.1.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.0.2', '1.1.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '1.0.0')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '1.0.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.1.2', '1.0.1')));
-
-	ListBox.Items.Add(IntToStr(CompareVersions('0.0.0', '1.1.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('0.0.2', '1.1.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('0.1.0', '1.0.0')));
-	ListBox.Items.Add(IntToStr(CompareVersions('0.1.0', '1.0.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('0.1.2', '1.0.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '0.1.0')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.0.0', '0.1.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.0.2', '0.1.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '0.0.0')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.1.0', '0.0.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('1.1.2', '0.0.1')));
-	ListBox.Items.Add(IntToStr(CompareVersions('0.0.0', '1.1.0')));*)
 end;
 
 function NextButtonClick(curPageID:integer): boolean;
@@ -140,11 +115,14 @@ begin
 	end;
 end;
 
-procedure CurPageChanged(CurPageID: Integer);
-begin
-	if(CurPageId = wpSelectComponents) then 
-	begin
-		MsgBox(BoolToStr(Pkg_CheckForUpgrade('GameMod', '{#GAMEMOD_VERSION}')), mbError, MB_YESNO);
-		Exit;
-	end;
-end;
+// procedure CurPageChanged(CurPageID: Integer);
+// begin
+// 	if(CurPageId = wpSelectComponents) then 
+// 	begin
+// 		MsgBox(BoolToStr(Pkg_CheckForUpgrade('GameMod', '{#GAMEMOD_VERSION}')), mbError, MB_YESNO);
+// 		Exit;
+// 	end;
+// end;
+
+
+
