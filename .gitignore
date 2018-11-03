@@ -38,3 +38,5 @@ components/launcher/imgui.ini
 components/gsc_parser/src/cpp/parser
 
 !*.lib
+
+installer/tmp
