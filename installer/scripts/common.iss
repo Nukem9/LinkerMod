@@ -97,7 +97,7 @@ end;
 //
 // Returns: True if the package should be updated
 //
-function Pkg_CheckForUpdate(packageName: string; bundledVersion: string): boolean;
+function Pkg_CheckForUpgrade(packageName: string; bundledVersion: string): boolean;
 var
 	installedVersion: String;
 begin

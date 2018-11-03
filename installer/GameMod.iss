@@ -144,7 +144,7 @@ procedure CurPageChanged(CurPageID: Integer);
 begin
 	if(CurPageId = wpSelectComponents) then 
 	begin
-		MsgBox(BoolToStr(Pkg_CheckForUpdate('GameMod', '{#GAMEMOD_VERSION}')), mbError, MB_YESNO);
+		MsgBox(BoolToStr(Pkg_CheckForUpgrade('GameMod', '{#GAMEMOD_VERSION}')), mbError, MB_YESNO);
 		Exit;
 	end;
 end;
