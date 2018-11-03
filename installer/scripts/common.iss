@@ -1,5 +1,7 @@
 #define ProjectGroup 'LinkerMod'
 
+#include "./utility.iss"
+
 [Setup]
 ; Require Windows Vista or higher
 MinVersion=6.0
@@ -29,16 +31,6 @@ Root: HKLM; Subkey: "Software\{#ProjectGroup}"; \
 			Flags: uninsdeletekeyifempty createvalueifdoesntexist;
 
 [Code]
-(* UTILITY FUNCTION - REMOVE FOR PRODUCTION *)
-function BoolToStr(Value : Boolean) : String; 
-begin
-  if Value then
-    result := 'true'
-  else
-    result := 'false';
-end;
-
-
 (* Note: These *MUST* use the module exports definition files	*)
 (*       Using __declspec(dllexport) does *NOT* work 			*)
 function  TestFunc( buffer:PChar): Cardinal;
@@ -94,12 +86,40 @@ end;
 // Returns True if present, and assigns the installed version
 // string to "installedVersion"
 //
-function Pkg_CheckIfInstalled(const packageName: string; var installedVersion: String): boolean;
+function Pkg_CheckInstalledVersion(const packageName: string; var installedVersion: String ): boolean;
 begin
 	Result := RegQueryStringValue(HKEY_LOCAL_MACHINE,
 						'Software\{#ProjectGroup}\' + packageName,
 						'CurrentVersion',
 						installedVersion);
+end;
+
+//
+// Returns the installed version of a package, or an empty string if not installed
+//
+function Pkg_GetInstalledVersion(const packageName: string): string;
+var
+	installedVersion: string;
+begin
+	if not Pkg_CheckInstalledVersion(packageName, installedVersion) then
+	begin
+		// Return an empty string if the package isn't installed
+		Result := #0;
+		Exit;
+	end
+
+	Result := installedVersion;
+end;
+
+//
+// Check if a package has an existing installation present
+// Returns True if present
+//
+function Pkg_IsInstalled(const packageName: string): boolean;
+var
+	installedVersion: string;
+begin
+	Result := Pkg_CheckInstalledVersion(packageName, installedVersion);
 end;
 
 //
@@ -131,7 +151,7 @@ begin
 	(* Check for existing <packageName> installs. If there is no 
 	   existing installation of <packageName>, we need to install
 	   the version bundled with the ModTools installer *)
-	if not Pkg_CheckIfInstalled(packageName, installedVersion) then
+	if not Pkg_CheckInstalledVersion(packageName, installedVersion) then
 	begin
 		Result := True;
 		Exit;
