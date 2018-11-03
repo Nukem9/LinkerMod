@@ -90,6 +90,33 @@ begin
 end;
 
 //
+// Check if a package has an existing installation present
+// Returns True if present, and assigns the installed version
+// string to "installedVersion"
+//
+function Pkg_CheckIfInstalled(const packageName: string; var installedVersion: String): boolean;
+begin
+	Result := RegQueryStringValue(HKEY_LOCAL_MACHINE,
+						'Software\{#ProjectGroup}\' + packageName,
+						'CurrentVersion',
+						installedVersion);
+end;
+
+//
+// Ask the user if they would like to upgrade from one version
+// of a package to another one.
+//
+// Returns True if the user said Yes
+//
+function Pkg_AskToUpgrade(packageName: string; fromVersion: string; toVersion: string): boolean;
+begin
+	Result := (MsgBox(	'An existing installation of ' + packageName + ' has been detected.' + #13#10 + #13#10 +
+			'Installed: ' + packageName + ' (' + fromVersion + ')' + #13#10 + 
+			'Bundled: ' + packageName + ' (' + toVersion + ')' + #13#10 + #13#10 +
+			'Would you like to automatically install the bundled version of ' + packageName + '?' , mbConfirmation, MB_YESNO) = IDYES);
+end;
+
+//
 // Check if an existing version of a package is installed, then check
 // if the bundled version of that package is newer than the installed one.
 // If the bundled version is newer, ask the user if they want to upgrade
@@ -104,10 +131,7 @@ begin
 	(* Check for existing <packageName> installs. If there is no 
 	   existing installation of <packageName>, we need to install
 	   the version bundled with the ModTools installer *)
-	if not RegQueryStringValue(HKEY_LOCAL_MACHINE,
-						'Software\{#ProjectGroup}\' + packageName,
-						'CurrentVersion',
-						installedVersion) then
+	if not Pkg_CheckIfInstalled(packageName, installedVersion) then
 	begin
 		Result := True;
 		Exit;
@@ -120,10 +144,7 @@ begin
 	*)
 	if CompareVersions(bundledVersion, installedVersion) > 0 then
 	begin
-		Result := (MsgBox(	'An existing installation of ' + packageName + ' has been detected.' + #13#10 + #13#10 +
-			'Installed: ' + packageName + ' (' + installedVersion + ')' + #13#10 + 
-			'Bundled: ' + packageName + ' (' + bundledVersion + ')' + #13#10 + #13#10 +
-			'Would you like to automatically install the bundled version of ' + packageName + '?' , mbConfirmation, MB_YESNO) = IDYES);
+		Result := Pkg_AskToUpgrade(packageName, installedVersion, bundledVersion);
 		Exit;
 	end
 

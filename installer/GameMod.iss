@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=GameMod
-AppVersion=0.0.2
+AppVersion=0.0.3
 UninstallDisplayIcon={app}\GameMod.exe
 
 WizardImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
@@ -32,7 +32,7 @@ Root: HKLM; Subkey: "Software\{#ProjectGroup}\{#SetupSetting('AppName')}"; \
 			ValueData: "{#GAMEMOD_VERSION}" 
 
 [Components]
-Name: "GameMod"; Description: "Game Mod"; Types: full compact custom; Flags: fixed
+Name: "GameMod"; Description: "Game Mod {#GAMEMOD_VERSION}"; Types: full compact custom; Flags: fixed
 
 [Tasks]
 Name: desktopicon;			Description: "Create a &desktop icon";	\
