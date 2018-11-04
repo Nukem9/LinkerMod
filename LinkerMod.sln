@@ -93,7 +93,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{E2C8
 	ProjectSection(SolutionItems) = preProject
 		components\scripts\csv.bat = components\scripts\csv.bat
 		components\scripts\ents.bat = components\scripts\ents.bat
-		components\scripts\README.md = components\scripts\README.md
 		components\scripts\setup.bat = components\scripts\setup.bat
 		components\scripts\soundalias.bat = components\scripts\soundalias.bat
 	EndProjectSection
