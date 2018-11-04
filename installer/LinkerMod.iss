@@ -86,17 +86,16 @@ Source: "components\resource\*";	DestDir: "{app}";		\
 
 
 [Run]
-;; extract-iwd --all --includeLocalized
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";		\
 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
 										Tasks: extract\iwd;
 ;										Flags: runhidden;											\
-;; extract-ff -v --all --includeLocalized
+
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";	\
 										Parameters: "extract-ff {code:ExtractFF_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
-										Tasks: extract\ffs\snd extract\ffs\raw
+										Tasks: extract\ffs\snd
 
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {#PleaseWait}";	\
 										Parameters: "ents --overwrite --dummyBrushes *";			\
@@ -113,12 +112,20 @@ Filename: "{#BinDir}\launcher.exe";		Description: "Launch mod tools";					\
 
 
 [Code]
+//
+// Installer Entrypoint
+//
 procedure InitializeWizard;
 begin
+	// We don't need to do anything special here
 end;
 
+//
+// Called when the user hits the "Next" button
+//
 function NextButtonClick(curPageID:integer): boolean;
 begin
+	// Automatically handle installation path validation
 	Result := Com_ValidateInstallPath(curPageID);
 end;
 
@@ -153,7 +160,7 @@ end;
 //
 function ExtractFF_ResolveParams(param: String): string;
 begin
-	Result := ' -v --overwrite --includeLocalized';
+	Result := ' --overwrite --includeLocalized';
 
 	AddRunArgument(Result, 'extract\ffs\snd', '--sounds');
 	AddRunArgument(Result, 'extract\ffs\raw', '--rawfiles');
