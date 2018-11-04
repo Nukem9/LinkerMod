@@ -59,10 +59,10 @@ Name: extract\ffs\ents; Description: "Extract &Entity Maps"; 	\
 ;
 Source: "build\Release\proxy.dll";			DestDir: "{#BinDir}";
 Source: "build\Release\game_mod.dll";		DestDir: "{#BinDir}"; Components: GameMod
+Source: "build\Release\linker_pc.dll";		DestDir: "{#BinDir}"; Components: LinkerMod
 Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}"; Components: LinkerMod\Utils
 Source: "build\Release\cod2map.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
 Source: "build\Release\cod2rad.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
-Source: "build\Release\linker_pc.dll";		DestDir: "{#BinDir}"; Components: LinkerMod
 Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
 
 ;
@@ -70,7 +70,7 @@ Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}"; Components: Linke
 ;
 
 ; Utility scripts
-Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";		\
+Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";	\
 									Components: LinkerMod\Utils; 	\
 									Flags: recursesubdirs;
 
@@ -82,7 +82,7 @@ Source: "components\resource\*";	DestDir: "{app}";		\
 #endif
 
 ; Test automatic shit
-; Source: "{code:GetAutoFiles}";				DestDir: "{#BinDir}\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
+; Source: "{code:GetAutoFiles}"; DestDir: "{#BinDir}\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
 
 
 [Run]
