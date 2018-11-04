@@ -92,20 +92,20 @@ Source: "components\resource\*";	DestDir: "{app}";		\
 
 [Run]
 ;; extract-iwd --all --includeLocalized
-Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";	\
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";		\
 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
 										Tasks: extract\iwd;
 ;										Flags: runhidden;											\
 ;; extract-ff -v --all --includeLocalized
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";	\
-										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";					\
-										WorkingDir:	"{#BinDir}";					\
+										Parameters: "extract-ff {code:ExtractFF_ResolveParams}";	\
+										WorkingDir:	"{#BinDir}";									\
 										Tasks: extract\ffs\snd extract\ffs\raw
 
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {#PleaseWait}";	\
-										Parameters: "ents --overwrite --dummyBrushes *";	\
-										WorkingDir:	"{#BinDir}";					\
+										Parameters: "ents --overwrite --dummyBrushes *";			\
+										WorkingDir:	"{#BinDir}";									\
 										Tasks: extract\ffs\ents
 
 ;										Flags: runhidden;							\
@@ -143,5 +143,22 @@ begin
 	if IsTaskSelected('extract\iwd\raw') then
 		Result := Result + ' --rawfiles';
 
-	MsgBox(Result, mbError, MB_YESNO);
+	MsgBox('IWD PARAMS: ' + Result, mbError, MB_YESNO);
+end;
+
+//
+// Resolve the asset_util parameters for fastfile asset extraction
+// TODO: Make this auto skip if sound & rawfiles are both empty
+//
+function ExtractFF_ResolveParams(param: String): string;
+begin
+	Result := ' -v --overwrite --includeLocalized';
+
+	if IsTaskSelected('extract\ffs\snd') then
+		Result := Result + ' --sounds';
+
+	if IsTaskSelected('extract\ffs\raw') then
+		Result := Result + ' --rawfiles';
+
+	MsgBox('FF PARAMS: ' + Result, mbError, MB_YESNO);
 end;
