@@ -89,6 +89,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{5D8F01
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{66B894E2-780C-4618-9F0A-EBCC5F3F5504}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{E2C8268D-57A7-427E-8AAC-20F4B577D3FE}"
+	ProjectSection(SolutionItems) = preProject
+		components\scripts\csv.bat = components\scripts\csv.bat
+		components\scripts\ents.bat = components\scripts\ents.bat
+		components\scripts\README.md = components\scripts\README.md
+		components\scripts\setup.bat = components\scripts\setup.bat
+		components\scripts\soundalias.bat = components\scripts\soundalias.bat
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -283,6 +292,7 @@ Global
 		{1E6C2C1C-6453-4129-AE3F-0EE8E6599C89} = {66B894E2-780C-4618-9F0A-EBCC5F3F5504}
 		{934C1737-3D69-4D46-B43C-047FEB737B54} = {5D8F01F7-C5A4-4E85-98DC-0E910AFA0D77}
 		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E} = {2F41585B-A483-460A-ABE7-1E04228707E7}
+		{E2C8268D-57A7-427E-8AAC-20F4B577D3FE} = {2F41585B-A483-460A-ABE7-1E04228707E7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3EC60A60-52E5-4CED-999D-8AB5B4647111}
