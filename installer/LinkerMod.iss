@@ -25,35 +25,31 @@ Name: "GameMod";	Description: "Game Mod";	\
 					Flags: fixed
 
 ; exlusive flag makes them radio buttons
-Name: "LinkerMod"; Description: "Mod Tools"; Types: full custom
-Name: "LinkerMod\AssetUtil";	Description: "Asset Util"; Types: full;			Flags:
-Name: "LinkerMod\AssetViewer";	Description: "AssetViewer Mod"; Types: full;	Flags:
-Name: "LinkerMod\CoD2Map";		Description: "CoD2Map Mod"; Types: full;		Flags:
-Name: "LinkerMod\CoD2Rad";		Description: "CoD2Rad Mod"; Types: full;		Flags:
-Name: "LinkerMod\Linker";		Description: "Linker Mod"; Types: full;			Flags:
-Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags:
-
+Name: "LinkerMod"; 			Description: "Mod Tools"; Types: full custom
+Name: "LinkerMod\Utils";	Description: "Asset Utility";	Types: full;	Flags:
+Name: "LinkerMod\Mapping";	Description: "Radiant Mod";		Types: full;	Flags:
+Name: "LinkerMod\Assets";	Description: "Additional Assets"; Types: full;	Flags: fixed
 
 [Tasks]
 Name: extract;	Description: "Extract Assets";	\
-				Components: LinkerMod\AssetUtil;
+				Components: LinkerMod\Utils;
 Name: extract\iwd; 	Description: "Extract I&WDs"; 			\
-					Components: LinkerMod\AssetUtil;
+					Components: LinkerMod\Utils;
 Name: extract\iwd\img; 	Description: "Extract &Images"; 	\
-						Components: LinkerMod\AssetUtil;
+						Components: LinkerMod\Utils;
 Name: extract\iwd\snd; 	Description: "Extract &Sounds"; 	\
-						Components: LinkerMod\AssetUtil;
+						Components: LinkerMod\Utils;
 Name: extract\iwd\raw;	Description: "Extract &Rawfiles"; 	\
-						Components: LinkerMod\AssetUtil;
+						Components: LinkerMod\Utils;
 
 Name: extract\ffs; 		Description: "Extract &FastFiles"; 		\
-						Components: LinkerMod\AssetUtil;
+						Components: LinkerMod\Utils;
 Name: extract\ffs\snd; 	Description: "Extract &Sounds"; 		\
-						Components: LinkerMod\AssetUtil;
+						Components: LinkerMod\Utils;
 Name: extract\ffs\raw; 	Description: "Extract &Rawfiles"; 		\
-						Components: LinkerMod\AssetUtil;
+						Components: LinkerMod\Utils;
 Name: extract\ffs\ents; Description: "Extract &Entity Maps"; 	\
-						Components: LinkerMod\AssetUtil;
+						Components: LinkerMod\Utils;
 
 [Files]
 ; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
@@ -63,12 +59,11 @@ Name: extract\ffs\ents; Description: "Extract &Entity Maps"; 	\
 ;
 Source: "build\Release\proxy.dll";			DestDir: "{#BinDir}";
 Source: "build\Release\game_mod.dll";		DestDir: "{#BinDir}"; Components: GameMod
-Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}"; Components: LinkerMod\AssetUtil
-Source: "build\Release\asset_viewer.dll";	DestDir: "{#BinDir}"; Components: LinkerMod\AssetViewer
-Source: "build\Release\cod2map.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\CoD2Map
-Source: "build\Release\cod2rad.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\CoD2Rad
-Source: "build\Release\linker_pc.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Linker
-Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}"; Components: LinkerMod\Radiant
+Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}"; Components: LinkerMod\Utils
+Source: "build\Release\cod2map.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
+Source: "build\Release\cod2rad.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
+Source: "build\Release\linker_pc.dll";		DestDir: "{#BinDir}"; Components: LinkerMod
+Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
 
 ;
 ; Mod Tools asset files
@@ -76,7 +71,7 @@ Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}"; Components: Linke
 
 ; Utility scripts
 Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";		\
-									Components: LinkerMod\AssetUtil; 	\
+									Components: LinkerMod\Utils; 	\
 									Flags: recursesubdirs;
 
 #if BUILD_TYPE == 'PRODUCTION'
