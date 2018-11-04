@@ -29,19 +29,18 @@
 					"fileLocation": "absolute",
 					// The actual pattern to match problems in the output.
 					"pattern": {
-						"kind": "",
 						// The regular expression. Example to match: helloWorld.c:5:3: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]
-						"regexp": "^(Warning|Error):.*?Line\\s*(\\d+).*?Column\\s*(\\d+):\\s*\\[Hint\\]\\s*(.*)", //:\\s*Line\\s*(\\d+),\\s*Column\\s*(\\d+):\\s*\\[Hint\\]\\s*(.*)
+						"regexp": "^(Warning|Error):\\s*(.:.*?),?\\s*Line\\s*(\\d+).*?Column\\s*(\\d+):\\s*(.*)$",
 						// The first match group matches the file name which is relative.
-						// "file": 1,
+						"file": 2,
 						// The second match group matches the line on which the problem occurred.
-						"line": 2,
+						"line": 3,
 						// The third match group matches the column at which the problem occurred.
-						"column": 3,
+						"column": 4,
 						// The fourth match group matches the problem's severity. Can be ignored. Then all problems are captured as errors.
 						"severity": 1,
 						// The fifth match group matches the message.
-						"message": 4
+						"message": 5
 					}
 				},
 				{
