@@ -95,7 +95,7 @@ Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#Ple
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";	\
 										Parameters: "extract-ff {code:ExtractFF_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
-										Tasks: extract\ffs\snd
+										Tasks: extract\ffs\snd extract\ffs\raw
 
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {#PleaseWait}";	\
 										Parameters: "ents --overwrite --dummyBrushes *";			\
