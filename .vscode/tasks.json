@@ -26,10 +26,7 @@
 					// The problem is owned by the cpp language service.
 					"owner": "inno",
 					// The file name for reported problems is relative to the opened folder.
-					"fileLocation": [
-						"absolute",
-						"${workspaceFolder}"
-					],
+					"fileLocation": "absolute",
 					// The actual pattern to match problems in the output.
 					"pattern": {
 						"kind": "",
