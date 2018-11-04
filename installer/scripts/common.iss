@@ -8,7 +8,10 @@
 MinVersion=6.0
 
 DefaultGroupName="{#ProjectGroup}"
-LicenseFile="./installer/license.txt"
+
+#if BUILD_TYPE == 'PRODUCTION'
+	LicenseFile="./installer/license.txt"
+#endif
 
 OutputDir=./build/
 Compression=lzma2
@@ -21,7 +24,12 @@ DefaultDirName={code:GetDefaultDir}
 AppendDefaultDirName=no
 UsePreviousAppDir=no
 DirExistsWarning=no
-DisableDirPage=No
+
+#if BUILD_TYPE == 'PRODUCTION'
+	DisableDirPage=no
+#else
+	DisableDirPage=yes
+#endif
 
 [Languages]
 Name: english; MessagesFile: compiler:Default.isl

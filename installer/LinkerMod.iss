@@ -7,8 +7,9 @@
 AppName=LinkerMod
 AppVersion=0.0.1
 UninstallDisplayIcon={app}\LinkerMod.exe
-WizardImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
-WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
+
+;WizardImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
+;WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
 
 
 ; Inlude the Inno Downloader scripts
