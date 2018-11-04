@@ -44,12 +44,15 @@ Name: extract;	Description: "Extract Assets";	\
 				Components: LinkerMod\AssetUtil;
 Name: extract\iwd; 	Description: "Extract I&WDs"; 				\
 					Components: LinkerMod\AssetUtil;
-Name: extract\iwd\img; 	Description: "Extract Images"; 			\
-						Components: LinkerMod\AssetUtil
+Name: extract\iwd\all;	Description: "Extract E&verything"; 	\
+						Components: LinkerMod\AssetUtil;			\
+						Flags: exclusive;
+Name: extract\iwd\img; 	Description: "Extract &Images"; 		\
+						Components: LinkerMod\AssetUtil;			\
+						Flags: exclusive;
 Name: extract\iwd\snd; 	Description: "Extract &Sounds"; 		\
-						Components: LinkerMod\AssetUtil;
-Name: extract\iwd\misc; Description: "Extract &Other Assets"; 	\
-						Components: LinkerMod\AssetUtil;
+						Components: LinkerMod\AssetUtil;			\
+						Flags: exclusive;
 
 Name: extract\ffs; 		Description: "Extract &FastFiles"; 		\
 						Components: LinkerMod\AssetUtil;
@@ -92,17 +95,17 @@ Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";		\
 
 [Run]
 ;; extract-iwd --all --includeLocalized
-Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets...";		\
-										Parameters: "help";							\
-										WorkingDir:	"{#BinDir}";					\
-										Flags: runhidden;							\
-										Tasks: extract\iwd;
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... (this may take several minutes)";	\
+										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";	\
+										WorkingDir:	"{#BinDir}";									\
+										Tasks: extract\iwd;											
+;										Flags: runhidden;											\
 ;; extract-ff -v --all --includeLocalized
-Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets...";	\
-										Parameters: "";								\
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... (this may take several minutes)";	\
+										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";					\
 										WorkingDir:	"{#BinDir}";					\
-										Flags: runhidden;							\
-										Tasks: extract\ffs
+										Tasks: extract\ffs\snd extract\ffs\raw
+;										Flags: runhidden;							\
 ; Filename: "{app}\README.TXT"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
 ; Filename: "{app}\MYPROG.EXE"; Description: "Launch application"; Flags: postinstall nowait skipifsilent unchecked
 
@@ -151,4 +154,32 @@ end;
 function NextButtonClick(curPageID:integer): boolean;
 begin
 	Result := Com_ValidateInstallPath(curPageID);
+end;
+
+//
+// Resolve the asset_util parameters for IWD asset extraction
+//
+function ExtractIWD_ResolveParams(param: String): string;
+var
+	prefix: string;
+begin
+	if IsTaskSelected('extract\iwd\img') then
+	begin
+		Result := prefix + '--images';
+		Exit;
+	end
+
+	if IsTaskSelected('extract\iwd\snd') then
+	begin
+		Result := prefix + '--sounds';
+		Exit;
+	end
+
+	if IsTaskSelected('extract\iwd\all') then
+	begin
+		Result := prefix + '--all';
+		Exit;
+	end
+
+	Result := #0
 end;
