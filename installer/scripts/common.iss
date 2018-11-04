@@ -1,6 +1,8 @@
 #define ProjectGroup 'LinkerMod'
 #define BinDir '{app}\bin'
 
+#define PleaseWait '(this may take several minutes)'
+
 #include "./utility.iss"
 
 [Setup]

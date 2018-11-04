@@ -89,18 +89,18 @@ Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";		\
 
 [Run]
 ;; extract-iwd --all --includeLocalized
-Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... (this may take several minutes)";	\
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";	\
 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
 										Tasks: extract\iwd;
 ;										Flags: runhidden;											\
 ;; extract-ff -v --all --includeLocalized
-Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... (this may take several minutes)";	\
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";	\
 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";					\
 										WorkingDir:	"{#BinDir}";					\
 										Tasks: extract\ffs\snd extract\ffs\raw
 
-Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... (this may take several minutes)";	\
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {#PleaseWait}";	\
 										Parameters: "ents --overwrite --dummyBrushes *";	\
 										WorkingDir:	"{#BinDir}";					\
 										Tasks: extract\ffs\ents
