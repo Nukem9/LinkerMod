@@ -47,17 +47,26 @@
 					// The problem is owned by the cpp language service.
 					"owner": "inno",
 					// The file name for reported problems is relative to the opened folder.
-					"fileLocation": [
-						"absolute"
-					],
+					"fileLocation": "absolute",
 					// The actual pattern to match problems in the output.
-					"pattern": {
-						"regexp": "^(Error) on line (\\d+) in (.*?:.*?):\\s*(.*)$",
-						"file": 3,
-						"line": 2,
-						"message": 4,
-						"severity": 1
-					}
+					"pattern": [
+						{
+							"regexp": "^(Warning|Error) on line (\\d+) in\\s*([A-Z]:.+?):\\s*Column\\s*(\\d+):.*$",
+							"file": 3,
+							"line": 2,
+							"column": 4,
+							// "message": 5,
+							"severity": 1
+						},
+						{
+							"regexp": "^(.*)$",
+							"message": 1,
+							"loop": true
+						},
+						{
+							"regexp": "^Compile aborted.$",
+						},
+					]
 				}
 			]
 		}
