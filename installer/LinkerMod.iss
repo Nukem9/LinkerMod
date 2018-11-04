@@ -8,19 +8,13 @@ AppName=LinkerMod
 AppVersion=0.0.1
 UninstallDisplayIcon={app}\LinkerMod.exe
 
-;WizardImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
-;WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
-
-
-; Inlude the Inno Downloader scripts
-#include ReadReg(HKEY_LOCAL_MACHINE,'Software\Sherlock Software\InnoTools\Downloader','ScriptPath','');
-
-[Files]
-; Source: "build\Release\game_mod.dll"; DestDir: "{app}"
-; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
+#if BUILD_TYPE == 'PRODUCTION'
+	WizardImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
+	WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
+#endif
 
 [Icons]
-Name: "{commondesktop}\Game Mod"; Filename: "{#BinDir}\BlackOps.exe"
+Name: "{commondesktop}\Game Mod";	Filename: "{#BinDir}\BlackOps.exe"
 ; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{#BinDir}\BlackOps.exe"
 
 [Components]
@@ -62,6 +56,8 @@ Name: extract\ffs\ents; Description: "Extract &Entity Maps"; 	\
 						Components: LinkerMod\AssetUtil;
 
 [Files]
+; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
+
 ;
 ; Actual LinkerMod binaries
 ;
@@ -118,41 +114,7 @@ Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... (
 var progress:TOutputProgressWizardPage;
 
 procedure InitializeWizard;
-// var
-//	downloadPage:TWizardpage;
-//	UserPage: TWizardPage;
-//	ListBox: TNewListBox;
-//	tags: TStringList;
-//	i: Cardinal;
 begin
- 	itd_init;
-
-	// tags := GetVersionTags();
-//
-	// // Attempt to get the installation path
-	// UserPage :=  CreateCustomPage(wpWelcome, 'Which version should be installed?', '????');
-//
-//
-	// ListBox := TNewListBox.Create(UserPage);
-	// ListBox.Parent := UserPage.Surface;
-//
-	// For i := 0 to tags.Count - 1 do
-	// begin
-	//  ListBox.Items.Add(tags[i]);
-	// end;
-//
-	// ListBox.Items.Add('test1');
-	// ListBox.Items.Add('test2');
-//
-	// // GetString();
-	//
-	//  {Create our own progress page for the initial download of a small
-	// 	textfile from the server which says what the latest version is}
-	// //	progress := CreateOutputProgressPage(ITD_GetString(ITDS_Update_Caption), ITD_GetString(ITDS_Update_Description));
-//
-	// // Stuff
-	// //Create the ITD GUI so that we have it if we decide to download a new intaller version
-	// downloadPage:=itd_downloadafter(wpWelcome);
 end;
 
 function NextButtonClick(curPageID:integer): boolean;
