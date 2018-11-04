@@ -79,10 +79,12 @@ Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";		\
 									Components: LinkerMod\AssetUtil; 	\
 									Flags: recursesubdirs;
 
+#if BUILD_TYPE == 'PRODUCTION'
 ; Custom / missing assets
-; Source: "components\resource\*";	DestDir: "{app}";		\
-;									Components: LinkerMod;	\
-; 									Flags: recursesubdirs;
+Source: "components\resource\*";	DestDir: "{app}";		\
+									Components: LinkerMod;	\
+									Flags: recursesubdirs;
+#endif
 
 ; Test automatic shit
 ; Source: "{code:GetAutoFiles}";				DestDir: "{#BinDir}\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
