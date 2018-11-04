@@ -62,6 +62,7 @@
     <ClInclude Include="common\io.h" />
     <ClInclude Include="common\iwd.h" />
     <ClInclude Include="common\llist.h" />
+    <ClInclude Include="common\maps.h" />
     <ClInclude Include="common\str.h" />
     <ClInclude Include="cvar.h" />
     <ClInclude Include="gdt\assettype\aitype.h" />

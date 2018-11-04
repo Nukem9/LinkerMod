@@ -1,9 +1,14 @@
-#include "../common/ff.h"
-#include "zlib\zlib.h"
-#include "../common/io.h"
 #include "cmd_common.h"
-
 #include "../cvar.h"
+
+#include "../sys/AppInfo.h"
+
+#include "../common/ff.h"
+#include "../common/fs.h"
+#include "../common/io.h"
+#include "../common/maps.h"
+
+#include "zlib\zlib.h"
 
 #include <vector>
 #include <unordered_map>
@@ -257,92 +262,179 @@ char* FindEntsString(BYTE* start, BYTE* end)
 }
 
 //
+// Resolve the fastfile path for a given map
+//
+std::string Map_FastfilePath(const char* mapName) {
+	std::string path = AppInfo_FFDir();
+	path += "\\" + std::string(mapName) + ".ff";
+	FS_SanitizePath((char*)path.data());
+	return path;
+}
+
+//
+// Extract the entity list from a given fastfile
+//  filepath - the path to the target fastfile
+//  output - the path to the file where the extracted contents will be written
+//         - if NULL, the output contents are written to STDOUT
+//
+int Ents_ExtractFromFastfile(const char* filepath, const char* outpath = NULL) {
+	Con_Print_v("Extracting ents from \"%s\"...\n", filepath);
+
+	//
+	// Skip the file if overwrite is disabled and it already exists
+	//
+	if (!fs_overwrite.ValueBool() && FS_FileExists(outpath)) {
+		Con_Warning_v("Skipping... (file already exists)\n");
+		return 4;
+	}
+
+	FILE* h = nullptr;
+	if (fopen_s(&h, filepath, "r+b") != 0)
+	{
+		Con_Error("ERROR: Fastfile '%s' could not be found\n", filepath);
+		return -1;
+	}
+	rewind(h);
+
+	fseek(h, 0, SEEK_END);
+	size_t fileSize = ftell(h);
+
+	// Get Compressed FileSize and Allocate a Storage Buffer for Compressed Data
+	size_t cSize = fileSize - 12;
+	BYTE* cBuf = new BYTE[cSize | 0x8000];
+
+	fseek(h, 12, SEEK_SET);
+	fread(cBuf, 1, cSize, h);
+
+	XFile ffInfo;
+	unsigned long dSize = sizeof(XFile);
+	uncompress((BYTE*)&ffInfo, &dSize, cBuf, 0x8000);
+
+	dSize = ffInfo.size + 36;
+	if (dSize >= 1073741824)
+	{
+		//Any fastfiles that claim they decompress to a file >= 1GB
+		//are either corrupt or do not belong to the vanilla game
+		Con_Error("ERROR: Skipping %s\n", filepath);
+		return 1;
+	}
+
+	BYTE* dBuf = new BYTE[dSize];
+	uncompress(dBuf, &dSize, cBuf, cSize);
+	delete[] cBuf;
+
+	char* ents_str = FindEntsString((BYTE*)dBuf, dBuf + ffInfo.size + 36);
+	if (ents_str == NULL)
+	{
+		Con_Error("Error: Could not find entity string\n");
+		delete[] dBuf;
+		return -1;
+	}
+
+	EntityTable ents_table;
+	int l = ParseEnts(ents_str, &ents_table);
+	delete[] dBuf; // Free the fastfile buffer as we don't need it anymore
+
+	if (ents_genBrushes.ValueBool())
+		AddBrushes(&ents_table);
+
+	//
+	// Resolve the file handle for the output data
+	//
+	FILE* hOutput = stdout;
+
+	// If specified, we need to open the target output file
+	// but if we can't open it, abort the current file
+	if (outpath != NULL && fopen_s(&hOutput, outpath, "w") != 0) {
+		Con_Error("ERROR: Unable to open file for writing... (%s)\n", outpath);
+		return 3;
+	}
+
+	fprintf(hOutput, "%s", 
+		"iwmap 4\n"
+		"\"000_Global\" flags  active\n"
+		"\"The Map\" flags\n");
+
+	fprintf(hOutput, "%s", ents_table.header.c_str());
+
+#if 1
+	std::vector<std::vector<KeyValuePair>>& ents = ents_table.ents;
+	for (unsigned int i = 0; i < ents.size(); i++)
+	{
+		std::vector<KeyValuePair>& ent = ents[i];
+
+		if (ents_useLabels.ValueBool())
+			fprintf(hOutput, "// Entity %d\n", i);
+		fprintf(hOutput, "{\n");
+		for (unsigned int k = 0; k < ents[i].size(); k++)
+		{
+			KeyValuePair& kv = ent[k];
+			if (kv.key.length() > 0)
+				fprintf(hOutput, "\"%s\" \"%s\"\n", kv.key.c_str(), kv.value.c_str());
+			else
+				fprintf(hOutput, "%s\n", kv.value.c_str());
+		}
+		fprintf(hOutput, "}\n");
+	}
+#endif
+
+	// Close the handle to the output file if applicable
+	if (hOutput != stdout) {
+		fclose(hOutput);
+	}
+
+	return 0;
+}
+
+//
 // Argument format: argv[1...n] are zone filenames
 //
 int Cmd_Ents_f(int argc, char** argv)
 {
+	std::string outdir = fs_outdir.ValueString();
+
+	/* If the only filepath passed was "*", we assume that
+	the user wanted to automatically export entities for *ALL* maps */
+	if (argc == 2 && strcmp(argv[1], "*") == 0) {
+		//
+		// Enable verbose mode
+		//
+		g_verbose.Enable();
+
+		// Ensure that a valid output directory has been set
+		// default to <GameDir>/map_source/_prefabs/maps/
+		if (outdir.length() < 1) {
+			outdir = AppInfo_AppDir();
+			outdir += "/map_source/_prefabs/maps/";
+			FS_SanitizePath((char*)outdir.data());
+		}
+
+		auto ExtractMap = [&outdir](const char* name) {
+			std::string path = Map_FastfilePath(name);
+			std::string outPath = outdir + "/" + name + ".map";
+			FS_SanitizePath((char*)outPath.data());
+			
+			Ents_ExtractFromFastfile(path.c_str(), outPath.c_str());
+		};
+
+		// Actually extract the ent maps
+		for (const auto mapName : maps::sp) {
+			ExtractMap(mapName);
+		}
+		for (const auto mapName : maps::mp) {
+			ExtractMap(mapName);
+		}
+		for (const auto mapName : maps::zm) {
+			ExtractMap(mapName);
+		}
+
+		return 0;
+	}
+
 	for (int i = 1; i < argc; i++)
 	{
 		char* filepath = argv[i];
-
-		Con_Print_v("Extracting ents from \"%s\"...\n", filepath);
-
-		FILE* h = nullptr;
-		if (fopen_s(&h, filepath, "r+b") != 0)
-		{
-			Con_Error("ERROR: Fastfile '%s' could not be found\n", filepath);
-			return FALSE;
-		}
-		rewind(h);
-
-		fseek(h, 0, SEEK_END);
-		size_t fileSize = ftell(h);
-
-		// Get Compressed FileSize and Allocate a Storage Buffer for Compressed Data
-		size_t cSize = fileSize - 12;
-		BYTE* cBuf = new BYTE[cSize | 0x8000];
-
-		fseek(h, 12, SEEK_SET);
-		fread(cBuf, 1, cSize, h);
-
-		XFile ffInfo;
-		unsigned long dSize = sizeof(XFile);
-		uncompress((BYTE*)&ffInfo, &dSize, cBuf, 0x8000);
-
-		dSize = ffInfo.size + 36;
-		if (dSize >= 1073741824)
-		{
-			//Any fastfiles that claim they decompress to a file >= 1GB
-			//are either corrupt or do not belong to the vanilla game
-			Con_Error("ERROR: Skipping %s\n", filepath);
-			return 1;
-		}
-
-		BYTE* dBuf = new BYTE[dSize];
-		uncompress(dBuf, &dSize, cBuf, cSize);
-		delete[] cBuf;
-
-		char* ents_str = FindEntsString((BYTE*)dBuf, dBuf + ffInfo.size + 36);
-		if (ents_str == NULL)
-		{
-			Con_Error("Error: Could not find entity string\n");
-			delete[] dBuf;
-			return -1;
-		}
-
-		EntityTable ents_table;
-		int l = ParseEnts(ents_str, &ents_table);
-		delete[] dBuf; // Free the fastfile buffer as we don't need it anymore
-
-		if (ents_genBrushes.ValueBool())
-			AddBrushes(&ents_table);
-
-		Con_Print_nv(	"iwmap 4\n" 
-						"\"000_Global\" flags  active\n"
-						"\"The Map\" flags\n" );
-
-		Con_Print("%s", ents_table.header.c_str());
-
-#if 1
-		std::vector<std::vector<KeyValuePair>>& ents = ents_table.ents;
-		for (unsigned int i = 0; i < ents.size(); i++)
-		{
-			std::vector<KeyValuePair>& ent = ents[i];
-
-			if (ents_useLabels.ValueBool())
-				Con_Print("// Entity %d\n", i);
-			Con_Print("{\n");
-			for (unsigned int k = 0; k < ents[i].size(); k++)
-			{
-				KeyValuePair& kv = ent[k];
-				if (kv.key.length() > 0)
-					Con_Print("\"%s\" \"%s\"\n", kv.key.c_str(), kv.value.c_str());
-				else
-					Con_Print("%s\n", kv.value.c_str());
-			}
-			Con_Print("}\n");
-		}
-#endif
+		Ents_ExtractFromFastfile(filepath);
 	}
 
 	if (argc < 2)
