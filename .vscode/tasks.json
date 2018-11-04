@@ -30,7 +30,7 @@
 					// The actual pattern to match problems in the output.
 					"pattern": {
 						// The regular expression. Example to match: helloWorld.c:5:3: warning: implicit declaration of function ‘printf’ [-Wimplicit-function-declaration]
-						"regexp": "^(Warning|Error):\\s*(.:.*?),?\\s*Line\\s*(\\d+).*?Column\\s*(\\d+):\\s*(.*)$",
+						"regexp": "^(Warning|Error):\\s*(.:.*?),\\s*Line\\s*(\\d+).*?Column\\s*(\\d+):\\s*(.*)$",
 						// The first match group matches the file name which is relative.
 						"file": 2,
 						// The second match group matches the line on which the problem occurred.
