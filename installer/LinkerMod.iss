@@ -42,17 +42,14 @@ Name: "Debug";		Description: "Debug"; Types: full;
 [Tasks]
 Name: extract;	Description: "Extract Assets";	\
 				Components: LinkerMod\AssetUtil;
-Name: extract\iwd; 	Description: "Extract I&WDs"; 				\
+Name: extract\iwd; 	Description: "Extract I&WDs"; 			\
 					Components: LinkerMod\AssetUtil;
-Name: extract\iwd\all;	Description: "Extract E&verything"; 	\
-						Components: LinkerMod\AssetUtil;			\
-						Flags: exclusive;
-Name: extract\iwd\img; 	Description: "Extract &Images"; 		\
-						Components: LinkerMod\AssetUtil;			\
-						Flags: exclusive;
-Name: extract\iwd\snd; 	Description: "Extract &Sounds"; 		\
-						Components: LinkerMod\AssetUtil;			\
-						Flags: exclusive;
+Name: extract\iwd\img; 	Description: "Extract &Images"; 	\
+						Components: LinkerMod\AssetUtil;
+Name: extract\iwd\snd; 	Description: "Extract &Sounds"; 	\
+						Components: LinkerMod\AssetUtil;
+Name: extract\iwd\raw;	Description: "Extract &Rawfiles"; 	\
+						Components: LinkerMod\AssetUtil;
 
 Name: extract\ffs; 		Description: "Extract &FastFiles"; 		\
 						Components: LinkerMod\AssetUtil;
@@ -98,7 +95,7 @@ Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";		\
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... (this may take several minutes)";	\
 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
-										Tasks: extract\iwd;											
+										Tasks: extract\iwd;
 ;										Flags: runhidden;											\
 ;; extract-ff -v --all --includeLocalized
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... (this may take several minutes)";	\
@@ -166,26 +163,17 @@ end;
 // Resolve the asset_util parameters for IWD asset extraction
 //
 function ExtractIWD_ResolveParams(param: String): string;
-var
-	prefix: string;
 begin
+	Result := ' --overwrite --includeLocalized';
+
 	if IsTaskSelected('extract\iwd\img') then
-	begin
-		Result := prefix + '--images';
-		Exit;
-	end
+		Result := Result + ' --images';
 
 	if IsTaskSelected('extract\iwd\snd') then
-	begin
-		Result := prefix + '--sounds';
-		Exit;
-	end
+		Result := Result + ' --sounds';
 
-	if IsTaskSelected('extract\iwd\all') then
-	begin
-		Result := prefix + '--all';
-		Exit;
-	end
+	if IsTaskSelected('extract\iwd\raw') then
+		Result := Result + ' --rawfiles';
 
-	Result := #0
+	MsgBox(Result, mbError, MB_YESNO);
 end;
