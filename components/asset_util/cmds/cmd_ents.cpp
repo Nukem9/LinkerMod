@@ -409,6 +409,9 @@ int Cmd_Ents_f(int argc, char** argv)
 			FS_SanitizePath((char*)outdir.data());
 		}
 
+		// Make sure the output directory actually exists
+		FS_CreatePath(outdir.c_str());
+
 		auto ExtractMap = [&outdir](const char* name) {
 			std::string path = Map_FastfilePath(name);
 			std::string outPath = outdir + "/" + name + ".map";
