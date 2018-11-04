@@ -110,13 +110,14 @@ Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {
 
 ;										Flags: runhidden;							\
 ; Filename: "{app}\README.TXT"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
-; Filename: "{app}\MYPROG.EXE"; Description: "Launch application"; Flags: postinstall nowait skipifsilent unchecked
+
+#if BUILD_TYPE == 'PRODUCTION'
+Filename: "{#BinDir}\launcher.exe";		Description: "Launch mod tools";					\
+										Flags: postinstall nowait skipifsilent unchecked;
+#endif
 
 
 [Code]
-// Test
-var progress:TOutputProgressWizardPage;
-
 procedure InitializeWizard;
 begin
 end;
