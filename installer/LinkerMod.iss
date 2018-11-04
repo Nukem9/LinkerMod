@@ -13,9 +13,11 @@ UninstallDisplayIcon={app}\LinkerMod.exe
 	WizardSmallImageFile=C:\Users\SE2Dev\Pictures\dface_512x512.bmp
 #endif
 
+
 [Icons]
 Name: "{commondesktop}\Game Mod";	Filename: "{#BinDir}\BlackOps.exe"
 ; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{#BinDir}\BlackOps.exe"
+
 
 [Components]
 Name: "GameMod";	Description: "Game Mod";	\
@@ -31,8 +33,6 @@ Name: "LinkerMod\CoD2Rad";		Description: "CoD2Rad Mod"; Types: full;		Flags:
 Name: "LinkerMod\Linker";		Description: "Linker Mod"; Types: full;			Flags:
 Name: "LinkerMod\Radiant";		Description: "Radiant Mod"; Types: full;		Flags:
 
-Name: "Debug";		Description: "Debug"; Types: full;
-; Flags:
 
 [Tasks]
 Name: extract;	Description: "Extract Assets";	\
@@ -89,6 +89,7 @@ Source: "components\resource\*";	DestDir: "{app}";		\
 ; Test automatic shit
 ; Source: "{code:GetAutoFiles}";				DestDir: "{#BinDir}\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
 
+
 [Run]
 ;; extract-iwd --all --includeLocalized
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";	\
@@ -110,6 +111,7 @@ Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {
 ;										Flags: runhidden;							\
 ; Filename: "{app}\README.TXT"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
 ; Filename: "{app}\MYPROG.EXE"; Description: "Launch application"; Flags: postinstall nowait skipifsilent unchecked
+
 
 [Code]
 // Test
