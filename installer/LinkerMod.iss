@@ -128,23 +128,31 @@ begin
 end;
 
 //
+// Check if a given task is enabled - if it is, we append the mappedValue
+// to argString and return argString
+//
+function AddRunArgument(var argString: string; taskName: string; mappedValue: string): string;
+begin
+	if IsTaskSelected(taskName) then
+		argString := argString + ' ' + mappedValue;
+	Result := argString;
+end;
+
+//
 // Resolve the asset_util parameters for IWD asset extraction
 //
 function ExtractIWD_ResolveParams(param: String): string;
 begin
 	Result := ' --overwrite --includeLocalized';
 
-	if IsTaskSelected('extract\iwd\img') then
-		Result := Result + ' --images';
-
-	if IsTaskSelected('extract\iwd\snd') then
-		Result := Result + ' --sounds';
-
-	if IsTaskSelected('extract\iwd\raw') then
-		Result := Result + ' --rawfiles';
+	AddRunArgument(Result, 'extract\ffs\img', '--images');
+	AddRunArgument(Result, 'extract\ffs\snd', '--sounds');
+	AddRunArgument(Result, 'extract\ffs\raw', '--rawfiles');
 
 	MsgBox('IWD PARAMS: ' + Result, mbError, MB_YESNO);
 end;
+
+
 
 //
 // Resolve the asset_util parameters for fastfile asset extraction
@@ -154,11 +162,8 @@ function ExtractFF_ResolveParams(param: String): string;
 begin
 	Result := ' -v --overwrite --includeLocalized';
 
-	if IsTaskSelected('extract\ffs\snd') then
-		Result := Result + ' --sounds';
-
-	if IsTaskSelected('extract\ffs\raw') then
-		Result := Result + ' --rawfiles';
+	AddRunArgument(Result, 'extract\ffs\snd', '--sounds');
+	AddRunArgument(Result, 'extract\ffs\raw', '--rawfiles');
 
 	MsgBox('FF PARAMS: ' + Result, mbError, MB_YESNO);
 end;
