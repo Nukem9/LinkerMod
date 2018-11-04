@@ -154,6 +154,9 @@
     <ClInclude Include="cmds\search\handler.h">
       <Filter>cmds\search</Filter>
     </ClInclude>
+    <ClInclude Include="common\maps.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="common">

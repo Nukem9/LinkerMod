@@ -18,6 +18,9 @@ const char* FS_Cwd(void)
 
 bool FS_FileExists(const char* qpath)
 {
+	if (qpath == NULL)
+		return false;
+
 	FILE* h = NULL;
 	if (fopen_s(&h, qpath, "r") == NULL)
 	{
