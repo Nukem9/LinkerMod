@@ -102,18 +102,17 @@ int __cdecl IWD_IWDExtract(const char* iwdPath, const char* iwdName)
 			return -1;
 		}
 
-		if (g_extractAll.ValueBool())
-		{
-			IWD_IWDExtractFile(&iwd, file_stat.m_filename);
-			continue;
-		}
-		else if (g_extractImages.ValueBool() && _strnicmp(IWD_DIR_IMAGE, file_stat.m_filename, strlen(IWD_DIR_IMAGE)) == 0)
+		if (g_extractImages.ValueBool() && _strnicmp(IWD_DIR_IMAGE, file_stat.m_filename, strlen(IWD_DIR_IMAGE)) == 0)
 		{
 			IWD_IWDExtractFile(&iwd, file_stat.m_filename);
 			continue;
 		}
 		else if (g_extractSounds.ValueBool() && _strnicmp(IWD_DIR_SOUND, file_stat.m_filename, strlen(IWD_DIR_SOUND)) == 0)
 		{
+			IWD_IWDExtractFile(&iwd, file_stat.m_filename);
+			continue;
+		}
+		else if (g_extractMisc.ValueBool()) {
 			IWD_IWDExtractFile(&iwd, file_stat.m_filename);
 			continue;
 		}

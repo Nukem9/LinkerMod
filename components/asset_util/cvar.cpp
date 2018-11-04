@@ -42,6 +42,7 @@ REGISTER_GLOBAL_CVAR(g_dumpCVars, "dumpCVars", 'd', "Print all cvar values to th
 //
 REGISTER_CVAR(g_var, "dvar", NULL, "A test dvar", "/");
 REGISTER_CVAR(g_extractAll, "all", NULL, "Extract all supported files", false);
+REGISTER_CVAR(g_extractMisc, "rawfiles", NULL, "Extract rawfiles, and other misc. files", false);
 REGISTER_CVAR(g_extractImages, "images", NULL, "Extract image files", false);
 REGISTER_CVAR(g_extractSounds, "sounds", NULL, "Extract audio files", false);
 REGISTER_CVAR(g_useLocalized, "includeLocalized", NULL, "Extract from localized files as well", false);

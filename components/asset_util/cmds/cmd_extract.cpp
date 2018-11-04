@@ -76,7 +76,9 @@ int Cmd_Extract_FF_f(int argc, char** argv)
 {
 	if (g_extractAll.ValueBool())
 	{
+		g_extractImages.Enable();
 		g_extractSounds.Enable();
+		g_extractMisc.Enable();
 	}
 
 	// If the user didnt provide a specific fastfile to target - we automatically use *all* fastfiles
@@ -135,6 +137,13 @@ int Cmd_Extract_FF_f(int argc, char** argv)
 
 int Cmd_Extract_IWD_f(int argc, char** argv)
 {
+	if (g_extractAll.ValueBool())
+	{
+		g_extractImages.Enable();
+		g_extractSounds.Enable();
+		g_extractMisc.Enable();
+	}
+
 	FS_FileIterator(AppInfo_IWDDir(), FS_SEARCHPATTERN_IWD, IWD_IWDHandler);
 	return 0;
 }

@@ -455,7 +455,7 @@ int FF_FFExtractFiles(BYTE* searchData, DWORD searchSize)
 	auto scanList = std::vector<std::vector<BYTE>>();
 
 	// If we're extracting *all* supported assets, add the rawfiles to the pattern list
-	if (g_extractAll.ValueBool())
+	if (g_extractMisc.ValueBool())
 	{
 		scanList.push_back(std::vector<BYTE>({ '.', 'g', 's', 'c' }));
 		scanList.push_back(std::vector<BYTE>({ '.', 'c', 's', 'c' }));
