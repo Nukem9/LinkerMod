@@ -140,14 +140,12 @@ function ExtractIWD_ResolveParams(param: String): string;
 begin
 	Result := ' --overwrite --includeLocalized';
 
-	AddRunArgument(Result, 'extract\ffs\img', '--images');
-	AddRunArgument(Result, 'extract\ffs\snd', '--sounds');
-	AddRunArgument(Result, 'extract\ffs\raw', '--rawfiles');
+	AddRunArgument(Result, 'extract\iwd\img', '--images');
+	AddRunArgument(Result, 'extract\iwd\snd', '--sounds');
+	AddRunArgument(Result, 'extract\iwd\raw', '--rawfiles');
 
 	MsgBox('IWD PARAMS: ' + Result, mbError, MB_YESNO);
 end;
-
-
 
 //
 // Resolve the asset_util parameters for fastfile asset extraction
