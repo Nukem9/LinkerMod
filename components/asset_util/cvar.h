@@ -102,6 +102,7 @@ REGISTER_GLOBAL_CVAR(g_dumpCVars);
 //
 REGISTER_CVAR(g_var);
 REGISTER_CVAR(g_extractAll);
+REGISTER_CVAR(g_extractMisc);
 REGISTER_CVAR(g_extractImages);
 REGISTER_CVAR(g_extractSounds);
 REGISTER_CVAR(g_useLocalized);
