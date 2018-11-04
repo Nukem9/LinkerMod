@@ -105,6 +105,12 @@ Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... 
 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";					\
 										WorkingDir:	"{#BinDir}";					\
 										Tasks: extract\ffs\snd extract\ffs\raw
+
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... (this may take several minutes)";	\
+										Parameters: "ents --overwrite --dummyBrushes *";	\
+										WorkingDir:	"{#BinDir}";					\
+										Tasks: extract\ffs\ents
+
 ;										Flags: runhidden;							\
 ; Filename: "{app}\README.TXT"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
 ; Filename: "{app}\MYPROG.EXE"; Description: "Launch application"; Flags: postinstall nowait skipifsilent unchecked
