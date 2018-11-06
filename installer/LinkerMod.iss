@@ -18,6 +18,8 @@ UninstallDisplayIcon={app}\LinkerMod.exe
 Name: "{commondesktop}\Game Mod";	Filename: "{#BinDir}\BlackOps.exe"
 ; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{#BinDir}\BlackOps.exe"
 
+Name: "{commondesktop}\Launcher";	Filename: "{#BinDir}\Launcher.exe"
+Name: "{commondesktop}\Radiant";	Filename: "{#BinDir}\CoDBORadiant.exe"
 
 [Components]
 Name: "GameMod";	Description: "Game Mod";	\
