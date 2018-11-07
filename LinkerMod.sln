@@ -97,6 +97,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{E2C8
 		components\scripts\soundalias.bat = components\scripts\soundalias.bat
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pe_bliss", "components\shared\pe_lib\pe_lib.vcxproj", "{1461F543-D1FA-4E4C-B6D7-0F879F566035}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -269,6 +271,18 @@ Global
 		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Release|Win32.Build.0 = Release|Win32
 		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Release|x64.ActiveCfg = Release|x64
 		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E}.Release|x64.Build.0 = Release|x64
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Debug|Win32.Build.0 = Debug|Win32
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Debug|x64.ActiveCfg = Debug|x64
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Debug|x64.Build.0 = Debug|x64
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Production|Win32.ActiveCfg = Release|Win32
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Production|Win32.Build.0 = Release|Win32
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Production|x64.ActiveCfg = Release|x64
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Production|x64.Build.0 = Release|x64
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Release|Win32.ActiveCfg = Release|Win32
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Release|Win32.Build.0 = Release|Win32
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Release|x64.ActiveCfg = Release|x64
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -292,6 +306,7 @@ Global
 		{934C1737-3D69-4D46-B43C-047FEB737B54} = {5D8F01F7-C5A4-4E85-98DC-0E910AFA0D77}
 		{B9C48B82-7363-4D1A-9B0F-610D51D7B04E} = {2F41585B-A483-460A-ABE7-1E04228707E7}
 		{E2C8268D-57A7-427E-8AAC-20F4B577D3FE} = {2F41585B-A483-460A-ABE7-1E04228707E7}
+		{1461F543-D1FA-4E4C-B6D7-0F879F566035} = {66B894E2-780C-4618-9F0A-EBCC5F3F5504}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3EC60A60-52E5-4CED-999D-8AB5B4647111}

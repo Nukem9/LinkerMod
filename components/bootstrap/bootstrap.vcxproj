@@ -105,6 +105,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>$(ProjectDir)\exports.def</ModuleDefinitionFile>
       <MapExports>true</MapExports>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -183,6 +184,9 @@
   <ItemGroup>
     <ProjectReference Include="..\shared\jsoncpp\makefiles\msvc\lib_json.vcxproj">
       <Project>{1e6c2c1c-6453-4129-ae3f-0ee8e6599c89}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\shared\pe_lib\pe_lib.vcxproj">
+      <Project>{1461f543-d1fa-4e4c-b6d7-0f879f566035}</Project>
     </ProjectReference>
     <ProjectReference Include="..\shared\semver\semver.vcxproj">
       <Project>{5fb372dd-a7e1-4a4b-9a28-3ac02543e9e8}</Project>
