@@ -19,3 +19,7 @@
 *.txt text
 *.md text
 *.rc text
+
+# Ensure that materials are stored as binary
+components/resource/raw/materials/* binary
+components/resource/raw/material_properties/* binary
