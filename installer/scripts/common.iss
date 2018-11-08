@@ -204,3 +204,23 @@ begin
 		Exit;
 	end;
 end;
+
+procedure PE_AddImport(moduleName: string; symbolName: string);
+var
+	oldStatus: string;
+	oldFilename: string;
+begin
+	// Backup the current label contents
+	oldStatus := WizardForm.StatusLabel.Caption;
+	oldFilename := WizardForm.FilenameLabel.Caption;
+
+	// Set the new label contents
+	WizardForm.StatusLabel.Caption := 'Patching imports...';
+	WizardForm.FilenameLabel.Caption := ExpandConstant(CurrentFileName);
+
+	PE_AddNamedImport(ExpandConstant(CurrentFileName), moduleName, symbolName);
+
+	// Restore the old contents
+	WizardForm.StatusLabel.Caption := oldStatus;
+	WizardForm.FilenameLabel.Caption := oldFilename;
+end;

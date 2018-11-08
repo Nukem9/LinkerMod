@@ -2,6 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #include "./scripts/common.iss"
+#define GameMod_Exe	"BlackOps.exe"
 
 [Setup]
 AppName=LinkerMod
@@ -15,7 +16,7 @@ UninstallDisplayIcon={app}\LinkerMod.exe
 
 
 [Icons]
-Name: "{commondesktop}\Game Mod";	Filename: "{#BinDir}\BlackOps.exe"
+Name: "{commondesktop}\Game Mod";	Filename: "{#BinDir}\{#GameMod_Exe}"
 ; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{#BinDir}\BlackOps.exe"
 
 Name: "{commondesktop}\Launcher";	Filename: "{#BinDir}\Launcher.exe"
@@ -65,6 +66,16 @@ Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}"; Components: Linke
 Source: "build\Release\cod2map.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
 Source: "build\Release\cod2rad.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
 Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
+
+;
+; Install the existing BlackOps.exe into {app}\bin and add the required imports to it
+; TODO: decide if renaming it GameMod works
+;
+Source: "{app}\BlackOps.exe";	DestDir: "{#BinDir}";		\
+								DestName: "{#GameMod_Exe}";	\
+								Components: GameMod;		\
+								Flags: external;			\
+								AfterInstall: PE_AddImport('game_mod.dll', 'DLL_GetVersionString');
 
 ;
 ; Mod Tools asset files
@@ -142,7 +153,7 @@ begin
 	begin
 		WizardForm.StatusLabel.Caption := 'Installing something...';
 		{ Install something }
-		MsgBox('IWD PARAMS: ', mbError, MB_YESNO);
+		MsgBox('POST INSTALL', mbError, MB_YESNO);
 	end;
 end;
 
