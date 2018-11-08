@@ -81,6 +81,13 @@ function  GetGamePath(): PChar;
 external 'LMI_GamePath@files:bootstrap.dll stdcall';
 
 //
+// Resolve the game's installation path via the installation bootstrapper
+// Returns an empty string on failure
+//
+function  PE_AddNamedImport(filepath: string; _module: string; symbol: string): Integer;
+external 'PE_AddNamedImport@files:bootstrap.dll stdcall';
+
+//
 // Get the (automatically resolved) default installation directory
 // Returns an empty string if it couldn't be found
 //

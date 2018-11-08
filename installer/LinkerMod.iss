@@ -120,6 +120,8 @@ Filename: "{#BinDir}\launcher.exe";		Description: "Launch mod tools";					\
 procedure InitializeWizard;
 begin
 	// We don't need to do anything special here
+	PE_AddNamedImport(WizardDirValue + '\bin\zee.exe', 'KERNEL32.dll', 'GetFullPathNameA');
+	PE_AddNamedImport(WizardDirValue + '\bin\zee.exe', 'KERNEL32.dll', 'acorn');
 end;
 
 //

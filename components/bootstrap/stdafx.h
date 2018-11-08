@@ -30,3 +30,6 @@
 #include "shared_version.h"
 
 #include "jsoncpp/include/json/json.h"
+
+#include "common/fs.h"
+

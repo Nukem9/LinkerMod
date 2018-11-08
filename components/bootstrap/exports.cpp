@@ -2,9 +2,7 @@
 //
 
 #include "stdafx.h"
-
-#include "common/fs.h"
-
+#include "pe.h"
 
  void debug_main();
 
@@ -57,6 +55,7 @@ extern "C" {
 	std::string g_str = "";
 
 	std::string tags = "";
+	// DEPRECATED
 	const char* __stdcall LMI_GetTags(void)
 	{
 		auto j = DownloadReleaseJSon();
@@ -89,5 +88,20 @@ extern "C" {
 		Version _b(b);
 
 		return Compare(_a, _b);
+	}
+
+	//
+	// Add a named import to an EXE (if it's not already present)
+	//
+	int __stdcall PE_AddNamedImport(const char* filepath, const char* moduleName, const char* symbolName) {
+		return pe::AddImport(filepath, moduleName, symbolName);
+	}
+
+	int __stdcall PE_HasModule(const char* filepath, const char* moduleName) {
+		return pe::HasModule(filepath, moduleName);
+	}
+
+	int __stdcall PE_HasImport(const char* filepath, const char* moduleName, const char* symbolName) {
+		return pe::HasImport(filepath, moduleName, symbolName);
 	}
 }
