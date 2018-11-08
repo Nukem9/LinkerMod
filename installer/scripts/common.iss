@@ -3,6 +3,8 @@
 
 #define PleaseWait '(this may take several minutes)'
 
+#define GameMod_Exe	 "BlackOps.exe"
+
 #include "./utility.iss"
 
 [Setup]
