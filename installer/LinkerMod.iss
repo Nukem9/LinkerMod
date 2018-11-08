@@ -2,7 +2,6 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #include "./scripts/common.iss"
-#define GameMod_Exe	"BlackOps.exe"
 
 [Setup]
 AppName=LinkerMod
@@ -75,7 +74,7 @@ Source: "{app}\BlackOps.exe";	DestDir: "{#BinDir}";		\
 								DestName: "{#GameMod_Exe}";	\
 								Components: GameMod;		\
 								Flags: external;			\
-								AfterInstall: PE_AddImport('game_mod.dll', 'DLL_GetVersionString');
+								AfterInstall: PE_AddImport('game_mod.dll', 'DLL_VersionString');
 
 ;
 ; Mod Tools asset files
