@@ -170,7 +170,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="common\fs.cpp" />
-    <ClCompile Include="debug.cpp" />
     <ClCompile Include="exports.cpp" />
     <ClCompile Include="pe.cpp" />
     <ClCompile Include="stdafx.cpp">

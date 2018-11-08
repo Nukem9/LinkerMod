@@ -1,7 +1,7 @@
 EXPORTS
-TestFunc
 LMI_GamePath
 LMI_SetInstallPath
-LMI_GetTags
 LMI_CompareVersions
 PE_AddNamedImport
+PE_HasModule
+PE_HasImport

@@ -49,8 +49,6 @@ Source: ".\build\Release\bootstrap.dll";	DestDir: {app}; \
 [Code]
 (* Note: These *MUST* use the module exports definition files	*)
 (*       Using __declspec(dllexport) does *NOT* work 			*)
-function  TestFunc( buffer:PChar): Cardinal;
-external 'TestFunc@files:bootstrap.dll stdcall';
 
 //
 // Compare to semantic version strings
@@ -68,10 +66,6 @@ external 'LMI_CompareVersions@files:bootstrap.dll stdcall';
 //
 function  SetInstallPath(path: String): Boolean;
 external 'LMI_SetInstallPath@files:bootstrap.dll stdcall';
-
-// DEPRECATED
-function  GetVersions(): PChar;
-external 'LMI_GetTags@files:bootstrap.dll stdcall';
 
 //
 // Resolve the game's installation path via the installation bootstrapper

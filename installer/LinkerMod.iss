@@ -59,7 +59,6 @@ Name: extract\ffs\ents; Description: "Extract &Entity Maps"; 	\
 ;
 ; Actual LinkerMod binaries
 ;
-Source: "build\Release\proxy.dll";			DestDir: "{#BinDir}";
 Source: "build\Release\game_mod.dll";		DestDir: "{#BinDir}"; Components: GameMod
 Source: "build\Release\linker_pc.dll";		DestDir: "{#BinDir}"; Components: LinkerMod
 Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}"; Components: LinkerMod\Utils
@@ -130,7 +129,21 @@ end;
 function NextButtonClick(curPageID:integer): boolean;
 begin
 	// Automatically handle installation path validation
+	// If the given path isn't valid, we return false and the 
+	// installer won't continue to the next page
 	Result := Com_ValidateInstallPath(curPageID);
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+	// Upon entering the postInstall step, we need patch the imports
+	// for the assigned files (this runs BEFORE the [Run] section)
+	if CurStep = ssPostInstall then
+	begin
+		WizardForm.StatusLabel.Caption := 'Installing something...';
+		{ Install something }
+		MsgBox('IWD PARAMS: ', mbError, MB_YESNO);
+	end;
 end;
 
 //
