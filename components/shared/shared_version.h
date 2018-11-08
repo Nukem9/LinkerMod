@@ -9,6 +9,8 @@ typedef semver::v2::Version Version_t;
 #ifdef G_VERSION
 	const Version_t g_version(G_VERSION);
 	
+extern "C"
+{
 	__declspec(dllexport) const Version_t& DLL_Version()
 	{
 		return g_version;
@@ -29,9 +31,14 @@ typedef semver::v2::Version Version_t;
 	
 		return version;
 	}
+}
 #else
-__declspec(dllexport) const Version_t& DLL_Version();
-__declspec(dllexport) const char* DLL_VersionString();
+extern "C"
+{
+	__declspec(dllexport) const Version_t& DLL_Version();
+	__declspec(dllexport) const char* DLL_VersionString();
+}
+
 #endif
 
 //
