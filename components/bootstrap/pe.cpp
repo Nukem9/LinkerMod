@@ -67,10 +67,9 @@ namespace pe {
 		}
 
 		pe_base image(pe_factory::create_pe(pe_file));
-		ReturnType result = handler(image);
 		pe_file.close();
 		
-		return result;
+		return handler(image);
 	}
 
 	//
