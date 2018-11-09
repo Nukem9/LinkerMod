@@ -78,11 +78,16 @@ Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}";				\
 											Components: LinkerMod\Mapping;
 
 ;
+; Install actual applications
+; NOTE: Anything that uses DestName must have it defined BEFORE DestDir
+;       Otherwise the file will be copied, then copied again (and renamed)
+;       Resulting in two files on the disk (or perhaps there was another cause).
+;
+
 ; Install the existing BlackOps.exe into {app}\bin and add the required imports to it
 ; TODO: decide if renaming it GameMod works
-;
-Source: "{app}\BlackOps.exe";	DestDir: "{#BinDir}";			\
-								DestName: "{#GameMod_Exe}";		\
+Source: "{app}\BlackOps.exe";	DestName: "{#GameMod_Exe}";		\
+								DestDir: "{#BinDir}";			\
 								Components: GameMod;			\
 								Flags: external ignoreversion;	\
 								AfterInstall: PE_AddImport('game_mod.dll', '{#DEFAULT_EXPORT}');
@@ -97,8 +102,8 @@ Source: "{#BinSrcDir}\cod2rad.exe";	DestDir: "{#BinDir}";			\
 									Flags: ignoreversion;			\
 									AfterInstall: PE_AddImport('cod2rad.dll', '{#DEFAULT_EXPORT}');
 
-Source: "{#BinSrcDir}\CoDWaWRadiant.exe";	DestDir: "{#BinDir}";			\
-											DestName: "CoDBORadiant.exe";	\
+Source: "{#BinSrcDir}\CoDWaWRadiant.exe";	DestName: "CoDBORadiant.exe";	\
+											DestDir: "{#BinDir}";			\
 											Components: LinkerMod\Mapping;	\
 											Flags: ignoreversion;			\
 											AfterInstall: PE_AddImport('radiant_mod.dll', '{#DEFAULT_EXPORT}');
