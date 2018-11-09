@@ -70,11 +70,27 @@ Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}"; Components: Linke
 ; Install the existing BlackOps.exe into {app}\bin and add the required imports to it
 ; TODO: decide if renaming it GameMod works
 ;
-Source: "{app}\BlackOps.exe";	DestDir: "{#BinDir}";		\
-								DestName: "{#GameMod_Exe}";	\
-								Components: GameMod;		\
-								Flags: external;			\
+Source: "{app}\BlackOps.exe";	DestDir: "{#BinDir}";			\
+								DestName: "{#GameMod_Exe}";		\
+								Components: GameMod;			\
+								Flags: external ignoreversion;	\
 								AfterInstall: PE_AddImport('game_mod.dll', 'DLL_VersionString');
+
+Source: "{#BinSrcDir}\cod2map.exe";	DestDir: "{#BinDir}";			\
+									Components: LinkerMod\Mapping;	\
+									Flags: ignoreversion;			\
+									AfterInstall: PE_AddImport('cod2map.dll', 'DLL_VersionString');
+
+Source: "{#BinSrcDir}\cod2rad.exe";	DestDir: "{#BinDir}";			\
+									Components: LinkerMod\Mapping;	\
+									Flags: ignoreversion;			\
+									AfterInstall: PE_AddImport('cod2rad.dll', 'DLL_VersionString');
+
+Source: "{#BinSrcDir}\CoDWaWRadiant.exe";	DestDir: "{#BinDir}";			\
+											DestName: "CoDBORadiant.exe";	\
+											Components: LinkerMod\Mapping;	\
+											Flags: ignoreversion;			\
+											AfterInstall: PE_AddImport('radiant_mod.dll', 'DLL_VersionString');																								
 
 ;
 ; Mod Tools asset files

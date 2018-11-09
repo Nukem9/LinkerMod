@@ -1,5 +1,6 @@
-#define ProjectGroup 'LinkerMod'
-#define BinDir '{app}\bin'
+#define ProjectGroup	'LinkerMod'
+#define BinDir			'{app}\bin'
+#define BinSrcDir		'components\resource\bin'
 
 #define PleaseWait '(this may take several minutes)'
 
