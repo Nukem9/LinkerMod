@@ -67,6 +67,7 @@ Name: "LinkerMod\Assets\FF\Ents";	Description: "Entity Prefabs";			\
 
 
 [Tasks]
+Name: Converter;	Description: "Run Converter";
 
 [Files]
 ; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
@@ -157,6 +158,12 @@ Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {
 										Parameters: "ents --overwrite --dummyBrushes *";			\
 										WorkingDir:	"{#BinDir}";									\
 										Components: LinkerMod\Assets\FF\Ents;
+
+Filename: "{#BinDir}\converter.exe";	StatusMsg: "Running converter... {#PleaseWait}";	\
+										Parameters: "build all -y -nospam";					\
+										WorkingDir: "{#BinDir}";							\
+										Tasks: Converter;									\
+										Flags: runhidden;
 
 ;										Flags: runhidden;							\
 ; Filename: "{app}\README.TXT"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
