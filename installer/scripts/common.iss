@@ -7,6 +7,7 @@
 #define GameMod_Exe	 "BlackOps.exe"
 #define DEFAULT_EXPORT "DLL_VersionString"
 
+#include "./options.iss"
 #include "./utility.iss"
 
 [Setup]

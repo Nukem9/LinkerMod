@@ -112,10 +112,12 @@ Source: "{#BinSrcDir}\CoDWaWRadiant.exe";	DestName: "CoDBORadiant.exe";	\
 ; Mod Tools asset files
 ;
 
+#if INSTALLER_INCLUDE_SCRIPTS == yes
 ; Utility scripts
 Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";	\
 									Components: LinkerMod\Utils; 	\
 									Flags: recursesubdirs;
+#endif
 
 #if BUILD_TYPE == 'PRODUCTION'
 ; Custom / missing assets
