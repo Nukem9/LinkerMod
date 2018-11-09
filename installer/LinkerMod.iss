@@ -64,12 +64,18 @@ Name: extract\ffs\ents; Description: "Extract &Entity Maps"; 	\
 ;
 ; Actual LinkerMod binaries
 ;
-Source: "build\Release\game_mod.dll";		DestDir: "{#BinDir}"; Components: GameMod
-Source: "build\Release\linker_pc.dll";		DestDir: "{#BinDir}"; Components: LinkerMod
-Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}"; Components: LinkerMod\Utils
-Source: "build\Release\cod2map.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
-Source: "build\Release\cod2rad.dll";		DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
-Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}"; Components: LinkerMod\Mapping
+Source: "build\Release\game_mod.dll";		DestDir: "{#BinDir}";				\
+											Components: GameMod;
+Source: "build\Release\linker_pc.dll";		DestDir: "{#BinDir}";				\
+											Components: LinkerMod;
+Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}";				\
+											Components: LinkerMod\Utils;
+Source: "build\Release\cod2map.dll";		DestDir: "{#BinDir}";				\
+											Components: LinkerMod\Mapping;
+Source: "build\Release\cod2rad.dll";		DestDir: "{#BinDir}";				\
+											Components: LinkerMod\Mapping;
+Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}";				\
+											Components: LinkerMod\Mapping;
 
 ;
 ; Install the existing BlackOps.exe into {app}\bin and add the required imports to it
