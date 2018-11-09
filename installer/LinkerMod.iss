@@ -22,37 +22,51 @@ Name: "{commondesktop}\Game Mod";	Filename: "{#BinDir}\{#GameMod_Exe}"
 ; Name: "{commondesktop}\Radiant";	Filename: "{#BinDir}\CoDBORadiant.exe"
 
 [Components]
+;NOTE: The exlusive flag makes them radio buttons
+
 Name: "GameMod";	Description: "Game Mod";	\
 					Types: full compact custom;	\
 					Flags: fixed;
 
-; exlusive flag makes them radio buttons
 Name: "LinkerMod"; 			Description: "Mod Tools";			\
 							Types: full custom;
 Name: "LinkerMod\Utils";	Description: "Asset Utility";		\
-							Types: full;
+							Types: full custom;					\
+							Flags: fixed;
 Name: "LinkerMod\Mapping";	Description: "Mapping Tools";		\
 							Types: full;
-[Tasks]
-Name: extract;	Description: "Extract Assets";	\
-				Components: LinkerMod\Utils;
-Name: extract\iwd; 	Description: "Extract I&WDs"; 			\
-					Components: LinkerMod\Utils;
-Name: extract\iwd\img; 	Description: "Extract &Images"; 	\
-						Components: LinkerMod\Utils;
-Name: extract\iwd\snd; 	Description: "Extract &Sounds"; 	\
-						Components: LinkerMod\Utils;
-Name: extract\iwd\raw;	Description: "Extract &Rawfiles"; 	\
-						Components: LinkerMod\Utils;
 
-Name: extract\ffs; 		Description: "Extract &FastFiles"; 		\
-						Components: LinkerMod\Utils;
-Name: extract\ffs\snd; 	Description: "Extract &Sounds"; 		\
-						Components: LinkerMod\Utils;
-Name: extract\ffs\raw; 	Description: "Extract &Rawfiles"; 		\
-						Components: LinkerMod\Utils;
-Name: extract\ffs\ents; Description: "Extract &Entity Maps"; 	\
-						Components: LinkerMod\Utils;
+Name: "LinkerMod\Assets";	Description: "Game Assets";			\
+							Types: full custom;
+
+; IWD Assets
+Name: "LinkerMod\Assets\IWD";		Description: "IWD Assets";				\
+									Types: full custom;
+Name: "LinkerMod\Assets\IWD\Img";	Description: "Images";					\
+									Types: full custom;						\
+									ExtraDiskSpaceRequired: 5343760384;
+Name: "LinkerMod\Assets\IWD\Snd";	Description: "Sounds";					\
+									Types: full custom;						\
+									ExtraDiskSpaceRequired: 3819032576;
+Name: "LinkerMod\Assets\IWD\Raw";		Description: "Rawfiles";			\
+										Types: full custom;					\
+										ExtraDiskSpaceRequired: 12439552;
+
+; Fastfile Assets
+Name: "LinkerMod\Assets\FF";		Description: "Fastfile Assets";			\
+									Types: full custom;
+Name: "LinkerMod\Assets\FF\Snd";	Description: "Sounds";					\
+									Types: full custom;						\
+									ExtraDiskSpaceRequired: 295206912;	
+Name: "LinkerMod\Assets\FF\Raw";	Description: "Rawfiles";				\
+									Types: full custom;						\
+									ExtraDiskSpaceRequired: 44056576;
+Name: "LinkerMod\Assets\FF\Ents";	Description: "Entity Prefabs";			\
+									Types: full custom;						\
+									ExtraDiskSpaceRequired: 18104320;
+
+
+[Tasks]
 
 [Files]
 ; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
@@ -131,18 +145,18 @@ Source: "components\resource\*";	DestDir: "{app}";				\
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";		\
 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
-										Tasks: extract\iwd;
+										Components: LinkerMod\Assets\IWD;
 ;										Flags: runhidden;											\
 
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";	\
 										Parameters: "extract-ff {code:ExtractFF_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
-										Tasks: extract\ffs\snd extract\ffs\raw
+										Components: LinkerMod\Assets\FF\Snd LinkerMod\Assets\FF\Raw;
 
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {#PleaseWait}";	\
 										Parameters: "ents --overwrite --dummyBrushes *";			\
 										WorkingDir:	"{#BinDir}";									\
-										Tasks: extract\ffs\ents
+										Components: LinkerMod\Assets\FF\Ents;
 
 ;										Flags: runhidden;							\
 ; Filename: "{app}\README.TXT"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
@@ -186,12 +200,12 @@ begin
 end;
 
 //
-// Check if a given task is enabled - if it is, we append the mappedValue
+// Check if a given component is enabled - if it is, we append the mappedValue
 // to argString and return argString
 //
-function AddRunArgument(var argString: string; taskName: string; mappedValue: string): string;
+function AddRunArgument(var argString: string; compName: string; mappedValue: string): string;
 begin
-	if IsTaskSelected(taskName) then
+	if IsComponentSelected(compName) then
 		argString := argString + ' ' + mappedValue;
 	Result := argString;
 end;
@@ -203,9 +217,9 @@ function ExtractIWD_ResolveParams(param: String): string;
 begin
 	Result := ' --overwrite --includeLocalized';
 
-	AddRunArgument(Result, 'extract\iwd\img', '--images');
-	AddRunArgument(Result, 'extract\iwd\snd', '--sounds');
-	AddRunArgument(Result, 'extract\iwd\raw', '--rawfiles');
+	AddRunArgument(Result, 'LinkerMod\Assets\IWD\Img', '--images');
+	AddRunArgument(Result, 'LinkerMod\Assets\IWD\Snd', '--sounds');
+	AddRunArgument(Result, 'LinkerMod\Assets\IWD\Raw', '--rawfiles');
 
 	MsgBox('IWD PARAMS: ' + Result, mbError, MB_YESNO);
 end;
@@ -218,30 +232,30 @@ function ExtractFF_ResolveParams(param: String): string;
 begin
 	Result := ' --overwrite --includeLocalized';
 
-	AddRunArgument(Result, 'extract\ffs\snd', '--sounds');
-	AddRunArgument(Result, 'extract\ffs\raw', '--rawfiles');
+	AddRunArgument(Result, 'LinkerMod\Assets\FF\Snd', '--sounds');
+	AddRunArgument(Result, 'LinkerMod\Assets\FF\Raw', '--rawfiles');
 
 	MsgBox('FF PARAMS: ' + Result, mbError, MB_YESNO);
 end;
 
-procedure CurPageChanged(CurPageID: Integer);
-var
-InstallMessage: TLabel;
-begin
-  if CurPageID = wpInstalling then begin
-    InstallMessage:= TLabel.Create(WizardForm);
-    InstallMessage.AutoSize:= False;
-    InstallMessage.Top := WizardForm.ProgressGauge.Top + 
-     WizardForm.ProgressGauge.Height + ScaleY(8);
-    InstallMessage.Height := ScaleY(150);
-    InstallMessage.Left := WizardForm.ProgressGauge.Left + ScaleX(0);
-    InstallMessage.Width := ScaleX(417);
-    InstallMessage.Font:= WizardForm.FilenameLabel.Font;
-    InstallMessage.Font.Color:= clBlack;
-    InstallMessage.Font.Height:= ScaleY(15);
-    InstallMessage.Transparent:= True;
-    InstallMessage.WordWrap:= true;
-    InstallMessage.Caption:= 'aaaaaaaaaaaaaaaaaaaaaaaaasf'; //(ExpandConstant('{cm:CustomMessage}'));
-    InstallMessage.Parent:= WizardForm.InstallingPage; 
-  end;
-end;
+// procedure CurPageChanged(CurPageID: Integer);
+// var
+// InstallMessage: TLabel;
+// begin
+//   if CurPageID = wpInstalling then begin
+//     InstallMessage:= TLabel.Create(WizardForm);
+//     InstallMessage.AutoSize:= False;
+//     InstallMessage.Top := WizardForm.ProgressGauge.Top +
+//      WizardForm.ProgressGauge.Height + ScaleY(8);
+//     InstallMessage.Height := ScaleY(150);
+//     InstallMessage.Left := WizardForm.ProgressGauge.Left + ScaleX(0);
+//     InstallMessage.Width := ScaleX(417);
+//     InstallMessage.Font:= WizardForm.FilenameLabel.Font;
+//     InstallMessage.Font.Color:= clBlack;
+//     InstallMessage.Font.Height:= ScaleY(15);
+//     InstallMessage.Transparent:= True;
+//     InstallMessage.WordWrap:= true;
+//     InstallMessage.Caption:= 'aaaaaaaaaaaaaaaaaaaaaaaaasf'; //(ExpandConstant('{cm:CustomMessage}'));
+//     InstallMessage.Parent:= WizardForm.InstallingPage;
+//   end;
+// end;
