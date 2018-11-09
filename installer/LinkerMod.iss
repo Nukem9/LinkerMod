@@ -159,7 +159,7 @@ Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {
 										Components: LinkerMod\Assets\FF\Ents;
 
 Filename: "{#BinDir}\converter.exe";	StatusMsg: "Running converter... {#PleaseWait}";	\
-										Parameters: "build all -y -nospam";					\
+										Parameters: "build all -nopause -n -nospam";					\
 										WorkingDir: "{#BinDir}";							\
 										Tasks: Converter;									\
 										Flags: runhidden;
