@@ -147,7 +147,6 @@ Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#Ple
 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
 										Components: LinkerMod\Assets\IWD;
-;										Flags: runhidden;											\
 
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";	\
 										Parameters: "extract-ff {code:ExtractFF_ResolveParams}";	\
@@ -165,7 +164,6 @@ Filename: "{#BinDir}\converter.exe";	StatusMsg: "Running converter... {#PleaseWa
 										Tasks: Converter;									\
 										Flags: runhidden;
 
-;										Flags: runhidden;							\
 ; Filename: "{app}\README.TXT"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
 
 #if BUILD_TYPE == 'PRODUCTION'
