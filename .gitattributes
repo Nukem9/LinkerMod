@@ -20,6 +20,8 @@
 *.md text
 *.rc text
 
+*.exe binary
+
 # Ensure that materials are stored as binary
 components/resource/raw/materials/* binary
 components/resource/raw/material_properties/* binary
