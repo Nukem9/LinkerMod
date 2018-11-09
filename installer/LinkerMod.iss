@@ -103,8 +103,8 @@ Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";	\
 
 #if BUILD_TYPE == 'PRODUCTION'
 ; Custom / missing assets
-Source: "components\resource\*";	DestDir: "{app}";		\
-									Components: LinkerMod;	\
+Source: "components\resource\*";	DestDir: "{app}";				\
+									Components: LinkerMod\Assets;	\
 									Flags: recursesubdirs;
 #endif
 
