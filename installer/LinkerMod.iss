@@ -27,10 +27,15 @@ Name: "GameMod";	Description: "Game Mod";	\
 					Flags: fixed
 
 ; exlusive flag makes them radio buttons
-Name: "LinkerMod"; 			Description: "Mod Tools"; Types: full custom
-Name: "LinkerMod\Utils";	Description: "Asset Utility";	Types: full;	Flags:
-Name: "LinkerMod\Mapping";	Description: "Radiant Mod";		Types: full;	Flags:
-Name: "LinkerMod\Assets";	Description: "Additional Assets"; Types: full;	Flags: fixed
+Name: "LinkerMod"; 			Description: "Mod Tools";			\
+							Types: full custom;
+Name: "LinkerMod\Utils";	Description: "Asset Utility";		\
+							Types: full;
+Name: "LinkerMod\Mapping";	Description: "Mapping Tools";		\
+							Types: full;
+Name: "LinkerMod\Assets";	Description: "Additional Assets";	\
+							Types: full;						\
+							Flags: fixed;
 
 [Tasks]
 Name: extract;	Description: "Extract Assets";	\
@@ -90,7 +95,7 @@ Source: "{#BinSrcDir}\CoDWaWRadiant.exe";	DestDir: "{#BinDir}";			\
 											DestName: "CoDBORadiant.exe";	\
 											Components: LinkerMod\Mapping;	\
 											Flags: ignoreversion;			\
-											AfterInstall: PE_AddImport('radiant_mod.dll', '{#DEFAULT_EXPORT}');																								
+											AfterInstall: PE_AddImport('radiant_mod.dll', '{#DEFAULT_EXPORT}');
 
 ;
 ; Mod Tools asset files
@@ -153,7 +158,7 @@ end;
 function NextButtonClick(curPageID:integer): boolean;
 begin
 	// Automatically handle installation path validation
-	// If the given path isn't valid, we return false and the 
+	// If the given path isn't valid, we return false and the
 	// installer won't continue to the next page
 	Result := Com_ValidateInstallPath(curPageID);
 end;
