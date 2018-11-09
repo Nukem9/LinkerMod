@@ -5,6 +5,7 @@
 #define PleaseWait '(this may take several minutes)'
 
 #define GameMod_Exe	 "BlackOps.exe"
+#define DEFAULT_EXPORT "DLL_VersionString"
 
 #include "./utility.iss"
 

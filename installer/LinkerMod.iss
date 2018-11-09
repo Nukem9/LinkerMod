@@ -74,23 +74,23 @@ Source: "{app}\BlackOps.exe";	DestDir: "{#BinDir}";			\
 								DestName: "{#GameMod_Exe}";		\
 								Components: GameMod;			\
 								Flags: external ignoreversion;	\
-								AfterInstall: PE_AddImport('game_mod.dll', 'DLL_VersionString');
+								AfterInstall: PE_AddImport('game_mod.dll', '{#DEFAULT_EXPORT}');
 
 Source: "{#BinSrcDir}\cod2map.exe";	DestDir: "{#BinDir}";			\
 									Components: LinkerMod\Mapping;	\
 									Flags: ignoreversion;			\
-									AfterInstall: PE_AddImport('cod2map.dll', 'DLL_VersionString');
+									AfterInstall: PE_AddImport('cod2map.dll', '{#DEFAULT_EXPORT}');
 
 Source: "{#BinSrcDir}\cod2rad.exe";	DestDir: "{#BinDir}";			\
 									Components: LinkerMod\Mapping;	\
 									Flags: ignoreversion;			\
-									AfterInstall: PE_AddImport('cod2rad.dll', 'DLL_VersionString');
+									AfterInstall: PE_AddImport('cod2rad.dll', '{#DEFAULT_EXPORT}');
 
 Source: "{#BinSrcDir}\CoDWaWRadiant.exe";	DestDir: "{#BinDir}";			\
 											DestName: "CoDBORadiant.exe";	\
 											Components: LinkerMod\Mapping;	\
 											Flags: ignoreversion;			\
-											AfterInstall: PE_AddImport('radiant_mod.dll', 'DLL_VersionString');																								
+											AfterInstall: PE_AddImport('radiant_mod.dll', '{#DEFAULT_EXPORT}');																								
 
 ;
 ; Mod Tools asset files
