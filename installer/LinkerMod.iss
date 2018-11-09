@@ -16,10 +16,10 @@ UninstallDisplayIcon={app}\LinkerMod.exe
 
 [Icons]
 Name: "{commondesktop}\Game Mod";	Filename: "{#BinDir}\{#GameMod_Exe}"
-; Name: "{group}\LinkerMod\Game_Mod"; Filename: "{#BinDir}\BlackOps.exe"
 
-Name: "{commondesktop}\Launcher";	Filename: "{#BinDir}\Launcher.exe"
-Name: "{commondesktop}\Radiant";	Filename: "{#BinDir}\CoDBORadiant.exe"
+; THESE ARE NOT NEEDED (AS STEAM'S LAUNCHER SHORTCUT WORKS FINE)
+; Name: "{commondesktop}\Launcher";	Filename: "{#BinDir}\Launcher.exe"
+; Name: "{commondesktop}\Radiant";	Filename: "{#BinDir}\CoDBORadiant.exe"
 
 [Components]
 Name: "GameMod";	Description: "Game Mod";	\
@@ -223,4 +223,26 @@ begin
 	AddRunArgument(Result, 'extract\ffs\raw', '--rawfiles');
 
 	MsgBox('FF PARAMS: ' + Result, mbError, MB_YESNO);
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+var
+InstallMessage: TLabel;
+begin
+  if CurPageID = wpInstalling then begin
+    InstallMessage:= TLabel.Create(WizardForm);
+    InstallMessage.AutoSize:= False;
+    InstallMessage.Top := WizardForm.ProgressGauge.Top + 
+     WizardForm.ProgressGauge.Height + ScaleY(8);
+    InstallMessage.Height := ScaleY(150);
+    InstallMessage.Left := WizardForm.ProgressGauge.Left + ScaleX(0);
+    InstallMessage.Width := ScaleX(417);
+    InstallMessage.Font:= WizardForm.FilenameLabel.Font;
+    InstallMessage.Font.Color:= clBlack;
+    InstallMessage.Font.Height:= ScaleY(15);
+    InstallMessage.Transparent:= True;
+    InstallMessage.WordWrap:= true;
+    InstallMessage.Caption:= 'aaaaaaaaaaaaaaaaaaaaaaaaasf'; //(ExpandConstant('{cm:CustomMessage}'));
+    InstallMessage.Parent:= WizardForm.InstallingPage; 
+  end;
 end;
