@@ -33,10 +33,6 @@ Name: "LinkerMod\Utils";	Description: "Asset Utility";		\
 							Types: full;
 Name: "LinkerMod\Mapping";	Description: "Mapping Tools";		\
 							Types: full;
-Name: "LinkerMod\Assets";	Description: "Additional Assets";	\
-							Types: full;						\
-							Flags: fixed;
-
 [Tasks]
 Name: extract;	Description: "Extract Assets";	\
 				Components: LinkerMod\Utils;
@@ -121,8 +117,9 @@ Source: "components\scripts\*";		DestDir: "{#BinDir}\scripts";	\
 
 #if BUILD_TYPE == 'PRODUCTION'
 ; Custom / missing assets
+; Should automatically be installed if the user requested mapping support
 Source: "components\resource\*";	DestDir: "{app}";				\
-									Components: LinkerMod\Assets;	\
+									Components: LinkerMod\Mapping;	\
 									Flags: recursesubdirs;
 #endif
 
