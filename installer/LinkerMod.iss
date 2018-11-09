@@ -24,7 +24,7 @@ Name: "{commondesktop}\Radiant";	Filename: "{#BinDir}\CoDBORadiant.exe"
 [Components]
 Name: "GameMod";	Description: "Game Mod";	\
 					Types: full compact custom;	\
-					Flags: fixed
+					Flags: fixed;
 
 ; exlusive flag makes them radio buttons
 Name: "LinkerMod"; 			Description: "Mod Tools";			\
