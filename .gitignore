@@ -24,9 +24,9 @@
 
 components/sdk
 components/game_mod/steam
-components/*/Debug
-components/*/Release
-components/*/Production
+components/**/Debug
+components/**/Release
+components/**/Production
 components/shared/*/Debug
 components/shared/*/Release
 components/shared/*/Production
