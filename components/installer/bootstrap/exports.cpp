@@ -3,11 +3,17 @@
 
 #include "stdafx.h"
 #include "pe.h"
+#include "process.h"
+#include "ipc.h"
 
-extern std::string g_data ;
-std::string DownloadReleaseJSon();
+IPC::Connection app(NULL);
 
 extern "C" {
+	int __stdcall IPC_Init(HWND hWnd) {
+		app = IPC::Connection(hWnd);
+		return 0;
+	}
+
 	//
 	// Resolve the game's installation path
 	// Returns an empty string on failure
@@ -41,6 +47,7 @@ extern "C" {
 	// Add a named import to an EXE (if it's not already present)
 	//
 	int __stdcall PE_AddNamedImport(const char* filepath, const char* moduleName, const char* symbolName) {
+		app.printf("Patching imports for '%s'\n", filepath);
 		return pe::AddImport(filepath, moduleName, symbolName);
 	}
 
@@ -50,5 +57,29 @@ extern "C" {
 
 	int __stdcall PE_HasImport(const char* filepath, const char* moduleName, const char* symbolName) {
 		return pe::HasImport(filepath, moduleName, symbolName);
+	}
+
+	//
+	// This function is used by the installer
+	// to automatically pipe the output from the target command
+	// back to the log control in the actual installer window
+	//
+	int _stdcall LMI_Exec(const Process::LaunchInfo* info)
+	{
+		assert(info);
+
+		Pipe pipe(true);
+		app.printf("Create process... %s\n", info->filename);
+		auto process = Process::Create(*info, pipe);
+
+		std::string text = "";
+		bool read = true;
+		do {
+			if (read = pipe.Read(text)) {
+				app.print(text);
+			}
+		} while (read);
+
+		return process.WaitForExit();
 	}
 }

@@ -47,6 +47,21 @@ int __cdecl fileCallback(const char* filePath, const char* fileName)
 //
 int app_main(int argc, char** argv)
 {
+	setvbuf(stdout, nullptr, _IONBF, 0);
+
+#if DEBUG_ARGS
+	const auto indexWidth = (decltype(argc))log10(argc) + 1;
+	printf("argc: %d\n", indexWidth);
+	for (decltype(argc) i = 0; i < argc; i++)
+	{
+
+		// if (!SetConsoleTextAttribute(hConsoleOutput, i)) {
+		// 	printf("COULDNT SET ATRIB\n");
+		// }
+		printf("[%*d]: '%s'\n", indexWidth, i, argv[i]);
+	}
+#endif
+
 	if(argc <= 1)
 	{
 		Arg_PrintUsage();

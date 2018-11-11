@@ -57,7 +57,7 @@ Name: "LinkerMod\Assets\FF";		Description: "Fastfile Assets";			\
 									Types: full custom;
 Name: "LinkerMod\Assets\FF\Snd";	Description: "Sounds";					\
 									Types: full custom;						\
-									ExtraDiskSpaceRequired: 295206912;	
+									ExtraDiskSpaceRequired: 295206912;
 Name: "LinkerMod\Assets\FF\Raw";	Description: "Rawfiles";				\
 									Types: full custom;						\
 									ExtraDiskSpaceRequired: 44056576;
@@ -73,14 +73,12 @@ Name: Converter;	Description: "Run Converter";
 ; Source: "README.md"; DestDir: "{app}"; Flags: isreadme
 
 ;
-; Actual LinkerMod binaries
+; Actual LinkerMod DLLs
 ;
 Source: "build\Release\game_mod.dll";		DestDir: "{#BinDir}";				\
 											Components: GameMod;
 Source: "build\Release\linker_pc.dll";		DestDir: "{#BinDir}";				\
 											Components: LinkerMod;
-Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}";				\
-											Components: LinkerMod\Utils;
 Source: "build\Release\cod2map.dll";		DestDir: "{#BinDir}";				\
 											Components: LinkerMod\Mapping;
 Source: "build\Release\cod2rad.dll";		DestDir: "{#BinDir}";				\
@@ -89,7 +87,7 @@ Source: "build\Release\radiant_mod.dll";	DestDir: "{#BinDir}";				\
 											Components: LinkerMod\Mapping;
 
 ;
-; Install actual applications
+; Install vanilla binaries
 ; NOTE: Anything that uses DestName must have it defined BEFORE DestDir
 ;       Otherwise the file will be copied, then copied again (and renamed)
 ;       Resulting in two files on the disk (or perhaps there was another cause).
@@ -141,8 +139,17 @@ Source: "components\resource\*";	DestDir: "{app}";				\
 ; Test automatic shit
 ; Source: "{code:GetAutoFiles}"; DestDir: "{#BinDir}\debug}";	Components: Debug; Flags: external recursesubdirs createallsubdirs
 
+;
+; Install Asset Util
+; IMPORTANT: This MUST be installed LAST because it automatically initializes the
+;            asset extraction steps, etc. (if the user enabled them)
+;
+Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}";				\
+											Components: LinkerMod\Utils;		\
+											AfterInstall: ExtractAssets;		\
 
 [Run]
+#if 0
 Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";		\
 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";	\
 										WorkingDir:	"{#BinDir}";									\
@@ -157,12 +164,7 @@ Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {
 										Parameters: "ents --overwrite --dummyBrushes *";			\
 										WorkingDir:	"{#BinDir}";									\
 										Components: LinkerMod\Assets\FF\Ents;
-
-Filename: "{#BinDir}\converter.exe";	StatusMsg: "Running converter... {#PleaseWait}";	\
-										Parameters: "build all -nopause -n -nospam";					\
-										WorkingDir: "{#BinDir}";							\
-										Tasks: Converter;									\
-										Flags: runhidden;
+#endif
 
 ; Filename: "{app}\README.TXT"; Description: "View the README file"; Flags: postinstall shellexec skipifsilent
 
@@ -171,14 +173,35 @@ Filename: "{#BinDir}\launcher.exe";		Description: "Launch mod tools";					\
 										Flags: postinstall nowait skipifsilent unchecked;
 #endif
 
-
 [Code]
+var
+  Console: TRichEditViewer;
+
 //
 // Installer Entrypoint
 //
 procedure InitializeWizard;
 begin
 	// We don't need to do anything special here
+	Console := TRichEditViewer.Create(WizardForm);
+	Console.UseRichEdit := true;
+	Console.Top := WizardForm.ProgressGauge.Top + WizardForm.ProgressGauge.Height + ScaleY(8);
+	Console.Height := ScaleY(150);
+	Console.Left := WizardForm.ProgressGauge.Left + ScaleX(0);
+	Console.Width := ScaleX(417);
+	Console.ScrollBars := ssVertical;
+	// Console.ReadOnly := true;
+	// Console.HideSelection := true;
+	Console.Text := '';
+	Console.Parent := WizardForm.InstallingPage;
+
+	IPC_Init(Console.Handle);
+
+	// CreateOutputMsgMemoPage(wpInstalling,
+	// 	'Information', 'Please read the following important information before continuing.',
+	// 	'When you are ready to continue with Setup, click Next.',
+	// 	'Blah blah blah.');
+	// ShouldProcessEntry;
 end;
 
 //
@@ -192,17 +215,17 @@ begin
 	Result := Com_ValidateInstallPath(curPageID);
 end;
 
-procedure CurStepChanged(CurStep: TSetupStep);
-begin
-	// Upon entering the postInstall step, we need patch the imports
-	// for the assigned files (this runs BEFORE the [Run] section)
-	if CurStep = ssPostInstall then
-	begin
-		WizardForm.StatusLabel.Caption := 'Installing something...';
-		{ Install something }
-		MsgBox('POST INSTALL', mbError, MB_YESNO);
-	end;
-end;
+// procedure CurStepChanged(CurStep: TSetupStep);
+// begin
+// 	// Upon entering the postInstall step, we need patch the imports
+// 	// for the assigned files (this runs BEFORE the [Run] section)
+// 	if CurStep = ssPostInstall then
+// 	begin
+// 		WizardForm.StatusLabel.Caption := 'Installing something...';
+// 		{ Install something }
+// 		MsgBox('POST INSTALL', mbError, MB_YESNO);
+// 	end;
+// end;
 
 //
 // Check if a given component is enabled - if it is, we append the mappedValue
@@ -218,7 +241,7 @@ end;
 //
 // Resolve the asset_util parameters for IWD asset extraction
 //
-function ExtractIWD_ResolveParams(param: String): string;
+function ExtractIWD_ResolveParams(): string;
 begin
 	Result := ' --overwrite --includeLocalized';
 
@@ -226,41 +249,114 @@ begin
 	AddRunArgument(Result, 'LinkerMod\Assets\IWD\Snd', '--sounds');
 	AddRunArgument(Result, 'LinkerMod\Assets\IWD\Raw', '--rawfiles');
 
-	MsgBox('IWD PARAMS: ' + Result, mbError, MB_YESNO);
+	// MsgBox('IWD PARAMS: ' + Result, mbError, MB_YESNO);
 end;
 
 //
 // Resolve the asset_util parameters for fastfile asset extraction
 // TODO: Make this auto skip if sound & rawfiles are both empty
 //
-function ExtractFF_ResolveParams(param: String): string;
+function ExtractFF_ResolveParams(): string;
 begin
 	Result := ' --overwrite --includeLocalized';
 
 	AddRunArgument(Result, 'LinkerMod\Assets\FF\Snd', '--sounds');
 	AddRunArgument(Result, 'LinkerMod\Assets\FF\Raw', '--rawfiles');
 
-	MsgBox('FF PARAMS: ' + Result, mbError, MB_YESNO);
+	// MsgBox('FF PARAMS: ' + Result, mbError, MB_YESNO);
 end;
 
-// procedure CurPageChanged(CurPageID: Integer);
-// var
-// InstallMessage: TLabel;
-// begin
-//   if CurPageID = wpInstalling then begin
-//     InstallMessage:= TLabel.Create(WizardForm);
-//     InstallMessage.AutoSize:= False;
-//     InstallMessage.Top := WizardForm.ProgressGauge.Top +
-//      WizardForm.ProgressGauge.Height + ScaleY(8);
-//     InstallMessage.Height := ScaleY(150);
-//     InstallMessage.Left := WizardForm.ProgressGauge.Left + ScaleX(0);
-//     InstallMessage.Width := ScaleX(417);
-//     InstallMessage.Font:= WizardForm.FilenameLabel.Font;
-//     InstallMessage.Font.Color:= clBlack;
-//     InstallMessage.Font.Height:= ScaleY(15);
-//     InstallMessage.Transparent:= True;
-//     InstallMessage.WordWrap:= true;
-//     InstallMessage.Caption:= 'aaaaaaaaaaaaaaaaaaaaaaaaasf'; //(ExpandConstant('{cm:CustomMessage}'));
-//     InstallMessage.Parent:= WizardForm.InstallingPage;
-//   end;
-// end;
+procedure CurPageChanged(CurPageID: Integer);
+begin
+	if CurPageID = wpInstalling then begin
+		// InstallMessage:= TLabel.Create(WizardForm);
+		// InstallMessage.AutoSize:= False;
+		// InstallMessage.Top := WizardForm.ProgressGauge.Top + WizardForm.ProgressGauge.Height + ScaleY(8);
+		// InstallMessage.Height := ScaleY(150);
+		// InstallMessage.Left := WizardForm.ProgressGauge.Left + ScaleX(0);
+		// InstallMessage.Width := ScaleX(417);
+		// InstallMessage.Font:= WizardForm.FilenameLabel.Font;
+		// InstallMessage.Font.Color:= clBlack;
+		// InstallMessage.Font.Height:= ScaleY(15);
+		// InstallMessage.Transparent:= True;
+		// InstallMessage.WordWrap:= true;
+		// InstallMessage.Caption:= 'property BorderStyle: TFormBorderStyle; read write;\nproperty Caption: String; read write;\nproperty AutoScroll: Boolean; read write;\nproperty Color: TColor; read write;\nproperty Font: TFont; read write;\nproperty FormStyle: TFormStyle; read write;\nproperty KeyPreview: Boolean; read write;\nproperty Position: TPosition; read write;\nproperty OnActivate: TNotifyEvent; read write;\nproperty OnClick: TNotifyEvent; read write;\nproperty OnDblClick: TNotifyEvent; read write;\nproperty OnClose: TCloseEvent; read write;\nproperty OnCloseQuery: TCloseQueryEvent; read write;\nproperty OnCreate: TNotifyEvent; read write;\nproperty OnDestroy: TNotifyEvent; read write;\nproperty OnDeactivate: TNotifyEvent; read write;\nproperty OnHide: TNotifyEvent; read write;\nproperty OnKeyDown: TKeyEvent; read write;\nproperty OnKeyPress: TKeyPressEvent; read write;\nproperty OnKeyUp: TKeyEvent; read write;\nproperty OnResize: TNotifyEvent; read write;\nproperty OnShow: TNotifyEvent; read write;\n';
+		// InstallMessage.Parent:= WizardForm.InstallingPage;
+
+
+	end;
+end;
+
+function GetProgressHandle(Param: String): String;
+begin
+  Result := Format('%d', [Console.Handle]);
+  //[WizardForm.FilenameLabel.Handle]);
+	  //WizardForm.ProgressGauge.Handle]);
+end;
+
+// Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";		\
+// 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";		\
+// 										WorkingDir:	"{#BinDir}";										\
+// 										Components: LinkerMod\Assets\IWD;
+// 
+// Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";	\
+// 										Parameters: "extract-ff {code:ExtractFF_ResolveParams}";		\
+// 										WorkingDir:	"{#BinDir}";										\
+// 										Components: LinkerMod\Assets\FF\Snd LinkerMod\Assets\FF\Raw;
+// 
+// Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {#PleaseWait}";	\
+// 										Parameters: "ents --overwrite --dummyBrushes *";				\
+// 										WorkingDir:	"{#BinDir}";										\
+// 										Components: LinkerMod\Assets\FF\Ents;
+
+procedure ExtractAssets();
+var
+  AssetUtil: string;
+  launchInfo: LaunchInfo;
+begin
+	// Resolve the filepath for asset util
+	AssetUtil := ExpandConstant(CurrentFileName);
+
+	WizardForm.StatusLabel.Caption := 'Extracting assets...';
+
+	launchInfo.Filename := ExpandConstant(CurrentFileName);
+	launchInfo.WorkingDir := ExpandConstant('{#BinDir}');
+	// launchInfo.Parameters := 'help';
+
+	// ExecPiped(launchInfo);
+
+	// IWDs
+	if(IsComponentSelected('LinkerMod\Assets\IWD')) then
+	begin
+		WizardForm.StatusLabel.Caption := ExpandConstant('Extracting IWD assets... {#PleaseWait}');	
+		WizardForm.FilenameLabel.Caption := '';
+		
+		launchInfo.Parameters := 'extract-iwd' + ExtractIWD_ResolveParams;
+		ExecPiped(launchInfo);
+	end
+
+	// FASTFILES
+	if(
+		IsComponentSelected('LinkerMod\Assets\FF\Snd') or
+		IsComponentSelected('LinkerMod\Assets\FF\Raw')
+	) then
+	begin
+		WizardForm.StatusLabel.Caption := ExpandConstant('Extracting fastfile assets... {#PleaseWait}');	
+		WizardForm.FilenameLabel.Caption := '';
+
+		launchInfo.Parameters := 'extract-ff ' + ExtractFF_ResolveParams;
+		ExecPiped(launchInfo);
+	end
+
+	// ENTITIES
+	if(IsComponentSelected('LinkerMod\Assets\FF\Ents')) then
+	begin
+		WizardForm.StatusLabel.Caption := ExpandConstant('Extracting entity prefabs... {#PleaseWait}');	
+		WizardForm.FilenameLabel.Caption := '';
+		
+		launchInfo.Filename := ExpandConstant(CurrentFileName);
+		launchInfo.WorkingDir := ExpandConstant('{#BinDir}');
+		launchInfo.Parameters := 'ents --overwrite --dummyBrushes *';
+		ExecPiped(launchInfo);
+	end
+end;

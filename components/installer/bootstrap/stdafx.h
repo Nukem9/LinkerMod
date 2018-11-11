@@ -19,8 +19,10 @@
 #include <tchar.h>
 
 #include <string>
+#include <assert.h>
 #include <iostream>
 #include <algorithm> 
+#include <stdexcept>
 
 // Global definitions
 #define GITHUB_RELEASE_URL TEXT("https://api.github.com/repos/Nukem9/LinkerMod/releases")
@@ -32,4 +34,4 @@
 #include "jsoncpp/include/json/json.h"
 
 #include "common/fs.h"
-
+#include "common/utility.h"

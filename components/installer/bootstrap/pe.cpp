@@ -10,50 +10,6 @@
 
 using namespace pe_bliss;
 
-//
-// Utility functions
-//
-
-template<class _Elem,
-	class _Traits = std::char_traits<_Elem>,
-	class _Alloc = std::allocator<_Elem>>
-static std::basic_string<_Elem, _Traits, _Alloc> str_toupper(std::basic_string<_Elem, _Traits, _Alloc> str) {
-	std::transform(str.begin(), str.end(), str.begin(),
-		[](_Elem c) { return std::toupper(c); }
-	);
-	return str;
-}
-
-static std::string str_toupper(const char* pStr) {
-	std::string str = pStr;
-	std::transform(str.begin(), str.end(), str.begin(),
-		[](std::string::value_type c) { return std::toupper(c); }
-	);
-	return str;
-}
-
-static std::string va(const char* fmt, ...) {
-	std::string result(128, '\0');
-	va_list args;
-	va_start(args, fmt);
-	size_t len = vsnprintf((char*)result.data(), 0, fmt, args);
-	va_end(args);
-
-	if (len < 0)
-		throw "Invalid string";
-
-	result.resize(len + 1);
-
-	va_start(args, fmt);
-	len = vsnprintf((char*)result.data(), len + 1, fmt, args);
-	va_end(args);
-
-	if (len < 0)
-		throw "Unable to generate string";
-
-	return result;
-}
-
 namespace pe {
 	//
 	// Automatic handler for reading PE files

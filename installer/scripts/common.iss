@@ -229,3 +229,19 @@ begin
 	WizardForm.StatusLabel.Caption := oldStatus;
 	WizardForm.FilenameLabel.Caption := oldFilename;
 end;
+
+//
+// EXPERIMENTAL
+//
+function IPC_Init(consoleHandle: longint): integer;
+external 'IPC_Init@files:bootstrap.dll stdcall';
+
+type
+LaunchInfo =	record 
+				Filename : string;
+				Parameters : string;
+				WorkingDir : string;
+			end;
+
+function ExecPiped(launchInfo: LaunchInfo): integer;
+external 'LMI_Exec@files:bootstrap.dll stdcall';

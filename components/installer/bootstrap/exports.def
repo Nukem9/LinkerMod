@@ -1,7 +1,9 @@
 EXPORTS
+IPC_Init
 LMI_GamePath
 LMI_SetInstallPath
 LMI_CompareVersions
 PE_AddNamedImport
 PE_HasModule
 PE_HasImport
+LMI_Exec
