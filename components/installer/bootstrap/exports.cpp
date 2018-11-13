@@ -6,6 +6,8 @@
 #include "process.h"
 #include "ipc.h"
 
+#include <thread>
+
 IPC::Connection app(NULL);
 
 extern "C" {
@@ -57,7 +59,7 @@ extern "C" {
 
 	int __stdcall PE_HasImport(const char* filepath, const char* moduleName, const char* symbolName) {
 		return pe::HasImport(filepath, moduleName, symbolName);
-	}
+	}	
 
 	//
 	// This function is used by the installer
@@ -68,18 +70,46 @@ extern "C" {
 	{
 		assert(info);
 
-		Pipe pipe(true);
-		app.printf("Create process... %s\n", info->filename);
-		auto process = Process::Create(*info, pipe);
+		volatile bool terminated = false;
 
-		std::string text = "";
-		bool read = true;
-		do {
-			if (read = pipe.Read(text)) {
-				app.print(text);
+		//
+		// TODO: Handle cancel button clicks
+		//
+		const auto ProcessMessages = []() {
+			MSG msg;
+			// Use GetMessage() to prevent the loop from going nuts while
+			// waiting for messages to show up
+			while (GetMessage(&msg, NULL, 0, 0) > 0)
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
 			}
-		} while (read);
+		};
 
-		return process.WaitForExit();
+		int retn = 0;
+		std::thread worker([&info, &terminated, &retn]() {
+			Pipe pipe(true);
+			app.printf("Create process... %s\n", info->filename);
+			auto process = Process::Create(*info, pipe);
+
+			std::string text = "";
+			bool read = true;
+			do {
+				if (read = pipe.Read(text)) {
+					app.print(text);
+				}
+			} while (read);
+
+			auto retn = process.WaitForExit();
+			terminated = true;
+			return retn;
+		});
+
+		while (!terminated) {
+			ProcessMessages();
+		}
+
+		worker.join();
+		return retn;
 	}
 }
