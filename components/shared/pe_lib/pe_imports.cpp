@@ -560,7 +560,9 @@ const image_directory rebuild_imports_base(pe_base& pe, const imported_functions
 						}
 						else
 						{
-							memcpy(&raw_data[current_pos_for_iat], &iat_value, sizeof(iat_value));
+							// If we're not using the "saved" (aka get_iat_va()) value, we simply need to re-use the same value
+							// that we used for the OFT when writing to the FT
+							memcpy(&raw_data[current_pos_for_iat], &rva_of_named_import, sizeof(rva_of_named_import));
 							current_pos_for_iat += sizeof(rva_of_named_import);
 						}
 					}
