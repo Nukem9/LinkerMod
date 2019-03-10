@@ -116,6 +116,11 @@ BOOL GameMod_Init(HMODULE hModule)
 	PatchMemory(0x004A6CF1, (PBYTE)&flags, 4); // ai_water_trails
 
 	//
+	// Add missing dvar descriptions
+	//
+	Patch_DvarDescriptions();
+
+	//
 	// Stop vanilla scripts from resetting the user's fov
 	//
 	Detours::X86::DetourFunction((PBYTE)0x0062A0B0, (PBYTE)&Dvar_SetFromStringByName);

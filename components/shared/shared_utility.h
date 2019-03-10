@@ -69,6 +69,17 @@ static void PatchJump(ULONG_PTR instr, PBYTE dest)
 	FlushInstructionCache(GetCurrentProcess(), (LPVOID)instr, 5);
 }
 
+//
+// Only supports the 0x68 opcode
+//
+static void PatchPush(ULONG_PTR instr, PBYTE dest)
+{
+	BYTE* opcode = (BYTE*)instr;
+	ASSERT_MSG_VA(*opcode == 0x68, "Incorrect opcode at 0x%.08X", instr);
+
+	PatchMemory(instr + 1, (PBYTE)dest, sizeof(dest));
+}
+
 static void PatchMemory_WithNOP(ULONG_PTR Address, SIZE_T Size)
 {
 	DWORD d = 0;
