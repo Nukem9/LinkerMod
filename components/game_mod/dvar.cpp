@@ -61,7 +61,7 @@ void R_RegisterCustomDvars()
 
 	//this can go up to 13 - but anything > 11 has artifacts
 	sm_quality = Dvar_RegisterInt("sm_quality", 10, 5, 13, DVAR_ARCHIVE | 0x2000, "Exponent for shadow map resolution (2^n) - requires restart - anything over 11 has potential for artifacts");
-	
+
 	//
 	// Patch ShadowMap SampleSize
 	//
@@ -81,7 +81,7 @@ void R_RegisterCustomDvars()
 
 	r_showTess = Dvar_RegisterEnum("r_showTess", r_showTessNames, 0, 0x80u, "Show details for each surface");
 	com_cfg_readOnly = Dvar_RegisterInt("com_cfg_readOnly", com_cfg_readOnly_default ? 1 : 0, 0, 1, DVAR_AUTOEXEC, "Prevent writing to the config"); // Old flags were 0x2001
-	
+
 	static const char* com_dprintf_options[] =
 	{
 		"default",
@@ -119,10 +119,10 @@ void __cdecl CG_RegisterDvars()
 
 	gm_build_date = Dvar_RegisterString("gm_build_date", __TIMESTAMP__, 0x10 | 0x8, "Compile time for game_mod");
 	gm_version = Dvar_RegisterString("gm_version", DLL_VersionString(), 0x10 | 0x8, "Game_Mod version");
-	
+
 	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 1, "Enable external console window");
 	con_inputMaxMatchesShown = Dvar_RegisterInt("con_inputMaxMatchesShown", 24, 1, 64, 1, "Maximum number of suggestions in the console autocomplete preview");
-	
+
 	cg_drawViewpos = Dvar_RegisterInt("cg_drawViewpos", 0, 0, 1, 1, "Draw the current player origin and view angles");
 	scr_useFastFileOnly = Dvar_RegisterInt("scr_useFastFileOnly", 0, 0, 1, 0x2, "Disable the loading of raw script files from the current mod's directory");
 
@@ -387,6 +387,8 @@ void Patch_DvarDescriptions() {
 	DVAR_PATCH_DESCRIPTION("cg_ScoresPing_MedColor", 0x005c7540, "Color for medium ping");
 	DVAR_PATCH_DESCRIPTION("cg_adsZScaleMax", 0x004a601a, "The scale factor for shrinky dinks");
 	DVAR_PATCH_DESCRIPTION("cg_adsZoomToggleStyle", 0x004a39ea, "Style of zoom toggle - 0=oscillate, 1=rotate");
+	DVAR_PATCH_DESCRIPTION("cg_bloodLimitMsec", 0x004a5a35, "When limiting blood effects, number of milliseconds between effects.");	// CG_RegisterDvars
+	DVAR_PATCH_DESCRIPTION("cg_bloodLimitMsec", 0x004a611b, "When limiting blood effects, number of milliseconds between effects.");	// CG_RegisterDvars
 	DVAR_PATCH_DESCRIPTION("cg_bulletlength", 0x004a54e8, "The length of a non-tracer round");
 	DVAR_PATCH_DESCRIPTION("cg_bulletwidth", 0x004a54b0, "The width of the non-tracer round");
 	DVAR_PATCH_DESCRIPTION("cg_cameraVehicleExitTweenTime", 0x004a6f73, "Time(secs) to tween from gunner/vehicle camera to normal player camera");
@@ -508,6 +510,8 @@ void Patch_DvarDescriptions() {
 	DVAR_PATCH_DESCRIPTION("cg_overheadNamesSize", 0x004a5c8b, "The maximum size to show overhead names");
 	DVAR_PATCH_DESCRIPTION("cg_overheadRankSize", 0x004a5cf5, "The size to show rank text");
 	DVAR_PATCH_DESCRIPTION("cg_playerFrustumHalfHeight", 0x004a6ee8, "The radius used to calculate frustum target center for a player. Used for fast \"is on screen\" tests");
+	// DVAR_PATCH_DESCRIPTION("cg_playerState", 0x0082bbc6, "");	// Com_InitDvars
+	// DVAR_PATCH_DESCRIPTION("cg_playerState", 0x0082bc23, "");	// Com_InitDvars
 	DVAR_PATCH_DESCRIPTION("cg_scoreboardBannerHeight", 0x005c75f8, "Banner height of the scoreboard");
 	DVAR_PATCH_DESCRIPTION("cg_scoreboardFont", 0x005c77da, "Scoreboard font enum ( see menudefinition.h )");
 	DVAR_PATCH_DESCRIPTION("cg_scoreboardHeaderFontScale", 0x005c77ff, "Scoreboard header font scale");
@@ -575,8 +579,8 @@ void Patch_DvarDescriptions() {
 	DVAR_PATCH_DESCRIPTION("cl_motdString", 0x005913dc, "Message of the day");
 	DVAR_PATCH_DESCRIPTION("cl_mouseAccel", 0x00591087, "Mouse acceleration");
 	DVAR_PATCH_DESCRIPTION("cl_packetdup", 0x00591029, "Enable packet duplication");
-	DVAR_PATCH_DESCRIPTION("cl_paused", 0x004a56d9, "Pause the game");
-	DVAR_PATCH_DESCRIPTION("cl_paused", 0x0082bffe, "Pause the game");
+	DVAR_PATCH_DESCRIPTION("cl_paused", 0x004a56d9, "Pause the game");		// CG_RegisterDvars
+	DVAR_PATCH_DESCRIPTION("cl_paused", 0x0082bffe, "Pause the client");	// Com_InitDvars
 	DVAR_PATCH_DESCRIPTION("cl_pitchspeed", 0x00590fa8, "Max pitch speed in degrees for game pad");
 	DVAR_PATCH_DESCRIPTION("cl_serverStatusResendTime", 0x00591128, "Time in milliseconds to resend a server status message");
 	DVAR_PATCH_DESCRIPTION("cl_shownet", 0x00590e95, "Display network debugging information");
@@ -599,8 +603,8 @@ void Patch_DvarDescriptions() {
 	DVAR_PATCH_DESCRIPTION("com_timescale", 0x0082beec, "Scale time of each frame");
 	DVAR_PATCH_DESCRIPTION("com_voip_disable_threshold", 0x0082c0b4, "Message size at which voip becomes disabled");
 	DVAR_PATCH_DESCRIPTION("com_voip_resume_time", 0x0082c07d, "Time at which voip can resume");
-	DVAR_PATCH_DESCRIPTION("compassCoords", 0x0056b2f9, R"(x = North-South coord base value, 
-y = East-West coord base value, 
+	DVAR_PATCH_DESCRIPTION("compassCoords", 0x0056b2f9, R"(x = North-South coord base value,
+y = East-West coord base value,
 z = scale (game units per coord unit))");
 	DVAR_PATCH_DESCRIPTION("compassECoordCutoff", 0x0056b342, "Left cutoff for the scrolling east-west coords");
 	DVAR_PATCH_DESCRIPTION("compassEnemyFootstepMaxRange", 0x0056baae, "The maximum distance at which an enemy may appear on the compass due to 'footsteps'");
@@ -613,8 +617,8 @@ z = scale (game units per coord unit))");
 	DVAR_PATCH_DESCRIPTION("compassGridRows", 0x0056bc8a, "Grid row count.");
 	DVAR_PATCH_DESCRIPTION("compassLocalRadarRadius", 0x0056b5a8, "Maximum radius of the local radar");
 	DVAR_PATCH_DESCRIPTION("compassLocalRadarUpdateTime", 0x0056b56c, "Time between local radar updates");
-	DVAR_PATCH_DESCRIPTION("compassMaxRange", 0x0056b130, "The maximum range from the player in world space that objects will be shown on the compass");
-	DVAR_PATCH_DESCRIPTION("compassMaxRange", 0x007e0c54, "The maximum range from the player in world space that objects will be shown on the compass");
+	DVAR_PATCH_DESCRIPTION("compassMaxRange", 0x0056b130, "The maximum range from the player in world space that objects will be shown on the compass");	// CG_CompassRegisterDvars
+	DVAR_PATCH_DESCRIPTION("compassMaxRange", 0x007e0c54, "The maximum range from the player that objects will show on the compass");						// G_RegisterDvars | G_RegisterServerDemoDvars
 	DVAR_PATCH_DESCRIPTION("compassMinRadius", 0x0056b19f, "The minimum radius from the center of the compass that objects will appear.");
 	DVAR_PATCH_DESCRIPTION("compassMinRange", 0x0056b16c, "The minimum range from the player in world space that objects will appear on the compass");
 	DVAR_PATCH_DESCRIPTION("compassObjectiveArrowHeight", 0x0056b683, "The size of the objective arrow on the compass");
@@ -681,9 +685,9 @@ z = scale (game units per coord unit))");
 	DVAR_PATCH_DESCRIPTION("defaultDamageDuration", 0x005c4c8f, "default duration in milliseconds that damage should continue to get delivered");
 	DVAR_PATCH_DESCRIPTION("defaultDamageInterval", 0x005c4cc4, "default interval in milliseconds that damage should continue to get delivered");
 	DVAR_PATCH_DESCRIPTION("defaultHitDamage", 0x005c4c5a, "default initial damage delivered by getting hit by a flame ball");
-	DVAR_PATCH_DESCRIPTION("developer", 0x004a5848, "Turn on Development systems");
-	DVAR_PATCH_DESCRIPTION("developer", 0x006ce14d, "Turn on Development systems");
-	DVAR_PATCH_DESCRIPTION("developer", 0x0082be60, "Turn on Development systems");
+	DVAR_PATCH_DESCRIPTION("developer", 0x004a5848, "Turn on Development systems");		// CG_RegisterDvars
+	DVAR_PATCH_DESCRIPTION("developer", 0x006ce14d, "Enable development environment");	// R_RegisterDvars
+	DVAR_PATCH_DESCRIPTION("developer", 0x0082be60, "Enable development options");		// Com_InitDvars
 	DVAR_PATCH_DESCRIPTION("disconnected_ctrls", 0x0082bbab, "String representing the disconnected controllers");
 	DVAR_PATCH_DESCRIPTION("dive2swim", 0x006610a4, "Use to contorl the dive force applied to the player when pressing B in water.");
 	DVAR_PATCH_DESCRIPTION("dive_recharge", 0x006610d7, "Use to space out the dive to swim button presses.");
@@ -762,12 +766,12 @@ z = scale (game units per coord unit))");
 	DVAR_PATCH_DESCRIPTION("g_ScoresColor_Spectator", 0x004a67ff, "Spectator team color on scoreboard");
 	DVAR_PATCH_DESCRIPTION("g_TeamColor_Allies", 0x004a6937, "Allies team color");
 	DVAR_PATCH_DESCRIPTION("g_TeamColor_Axis", 0x004a6979, "Axis team color");
-	DVAR_PATCH_DESCRIPTION("g_TeamColor_EnemyTeam", 0x004a69f7, "Enemy team color");
-	DVAR_PATCH_DESCRIPTION("g_TeamColor_EnemyTeam", 0x005718dc, "Enemy team color");
+	DVAR_PATCH_DESCRIPTION("g_TeamColor_EnemyTeam", 0x004a69f7, "Enemy team color");	// CG_RegisterDvars
+	DVAR_PATCH_DESCRIPTION("g_TeamColor_EnemyTeam", 0x005718dc, "Enemy team color");	// G_RegisterDvars
 	DVAR_PATCH_DESCRIPTION("g_TeamColor_EnemyTeamAlt", 0x004a6a69, "Enemy team color");
 	DVAR_PATCH_DESCRIPTION("g_TeamColor_Free", 0x004a6ad7, "Free Team color");
-	DVAR_PATCH_DESCRIPTION("g_TeamColor_MyTeam", 0x004a69bb, "Player team color");
-	DVAR_PATCH_DESCRIPTION("g_TeamColor_MyTeam", 0x005718a0, "Player team color");
+	DVAR_PATCH_DESCRIPTION("g_TeamColor_MyTeam", 0x004a69bb, "Player team color");	// CG_RegisterDvars
+	DVAR_PATCH_DESCRIPTION("g_TeamColor_MyTeam", 0x005718a0, "Player team color");	// G_RegisterDvars
 	DVAR_PATCH_DESCRIPTION("g_TeamColor_MyTeamAlt", 0x004a6a33, "Player team color");
 	DVAR_PATCH_DESCRIPTION("g_TeamColor_Spectator", 0x004a6aa1, "Spectator team color");
 	DVAR_PATCH_DESCRIPTION("g_TeamName_Allies", 0x004a68f6, "Allied team name");
@@ -786,6 +790,8 @@ z = scale (game units per coord unit))");
 	DVAR_PATCH_DESCRIPTION("g_dropUpSpeedBase", 0x00571733, "Base component of the initial vertical speed of a dropped item");
 	DVAR_PATCH_DESCRIPTION("g_dropUpSpeedRand", 0x00571768, "Random component of the initial vertical speed of a dropped item");
 	DVAR_PATCH_DESCRIPTION("g_dumpAnims", 0x007e27f2, "Animation debugging info for the given character number");
+	DVAR_PATCH_DESCRIPTION("g_dumpAnimsNetwork", 0x004a4e62, "Write animation commands debug info for this entity");	// CG_RegisterDvars
+	DVAR_PATCH_DESCRIPTION("g_dumpAnimsNetwork", 0x007e2814, "Write animation commands debug info for this entity");	// G_RegisterDvars
 	DVAR_PATCH_DESCRIPTION("g_entinfo", 0x007e1d21, "Display entity information");
 	DVAR_PATCH_DESCRIPTION("g_entinfo_AItext", 0x007e1d69, "Type of text information for AI entinfo");
 	DVAR_PATCH_DESCRIPTION("g_entinfo_maxdist", 0x007e1d8d, "Maximum distance of an entity from the camera at which to show entity information");
@@ -793,9 +799,9 @@ z = scale (game units per coord unit))");
 	DVAR_PATCH_DESCRIPTION("g_entinfo_type", 0x007e1d41, "Type of entities to display information");
 	DVAR_PATCH_DESCRIPTION("g_friendlyNameDist", 0x007e171a, "Maximum range for seeing a friendly's name");
 	DVAR_PATCH_DESCRIPTION("g_friendlyfireDist", 0x007e174c, "Maximum range for disabling fire at a friendly");
-	DVAR_PATCH_DESCRIPTION("g_gametype", 0x00549ac3, "The current campaign");
-	DVAR_PATCH_DESCRIPTION("g_gametype", 0x005715e0, "The current campaign");
-	DVAR_PATCH_DESCRIPTION("g_gametype", 0x00698391, "The current campaign");
+	DVAR_PATCH_DESCRIPTION("g_gametype", 0x00549ac3, "Game Type");				// SV_SetGametype
+	DVAR_PATCH_DESCRIPTION("g_gametype", 0x005715e0, "The current campaign");	// G_RegisterDvars
+	DVAR_PATCH_DESCRIPTION("g_gametype", 0x00698391, "Current game type");		// SV_Init
 	DVAR_PATCH_DESCRIPTION("g_inactivity", 0x00571699, "Time delay before player is kicked for inactivity");
 	DVAR_PATCH_DESCRIPTION("g_knockback", 0x007e0e84, "Maximum knockback");
 	DVAR_PATCH_DESCRIPTION("g_log", 0x00571611, "Log file name");
@@ -805,6 +811,8 @@ z = scale (game units per coord unit))");
 	DVAR_PATCH_DESCRIPTION("g_motd", 0x005716bb, "The message of the day");
 	DVAR_PATCH_DESCRIPTION("g_password", 0x00571647, "Password");
 	DVAR_PATCH_DESCRIPTION("g_playerCollisionEjectSpeed", 0x005716d6, "Speed at which to push intersecting players away from each other");
+	DVAR_PATCH_DESCRIPTION("g_player_maxhealth", 0x0069827f, "Maximum player health");		// SV_Init
+	DVAR_PATCH_DESCRIPTION("g_player_maxhealth", 0x007e0c9a, "Player's maximum health");	// G_RegisterDvars | G_RegisterServerDemoDvars
 	DVAR_PATCH_DESCRIPTION("g_speed", 0x007e0e53, "Player speed");
 	DVAR_PATCH_DESCRIPTION("g_useholdspawndelay", 0x005719a7, "Time in milliseconds that the player is unable to 'use' after spawning");
 	DVAR_PATCH_DESCRIPTION("g_useholdtime", 0x007e17b1, "Time to hold the 'use' button to activate use");
@@ -902,8 +910,8 @@ server to still be talking in milliseconds)");
 	DVAR_PATCH_DESCRIPTION("lb_minrefresh", 0x004d9bad, "Minimum time (in seconds) between leaderboard fetches");
 	DVAR_PATCH_DESCRIPTION("lb_type", 0x004d9c0f, "Leaderboard type to display");
 	DVAR_PATCH_DESCRIPTION("lb_typeByResetPeriod", 0x004d9c2a, "Reset period for Leaderboards ( 'all_time', 'monthly', weekly )");
-	DVAR_PATCH_DESCRIPTION("loc_language", 0x005d3051, "Language");
-	DVAR_PATCH_DESCRIPTION("loc_language", 0x00691121, "Language");
+	DVAR_PATCH_DESCRIPTION("loc_language", 0x005d3051, "The current language locale");	// CL_Vid_Restart_f
+	DVAR_PATCH_DESCRIPTION("loc_language", 0x00691121, "Language");						// SEH_InitLanguage
 	DVAR_PATCH_DESCRIPTION("logfile", 0x0082beaf, "Write to log file - 0 = disabled, 1 = async file write, 2 = Sync every write");
 	DVAR_PATCH_DESCRIPTION("lowAmmoWarningColor1", 0x004df62a, "Color 1 of 2 to oscilate between");
 	DVAR_PATCH_DESCRIPTION("lowAmmoWarningColor2", 0x004df65d, "Color 2 of 2 to oscilate between");
@@ -925,8 +933,8 @@ server to still be talking in milliseconds)");
 	DVAR_PATCH_DESCRIPTION("mantle_view_yawcap", 0x004b470a, "The angle at which to restrict a sideways turn while mantling");
 	DVAR_PATCH_DESCRIPTION("mantle_weapon_anim_height", 0x004b477a, "If the player is mantling at this height or higher, the mantle animation will play.");
 	DVAR_PATCH_DESCRIPTION("mantle_weapon_height", 0x004b473c, "If the player is mantling at this height or lower, his weapon will remain equipped.");
-	DVAR_PATCH_DESCRIPTION("mapname", 0x0040c913, "The current map name");
-	DVAR_PATCH_DESCRIPTION("mapname", 0x00698404, "The current map name");
+	DVAR_PATCH_DESCRIPTION("mapname", 0x0040c913, "The current map name");	// SaveMemory_CreateHeader
+	DVAR_PATCH_DESCRIPTION("mapname", 0x00698404, "Current map name");		// SV_Init
 	DVAR_PATCH_DESCRIPTION("maxShardSplit", 0x0055b753, "Max number of shards that a glass can be split into");
 	DVAR_PATCH_DESCRIPTION("maxStatsBackupInterval", 0x004e15aa, "Maximum number of days before performing stats backup to Demonware User Storage");
 	DVAR_PATCH_DESCRIPTION("metPlayerListUpdateInterval", 0x0052289c, "Time in milliseconds since uploaded recent met player list.");
@@ -978,8 +986,8 @@ server to still be talking in milliseconds)");
 	DVAR_PATCH_DESCRIPTION("notice_onEscArg", 0x0083665e, "UI Notice EscArg");
 	DVAR_PATCH_DESCRIPTION("party_maxplayers", 0x0069638e, "Maximum number of players");
 	DVAR_PATCH_DESCRIPTION("party_minplayers", 0x006963f9, "Minimum number of players needed to start the game");
-	DVAR_PATCH_DESCRIPTION("password", 0x004d1fa0, "password");
-	DVAR_PATCH_DESCRIPTION("password", 0x0059149c, "password");
+	DVAR_PATCH_DESCRIPTION("password", 0x004d1fa0, "password"); // CL_PC_RegisterDvars
+	DVAR_PATCH_DESCRIPTION("password", 0x0059149c, "password"); // CL_InitOnceForAllClients
 	DVAR_PATCH_DESCRIPTION("penetrationCount", 0x00698579, "Maximum number of private clients allowed on the server");
 	DVAR_PATCH_DESCRIPTION("penetrationCount_allies", 0x006985ba, "Maximum number for TEAM_ALLIES");
 	DVAR_PATCH_DESCRIPTION("penetrationCount_axis", 0x00698598, "Maximum number for TEAM_AXIS");
@@ -1065,6 +1073,10 @@ server to still be talking in milliseconds)");
 	DVAR_PATCH_DESCRIPTION("player_breath_snd_lerp", 0x0065f50c, "The interpolation rate for the player hold breath sound");
 	DVAR_PATCH_DESCRIPTION("player_burstFireCooldown", 0x00660713, "Seconds after a burst fire before weapons can be fired again.");
 	DVAR_PATCH_DESCRIPTION("player_clipSizeMultiplier", 0x0065f725, "Changes the clip size of weapons with more than one bullet in their clip.");
+	DVAR_PATCH_DESCRIPTION("player_damageMultiplier", 0x006982aa, "Player damage is scaled by this amount; used by script for setting difficulty level");	// SV_Init
+	DVAR_PATCH_DESCRIPTION("player_damageMultiplier", 0x007e0cc5, "Player damage is scaled by this amount; used by script for setting difficulty level");	// G_RegisterDvars | G_RegisterServerDemoDvars
+	DVAR_PATCH_DESCRIPTION("player_deathInvulnerableTime", 0x00698369, "Time player is invlunerable just before death");			// SV_Init
+	DVAR_PATCH_DESCRIPTION("player_deathInvulnerableTime", 0x007e183c, "The time that the player is invulnerable before dying");	// G_RegisterDvars | G_RegisterServerDemoDvars
 	DVAR_PATCH_DESCRIPTION("player_dmgtimer_flinchTime", 0x0066001a, "Maximum time to play flinch animations");
 	DVAR_PATCH_DESCRIPTION("player_dmgtimer_maxTime", 0x0065ff98, "The maximum time that the player is slowed due to damage");
 	DVAR_PATCH_DESCRIPTION("player_dmgtimer_minScale", 0x0065ffcc, "The minimum scale value to slow the player by when damaged");
@@ -1084,7 +1096,7 @@ server to still be talking in milliseconds)");
 	DVAR_PATCH_DESCRIPTION("player_meleeHeight", 0x00660681, "The height of the player's melee attack");
 	DVAR_PATCH_DESCRIPTION("player_meleeRange", 0x00660611, "The maximum range of the player's melee attack");
 	DVAR_PATCH_DESCRIPTION("player_meleeWidth", 0x00660649, "The width of the player's melee attack");
-	DVAR_PATCH_DESCRIPTION("player_moveThreshhold", 0x0065f981, R"(The speed at which the player is considered to be moving for the purposes of 
+	DVAR_PATCH_DESCRIPTION("player_moveThreshhold", 0x0065f981, R"(The speed at which the player is considered to be moving for the purposes of
 view model bob and multiplayer model movement)");
 	DVAR_PATCH_DESCRIPTION("player_move_factor_on_torso", 0x0065f6bd, "The contribution movement direction has on player torso direction(multi-player only)");
 	DVAR_PATCH_DESCRIPTION("player_revivePlayerListCycleTime", 0x0065f871, "The time for cycling through the list of players who are in last stand.");
@@ -1709,6 +1721,11 @@ view model bob and multiplayer model movement)");
 	DVAR_PATCH_DESCRIPTION("ui_browserVoiceChat", 0x005f1678, "Voice chat is active");
 	DVAR_PATCH_DESCRIPTION("ui_buildLocation", 0x00836122, "Where to draw the build number");
 	DVAR_PATCH_DESCRIPTION("ui_buildSize", 0x0083615d, "Font size to use for the build number");
+	DVAR_PATCH_DESCRIPTION("ui_campaign", 0x0040c996, "The current campaign");	// SaveMemory_CreateHeader
+	DVAR_PATCH_DESCRIPTION("ui_campaign", 0x0051d1f0, "Current campaign");		// UI_RegisterDvars?
+	DVAR_PATCH_DESCRIPTION("ui_campaign", 0x0053454d, "The current campaign");	// SaveMemory_ReadLoadFromDevice
+	DVAR_PATCH_DESCRIPTION("ui_campaign", 0x0063aebb, "Campaign");				// ExtractMapStringFromSaveGame
+	DVAR_PATCH_DESCRIPTION("ui_campaign", 0x007e0c32, "The current campaign");	// G_RegisterDvars | G_RegisterServerDemoDvars
 	DVAR_PATCH_DESCRIPTION("ui_challengeGameMode", 0x004f2353, "Game mode type for the challenge you are viewing");
 	DVAR_PATCH_DESCRIPTION("ui_clanDescription", 0x00644314, "Description of player's clan.");
 	DVAR_PATCH_DESCRIPTION("ui_clanName", 0x006442f9, "Name of player's clan.");
