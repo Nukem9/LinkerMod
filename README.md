@@ -2,6 +2,8 @@
 ###### Enhancements for Call of Duty: Black Ops' Mod Tools
 #### Join the [Discord Server](https://discord.gg/nukNNsP)!
 
+[![Trailer](https://img.youtube.com/vi/52ZIHQ44xeM/0.jpg)](https://youtu.be/52ZIHQ44xeM)
+
 ## Features
 - Mod Support
     - Build and load mods just like in previous titles
