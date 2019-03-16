@@ -297,6 +297,15 @@ begin
 	end;
 end;
 
+// Notify the user that they need to validate their mod tools installation
+// before they can use the mod tools again
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+	if CurUninstallStep = usPostUninstall then begin
+		MsgBox('Please validate the integrity of your Mod Tools installation via Steam.', mbInformation, MB_OK);
+	end
+end;
+
 function GetProgressHandle(Param: String): String;
 begin
   Result := Format('%d', [Console.Handle]);
