@@ -33,6 +33,7 @@ public:
 REGISTER_GLOBAL_CVAR(g_verbose, "verbose", 'v', "Enable verbose logging", false);
 REGISTER_GLOBAL_CVAR(g_logfile, "logfile", 'l', "Enable logging to file", false);
 REGISTER_GLOBAL_CVAR(fs_overwrite, "overwrite", 'o', "Overwrite existing files", false);
+REGISTER_GLOBAL_CVAR(fs_gamepath, "gamepath", 'g', "Explicitly specify game directory", "");
 #if _DEBUG
 REGISTER_GLOBAL_CVAR(g_dumpCVars, "dumpCVars", 'd', "Print all cvar values to the console", false);
 #endif

@@ -10,6 +10,13 @@ char g_GameDirectory[MAX_PATH];
 
 bool AppInfo_Init()
 {
+	const char* _cli_gamepath = fs_gamepath.ValueString();
+	if (_cli_gamepath != nullptr && *_cli_gamepath != '\0') {
+		// TODO - Validate that the path actually contains the game
+		strcpy_s(g_GameDirectory, _cli_gamepath);
+		return true;
+	}
+
 	const bool foundPath = GetGameDirectory(g_GameDirectory, ARRAYSIZE(g_GameDirectory));
 	if(!foundPath)
 	{
