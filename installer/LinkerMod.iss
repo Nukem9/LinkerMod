@@ -101,6 +101,16 @@ Source: "{app}\BlackOps.exe";	DestName: "{#GameMod_Exe}";		\
 								Flags: external ignoreversion;	\
 								AfterInstall: PE_AddImport('game_mod.dll', '{#DEFAULT_EXPORT}');
 
+; Copy the DLL dependencies for the patched game exe
+Source: "{app}\binkw32.dll";	DestDir: "{#BinDir}";			\
+								Components: GameMod;			\
+								Flags: external ignoreversion;
+
+Source: "{app}\steam_api.dll";	DestDir: "{#BinDir}";			\
+								Components: GameMod;			\
+								Flags: external ignoreversion;
+
+; Mod tools binaries
 Source: "{#BinSrcDir}\cod2map.exe";	DestDir: "{#BinDir}";			\
 									Components: LinkerMod\Mapping;	\
 									Flags: ignoreversion;			\
@@ -298,12 +308,12 @@ end;
 // 										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";		\
 // 										WorkingDir:	"{#BinDir}";										\
 // 										Components: LinkerMod\Assets\IWD;
-// 
+//
 // Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";	\
 // 										Parameters: "extract-ff {code:ExtractFF_ResolveParams}";		\
 // 										WorkingDir:	"{#BinDir}";										\
 // 										Components: LinkerMod\Assets\FF\Snd LinkerMod\Assets\FF\Raw;
-// 
+//
 // Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {#PleaseWait}";	\
 // 										Parameters: "ents --overwrite --dummyBrushes *";				\
 // 										WorkingDir:	"{#BinDir}";										\
@@ -328,9 +338,9 @@ begin
 	// IWDs
 	if(IsComponentSelected('LinkerMod\Assets\IWD')) then
 	begin
-		WizardForm.StatusLabel.Caption := ExpandConstant('Extracting IWD assets... {#PleaseWait}');	
+		WizardForm.StatusLabel.Caption := ExpandConstant('Extracting IWD assets... {#PleaseWait}');
 		WizardForm.FilenameLabel.Caption := '';
-		
+
 		launchInfo.Parameters := 'extract-iwd' + ExtractIWD_ResolveParams;
 		ExecPiped(launchInfo);
 	end
@@ -341,7 +351,7 @@ begin
 		IsComponentSelected('LinkerMod\Assets\FF\Raw')
 	) then
 	begin
-		WizardForm.StatusLabel.Caption := ExpandConstant('Extracting fastfile assets... {#PleaseWait}');	
+		WizardForm.StatusLabel.Caption := ExpandConstant('Extracting fastfile assets... {#PleaseWait}');
 		WizardForm.FilenameLabel.Caption := '';
 
 		launchInfo.Parameters := 'extract-ff ' + ExtractFF_ResolveParams;
@@ -351,9 +361,9 @@ begin
 	// ENTITIES
 	if(IsComponentSelected('LinkerMod\Assets\FF\Ents')) then
 	begin
-		WizardForm.StatusLabel.Caption := ExpandConstant('Extracting entity prefabs... {#PleaseWait}');	
+		WizardForm.StatusLabel.Caption := ExpandConstant('Extracting entity prefabs... {#PleaseWait}');
 		WizardForm.FilenameLabel.Caption := '';
-		
+
 		launchInfo.Filename := ExpandConstant(CurrentFileName);
 		launchInfo.WorkingDir := ExpandConstant('{#BinDir}');
 		launchInfo.Parameters := 'ents --overwrite --dummyBrushes *';
