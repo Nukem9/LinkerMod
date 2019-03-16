@@ -160,19 +160,19 @@ Source: "build\Release\asset_util.exe";		DestDir: "{#BinDir}";				\
 
 [Run]
 #if 0
-Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";		\
-										Parameters: "extract-iwd {code:ExtractIWD_ResolveParams}";	\
-										WorkingDir:	"{#BinDir}";									\
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting IWD assets... {#PleaseWait}";											\
+										Parameters: "extract-iwd --gamepath '{code:WizardDirValue}' {code:ExtractIWD_ResolveParams}";	\
+										WorkingDir:	"{#BinDir}";																		\
 										Components: LinkerMod\Assets\IWD;
 
-Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";	\
-										Parameters: "extract-ff {code:ExtractFF_ResolveParams}";	\
-										WorkingDir:	"{#BinDir}";									\
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting fastfile assets... {#PleaseWait}";									\
+										Parameters: "extract-ff --gamepath '{code:WizardDirValue}' {code:ExtractFF_ResolveParams}";	\
+										WorkingDir:	"{#BinDir}";																	\
 										Components: LinkerMod\Assets\FF\Snd LinkerMod\Assets\FF\Raw;
 
-Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {#PleaseWait}";	\
-										Parameters: "ents --overwrite --dummyBrushes *";			\
-										WorkingDir:	"{#BinDir}";									\
+Filename: "{#BinDir}\asset_util.exe";	StatusMsg: "Extracting entity prefabs... {#PleaseWait}";									\
+										Parameters: "ents --overwrite --dummyBrushes --gamepath '{code:WizardDirValue}' *";			\
+										WorkingDir:	"{#BinDir}";																	\
 										Components: LinkerMod\Assets\FF\Ents;
 #endif
 
