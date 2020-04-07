@@ -276,3 +276,5 @@ dvar_s *Dvar_SetFromStringByNameFromSource(const char *dvarName, const char *str
 void Dvar_SetFromStringByName(const char *dvarName, const char *string);
 
 void Dvar_ClearModified(dvar_s *dvar);
+
+void Patch_DvarDescriptions();
