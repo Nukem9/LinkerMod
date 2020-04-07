@@ -4,7 +4,7 @@ std::unordered_map<std::string, unsigned int> gPerkList(
 {
 	{ "specialty_longersprint",				PERK_LONGERSPRINT },
 	{ "specialty_unlimitedsprint",			PERK_UNLIMITEDSPRINT },
-	{ "specialty_scavenger",				PERK_SCAVENGER },
+	{ "specialty_scavanger",				PERK_SCAVENGER },			// Yes, this typo is intentional.
 	{ "specialty_fastreload",				PERK_FASTRELOAD },
 	{ "specialty_bulletdamage",				PERK_BULLETDAMAGE },
 	{ "specialty_bulletaccuracy",			PERK_BULLETACCURACY },

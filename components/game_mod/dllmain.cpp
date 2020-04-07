@@ -489,13 +489,22 @@ BOOL GameMod_Init(HMODULE hModule)
 	PatchMemory(0x00A5675C, (PBYTE)&ptr, 4);
 
 	//
-	// Additional perk logic
+	// Additional perk logic. NOTE: THIS MUST MATCH BIT LOGIC IN BG_PERKS
 	//
 	Detours::X86::DetourFunction((PBYTE)0x00584480, (PBYTE)&BG_GetPerkIndexForName);
 	Detours::X86::DetourFunction((PBYTE)0x0087CF80, (PBYTE)&SV_SetPerk_f);
 	Detours::X86::DetourFunction((PBYTE)0x007D8FF0, (PBYTE)&PlayerCmd_SetPerk);
 	Detours::X86::DetourFunction((PBYTE)0x007D90B0, (PBYTE)&PlayerCmd_HasPerk);
 	Detours::X86::DetourFunction((PBYTE)0x007D9170, (PBYTE)&PlayerCmd_UnsetPerk);
+
+	PatchMemory(0x0067FE0E, (PBYTE)"\x01", 1);// PERK_LONGERSPRINT
+	PatchMemory(0x0075D69C, (PBYTE)"\x01", 1);// PERK_LONGERSPRINT
+	PatchMemory(0x00500F04, (PBYTE)"\x02", 1);// PERK_UNLIMITEDSPRINT
+	PatchMemory(0x00761154, (PBYTE)"\x02", 1);// PERK_UNLIMITEDSPRINT
+	PatchMemory(0x0075E388, (PBYTE)"\x40\x00\x00\x00", 4);// PERK_FLAKJACKET
+	PatchMemory(0x00760593, (PBYTE)"\x00\x10\x00\x00", 4);// PERK_ENDURANCE
+	PatchMemory(0x00406DF0, (PBYTE)"\x00\x20\x00\x00", 4);// PERK_DEADSHOT
+	PatchMemory(0x00563223, (PBYTE)"\x00\x20\x00\x00", 4);// PERK_DEADSHOT
 
 	//
 	// Increase PMem size

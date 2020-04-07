@@ -17,6 +17,8 @@ enum
 	PERK_ENDURANCE = 12,
 	PERK_DEADSHOT = 13,
 	PERK_ADDITIONALPRIMARYWEAPON = 14,
+
+	// Begin custom perks
 	PERK_FASTSWITCH = 15,
 	PERK_STOCKPILE = 16,
 	PERK_FASTADS = 17,
@@ -29,48 +31,15 @@ enum
 	ORIGINAL_PERK_COUNT = 15,
 };
 
-static bool IS_VANILLA_CALCULATION_PERK(int x)
-{
-	return (x == PERK_LONGERSPRINT || x == PERK_UNLIMITEDSPRINT || x == PERK_FLAKJACKET || x == PERK_ENDURANCE || x == PERK_DEADSHOT);
-}
-
-// Vanilla calculation:    (3 << 2 * perkIndex)                            -- 2 bits per perk
-// Newer perk calculation: (1 << (vanillaPerksBelowPerkIndex + perkIndex)) -- 1 bit per perk
-
-// 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00 (bit number)
-// 26 25 24 23 13 13 12 12 22 21 20 19 18 17 16 15 14 11 06 06 10 09 08 07 05 04 03 02 01 01 00 00 (perk number)
-//  0  0  0  0  1  1  1  1  0  0  0  0  0  0  0  0  0  0  1  1  0  0  0  0  0  0  0  0  1  1  1  1 (1 = vanilla calculation bit, 0 = new calculation bit)
-// Vanilla calculation perks: still use vanilla engine code
-// Vanilla calculation perks: bit number starts at (perk number * 2)
+//
+// NOTE: THIS MUST MATCH THE PERK BIT CODE IN DLLMAIN
+//
+// Vanilla calculation:    (3 << 2 * perkIndex)   -- 2 bits per perk
+// Newer perk calculation: (1 << (perkIndex))     -- 1 bit per perk
 
 inline unsigned int BG_PERK_BITS(int x)
 {
-	//return ((x >= 15) ? (1UL << (15 + x)) : (3UL << 2 * x));
-
-	if (IS_VANILLA_CALCULATION_PERK(x))
-	{
-		return 3UL << 2 * x;
-	}
-	else
-	{
-		int vanillaPerksBelowPerkIndex = 0;
-		for (int i = 0; i < x; i++)
-		{
-			if (IS_VANILLA_CALCULATION_PERK(i))
-			{
-				if (x + vanillaPerksBelowPerkIndex > i * 2)
-				{
-					vanillaPerksBelowPerkIndex++;
-				}
-				else
-				{
-					vanillaPerksBelowPerkIndex--;
-				}
-			}
-		}
-
-		return 1UL << (vanillaPerksBelowPerkIndex + x);
-	}
+	return 1u << x;
 }
 
 // /game/bg_perks.h:135
