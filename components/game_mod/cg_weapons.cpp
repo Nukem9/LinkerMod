@@ -114,23 +114,20 @@ void StartWeaponAnim(int localClientNum, int weaponNum, DObj *obj, int animIndex
 	else if (IS_WEAPONSTATE_OFFHAND(weaponstate) && BG_HasPerk(ps_perks, PERK_FASTOFFHAND))
 	{
 		// Fast offhand throw perk
-		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
-		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
-		rate /= perk_weapSwitchMultiplier->current.value;
+		ASSERT(perk_fastOffhandRate->current.value > 0.0f);
+		rate /= perk_fastOffhandRate->current.value;
 	}
 	else if (weaponstate == WEAPON_SPRINT_DROP && BG_HasPerk(ps_perks, PERK_FASTSPRINTRECOVERY))
 	{
 		// Fast sprint recovery perk
-		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
-		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
-		rate /= perk_weapSwitchMultiplier->current.value;
+		ASSERT(perk_fastSprintRate->current.value > 0.0f);
+		rate /= perk_fastSprintRate->current.value;
 	}
 	else if (IS_WEAPONSTATE_MELEE(weaponstate) && BG_HasPerk(ps_perks, PERK_FASTMELEE))
 	{
 		// Fast melee perk
-		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
-		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
-		rate /= perk_weapSwitchMultiplier->current.value;
+		ASSERT(perk_fastMeleeRate->current.value > 0.0f);
+		rate /= perk_fastMeleeRate->current.value;
 	}
 
 	for (int i = 1; i < WEAP_ANIM_VIEWMODEL_END; i++)

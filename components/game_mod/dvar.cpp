@@ -13,6 +13,9 @@ dvar_s* cg_drawViewpos = NULL;
 dvar_s* scr_useFastFileOnly = NULL;
 dvar_s* scr_suppressErrors = NULL;
 dvar_s* perk_weapRateEnhanced = NULL;
+dvar_s* perk_fastOffhandRate = NULL;
+dvar_s* perk_fastSprintRate = NULL;
+dvar_s* perk_fastMeleeRate = NULL;
 
 dvar_s* com_waitForStreamer = NULL;
 dvar_s* com_developer_print = NULL;
@@ -129,6 +132,9 @@ void __cdecl CG_RegisterDvars()
 	scr_suppressErrors = Dvar_RegisterBool("scr_suppressErrors", false, 0x2, "Suppress fatal script errors");
 
 	perk_weapRateEnhanced = Dvar_RegisterInt("perk_weapRateEnhanced", 0, 0, 1, 0x80, "Double tap will shoot 2x the bullets for every shot");
+	perk_fastOffhandRate = Dvar_RegisterFloat("perk_fastOffhandRate", 0.5f, 0.01f, 1.0f, 0x80, "Multiplier for specialty_fastoffhand");
+	perk_fastSprintRate = Dvar_RegisterFloat("perk_fastSprintRate", 0.5f, 0.01f, 1.0f, 0x80, "Multiplier for specialty_fastsprintrecovery");
+	perk_fastMeleeRate = Dvar_RegisterFloat("perk_fastMeleeRate", 0.5f, 0.01f, 1.0f, 0x80, "Multiplier for specialty_fastmelee");
 
 	radiant_live = Dvar_RegisterInt("radiant_live", 0, 0, 1, 0x0, "Enable live Radiant updates in the game");
 	radiant_livePort = Dvar_RegisterInt("radiant_livePort", 3700, 0, 65535, 0x0, "Network port for Radiant");
