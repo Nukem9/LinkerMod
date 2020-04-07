@@ -188,6 +188,27 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 
 		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
 	}
+	else if (IS_WEAPONSTATE_OFFHAND(*weaponState) && BG_HasPerk(ps->perks, PERK_FASTOFFHAND))
+	{
+		// Fast offhand throw perk
+		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
+		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
+		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
+	}
+	else if (*weaponState == WEAPON_SPRINT_DROP && BG_HasPerk(ps->perks, PERK_FASTSPRINTRECOVERY))
+	{
+		// Fast sprint recovery perk
+		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
+		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
+		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
+	}
+	else if (IS_WEAPONSTATE_MELEE(*weaponState) && BG_HasPerk(ps->perks, PERK_FASTMELEE))
+	{
+		// Fast melee perk
+		// TODO - use its own dvar instead of perk_weapSwitchMultiplier
+		ASSERT(perk_weapSwitchMultiplier->current.value > 0.0f);
+		msec = (int)((float)pml->msec / perk_weapSwitchMultiplier->current.value);
+	}
 	else
 	{
 		// Default modifier time
