@@ -197,8 +197,10 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 	else if (*weaponState == WEAPON_SPRINT_DROP && BG_HasPerk(ps->perks, PERK_FASTSPRINTRECOVERY))
 	{
 		// Fast sprint recovery perk
-		ASSERT(perk_fastSprintRate->current.value > 0.0f);
-		msec = (int)((float)pml->msec / perk_fastSprintRate->current.value);
+		if (perk_sprintRecoveryMultiplier->current.value != 0.0f)
+			msec = (int)((float)pml->msec / perk_sprintRecoveryMultiplier->current.value);
+		else
+			msec = max(*weaponDelay, *weaponTime);
 	}
 	else if (IS_WEAPONSTATE_MELEE(*weaponState) && BG_HasPerk(ps->perks, PERK_FASTMELEE))
 	{

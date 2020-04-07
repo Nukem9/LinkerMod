@@ -120,8 +120,10 @@ void StartWeaponAnim(int localClientNum, int weaponNum, DObj *obj, int animIndex
 	else if (weaponstate == WEAPON_SPRINT_DROP && BG_HasPerk(ps_perks, PERK_FASTSPRINTRECOVERY))
 	{
 		// Fast sprint recovery perk
-		ASSERT(perk_fastSprintRate->current.value > 0.0f);
-		rate /= perk_fastSprintRate->current.value;
+		if (perk_sprintRecoveryMultiplier->current.value != 0.0f)
+			rate /= perk_sprintRecoveryMultiplier->current.value;
+		else
+			rate = 1000.0f;
 	}
 	else if (IS_WEAPONSTATE_MELEE(weaponstate) && BG_HasPerk(ps_perks, PERK_FASTMELEE))
 	{
