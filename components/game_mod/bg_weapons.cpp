@@ -192,6 +192,7 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 	{
 		// Fast offhand throw perk
 		ASSERT(perk_fastOffhandRate->current.value > 0.0f);
+
 		msec = (int)((float)pml->msec / perk_fastOffhandRate->current.value);
 	}
 	else if (*weaponState == WEAPON_SPRINT_DROP && BG_HasPerk(ps->perks, PERK_FASTSPRINTRECOVERY))
@@ -205,8 +206,9 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 	else if (IS_WEAPONSTATE_MELEE(*weaponState) && BG_HasPerk(ps->perks, PERK_FASTMELEE))
 	{
 		// Fast melee perk
-		ASSERT(perk_fastMeleeRate->current.value > 0.0f);
-		msec = (int)((float)pml->msec / perk_fastMeleeRate->current.value);
+		ASSERT(perk_weapMeleeMultiplier->current.value > 0.0f);
+
+		msec = (int)((float)pml->msec / perk_weapMeleeMultiplier->current.value);
 	}
 	else
 	{

@@ -179,9 +179,9 @@ VANILLA_DVAR(perk_sprintRecoveryMultiplier, 0x00BDF2C4);
 VANILLA_DVAR(perk_weapRateMultiplier, 0x00BDF35C);
 VANILLA_DVAR(perk_weapReloadMultiplier, 0x00BDF358);
 VANILLA_DVAR(perk_weapSwitchMultiplier, 0x00BDF2C0);
+VANILLA_DVAR(perk_weapMeleeMultiplier, 0x00BDF328);
 extern dvar_s* perk_weapRateEnhanced;
 extern dvar_s* perk_fastOffhandRate;
-extern dvar_s* perk_fastMeleeRate;
 
 VANILLA_DVAR(phys_gravity, 0x023D2FA8);
 
