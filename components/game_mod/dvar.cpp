@@ -81,7 +81,7 @@ void R_RegisterCustomDvars()
 	PatchMemory(0x0073534F, (PBYTE)&sampleSize, 4);
 	PatchMemory(0x00735361, (PBYTE)&smResPower, 1);
 
-	r_showTess = Dvar_RegisterEnum("r_showTess", r_showTessNames, 0, 0x80u, "Show details for each surface");
+	r_showTess = Dvar_RegisterEnum("r_showTess", r_showTessNames, 0, DVAR_CHEAT, "Show details for each surface");
 	com_cfg_readOnly = Dvar_RegisterInt("com_cfg_readOnly", com_cfg_readOnly_default ? 1 : 0, 0, 1, DVAR_AUTOEXEC, "Prevent writing to the config"); // Old flags were 0x2001
 
 	static const char* com_dprintf_options[] =
@@ -92,8 +92,8 @@ void R_RegisterCustomDvars()
 		NULL
 	};
 
-	com_developer_print = Dvar_RegisterEnum("developer_print", com_dprintf_options, 0, 0x80, "Modify Com_DPrintf() behavior");
-	sv_showCommands = Dvar_RegisterBool("sv_showCommands", 0, 0, "Print client commands in the log file");
+	com_developer_print = Dvar_RegisterEnum("developer_print", com_dprintf_options, 0, DVAR_CHEAT, "Modify Com_DPrintf() behavior");
+	sv_showCommands = Dvar_RegisterBool("sv_showCommands", false, DVAR_NOFLAG, "Print client commands in the log file");
 
 	r_streamCheckAabb = Dvar_RegisterBool("r_streamCheckAabb", false, DVAR_CHEAT, "Enables runtime checking of the stream aabb tree");
 
@@ -119,37 +119,37 @@ void __cdecl CG_RegisterDvars()
 {
 	CG_RegisterDvars_o();
 
-	gm_build_date = Dvar_RegisterString("gm_build_date", __TIMESTAMP__, 0x10 | 0x8, "Compile time for game_mod");
-	gm_version = Dvar_RegisterString("gm_version", DLL_VersionString(), 0x10 | 0x8, "Game_Mod version");
+	gm_build_date = Dvar_RegisterString("gm_build_date", __TIMESTAMP__, DVAR_INIT | DVAR_SYSTEMINFO, "Compile time for game_mod");
+	gm_version = Dvar_RegisterString("gm_version", DLL_VersionString(), DVAR_INIT | DVAR_SYSTEMINFO, "Game_Mod version");
 
-	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, 1, "Enable external console window");
-	con_inputMaxMatchesShown = Dvar_RegisterInt("con_inputMaxMatchesShown", 24, 1, 64, 1, "Maximum number of suggestions in the console autocomplete preview");
+	con_extcon = Dvar_RegisterInt("con_extcon", 0, 0, 1, DVAR_ARCHIVE, "Enable external console window");
+	con_inputMaxMatchesShown = Dvar_RegisterInt("con_inputMaxMatchesShown", 24, 1, 64, DVAR_ARCHIVE, "Maximum number of suggestions in the console autocomplete preview");
 
-	cg_drawViewpos = Dvar_RegisterInt("cg_drawViewpos", 0, 0, 1, 1, "Draw the current player origin and view angles");
-	scr_useFastFileOnly = Dvar_RegisterInt("scr_useFastFileOnly", 0, 0, 1, 0x2, "Disable the loading of raw script files from the current mod's directory");
+	cg_drawViewpos = Dvar_RegisterInt("cg_drawViewpos", 0, 0, 1, DVAR_ARCHIVE, "Draw the current player origin and view angles");
+	scr_useFastFileOnly = Dvar_RegisterInt("scr_useFastFileOnly", 0, 0, 1, DVAR_USERINFO, "Disable the loading of raw script files from the current mod's directory");
 
-	scr_suppressErrors = Dvar_RegisterBool("scr_suppressErrors", false, 0x2, "Suppress fatal script errors");
+	scr_suppressErrors = Dvar_RegisterBool("scr_suppressErrors", false, DVAR_USERINFO, "Suppress fatal script errors");
 
-	perk_weapRateEnhanced = Dvar_RegisterInt("perk_weapRateEnhanced", 0, 0, 1, 0x80, "Double tap will shoot 2x the bullets for every shot");
-	perk_fastOffhandRate = Dvar_RegisterFloat("perk_fastOffhandRate", 0.5f, 0.01f, 1.0f, 0x80, "Multiplier for specialty_fastoffhand");
-	perk_fastMeleeRate = Dvar_RegisterFloat("perk_fastMeleeRate", 0.5f, 0.01f, 1.0f, 0x80, "Multiplier for specialty_fastmelee");
+	perk_weapRateEnhanced = Dvar_RegisterInt("perk_weapRateEnhanced", 0, 0, 1, DVAR_CHEAT, "Double tap will shoot 2x the bullets for every shot");
+	perk_fastOffhandRate = Dvar_RegisterFloat("perk_fastOffhandRate", 0.5f, 0.01f, 1.0f, DVAR_CHEAT, "Multiplier for specialty_fastoffhand");
+	perk_fastMeleeRate = Dvar_RegisterFloat("perk_fastMeleeRate", 0.5f, 0.01f, 1.0f, DVAR_CHEAT, "Multiplier for specialty_fastmelee");
 
-	radiant_live = Dvar_RegisterInt("radiant_live", 0, 0, 1, 0x0, "Enable live Radiant updates in the game");
-	radiant_livePort = Dvar_RegisterInt("radiant_livePort", 3700, 0, 65535, 0x0, "Network port for Radiant");
-	radiant_liveDebug = Dvar_RegisterInt("radiant_liveDebug", 0, 0, 1, 0x0, "Debugging prints for Radiant commands");
+	radiant_live = Dvar_RegisterInt("radiant_live", 0, 0, 1, DVAR_NOFLAG, "Enable live Radiant updates in the game");
+	radiant_livePort = Dvar_RegisterInt("radiant_livePort", 3700, 0, 65535, DVAR_NOFLAG, "Network port for Radiant");
+	radiant_liveDebug = Dvar_RegisterInt("radiant_liveDebug", 0, 0, 1, DVAR_NOFLAG, "Debugging prints for Radiant commands");
 
 	// Must be set at launch time to function correctly
-	r_renderTweaks = Dvar_RegisterBool("r_renderTweaks", false, 0x2, "Allow renderer tweaks");
+	r_renderTweaks = Dvar_RegisterBool("r_renderTweaks", false, DVAR_USERINFO, "Allow renderer tweaks");
 
-	r_renderLit = Dvar_RegisterBool("r_renderLit", true, 0x2, "");
-	r_renderStandardPostFx = Dvar_RegisterBool("r_renderStandardPostFx", true, 0x2, "");
-	r_renderDistortion = Dvar_RegisterBool("r_renderDistortion", true, 0x2, "");
-	r_renderEmissive = Dvar_RegisterBool("r_renderEmissive", true, 0x2, "");
-	r_renderCorona = Dvar_RegisterBool("r_renderCorona", true, 0x2, "");
-	r_renderSuperflare = Dvar_RegisterBool("r_renderSuperflare", true, 0x2, "");
-	r_renderSun = Dvar_RegisterBool("r_renderSun", true, 0x2, "");
-	r_renderReflected = Dvar_RegisterBool("r_renderReflected", true, 0x2, "");
-	r_renderCloakHDR = Dvar_RegisterBool("r_renderCloakHDR", true, 0x2, "");
+	r_renderLit = Dvar_RegisterBool("r_renderLit", true, DVAR_USERINFO, "");
+	r_renderStandardPostFx = Dvar_RegisterBool("r_renderStandardPostFx", true, DVAR_USERINFO, "");
+	r_renderDistortion = Dvar_RegisterBool("r_renderDistortion", true, DVAR_USERINFO, "");
+	r_renderEmissive = Dvar_RegisterBool("r_renderEmissive", true, DVAR_USERINFO, "");
+	r_renderCorona = Dvar_RegisterBool("r_renderCorona", true, DVAR_USERINFO, "");
+	r_renderSuperflare = Dvar_RegisterBool("r_renderSuperflare", true, DVAR_USERINFO, "");
+	r_renderSun = Dvar_RegisterBool("r_renderSun", true, DVAR_USERINFO, "");
+	r_renderReflected = Dvar_RegisterBool("r_renderReflected", true, DVAR_USERINFO, "");
+	r_renderCloakHDR = Dvar_RegisterBool("r_renderCloakHDR", true, DVAR_USERINFO, "");
 
 	com_waitForStreamer = Dvar_RegisterInt("waitForStreamer", 1, 0, 2, DVAR_NOFLAG, "1) wait for initial lowmips, 2) wait for full initial texture load.");
 
