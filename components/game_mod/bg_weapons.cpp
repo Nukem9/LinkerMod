@@ -245,10 +245,20 @@ int PM_Weapon_WeaponTimeAdjust(pmove_t *pm, pml_t *pml)
 			bool holdingGrenadeBtn = (weapDef->weapType == WEAPTYPE_GRENADE || weapDef->weapType == WEAPTYPE_MINE) && weapDef->holdButtonToThrow;
 			bool holdingFireBtn = false;
 
-			if (ps->bRunLeftGun)
-				holdingFireBtn = pm->cmd.button_bits.testBit(0x18) != 0;
+			if (weapDef->bDualWield && !Dvar_GetString("gpad_enabled"))
+			{
+				if (ps->bRunLeftGun)
+					holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
+				else
+					holdingFireBtn = pm->cmd.button_bits.testBit(24) != 0;
+			}
 			else
-				holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
+			{
+				if (ps->bRunLeftGun)
+					holdingFireBtn = pm->cmd.button_bits.testBit(24) != 0;
+				else
+					holdingFireBtn = pm->cmd.button_bits.testBit(0) != 0;
+			}
 
 			if ((*weaponState < WEAPON_OFFHAND_INIT || *weaponState > WEAPON_OFFHAND_END)
 				&& (pausedAfterFiring || holdingGrenadeBtn)
@@ -320,16 +330,33 @@ int PM_Weapon_ShouldBeFiring(pmove_t *pm, int delayedAction, bool testOnly)
 
 	WeaponDef *weapDef = BG_GetWeaponDef(ps->weapon);
 	int weaponBit = PM_GetWeaponFireButton(ps->weapon);
-	bool shouldStartFiring = pm->cmd.button_bits.testBit(weaponBit) != 0;
+	int dualWieldWeaponBit = 24;
+	bool shouldStartFiring = false;
 
-	// If this is a dw weapon and we're using the offhand
-	if (ps->bRunLeftGun && weapDef->bDualWield)
+	if (weapDef->bDualWield)
 	{
-		// Check if player holding the fire key
-		if (pm->cmd.button_bits.testBit(24))
-			shouldStartFiring = true;
+		if (!Dvar_GetString("gpad_enabled"))
+		{
+			if (ps->bRunLeftGun)
+			{
+				shouldStartFiring = pm->cmd.button_bits.testBit(weaponBit);
+			}
+			else
+			{
+				shouldStartFiring = pm->cmd.button_bits.testBit(dualWieldWeaponBit);
+			}
+		}
 		else
-			shouldStartFiring = false;
+		{
+			if (ps->bRunLeftGun)
+			{
+				shouldStartFiring = pm->cmd.button_bits.testBit(dualWieldWeaponBit);
+			}
+			else
+			{
+				shouldStartFiring = pm->cmd.button_bits.testBit(weaponBit);
+			}
+		}
 	}
 
 	if (weapDef->freezeMovementWhenFiring && ps->groundEntityNum == 1023)
