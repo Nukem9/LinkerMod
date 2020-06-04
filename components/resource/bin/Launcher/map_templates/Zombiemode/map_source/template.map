@@ -3,21 +3,24 @@ iwmap 4
 "The Map" flags 
 // entity 0
 {
-"spawnflags" "1024"
-"waterdirection " "80"
+"maxlightgridcolors" "32000"
+"exposure" "1.4"
+"treescatteramount" "0.0"
+"treescatterintensity" "0.0"
+"sunshadowintensity" "5.0"
+"_sunshadowcolor" "0.7176 0.7450 0.8117"
+"sunlight" "13"
+"suncolor" "1 0.831 0.71"
+"ambientintensity" "0.7"
+"_ambientcolor" "0.78 0.78 0.78"
+"newsun" "1"
+"sundirection" "-152.86 -10 0"
+"skyboxmodel" "skybox_mp_hotel"
 "classname" "worldspawn"
-"northyaw" "225"
-"skyboxmodel" "skybox_night"
-"sundirection" "-40.5026 38.2786 0"
-"suncolor" "1 0.9254 0.8627"
-"sunlight" "1"
-"sundiffusecolor" "0.255 0.34078 0.427451"
-"diffusefraction" "0.175"
-"_color" "0.8 1 1"
-"ambient" ".3"
-"sunradiosity" "1.3"
-"radiosityscale" ".75"
-"contrastgain" ".8"
+"sky_intensity_angle0" "90"
+"sky_intensity_angle1" "-30"
+"sky_intensity_factor0" "1.5"
+"sky_intensity_factor1" "2.5"
 // brush 0
 {
  ( 944 640 0 ) ( -928 640 0 ) ( -928 528 0 ) caulk 64 64 0 0 0 0 lightmap_gray 16384 16384 -64 0 0 0

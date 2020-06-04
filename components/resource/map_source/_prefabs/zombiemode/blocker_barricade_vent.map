@@ -50,7 +50,7 @@ iwmap 4
 }
 // entity 3
 {
-"script_noteworthy" "4"
+"script_noteworthy" "3"
 "script_team" "new_barricade"
 "script_parameters" "barricade_vents"
 "targetname" "auto1"
@@ -67,7 +67,7 @@ iwmap 4
 }
 // entity 4
 {
-"script_noteworthy" "3"
+"script_noteworthy" "2"
 "script_team" "new_barricade"
 "script_parameters" "barricade_vents"
 "targetname" "auto1"
@@ -84,7 +84,7 @@ iwmap 4
 }
 // entity 5
 {
-"script_noteworthy" "2"
+"script_noteworthy" "1"
 "script_team" "new_barricade"
 "script_parameters" "barricade_vents"
 "targetname" "auto1"
@@ -101,7 +101,7 @@ iwmap 4
 }
 // entity 6
 {
-"script_noteworthy" "1"
+"script_noteworthy" "0"
 "script_team" "new_barricade"
 "script_parameters" "barricade_vents"
 "targetname" "auto1"

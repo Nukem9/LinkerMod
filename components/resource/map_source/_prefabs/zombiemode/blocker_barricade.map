@@ -59,22 +59,6 @@ iwmap 4
 }
 // entity 5
 {
-"classname" "script_struct"
-"origin" "0.0 47.0 42.0"
-"angles" "0 270 0"
-"target" "auto1"
-"targetname" "exterior_goal"
-}
-// entity 6
-{
-"classname" "script_struct"
-"origin" "0.0 47.0 42.0"
-"angles" "0 270 0"
-"target" "auto1"
-"targetname" "exterior_goal"
-}
-// entity 7
-{
 "script_team" "classic_boards"
 "script_parameters" "board"
 "script_noteworthy" "1"
@@ -91,7 +75,7 @@ iwmap 4
  ( -42 10 91.25 ) ( -40 10 99 ) ( -40 8 99 ) eb_art_floor_wood_hardwood02 63.998245 123.68435 -265.75 -126.07263 0 0 lightmap_gray 16383.551 15831.342 -263.73944 -126.07172 0 0
 }
 }
-// entity 8
+// entity 6
 {
 "script_team" "classic_boards"
 "script_parameters" "board"
@@ -109,7 +93,7 @@ iwmap 4
  ( 7 8 109 ) ( 7 6 109 ) ( -1 6 108 ) eb_art_floor_wood_hardwood02 64 -126.01243 -267.70377 26.103199 90 0.00024709795 lightmap_gray 16381.063 -16129.833 -265.67654 26.049406 90 2.6207736e-005
 }
 }
-// entity 9
+// entity 7
 {
 "script_team" "classic_boards"
 "script_parameters" "board"
@@ -127,7 +111,7 @@ iwmap 4
  ( -10 8 110 ) ( -10 6 110 ) ( -18 6 110 ) eb_art_floor_wood_hardwood02 64 -128 -267.72998 9.6666069 90 -0.00010753813 lightmap_gray 16383 -16384.488 -265.72592 9.75 90 0
 }
 }
-// entity 10
+// entity 8
 {
 "script_team" "classic_boards"
 "script_parameters" "board"
@@ -145,7 +129,7 @@ iwmap 4
  ( -41 6 30 ) ( -41 6 38 ) ( -41 4 38 ) eb_art_floor_wood_hardwood02 64.017906 128 -269.82001 -66 0 0 lightmap_gray 16386.334 16384 -267.78751 -66 0 0
 }
 }
-// entity 11
+// entity 9
 {
 "script_team" "classic_boards"
 "script_parameters" "board"
@@ -163,7 +147,7 @@ iwmap 4
  ( -40.5 6 66.5 ) ( -40.5 6 74.5 ) ( -40.5 4 74.5 ) eb_art_floor_wood_hardwood02 64.008789 128 -269.78384 -93.5 0 0 lightmap_gray 16383.5 16384 -267.74298 -93.5 0 0
 }
 }
-// entity 12
+// entity 10
 {
 "script_team" "classic_boards"
 "script_parameters" "board"
@@ -180,4 +164,12 @@ iwmap 4
  ( 44.75 4 85.75 ) ( 46 4 77.75 ) ( -41.75 4 75.25 ) eb_art_floor_wood_hardwood02 64 128 15.116501 -569.72626 88.798042 9.3012968e-005 lightmap_gray 16384.35 16384.539 -558.47241 -113.83401 8.7946997 0
  ( -43 6 83.25 ) ( -43 4 83.25 ) ( -41.75 4 75.25 ) eb_art_floor_wood_hardwood02 64.007492 -126.49424 -279.77487 107.94002 180 0 lightmap_gray 16383.75 -16191.054 -277.74503 107.93725 180 0
 }
+}
+// entity 11
+{
+"classname" "script_struct"
+"origin" "0.0 47.0 42.0"
+"angles" "0 270 0"
+"target" "auto1"
+"targetname" "exterior_goal"
 }
