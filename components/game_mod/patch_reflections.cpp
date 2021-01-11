@@ -215,12 +215,15 @@ BOOL LoadBSPReflectionData(const char* bspPath, BYTE* dest, size_t destSize)
 	if (padded(size) != padded(destSize))
 	{
 		printf("ERROR: Fastfile probe count does not match the BSP probe count - please rebuild fastfile\n");
+		delete[] index;
 		fclose(h);
+
 		return FALSE;
 	}
 
 	fseek(h, offset, SEEK_SET);
 	fread(dest, 1, size, h);
+	delete[] index;
 	fclose(h);
 	
 	return TRUE;

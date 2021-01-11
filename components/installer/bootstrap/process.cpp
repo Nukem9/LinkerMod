@@ -46,7 +46,7 @@ bool Pipe::Read(std::string& dst) {
 	//
 	CloseHandle_s(_hWrite);
 
-	dst = "";
+	dst.clear();
 	dst.resize(bufLen);
 
 	DWORD dwRead = 0;

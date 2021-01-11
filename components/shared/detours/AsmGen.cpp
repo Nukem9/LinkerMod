@@ -88,7 +88,7 @@ BYTE *AsmGen::GetStream(bool Free)
 	BYTE *data = (BYTE *)malloc(m_Stream.size() * sizeof(BYTE));
 
 	for (size_t i = 0; i < m_Stream.size(); i++)
-		data[i] = m_Stream.at(i);
+		data[i] = m_Stream[i];
 
 	m_StreamData = (Free) ? data : nullptr;
 

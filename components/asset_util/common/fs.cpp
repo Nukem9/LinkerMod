@@ -219,7 +219,7 @@ int FS_CreatePath(const char* _targetPath)
 			strncpy(buf + strlen(buf), targetPath, i);
 
 			char* qpath = buf;
-			if (strlen(qpath) == 0)
+			if (qpath[0] == '\0')
 				continue;
 
 			FS_SanitizePath(qpath);

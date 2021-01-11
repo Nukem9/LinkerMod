@@ -13,7 +13,6 @@ enum class FileType
 {
 	IWD,
 	FF,
-
 	ERR,
 };
 
@@ -24,11 +23,23 @@ struct FileEntry
 	std::string name;
 	std::string path;
 
+	FileEntry(FileType t, std::string n, std::string p)
+	{
+		type = std::move(t);
+		name = std::move(n);
+		path = std::move(p);
+	}
+
+	FileEntry(void)
+	{
+		Clear();
+	}
+
 	void Clear(void)
 	{
 		type = FileType::ERR;
-		path = "";
-		name = "";
+		name.clear();
+		path.clear();
 	}
 };
 
@@ -52,7 +63,7 @@ private:
 public:
 	std::string test;
 
-	CachedFile(void) : data(NULL), size(0)
+	CachedFile(void) : entry(), data(NULL), size(0)
 	{
 	}
 

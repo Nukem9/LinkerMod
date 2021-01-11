@@ -35,9 +35,9 @@ int Character::ExtractFromGSC(const char* qpath)
 	GSC_Character_ExtractAliasEntry("legDmg4", str.c_str(), &this->legDmg[3], "");
 	
 	// misc models arent supported right now
-	this->misc[0].model = "";
-	this->misc[1].model = "";
-	this->misc[2].model = "";
+	this->misc[0].model.clear();
+	this->misc[1].model.clear();
+	this->misc[2].model.clear();
 
 	/* Unsupported - Can't find any examples of these
 	

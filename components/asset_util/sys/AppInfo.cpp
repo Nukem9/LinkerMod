@@ -86,10 +86,10 @@ const char* AppInfo_RawDir()
 
 const char* AppInfo_OutDir()
 {
-	if (strlen(fs_outdir.ValueString()) == 0)
+	if (fs_outdir.ValueString()[0] == '\0')
 		return AppInfo_RawDir();
 
-	if (strstr(fs_outdir.ValueString(), ":") != NULL && strstr(fs_outdir.ValueString(), ":") != fs_outdir.ValueString() + 1)
+	if (strchr(fs_outdir.ValueString(), ':') != NULL && strchr(fs_outdir.ValueString(), ':') != fs_outdir.ValueString() + 1)
 	{
 		Con_Warning("Invalid output directory - falling back to default\n");
 		fs_outdir.AssignRawString("");

@@ -175,10 +175,10 @@ const file_version_info resource_version_info_reader::get_version_info(lang_stri
 
 					//Save name-value pair
 #ifdef PE_BLISS_WINDOWS
-					new_values.insert(std::make_pair(reinterpret_cast<const unicode16_t*>(string_block->Key), data));
+					new_values.emplace(reinterpret_cast<const unicode16_t*>(string_block->Key), data);
 #else
-					new_values.insert(std::make_pair(pe_utils::from_ucs2(reinterpret_cast<const unicode16_t*>(string_block->Key)),
-						pe_utils::from_ucs2(data)));
+					new_values.emplace(pe_utils::from_ucs2(reinterpret_cast<const unicode16_t*>(string_block->Key)),
+						pe_utils::from_ucs2(data));
 #endif
 
 					//Navigate to next string block
@@ -186,9 +186,9 @@ const file_version_info resource_version_info_reader::get_version_info(lang_stri
 				}
 
 #ifdef PE_BLISS_WINDOWS
-				string_values.insert(std::make_pair(reinterpret_cast<const unicode16_t*>(string_table->Key), new_values));
+				string_values.emplace(reinterpret_cast<const unicode16_t*>(string_table->Key), new_values);
 #else
-				string_values.insert(std::make_pair(pe_utils::from_ucs2(reinterpret_cast<const unicode16_t*>(string_table->Key)), new_values));
+				string_values.emplace(pe_utils::from_ucs2(reinterpret_cast<const unicode16_t*>(string_table->Key)), new_values);
 #endif
 
 				//Navigate to next string table block
@@ -231,7 +231,7 @@ const file_version_info resource_version_info_reader::get_version_info(lang_stri
 						uint16_t lang_id = *reinterpret_cast<const uint16_t*>(resource_data.data() + value_pos + i);
 						uint16_t codepage_id = *reinterpret_cast<const uint16_t*>(resource_data.data() + value_pos + sizeof(uint16_t) + i);
 						//Save translation
-						translations.insert(std::make_pair(lang_id, codepage_id));
+						translations.emplace(lang_id, codepage_id);
 					}
 				}
 
@@ -285,6 +285,6 @@ const file_version_info resource_version_info_reader::get_version_info(lang_stri
 	if(entries.size() <= index)
 		throw pe_exception("Resource data entry not found", pe_exception::resource_data_entry_not_found);
 
-	return get_version_info(string_values, translations, entries.at(index).get_data_entry().get_data()); //Data directory
+	return get_version_info(string_values, translations, entries[index].get_data_entry().get_data()); //Data directory
 }
 }

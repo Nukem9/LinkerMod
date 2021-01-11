@@ -308,7 +308,7 @@ const resource_data_info pe_resource_viewer::get_resource_data_by_name(resource_
 	if(entries.size() <= index)
 		throw pe_exception("Resource data entry not found", pe_exception::resource_data_entry_not_found);
 
-	return resource_data_info(entries.at(index).get_data_entry()); //Data directory
+	return resource_data_info(entries[index].get_data_entry()); //Data directory
 }
 
 //Returns raw resource data by root name, name and index in language directory (instead of language)
@@ -324,7 +324,7 @@ const resource_data_info pe_resource_viewer::get_resource_data_by_name(const std
 	if(entries.size() <= index)
 		throw pe_exception("Resource data entry not found", pe_exception::resource_data_entry_not_found);
 
-	return resource_data_info(entries.at(index).get_data_entry()); //Data directory
+	return resource_data_info(entries[index].get_data_entry()); //Data directory
 }
 
 //Returns raw resource data by type, ID and index in language directory (instead of language)
@@ -340,7 +340,7 @@ const resource_data_info pe_resource_viewer::get_resource_data_by_id(resource_ty
 	if(entries.size() <= index)
 		throw pe_exception("Resource data entry not found", pe_exception::resource_data_entry_not_found);
 
-	return resource_data_info(entries.at(index).get_data_entry()); //Data directory
+	return resource_data_info(entries[index].get_data_entry()); //Data directory
 }
 
 //Returns raw resource data by root name, ID and index in language directory (instead of language)
@@ -356,6 +356,6 @@ const resource_data_info pe_resource_viewer::get_resource_data_by_id(const std::
 	if(entries.size() <= index)
 		throw pe_exception("Resource data entry not found", pe_exception::resource_data_entry_not_found);
 
-	return resource_data_info(entries.at(index).get_data_entry()); //Data directory
+	return resource_data_info(entries[index].get_data_entry()); //Data directory
 }
 }

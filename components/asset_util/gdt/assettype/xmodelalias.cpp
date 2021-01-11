@@ -11,7 +11,7 @@ XModelAlias::XModelAlias()
 {
 	for (int i = 0; i < XMODELALIAS_MODELCOUNT; i++)
 	{
-		this->model[i] = "";
+		this->model[i].clear();
 	}
 }
 

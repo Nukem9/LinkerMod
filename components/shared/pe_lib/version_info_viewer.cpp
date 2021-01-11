@@ -82,7 +82,7 @@ const version_info_viewer::translation_list version_info_viewer::get_translation
 			<< std::setw(4) << std::setfill(L'0') <<  (*it).second;
 
 		//Save it
-		ret.push_back(ss.str());
+		ret.emplace_back(ss.str());
 	}
 
 	return ret;

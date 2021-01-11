@@ -75,7 +75,7 @@ const std::string resource_cursor_icon_reader::get_single_icon_by_id(uint32_t id
 		throw pe_exception("Resource data entry not found", pe_exception::resource_data_entry_not_found);
 
 	//Get icon headers
-	std::string icon_data(lookup_icon_group_data_by_icon(id, languages.at(index)));
+	std::string icon_data(lookup_icon_group_data_by_icon(id, languages[index]));
 	//Append icon data
 	icon_data.append(res_.get_resource_data_by_id(pe_resource_viewer::resource_icon, id, index).get_data());
 	return icon_data;
@@ -263,7 +263,7 @@ const std::string resource_cursor_icon_reader::get_single_cursor_by_id(uint32_t 
 	
 	std::string raw_cursor_data(res_.get_resource_data_by_id(pe_resource_viewer::resource_cursor, id, index).get_data());
 	//Get cursor headers
-	std::string cursor_data(lookup_cursor_group_data_by_cursor(id, languages.at(index), raw_cursor_data));
+	std::string cursor_data(lookup_cursor_group_data_by_cursor(id, languages[index], raw_cursor_data));
 	//Append cursor data
 	cursor_data.append(raw_cursor_data.substr(sizeof(uint16_t) * 2 /* hotspot position */));
 	return cursor_data;
