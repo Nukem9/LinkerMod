@@ -104,10 +104,10 @@ void R_BuildSpotLightInfo(float* source, GfxLight* light, float spotShadowFade)
 	const float farEdge = g_lightInfo.kvs.far_edge; //0.0f;
 
 	vec4 aAbB; // = { 0.0f, 1.0f, 0.0f, 1.0f };
-	memcpy(&aAbB, &g_lightInfo.kvs.superellipse, sizeof(vec4));
+	memcpy(&aAbB, &g_lightInfo.kvs.superellipse, sizeof(aAbB));
 
 	vec4 attenuation; // = { 1.0f, 0.0f, 0.0f, 0.0f };
-	memcpy(&attenuation, &g_lightInfo.kvs.attenuation, sizeof(vec3));
+	memcpy(&attenuation, &g_lightInfo.kvs.attenuation, sizeof(attenuation));
 
 	vec4 fallOff;
 	fallOff.x = cutOn;
@@ -115,8 +115,8 @@ void R_BuildSpotLightInfo(float* source, GfxLight* light, float spotShadowFade)
 	fallOff.z = ((light->radius - cutOn) * nearEdge) + cutOn;
 	fallOff.w = ((light->radius - cutOn) * farEdge) + cutOn;
 
-	memcpy(&g_lightInfo.aAbB, &aAbB, sizeof(vec4));
-	memcpy(&g_lightInfo.attenuation, &attenuation, sizeof(vec4));
+	memcpy(&g_lightInfo.aAbB, &aAbB, sizeof(g_lightInfo.aAbB));
+	memcpy(&g_lightInfo.attenuation, &attenuation, sizeof(g_lightInfo.attenuation));
 
 	vec4 angles = { 0.0f, 0.0f, 0.0f, 0.0f };
 	memcpy(&angles, light->angles, sizeof(float) * 3);

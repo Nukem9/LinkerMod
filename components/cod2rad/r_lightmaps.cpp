@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 #define LOG_VEC_EQ(A,B) if (A != B) { printf("(%f) %f %f %f == %f %f %f\n", Vec3Variance(&A, &B), A.x, A.y, A.z, B.x, B.y, B.z); }
 
@@ -467,13 +467,13 @@ void ImproveLightingApproximation(vec3* lighting, vec3 *highlightDir, vec3* pel_
 			}
 		}
 
-		*pel_amb = new_pel_amb;
-		*pel_dir = new_pel_dir;
+		*pel_amb = std::move(new_pel_amb);
+		*pel_dir = std::move(new_pel_dir);
 
 		initialByteDir[0] = updatedByteDir[0];
 		initialByteDir[1] = updatedByteDir[1];
 
-		*highlightDir = dir;
+		*highlightDir = std::move(dir);
 
 		error = curError;
 	}

@@ -994,7 +994,7 @@ void pe_base::read_pe(std::istream& file, bool read_debug_raw_data)
 					if(file.bad() || file.eof())
 						throw pe_exception("Error reading file", pe_exception::error_reading_file);
 
-					debug_data_.insert(std::make_pair(directory.PointerToRawData, data));
+					debug_data_.emplace(directory.PointerToRawData, data);
 				}
 
 				//Go to next debug entry

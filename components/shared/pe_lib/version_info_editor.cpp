@@ -85,7 +85,7 @@ void version_info_editor::set_property(const std::wstring& property_name, const 
 			it = strings_edit_.begin();
 			if(it == strings_edit_.end()) //If there's no any translation table, add default one
 			{
-				it = strings_edit_.insert(std::make_pair(default_language_translation, string_values_map())).first;
+				it = strings_edit_.emplace(default_language_translation, string_values_map()).first;
 				//Also add it to translations list
 				add_translation(default_language_translation);
 			}
@@ -96,7 +96,7 @@ void version_info_editor::set_property(const std::wstring& property_name, const 
 		it = strings_edit_.find(translation); //Find specified translation table
 		if(it == strings_edit_.end()) //If there's no translation, add it
 		{
-			it = strings_edit_.insert(std::make_pair(translation, string_values_map())).first;
+			it = strings_edit_.emplace(translation, string_values_map()).first;
 			//Also add it to translations list
 			add_translation(translation);
 		}
@@ -125,7 +125,7 @@ void version_info_editor::add_translation(uint16_t language_id, uint16_t codepag
 			return;
 	}
 
-	translations_edit_.insert(std::make_pair(language_id, codepage_id));
+	translations_edit_.emplace(language_id, codepage_id);
 }
 
 //Removes translation from translations and strings lists

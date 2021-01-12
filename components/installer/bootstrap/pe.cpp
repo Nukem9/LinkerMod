@@ -41,7 +41,7 @@ namespace pe {
 		};
 
 		const auto _module = FormatName(moduleName);
-		const auto _symbol = symbolName != nullptr ? FormatName(symbolName) : std::string("");
+		const auto _symbol = symbolName != nullptr ? FormatName(symbolName) : std::string();
 
 		// Iterate over all modules used by the given image
 		const auto moduleList = get_imported_functions(image);

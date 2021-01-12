@@ -622,7 +622,7 @@ const image_directory rebuild_exports(pe_base& pe, const export_info& info, expo
 		
 		//If function is named, save its name ordinal and name in sorted alphabetically order
 		if(func.has_name())
-			funcs.insert(std::make_pair(func.get_name(), static_cast<uint16_t>(func.get_ordinal() - ordinal_base))); //Calculate name ordinal
+			funcs.emplace(func.get_name(), static_cast<uint16_t>(func.get_ordinal() - ordinal_base)); //Calculate name ordinal
 
 		//If function is forwarded to another DLL
 		if(func.is_forwarded())

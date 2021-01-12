@@ -482,7 +482,7 @@ int Rip_SoundBank_Soundalias_Callback_f(ForeignPointer<SndBank>& bank, ForeignPo
 
 	std::string language = "<error>";
 
-	auto _offset = name.find_last_of(".");
+	auto _offset = name.find_last_of('.');
 	if (_offset != std::string::npos && _offset + 1 < name.size())
 		language = std::string(name, _offset + 1);
 	else
@@ -510,7 +510,7 @@ int Rip_SoundBank_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZone
 }
 
 
-int Rip_Snapshot_Callback_f(std::string name, std::vector<ForeignPointer<snd_snapshot>>& snapshots)
+int Rip_Snapshot_Callback_f(const std::string& name, std::vector<ForeignPointer<snd_snapshot>>& snapshots)
 {
 	Con_Print("Exporting snapshot %s.snapshot.csv...\n", name.c_str());
 
@@ -564,7 +564,7 @@ int Rip_Snapshot_Callback_f(std::string name, std::vector<ForeignPointer<snd_sna
 	return 0;
 }
 
-int Rip_Radverb_Callback_f(std::string name, std::vector<ForeignPointer<snd_radverb>>& radverbs)
+int Rip_Radverb_Callback_f(const std::string& name, std::vector<ForeignPointer<snd_radverb>>& radverbs)
 {
 	Con_Print("Exporting snapshot %s.radverb.csv...\n", name.c_str());
 

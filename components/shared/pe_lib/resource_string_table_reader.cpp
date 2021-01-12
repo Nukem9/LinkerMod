@@ -45,13 +45,13 @@ const resource_string_list resource_string_table_reader::parse_string_list(uint3
 		{
 			//Create and save string (UNICODE)
 #ifdef PE_BLISS_WINDOWS
-			ret.insert(
-				std::make_pair(static_cast<uint16_t>(((id - 1) << 4) + i), //ID of string is calculated such way
-				std::wstring(reinterpret_cast<const wchar_t*>(resource_data.data() + passed_bytes), string_length)));
+			ret.emplace(
+				static_cast<uint16_t>(((id - 1) << 4) + i), //ID of string is calculated such way
+				std::wstring(reinterpret_cast<const wchar_t*>(resource_data.data() + passed_bytes), string_length));
 #else
-			ret.insert(
-				std::make_pair(static_cast<uint16_t>(((id - 1) << 4) + i), //ID of string is calculated such way
-				pe_utils::from_ucs2(u16string(reinterpret_cast<const unicode16_t*>(resource_data.data() + passed_bytes), string_length))));
+			ret.emplace(
+				static_cast<uint16_t>(((id - 1) << 4) + i), //ID of string is calculated such way
+				pe_utils::from_ucs2(u16string(reinterpret_cast<const unicode16_t*>(resource_data.data() + passed_bytes), string_length)));
 #endif
 		}
 

@@ -36,5 +36,5 @@ int Rip_SoundBank_GatherSnapshots_Callback_f(ForeignPointer<XAsset>& asset, Fore
 int Rip_SoundBank_GatherRadverbs_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName>& zoneName, void* data);
 
 int Rip_SoundBank_Callback_f(ForeignPointer<XAsset>& asset, ForeignPointer<XZoneName>& zoneName, void* data);
-int Rip_Snapshot_Callback_f(std::string name, std::vector<ForeignPointer<snd_snapshot>>& snapshots);
-int Rip_Radverb_Callback_f(std::string name, std::vector<ForeignPointer<snd_radverb>>& radverbs);
+int Rip_Snapshot_Callback_f(const std::string& name, std::vector<ForeignPointer<snd_snapshot>>& snapshots);
+int Rip_Radverb_Callback_f(const std::string& name, std::vector<ForeignPointer<snd_radverb>>& radverbs);

@@ -509,6 +509,7 @@ int FF_FFExtract(const char* filepath, const char* filename)
 		//Any fastfiles that claim they decompress to a file >= 1GB
 		//are either corrupt or do not belong to the vanilla game
 		Con_Error("ERROR: Skipping %s\n", filename);
+		delete[] cBuf;
 		return 1;
 	}
 

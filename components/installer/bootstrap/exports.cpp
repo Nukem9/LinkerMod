@@ -33,7 +33,7 @@ extern "C" {
 	bool __stdcall LMI_SetInstallPath(const char* path)
 	{
 		const std::string binaryPath = FS::JoinPath(path, "BlackOps.exe");
-		return FS::FileExists(binaryPath.c_str());
+		return FS::FileExists(binaryPath);
 	}
 
 	int __stdcall LMI_CompareVersions(const char* a, const char* b)

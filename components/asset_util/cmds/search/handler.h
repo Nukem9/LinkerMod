@@ -211,17 +211,14 @@ class Handler
 			_SlotHandleData_f HandlerCallback=Handler::_SlotHandleData_DefaultCallback,
 			_SlotInit_f InitCallback = Handler::_SlotInit_DefaultCallback,
 			_SlotPostInit_f PostInitCallback = Handler::_SlotPostInit_DefaultCallback)
+		: input_data(source_data), input_index(0),
+		_SlotInit_Callback(InitCallback),
+		_SlotPostInit_Callback(PostInitCallback),
+		_SlotHandleData_Callback(HandlerCallback)
 	{
 		numSlots = _slotCount;
 		slots = new _SLOT_T *[numSlots];
 		memset(slots, 0, sizeof(_SLOT_T *) * numSlots);
-
-		input_data = source_data;
-		input_index = 0;
-
-		_SlotInit_Callback = InitCallback;
-		_SlotPostInit_Callback = PostInitCallback;
-		_SlotHandleData_Callback = HandlerCallback;
 	}
 
 	~Handler()

@@ -101,7 +101,7 @@ static void FixupFunction(ULONG_PTR Address, ULONG_PTR DestAddress)
 	PatchMemory(Address + 1, (PBYTE)&data, 4);
 }
 
-static bool StrEndsWith (std::string str, std::string substr)
+static bool StrEndsWith (const std::string &str, const std::string &substr)
 {
     if (str.length() >= substr.length())
         return (0 == str.compare (str.length() - substr.length(), substr.length(), substr));

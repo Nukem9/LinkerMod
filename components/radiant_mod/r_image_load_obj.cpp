@@ -342,7 +342,7 @@ bool Image_LoadFromFileWithReader(GfxImage *image, int (__cdecl * OpenFileRead)(
 	int picmip				= image->picmip.platform[/*useFastFile->current.enabled == 0*/0];
 	char streamedMipLevels	= picmip > 0;
 
-	int readSize			= fileHeader.fileSizeForPicmip[picmip > 0] - 48;
+	int readSize			= fileHeader.fileSizeForPicmip[streamedMipLevels] - 48;
 	char *imageData			= (char *)Z_Malloc(readSize);
 
 	if (FS_Read(imageData, readSize, fileHandle) == readSize)
